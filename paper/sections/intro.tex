@@ -1,0 +1,257 @@
+\section{Introduction}
+\label{sec:intro}
+
+Most modern  programming languages support dynamic  allocation of heap
+data.  Static  analysis of heap data  is much harder  than analysis of
+static   and   stack   data.    Garbage   collectors,   for   example,
+conservatively  approximate  the liveness  of  heap  objects by  their
+reachability  from a  set of  memory  locations called  the {\em  root
+  set\/}.  Consequently, many objects  that are reachable but not live
+remain  uncollected, causing  a  larger-than-necessary memory  demand.
+This is confirmed  by empirical studies on Haskell~\cite{rojemo96lag},
+Scheme~\cite{karkare06effectiveness}                                and
+Java~\cite{shaham02estimating} programs.
+
+Here we consider a first-order  pure functional language and propose a
+liveness  analysis  which  annotates  various program  points  with  a
+description  of variables and  fields whose  object references  may be
+dereferenced  in the future.   The garbage  collector then  only marks
+objects pointed by live references and leaves other, merely reachable,
+objects  to  be  reclaimed.    (Although  not  strictly  necessary,  a
+collector  would  normally {\em  nullify}  dead  variables and  fields
+rather than leaving dangling  references.)  Since there are fewer live
+objects   than   reachable   objects,   more  memory   is   reclaimed.
+Additionally, since  the collector traverses a smaller  portion of the
+heap, the time spent for each collection is also smaller.  The work is
+presented in  the context of a  stop-the-world non-incremental garbage
+collector (mark-and-sweep,  compacting or  copying) for which  we also
+show a  monotonicity result: that  our technique can never  cause more
+garbage  collections  to  occur   in  spite  of  changing  the  rather
+unpredictable  execution  points   at  which  collections  occur.   We
+anticipate that our technique  is applicable to more modern collectors
+(generational,  concurrent, parallel),  but leave  such  extensions to
+future work.
+
+We first define a {\em fully context-sensitive} (in the sense that its
+results  are unaffected  by function  inlining) liveness  analysis and
+prove it  correct.  However, fully context-sensitive  methods often do
+not scale,  and this analysis would  also require us  to determine, at
+run-time,  the internal  liveness of  a  function body  at each  call.
+Hence,   similarly   to   the   0-CFA   approach,   we   determine   a
+context-independent {\em summary} of  liveness for each function which
+safely   approximates   the   context-dependence   of   all   possible
+calls~\cite{chatterjee99relevant,cherem07fast,lee05static}.       (Note
+that  an intraprocedural context-insensitive  method which  assumes no
+information  about function  callers would  be too  imprecise  for our
+needs.)   In essence  our approach  sets up  interprocedural data-flow
+equations for the liveness summaries  of functions and shows how these
+can be solved symbolically  as context-free grammars (CFGs)\@.  We can
+then determine  a CFG  for each program  point; these are  then safely
+approximated with  finite-state automata  which are encoded  as tables
+for each program point.  For  garbage collection purposes only {\em GC
+  points}  (program points  representing  calls, to  $\CONS$  or to  a
+user-function) need to be stored.
+% which may call eventually call $\CONS$, need to be stored.
+
+We  previously proposed  an intraprocedural  method for  heap liveness
+analysis   for   a   Java-like   language~\cite{khedker07heap}   which
+statically inserted  statements nullifying dead  references to improve
+garbage collection; by  contrast nullification here occurs dynamically
+(which can work better with  aliasing) when the garbage collector acts
+on  liveness  annotations  to  avoid traversing  dead  references.   A
+workshop    paper~\cite{karkare07liveness}    outlined    the    basic
+0-CFA-style-summary  interprocedural  approach  to  functional-program
+liveness  analysis.   The  current  paper adds  the  context-sensitive
+analysis and better formalization along with experimental results.
+%   to  substantiate our ideas.
+
+\kern -3pt   %% AM: a very small tweak to get back to 2 pages for this
+             %% section.
+%% AM: rewrite the next paragraph to save 3-4 words and remove this \kern.
+
+
+%------------------------------------------------------------%
+\setcounter{page}{2}
+\subsubsection{Motivating Example}
+\label{sec:motiv}
+
+Figure~\ref{fig:mot-example}(a) shows  an example program.   The label
+$\pi$ of an expression $e$  denotes a program point.  During execution
+of  the program, it  represents the  instant of  time just  before the
+evaluation  of  $e$.  
+%%While we discuss liveness, it  will also be important to consider an
+%%instance of time  just after the execution of  an expression, though
+%%we shall not be required to mark it with a label.
+% memory as  a (possibly  disconnected) directed
+% acyclic   graph.\footnote{Since  the   language   under  consideration
+%   (Section~\ref{sec:defs}) does not  have any imperative features, the
+%   heap cannot  have cycles.}
+% Here all data  is assumed to  be boxed, i.e.\
+% stored in heap and accessed through references.
+We  view the  heap  as a graph.  
+Nodes in the heap, also  called  ($\CONS$) {\em  cells\/} contain $\CAR$ and $\CDR$ {\em fields}
+containing values.  Edges in the graph are {\em references} and
+emanate from {\em variables} or fields.
+Variable and field values may also be atomic values ($\NIL$, integers etc.)
+While it is convenient to box these in diagrams, our presented
+analysis treats them as non-heap values.
+
+Figure~\ref{fig:mot-example}(b)  shows the heap at $\pi$.
+The edges shown  by thick arrows are those  which are made live by the
+program. In addition,  assuming that
+the value of any reachable part of the program result may be explored
+or printed, the edges marked by thick dashed arrows are also live.
+A cell  is  marked and preserved  during  garbage collection,  only  if it  is
+reachable from the  root set through a path of  live edges.  All other
+cells can be  reclaimed.  Thus if  a garbage collection takes
+% place   at    the   time   represented   by   the    heap   shown   in
+at $\pi$ with the    heap   shown   in
+Figure~\ref{fig:mot-example}(b), only the cells $\pw$ and $(\CDR~ \pw)$, along with $(\CAR~(\CDR~\pw))$ and all cells reachable from it,
+will be marked and preserved.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% MOTIVATING EXAMPLE
+\newcommand{\nilfigure}
+{\scalebox{0.75}{
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,0)(1,1)
+%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
+\putnode{start}{origin}{0}{0}{}
+\putnode{stop}{origin}{10}{10}{}
+\ncline[offsetB=0,nodesepB=0,linewidth=.7]{-}{start}{stop} %here
+\end{pspicture}
+}}
+
+
+\begin{figure}[t!]
+%%%%{\color{Myblue}
+\begin{picture}(100,130)(0,-90)
+%  \begin{center}
+    \begin{tabular}{cc}
+\begin{boxedminipage}{.5\textwidth}
+      {\sf
+	\renewcommand{\arraystretch}{1}{
+	  \begin{uprogram}
+	  \UFL\ \hspace*{-.31\TAL} (\DEFINE\ (\append\  \lista\ \listb)
+	  \UNL{0}  (\SIF~(\NULLQ \ \lista)
+	       \listb
+	  \UNL{1}      (\CONS\ (\CAR\  \lista)
+%          \UNL{2}          (\CAR\  \lista)
+	  \UNL{2}\;\;\;\;\;          (\append\ (\CDR\  \lista)
+          \listb))))
+          \UNL{0}
+	  \UNL{0} \hspace*{-.49\TAL} (\LET\ z  $\leftarrow$(\CONS\ (\CONS\ $4$ (\CONS\ $5$ \NIL))
+	  \UNL{3}\ \ \ \  (\CONS\ $6$ \NIL)) \IN
+	  \UNL{0} (\LET\ y  $\leftarrow$ (\CONS\ $3$ \NIL) \IN
+	  \UNL{1}   (\LET\ w $\leftarrow$ (\append\ y z)\ \IN
+	  \UNL{1}               $\,\,\,\,\,\,\,\,\pi$:(\CAR\ (\CDR\ w)))))
+	\end{uprogram}
+      }} 
+\end{boxedminipage}
+      &
+      \raisebox{-25mm}{\scalebox{.75}{
+	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
+      \psset{unit=1mm}
+      \psset{linewidth=.3mm}
+      \begin{pspicture}(0,-5)(70,60)
+	%\psframe(0,0)(73,60)
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\putnode{o}{origin}{13}{50}{\TwoCells{o1}{o2}}
+	\putnode{a}{o}{-10}{-15}{\psframebox{3}}
+%	\putnode{b}{o}{10}{-15}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
+	\ncline[offsetB=-.5,nodesepB=.1]{*->}{o1}{a}
+	%\aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
+	%      fillcolor=white]{$\times$}}}
+        \putnode{b}{o}{0}{-3}{\psframebox[linestyle=none,framesep=.5]{\scalebox{.63}{\nilfigure}}}
+%	\ncline[offsetB=-.5,nodesepB=.1]{*->}{o2}{b}
+	%\ncline[offsetB=-.5,nodesepB=.1]{->}{o2}{b}
+	\putnode{y}{o}{-14}{8}{\psframebox[linestyle=none,framesep=.5]{y}}
+	\nccurve[nodesepB=-.2,angleA=330,angleB=120]{->}{y}{o}
+	\aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
+		  fillcolor=white]{$\times$}}}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\putnode{c}{o}{25}{0}{\TwoCells{c1}{c2}}
+	\putnode{d}{c}{10}{-10}{\TwoCells{d1}{d2}}
+	\putnode{e}{d}{-13}{-12}{\TwoCells{e1}{e2}}
+	\putnode{f}{d}{13}{-12}{\TwoCells{f1}{f2}}
+	\ncline[nodesepB=-.5]{*->}{c2}{d}
+	\ncline[nodesepB=-.5,linewidth=.7]{->}{c2}{d}
+	\nccurve[ncurv=1,angleA=270,angleB=330]{*->}{c1}{a}
+	\aput[-3.5](.2){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
+	      fillcolor=white]{$\times$}}}
+	\nccurve[nodesepB=-.5,angleA=240,angleB=70]{*->}{d1}{e}
+	\nccurve[nodesepB=-.5,angleA=240,angleB=70,linewidth=.7]{->}{d1}{e}
+	\nccurve[nodesepB=-.5,angleA=300,angleB=110]{*->}{d2}{f}
+	\aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
+	      fillcolor=white]{$\times$}}}
+	\putnode{w}{c}{-8}{8}{\psframebox[linestyle=none,framesep=.2]{w}}
+	\putnode{ww}{c}{15}{8}{\psframebox[linestyle=none,framesep=.2]{z}}
+	\nccurve[nodesepB=-.2,angleA=330,angleB=120,linewidth=.7]{->}{w}{c}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\putnode{g}{e}{-8}{-12}{\psframebox{4}}
+	\putnode{h}{e}{8}{-14}{\TwoCells{h1}{h2}}
+	\putnode{i}{f}{-8}{-11}{\psframebox{6}}
+%	\putnode{j}{f}{8}{-11}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
+	\ncline[offsetB=-.5,nodesepB=.1]{*-}{e1}{e1}
+	\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{e1}{g}
+        %here
+        \putnode{j1}{f}{0}{-3}{\psframebox[linestyle=none,framesep=0]{\scalebox{.63}{\nilfigure}}}
+        \putnode{j2}{h}{0}{-3}{\psframebox[linestyle=none,framesep=.5]{\scalebox{.63}{\nilfigure}}}
+
+%        \aput[-3.2](.6){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,fillstyle=solid,
+%	      fillcolor=white]{$\times$}}} %and here
+	\ncline[offsetB=-.5,nodesepB=-.3]{*-}{e2}{e2}
+	\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{e2}{h} 
+%	\aput[-3.2](.5){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,fillstyle=solid,
+%	      fillcolor=white]{$\times$}}} %and here
+
+	\ncline[offsetB=-.5,nodesepB=.1]{*->}{f1}{i}
+	\ncline[offsetB=-.5,nodesepB=.1]{*->}{f2}{j}
+	\nccurve[nodesepB=-.2,angleA=270,angleB=90]{->}{ww}{d}
+	\aput[-3.2](.4){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,fillstyle=solid,
+	      fillcolor=white]{$\times$}}}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\putnode{k}{h}{-8}{-11}{\psframebox{5}}
+%	\putnode{l}{h}{8}{-11}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
+	\ncline[offsetB=-.5,nodesepB=.1]{*-}{h1}{h1}
+	\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{h1}{k}
+%	\ncline[offsetB=-.5,nodesepB=.1]{*->}{h2}{l}
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+      \end{pspicture}}} \\
+      (a) Example program.&
+      \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
+	(b) Memory graph at $\pi$. Thick edges denote \\
+        {\white (b) }live links. Traversal stops at edges marked\\
+        {\white (b) }$\times$  during garbage collection.
+      \end{tabular}}
+    \end{tabular}
+\end{picture}
+
+\kern -3ex
+
+\caption{Example Program and its Memory Graph.}\label{fig:mot-example}    
+%  \end{center}
+%%%%}\color{Myblue} end
+\end{figure}
+
+
+\subsubsection{Organization of the paper}
+Section~\ref{sec:defs} gives
+the syntax and semantics of
+the language used to illustrate our analysis along with basic concepts
+and    notations.
+% Section~\ref{sec:operational}   describes    the
+% operational semantics  of the  language.
+Liveness analysis is described in
+Section~\ref{sec:liveness} followed by a sketch of a correctness
+proof relative to a non-standard semantics.
+Section~\ref{sec:computing} shows how to encode liveness as
+finite-state automata.
+Section~\ref{sec:experiments}   reports   experimental   results and
+Section~\ref{sec:lgc-always-better} proves that a liveness based
+collector can never do more garbage collections than a reachability
+based collector. 
+% and Section~\ref{sec:conclusion} concludes the paper.
+
