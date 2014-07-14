@@ -1,0 +1,9 @@
+git clone https://amit23358@bitbucket.org/iitbfhra/livenstrict.git
+git pull
+git add
+git config --global user.name "Prasanna"
+git config --global user.email as@cse.iitb.ac.in
+git commit plan-for-liveNstrict.xoj -m "Plan for liveness-and-strictness paper"
+git commit -a
+git push
+
