@@ -1,9 +1,14 @@
-Current garbage collectors  leave much heap-allocated data uncollected
-because they preserve data {\em reachable} from a root set.
-% However, it is only necessary to preserve {\em live} data---a subset of
-% reachable data.
-However, only  {\em live} data---a subset of  reachable data---need be
-preserved.
+
+{\color{red}
+The memory  requirement of a lazy functional  programming language can
+be decreased  in two ways. One can  use the result a  of {\em liveness
+analysis}  to preserve only  {\em live}  data---a subset  of reachable
+data---during garbage collection. Apart  from evaluated data this will
+also  results  in  early  release  of  memory  hogging  closures.   In
+addition, one  can also  evaluate closures that  are guaranteed  to be
+evaluated in  the future.  The  information that is required  for this
+eager evaluation comes from {\em strictness analysis}.
+}
 
 Using   a    first-order   functional   language    we   formulate   a
 context-sensitive liveness  analysis for structured data  and prove it
@@ -13,8 +18,6 @@ finite-state  automaton---which   the  garbage-collector  inspects  to
 curtail reachability  during marking. As  a result, fewer  objects are
 marked  (albeit  with a  more  expensive  marker)  and then  preserved
 (e.g.\ by a copy phase).
-% and secondly because of the consequent
-%reduced number of collections during a computation.
 
 Experiments  confirm the  expected performance  benefits---increase in
 garbage  reclaimed  and  a   consequent  decrease  in  the  number  of
