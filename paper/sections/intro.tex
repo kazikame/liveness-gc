@@ -1,77 +1,63 @@
 \section{Introduction}
 \label{sec:intro}
 
-Most modern  programming languages support dynamic  allocation of heap
-data.  Static  analysis of heap data  is much harder  than analysis of
-static   and   stack   data.    Garbage   collectors,   for   example,
-conservatively  approximate  the liveness  of  heap  objects by  their
-reachability  from a  set of  memory  locations called  the {\em  root
-  set\/}.  Consequently, many objects  that are reachable but not live
-remain  uncollected, causing  a  larger-than-necessary memory  demand.
-This is confirmed  by empirical studies on Haskell~\cite{rojemo96lag},
-Scheme~\cite{karkare06effectiveness}                                and
-Java~\cite{shaham02estimating} programs.
+Functional  programming  languages  depend  on  garbage  collector  to
+efficiently  reclaim  unused  memory   allocated  by  programs  either
+explicitly (for example using constructors) or implicitly (for example
+for      closures).       However,      empirical      studies      on
+Haskell~\cite{rojemo96lag},  Scheme~\cite{karkare06effectiveness}  and
+Java~\cite{shaham02estimating}  programs   have  shown   that  garbage
+collectors leave uncollected a lot of memory objects that are not live
+(here {\em live}ness  means the object can potentially be  used by the
+program at  a later  stage).  Due  to lack of  a suitable  analysis to
+distinguish  reachable  objects  from live  objects.  current  garbage
+collectors conservatively approximate the  liveness of heap objects by
+their reachability from a set of memory locations called the {\em root
+  set\/} resulting in unnecessary memory usage.
 
-Here we consider a first-order  pure functional language and propose a
-liveness  analysis  which  annotates  various program  points  with  a
-description  of variables and  fields whose  object references  may be
-dereferenced  in the future.   The garbage  collector then  only marks
-objects pointed by live references and leaves other, merely reachable,
-objects  to  be  reclaimed.    (Although  not  strictly  necessary,  a
-collector  would  normally {\em  nullify}  dead  variables and  fields
-rather than leaving dangling  references.)  Since there are fewer live
-objects   than   reachable   objects,   more  memory   is   reclaimed.
-Additionally, since  the collector traverses a smaller  portion of the
-heap, the time spent for each collection is also smaller.  The work is
-presented in  the context of a  stop-the-world non-incremental garbage
-collector (mark-and-sweep,  compacting or  copying) for which  we also
-show a  monotonicity result: that  our technique can never  cause more
-garbage  collections  to  occur   in  spite  of  changing  the  rather
-unpredictable  execution  points   at  which  collections  occur.   We
-anticipate that our technique  is applicable to more modern collectors
-(generational,  concurrent, parallel),  but leave  such  extensions to
-future work.
+Languages having lazy  semantics for evaluation put  further demand on
+memory as they  require heap allocated closure to be  carried from the
+point of occurrence  of an expression to the point  of (first) real use
+of  that expression.  Strictness analysis~\cite{some-refs}  statically
+determines  the  patterns  of  future usage  of  an  expression,  thus
+allowing some  of the  closures to  be evaluated at  the point  of the
+occurrence of the corresponding expression.
 
-We first define a {\em fully context-sensitive} (in the sense that its
-results  are unaffected  by function  inlining) liveness  analysis and
-prove it  correct.  However, fully context-sensitive  methods often do
-not scale,  and this analysis would  also require us  to determine, at
-run-time,  the internal  liveness of  a  function body  at each  call.
-Hence,   similarly   to   the   0-CFA   approach,   we   determine   a
-context-independent {\em summary} of  liveness for each function which
-safely   approximates   the   context-dependence   of   all   possible
-calls~\cite{chatterjee99relevant,cherem07fast,lee05static}.       (Note
-that  an intraprocedural context-insensitive  method which  assumes no
-information  about function  callers would  be too  imprecise  for our
-needs.)   In essence  our approach  sets up  interprocedural data-flow
-equations for the liveness summaries  of functions and shows how these
-can be solved symbolically  as context-free grammars (CFGs)\@.  We can
-then determine  a CFG  for each program  point; these are  then safely
-approximated with  finite-state automata  which are encoded  as tables
-for each program point.  For  garbage collection purposes only {\em GC
-  points}  (program points  representing  calls, to  $\CONS$  or to  a
-user-function) need to be stored.
-% which may call eventually call $\CONS$, need to be stored.
+We propose the  use of liveness analysis of heap  cells and strictness
+analysis  of expressions  to  reduce the  memory  requirement of  lazy
+functional  programming languages.   We modify  garbage collectors  to
+preserve  only {\em  live} data---a  subset of  {\em reachable  data}.
+This results in an increase  in the garbage reclaimed and consequently
+in fewer  garbage collections.  Further, we eagerly evaluate closures
+that are guaranteed to be evaluated in the future (strict closures).
 
-We  previously proposed  an intraprocedural  method for  heap liveness
-analysis   for   a   Java-like   language~\cite{khedker07heap}   which
-statically inserted  statements nullifying dead  references to improve
-garbage collection; by  contrast nullification here occurs dynamically
-(which can work better with  aliasing) when the garbage collector acts
-on  liveness  annotations  to  avoid traversing  dead  references.   A
-workshop    paper~\cite{karkare07liveness}    outlined    the    basic
-0-CFA-style-summary  interprocedural  approach  to  functional-program
-liveness  analysis.   The  current  paper adds  the  context-sensitive
-analysis and better formalization along with experimental results.
-%   to  substantiate our ideas.
+The main contribution  of this paper is an uniform  framework for {\em
+  liveness} and {\em strictness}  analysis to enable the optimizations
+mentioned  above. Using  a central  notion of  demand, we  formulate a
+context-sensitive liveness  analysis for structured data  and prove it
+correct.  We then  present strictness as a dual of  liveness. We use a
+0-CFA-like conservative approximation to  annotate each allocation and
+function-call program point with  a finite-state automaton---which the
+garbage-collector inspects to curtail reachability during marking. The
+result of  the strictness analysis,  being necessarily finite,  can be
+directly used to insert code to evaluate closures.
 
-\kern -3pt   %% AM: a very small tweak to get back to 2 pages for this
-             %% section.
-%% AM: rewrite the next paragraph to save 3-4 words and remove this \kern.
+We previously proposed an interprocedural liveness analysis to improve
+garbage collection first order eager subset of Scheme~\cite{cc-paper}.
+The current paper extends the work to handle lazy evaluation semantics
+for the same language.
+
+Experiments  confirm  the  expected  performance benefits.  The  early
+evaluation   of   closures  decreases   the   memory   demands  of   a
+program. Further,  liveness-based collection results in  a increase in
+garbage  reclaimed  and  a   consequent  decrease  in  the  number  of
+collections, a decrease  in the memory size required  to run programs,
+and  reduced  overall  garbage  collection  time  for  a  majority  of
+programs.
+
 
 
 %------------------------------------------------------------%
-\setcounter{page}{2}
 \subsubsection{Motivating Example}
 \label{sec:motiv}
 
