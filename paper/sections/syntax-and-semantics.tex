@@ -1,0 +1,295 @@
+
+
+\section{The target language---syntax and semantics}
+\label{sec:defs}
+We let $x$, $y$, $z$ range over variables, $f$ over user-functions and
+$p$ over  primitive functions ($\CONS$, $\PRIM$ etc.).   The syntax of
+our language  is shown  in Figure~\ref{fig:lang-syntax}; it  has eager
+semantics and  restricts programs to be in  Administrative Normal Form
+(ANF)~\cite{chakravarty03perspective}  where all actual  parameters to
+functions   are   variables.   This   restriction   does  not   affect
+expressibility (and indeed we feel  free to ignore it in examples when
+inessential). In addition, this  form also explicates the formation of
+closures.  We further  require  that  each variable  in  a program  is
+distinct, so  that no scope shadowing  occurs---this simplifies proofs
+of soundness.  In this  formulation expressions: either perform a test
+($\SIF$), make a computation step ($\LET$) or return ($\RETURN$).  The
+$\RETURN$ keyword is logically redundant, but we find it clarifies the
+semantics and analysis.
+
+
+The body of the program is
+the  expression denoted  by  $e_\mainpgm$; for analysis purposes
+it is convenient
+to regard $e_\mainpgm$ as part of a function definition
+$(\DEFINE\ ({\tt main})\ e_\mainpgm)$ as in C\@.
+% As  mentioned earlier,
+We write  $\pi\!:\!e$ to  associate the label  $\pi$ (not part  of the
+language syntax) with the program point just before expression $e$.
+
+% \paragraph{Inlining.}
+In spite of the ANF restrictions it is still possible
+to inline non-recursive functions (a fact we use to prove the safety
+of liveness analysis).  A user-function call
+$(\LET\,\, x \leftarrow (f\,y_1\,\ldots\,y_n) \,\, \IN\,\, e)$
+to a function defined
+(after renaming its formals and locals to be disjoint from existing variables)
+by $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ e_f)$
+is replaced by a sequence of $\LET$'s of the form
+$z_i\leftarrow (\ID\,\,y_i)$ followed by
+the body $e_f$ but with its $(\RETURN\,\,w)$ expressions replaced by
+$(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.
+
+\begin{figure}[t!]
+\footnotesize
+\begin{eqnarray*}
+   p \in \mathit{Prog} & ::= & d_1 \ldots d_n \,\, e_\mainpgm
+    \hspace{7em} \mbox{\em --- program}\\
+    d \in Fdef & ::= & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots \,\,x_n)\,\,
+    e) 
+    \hspace{1.7em} \mbox{\em --- function definition} \\
+e \in \mathit{Expr} & ::= &
+\left\{\begin{array}{ll@{\hspace{4em}}l}
+       (\SIF\,\, x\,\, e_1\,\, e_2) && \mbox{\em --- conditional} \\ 
+       (\LET\,\, x \leftarrow s\,\, \IN\,\, e) && \mbox{\em --- let binding} \\
+       (\RETURN\,\, x) && \mbox{\em --- return from function}
+    \end{array}\right. \\
+s \in \mathit{Stmt} & ::= &
+\left\{\begin{array}{lr@{\hspace{1em}}l}
+       k && \mbox{\em --- constant (numeric or $\NIL$)}\\
+       (\CONS\,\, x_1\,\, x_2) && \mbox{\em --- constructor} \\ 
+       (\CAR\,\, x) &  (\CDR\,\, x) & \mbox{\em --- selectors} \\ 
+       (\NULLQ\,\, x) & (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester and generic arithmetic} \\ 
+%        (\NULLQ\,\, x) && \mbox{\em ---  tester} \\ 
+       (\ID\,\, x) && \mbox{\em ---  identity function (for inlining)} \\ 
+%        (\PRIM\,\, x_1\,\, x_2) && \mbox{\em --- generic arithmetic} \\ 
+       \multicolumn{2}{l}{(f\,\, x_1\,\,\ldots\,\, x_n)} 
+            & \mbox{\em --- function application} 
+    \end{array}\right.
+\end{eqnarray*}
+  \caption{The syntax of our language}\label{fig:lang-syntax}
+\figrule
+\normalsize
+\end{figure}
+
+
+\subsubsection{Semantics}
+We now give an operational
+semantics for  our language.  Later, a refinement of
+the  operational semantics,  which we  call minefield  semantics, will
+serve to prove liveness analysis correct.
+We give a small-step semantics because, unlike big-step semantics,
+correctness for non-terminating programs does not need special treatment.
+We start with the domains used by the semantics:
+\[
+\begin{array}{rlcl@{\hspace{2em}}l}
+\rho: & \mathit{Env} &=&\mathit{Var} \rightarrow {Loc} & \mbox{-- Environment} \\ 
+v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Val \times
+  Val}& \mbox{-- Values}\\
+c:   & \mathit{Clo} &=& \mathit{(Exp \times Env)}& \mbox{-- Closures}\\
+\heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow (\mathit{Val} +
+\mathit{Clo}) & \mbox{-- Heap}
+\end{array}
+\]
+%Note that in the eager case, if a cons had a numeric argument, this
+%fact was known when the cons was created. Thus you could have unboxed
+%numbers. This is not possible now. For instance, the argument of a
+%cons could be a closure which evaluates to a number.
+%Decision - numbers are boxed
+Here $\mathit{Loc}$ is countable set of locations which hold $\CONS$ cells.
+A value is either a number, the empty list $\NIL$, or a location  $\ell$.
+Our liveness analysis does not track numeric values, and thus is neutral
+as to whether these are boxed or represented as immediates.
+An environment is a finite mapping from variables to values, and a heap a finite mapping
+from locations to pairs of values.
+% Given  a program,  an  environment is  a
+% mapping from  the set  of variables of  the program  $\mathit{Var}$ to
+% values in $\mathit{Val}$.    The heap is a mapping
+% from  locations  to pairs of  values.
+Finally, $\stk$ is a stack
+(using $\bullet$ for push and $[\,]$ for empty stack)
+of frames of unfinished function calls.  A
+frame is a triple $(e,x,\rho)$ representing the call site
+$
+(\LET\,\, x \leftarrow (f\,y_1\,\ldots\,y_n) \,\, \IN\,\, e)
+$
+being evaluated in environment $\rho$.
+Frames can also be viewed as continuations, in this view
+the ({\sc ord-return}) 
+ rule in the small-step operational semantics (Figure~\ref{fig:lang-opsem-small}) invokes them.
+
+The semantics 
+of statements $s$ are given by the judgement form
+$\rho, \heap, s \rightsquigarrow \heap', v$
+and those for expressions $e$ by the form
+$\rho, \stk, \heap, e \rightarrow \rho', \stk', \heap', e'$.
+The start state is $(\{\},[\,], \{\}, e_\mainpgm)$ and the
+program terminates successfully with result value $\rho(x)$
+on reaching the halt state $(\rho,[\,], \heap, (\RETURN\ x))$
+
+Notation:  we write $\rho[x \mapsto v]$ for the environment which is
+as $\rho$ but has value $v$ at $x$.
+We also write $[\myvec{x} \mapsto \myvec{v}]$ which respectively
+has values $v_1, \ldots, v_n$ at $x_1, \ldots, x_n$ and write
+$[\myvec{x} \mapsto \rho(\myvec{y})]$ when 
+$v_1, \ldots, v_n$ are $\rho(y_1), \ldots, \rho(y_n)$.
+
+\paragraph{Stuck states.} Note that certain forms of $e$ do not reduce
+with $\rightarrow$ (perhaps because $\rightsquigarrow$ could not reduce
+a contained $s$).  Some of these we eliminate syntactically, e.g.\
+ensuring all variables and functions are defined and are called with
+the correct number of parameters.
+Others include $(\CDR\ \NIL), (\CAR\ 3), (+\ \NIL\ 4)$ and $(\SIF\ \NIL\ e_1\ e_2)$.
+All but the first can be eliminated with a static type system but,
+treating our program as dynamically typed, we regard all these
+as stuck states.
+
+% A program terminates successfully if it reaches the halt state
+% in Figure~\ref{fig:lang-opsem-small}.
+% Note that $\rho,[\,], \heap, \pp{\pi}{(\RETURN\ x)}$
+% is the halt state (with result value $\rho(x)$).
+
+
+
+\begin{figure}[t!]  
+% (Random text to ensure proper line-spacing (problem with infrule macro?).)
+
+\footnotesize
+\begin{minipage}{0.335\textwidth}
+\infrule[ord-const]
+        {}
+        {\rho, \stk, \heap,   \pp{\pi}{k}
+          \rightsquigarrow \rho, \stk, \heap, k}
+\end{minipage}\begin{minipage}{0.655\textwidth}
+\infrule[ord-cons]
+      {
+%%\mbox{$\ell \not\in \mbox{dom}(\heap)$ is a fresh location}
+}
+      {\rho, \ell \bullet \stk,\heap, \pp{\pi}{(\CONS\,\, x\ y)}
+        \rightsquigarrow \rho, \stk, \heap[\ell\mapsto(\rho(x),\rho(y))],
+        \ell}
+\end{minipage} \\[0.5ex]
+
+\begin{minipage}{0.395\textwidth}
+\infrule[ord-car]
+        {\heap(\rho(x)) = (e_1, e_2)}
+        {\rho, \stk, \heap, \pp{\pi}{(\CAR\,\, x)}
+          \rightsquigarrow \rho, \stk, \heap, e_1}
+\end{minipage}
+\begin{minipage}{0.395\textwidth}
+\infrule[ord-car]
+        {\heap(\rho(x)) = e}
+        {\rho, \stk, \heap, \pp{\pi}{(\CAR\,\, x)}
+          \rightsquigarrow \rho, (\CAR \bullet):\stk, \heap, v_1}
+\end{minipage}\\[0.5ex]
+
+
+
+
+
+\begin{minipage}{0.595\textwidth}
+\infrule[ord-cdr]
+        {\heap(\rho(x)) = (v_1, v_2)}
+        {\rho, \heap, \pp{\pi}{(\CDR\,\, x)}
+          \rightsquigarrow \heap, v_2}
+\end{minipage} \\[0.5ex]
+
+\begin{minipage}{0.395\textwidth}
+\infrule[ord-id]
+      {
+}
+      {\rho, \heap, \pp{\pi}{(\ID\,\, x)}
+        \rightsquigarrow \heap, \rho(x)}
+\end{minipage}\begin{minipage}{0.595\textwidth}
+\infrule[ord-prim]
+      {\rho(x) \in \mathbb{N} \andalso \rho(y)\in \mathbb{N}}
+      {\rho, \heap, \pp{\pi}{(\PRIM\,\, x\ y)}
+        \rightsquigarrow \heap, \rho(x) + \rho(y)}
+\end{minipage} \\[0.5ex]
+
+\begin{minipage}{0.395\textwidth}
+% \infrule[ord-null-false]
+\infrule[]
+        {\rho(x)\not= \NIL
+        }{\rho, \heap, \pp{\pi}{(\NULLQ\,\, x)}
+          \rightsquigarrow \heap, 0}
+\end{minipage}\begin{minipage}{0.595\textwidth}
+% \infrule[ord-null-true]
+\infrule[ord-null]
+        {\rho(x)= \NIL
+        }{\rho, \heap, \pp{\pi}{(\NULLQ\,\, x)}
+          \rightsquigarrow \heap, 1}
+\end{minipage} \\[0.5ex]
+
+\begin{minipage}{0.395\textwidth}
+% \infrule[ord-if-true]{
+\infrule[]{
+  \rho(x) \in \mathbb{N}\setminus\{0\}
+}{
+  \rho,\stk, \heap,
+  \pp{\pi}{(\SIF\ x\ \pp{\pi_2}{e_1}\ \pp{\pi_3}{e_2})}
+  \longrightarrow \rho,\stk, \heap, e_1}
+\end{minipage}\begin{minipage}{0.595\textwidth}
+% \infrule[ord-if-false]{
+\infrule[ord-if]{
+  \rho(x) = 0
+}{
+  \rho,\stk, \heap,
+  \pp{\pi}{(\SIF\ x\ \pp{\pi_2}{e_1}\ \pp{\pi_3}{e_2})}
+  \longrightarrow \rho,\stk, \heap, e_2}
+\end{minipage} \\[0.5ex]
+
+\begin{minipage}{0.990\textwidth}
+\infrule[ord-let-nonfn]{
+%  \rho,\stk, \heap, \pp{\pi_1}{s} \longrightarrow \rho,\stk, \heap', v_1 
+  \rho, \heap, \pp{\pi_1}{s} \rightsquigarrow \heap', v 
+  \andalso
+  \mbox{$s$ is not
+$\pp{\pi}{(f\,\, \pp{\pi_1}{y_1} \ldots \pp{\pi_n}{y_n})}$
+       }
+}{
+  \rho,\stk, \heap,  \pp{\pi}{(\LET\,\, x
+    \leftarrow  \pp{\pi_1}{s}\,\, \IN\,\,
+    \pp{\pi_2}{e})}
+  \longrightarrow
+  \rho[x \mapsto v], \stk, \heap', \pp{\pi_2}{e}}
+\end{minipage} \\[0.5ex]
+
+\begin{minipage}{0.990\textwidth}
+\infrule[ord-let-fncall]{
+  \mbox{$s$ is 
+$\pp{\pi}{(f\,\, \pp{\pi_1}{y_1} \ldots \pp{\pi_n}{y_n})}$
+       }
+\andalso
+\mbox{$f$ defined as $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \pp{\pi_f}{e_f})$}
+}{
+  \rho,\stk, \heap,  \pp{\pi}{(\LET\,\, x
+    \leftarrow  \pp{\pi_1}{s}\,\, \IN\,\,
+    \pp{\pi_2}{e})}
+  \longrightarrow
+% [z_1\mapsto \rho(y_1), \ldots, z_n\mapsto \rho(y_n)], 
+[\myvec{z} \mapsto \rho(\myvec{y})],
+  \,(\rho,x,e)\bullet\stk,\, \heap, e_f
+}
+\end{minipage} \\[0.5ex]
+
+\begin{minipage}{0.990\textwidth}
+\infrule[ord-return]{
+}{
+  \rho, \,(\rho',x',e')\bullet\stk,\, \heap,
+  \pp{\pi}{(\RETURN\ x)}
+  \longrightarrow \rho'[x' \mapsto \rho(x)], \stk, \heap, e'}
+\end{minipage}
+
+% \normalsize
+% Note that $\rho,[\,], \heap, \pp{\pi}{(\RETURN\ x)}$
+% is the halt state (with result value $\rho(x)$).
+
+  \caption{The small-step operational semantics}
+  \label{fig:lang-opsem-small}
+\figrule
+\normalsize
+\end{figure}
+
+%==============================================================
+\renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
