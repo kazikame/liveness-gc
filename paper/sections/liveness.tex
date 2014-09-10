@@ -1,0 +1,202 @@
+\section{Liveness}\label{sec:liveness}
+
+In classical liveness analysis a  variable is either `live' (its value
+may be  used in future  computation) or `dead' (definitely  not used).
+Semantically, a variable is dead at a given program point if arbitrary
+changes to its value have no effect on the computation.  Later we will
+use $\bot$ to represent a value  which `explodes' when it is used in a
+computation; dead variables can  safely have their value replaced with
+$\bot$.  For heap-allocated data we need a richer model of liveness in
+that both variables  and fields of $\CONS$ cells may  be dead or live.
+Using  $\acar$,  $\acdr$  to  represent access  using  $\CAR$,  $\CDR$
+respectively, liveness of the structure reachable from a variable is a
+set  of  {\em  access  paths}  which  we  represent  as  a  subset  of
+$\{\acar,\acdr\}^\ast$, and  use conventional grammar  notation.  Thus
+the liveness of $x$ being $\{\acdr\acar, \acdr\acdr\acar\}$ means that
+future computation can  only refer to the second  and third members of
+$x$   considered  as   a   list.   Semantically,   access  paths   are
+prefix-closed, as  accessing a field requires accessing  all the paths
+from  the variable  to  the field,  and  hence the  above liveness  is
+properly   written   $\{\epsilon,   \acdr,   \acdr\acar,   \acdr\acdr,
+\acdr\acdr\acar\}$.  The classical notions  of a scalar variable being
+live or dead correspond to $\{\epsilon\}$ and $\{\}$.
+
+The  overall liveness  (also  written {\em  liveness environment}  for
+emphasis) at a program point  is conceptually a mapping from variables
+to subsets of $\{\acar,\acdr\}^\ast$, but we often abuse notation, for
+example writing $\{x.\acar\acdr, x.\acdr, y.\epsilon\}$ instead of the
+map           $[x          \mapsto\{\epsilon,\acar,\acar\acdr,\acdr\},
+  y\mapsto\{\epsilon\},  z\mapsto\{\}]$.    Analogously  to  classical
+liveness,  the liveness  at  program  point $\pi$  in  $\pi:e$ is  the
+liveness just before executing $e$.
+
+A complementary notion to liveness is {\em demand}.  The demand for
+expression $e$ is again an access path---that subset of of $\{\acar,\acdr\}^\ast$ which the
+context of $e$ may explore of $e$'s result.  So, for example given a
+demand $\sigma$ and the expression $\pi: (\RETURN\ x)$, the liveness at
+$\pi$ is exactly $x.\sigma$.
+The classical analogy of this is in {\em strong liveness}, where
+an assignment node $n: x:=y+z$ causes $y$ and $z$ to be live on entry
+to $n$ if (and only if) $x$ is live at exit of $n$---the liveness
+of $x$ at exit from $n$ becomes the demand on $y+z$.
+Note that, for an operation like division which
+may raise an exception, the assignment $n: x:=y/z$ makes $y$ and $z$ live
+regardless of the liveness of $x$.
+
+We use $\sigma$  to range over demands, $\alpha$  to range over access
+paths  and $\Lv$  to range  over liveness  environments.  The notation
+$\sigma_1\sigma_2$  denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
+\alpha_1 \in  \sigma_1, \alpha_2 \in \sigma_2\rbrace$.  Often we shall
+abuse notation to  juxtapose an edge label and a  set of access paths:
+$\acar\sigma$   is   a   shorthand  for   $\lbrace\acar\rbrace\sigma$.
+Finally,  we use $\Lfonly$  to range  over {\em  demand transformers}.
+These transform demands on a function call into demands for its formal
+parameters:    given    a    user    function    $f$,    defined    by
+$(\DEFINE\  (f\ x_1\  \ldots\ x_n)\  \  e_f)$ and  called with  demand
+$\sigma$, then $\Lf{f}{i}{\sigma}$ is the liveness of $x_i$ at $e_f$.
+
+Note that liveness refers to  variables and fields, and not to $\CONS$
+cells  (i.e.\  to  edges  in   the  memory  graph,  not  to  locations
+themselves).   Hence liveness  of $\{x.\epsilon,x.\acar\}$  means that
+future computation may refer to  the value $\ell$ of variable $x$, and
+also to the $\CAR$ field of  location $\ell$.  In the absence of other
+pointers to heap location $\ell$, we are certain that the $\CDR$ field
+of  $\ell$  will  not  be   referenced  and  may  hence  be  corrupted
+arbitrarily.   Note therefore,  that  while $\ell$  cannot be  garbage
+collected, any location  $\ell'$ stored in the $\CDR$  field of $\ell$
+would  be  garbage (again  provided  there  are  no other  aliases  to
+$\ell$).
+
+
+
+\subsection{Liveness Analysis}
+First recall the classical formulation of liveness (as sets of simple variables)
+on three-address instructions,
+$
+\mathit{live}_\mathit{in}(I) = \mathit{live}_\mathit{out}(I)
+     \setminus \mathit{def\/}(I)
+     \cup   \mathit{ref\/}(I)
+$,
+and then note that {\em strong liveness} needs, when $I$ is the instruction $z:=x+y$,
+that $\mathit{ref}(I)$ be refined to
+$\{x,y\}$ if $z \in\mathit{live}_\mathit{out}(I)$ and $\{\}$ otherwise.
+
+Our liveness analysis formulated in Figure~\ref{fig:live-judge}
+is analogous.
+% has three analogous aspects.
+% \begin{itemize}
+% \item
+Firstly, the function $\mathit{ref}$, when given a statement $s$,
+returns the incremental liveness {\em generated} by $s$.
+Because we generalize {\em strong} liveness, $\mathit{ref}$ needs a second parameter,
+specifying the demand $\sigma$ on the result of $s$,
+to determine which access paths of its free variables are made live.
+The cases for $(\ID\ x)$ and $(\PRIM\ x\ y)$ exemplify this.
+% The cases for
+% $(\CAR\ x)$, $(\CAR\ x)$ and $(\CONS\ x\ y)$ show how demand for path $\alpha \in \sigma$
+% is transformed into a deeper or shallower path in the demand for (or liveness of) $x$ or $y$.
+% The   operator \PRIM\ dereferences its arguments  resulting in the liveness shown.
+A demand  of  $\sigma$  on  (\CAR~$x$)  is  transformed  to  the  demand
+$\acar\sigma$  on  $x$.   In  addition, \CAR\  always  dereferences  its
+argument (even if its result is never used).
+This generates the liveness  $\{x.\epsilon\} \cup  x.\acar\sigma$
+(note $\sigma$ may be $\{\}$).
+In the opposite  sense, the  demand  of $\acar\sigma$  on
+(\CONS~$x$~$y$) is  transformed to the  demand $\sigma$ on  $x$.  Note
+that \CONS\ does not, by itself, dereference its arguments.
+Thirdly, for the case of a user-function call, a third parameter $\Lfonly$ to 
+$\mathit{ref}$
+expresses how the demand $\sigma$ on the result is transformed into demands on its parameters.
+Constants generate no liveness.
+
+% \item
+The  function  $\mathcal{L}$ now  gives  the  (total)  liveness of  an
+expression $e$.   The cases $\RETURN$ and  $\SIF$ are straightforward,
+but note the liveness $x.\epsilon$  generated by the latter.  The case
+$(\LET\   z\leftarrow   s\  \IN\   e')$   resembles  a   three-address
+instruction:  the liveness  of $e$  is given  by taking  the liveness,
+$\Lv$, of $e'$, killing any liveness of $z$ and adding any incremental
+liveness from  $s$.  The main subtlety  is how the liveness  of $z$ in
+$\Lv$  is converted  to a  demand  $\Lv(z)$ to  be placed  on $s$  via
+$\mathit{ref}(s,\Lv(z),\Lfonly)$.
+
+% \item
+%%%%%%\marginpar{Say $\mathcal{L}$ is monotonic?}
+Finally, the  judgement form $\mathit{Prog}  \len \Lfonly$ is  used to
+determine  $\Lfonly$\@.   Analogously   to  classical  liveness  being
+computed  as  a  solution  of  dataflow  equations,  we  require,  via
+inference   rule  ({\sc  live-define}),   $\Lfonly$  to   satisfy  the
+fixed-point property that:  when we assume $\Lfonly$ to  be the family
+of demand transformers for the program then the calculated liveness of
+each function  body $\mathcal{L}(e_f,\sigma,\Lfonly)$ agrees  with the
+assumed $\Lfonly$.   As usual, there  are often multiple  solutions to
+$\Lfonly$;  all are  safe (see  Section~\ref{sec:correctness})  but we
+prefer  the  least  one  as  giving  the  least  liveness  subject  to
+safety---and hence greatest amount of garbage collected.
+% \end{itemize}
+
+We make three observations: firstly the rule ({\sc live-define}) has a
+least  solution  as  $\mathcal{L}(\cdot)$  is monotonic  in  $\sigma$;
+secondly  that  ({\sc  live-define})   resembles  the  rule  for  type
+inference of mutually recursive  function definitions, and thirdly the
+asymmetry of  demand and liveness (compared to  post- and pre-liveness
+classically) is due to the functional formulation here.
+
+Section~\ref{sec:computing} shows how the demand transformers $\Lfonly$ for a program
+(representing a fully context-sensitive analysis)
+can be safely approximated, for each function, by a {\em procedure summary}
+(unifying the contexts in the style of 0-CFA)\@.
+The summary consists of a pair of a single demand and, for this demand,
+the corresponding tuple of demands the function makes on its arguments.
+
+%==============================================================
+\begin{figure}[t]  
+% \footnotesize
+\begin{eqnarray*}
+\mathit{ref\/}(\kappa,\sigma,\Lfonly)
+          &=& \{\,\} \mbox{, for $\kappa$ a constant, including $\NIL$}\\
+\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
+          &=& \{x.\alpha \mid \acar\alpha \in \sigma\} \cup \{y.\alpha \mid \acdr\alpha \in \sigma\} \\
+\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
+          &=& \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in \sigma\} \\
+\mathit{ref\/}((\CDR~x),\sigma,\Lfonly)
+          &=& \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in \sigma\} \\
+\mathit{ref\/}((\ID~x),\sigma,\Lfonly)
+          &=& \{x.\sigma\} \\
+\mathit{ref\/}((\PRIM~x~y),\sigma,\Lfonly)
+          &=& \{x.\epsilon,y.\epsilon\} \\
+\mathit{ref\/}((\NULLQ~x),\sigma,\Lfonly)
+          &=& \{x.\epsilon\} \\
+\mathit{ref\/}((f~y_1~\cdots~y_n),\sigma,\Lfonly)
+%          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
+          &=&  \begin{array}{@{}l}  % to discourage \displaystyle
+               \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
+               \end{array}
+%          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
+\\[1ex]
+\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& x.\sigma \\
+\mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
+        \mathcal{L}(e_1,\sigma,\Lfonly) \cup
+        \mathcal{L}(e_2,\sigma,\Lfonly) \cup
+        \{x.\epsilon\} \\
+\mathcal{L}((\LET~x \leftarrow  s~\IN~e),\sigma,\Lfonly) &=&
+        \Lv
+           \setminus \{x.*\}
+           \cup \mathit{ref\/}(s,\Lv(x),\Lfonly)
+\mbox{ where } \Lv = \mathcal{L}(e,\sigma,\Lfonly)
+\end{eqnarray*}
+
+\begin{minipage}{0.85\textwidth}
+\infrule[live-define]
+        {\mathcal{L}(e_f,\sigma,\Lfonly) = 
+           \bigcup_{i=1}^n z_i.\Lf{f}{i}{\sigma}
+              \mbox{ for each $f$ and $\sigma$}
+        }
+        { d_1 \ldots d_k \len \Lfonly
+\\ \makebox[0mm]{where
+     $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
+\end{minipage}
+
+\normalsize
+  \caption{Liveness equations and judgement rule}\label{fig:live-judge}
+\end{figure}
