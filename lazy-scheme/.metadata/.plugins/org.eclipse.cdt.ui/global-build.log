@@ -1,0 +1,5 @@
+17:46:02 **** Build of configuration Default for project LazyScheme ****
+make all 
+g++ -O2 -g -Wall -fmessage-length=0   -c -o LazyScheme.o LazyScheme.cpp
+make: g++: Command not found
+make: *** [LazyScheme.o] Error 127

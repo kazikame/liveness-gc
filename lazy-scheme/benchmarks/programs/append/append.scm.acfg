@@ -1,0 +1,231 @@
+Partition #0 | SIZE = 1 | TYPE = NONE
+T/sq/1            -->  e
+
+Partition #1 | SIZE = 1 | TYPE = RIGHT
+T/append/1*       -->  1b . T/append/1* | e
+
+Partition #2 | SIZE = 1 | TYPE = RIGHT
+T/append/1        -->  Xb . T/append/1* | 0 . 0b . T/append/1* | 1 . T/append/1
+
+Partition #3 | SIZE = 1 | TYPE = NONE
+D/all             -->  e | 1 . 0
+
+Partition #4 | SIZE = 1 | TYPE = NONE
+D/double          -->  T/sq/1 . 0b . 1b . T/append/1 . D/all
+
+Partition #5 | SIZE = 1 | TYPE = NONE
+p#11              -->  D/double
+
+Partition #6 | SIZE = 1 | TYPE = NONE
+p#7               -->  D/double
+
+Partition #7 | SIZE = 1 | TYPE = NONE
+D/sq              -->  0b . 1b . T/append/1 . D/all
+
+Partition #8 | SIZE = 1 | TYPE = NONE
+p#2               -->  D/sq
+
+Partition #9 | SIZE = 1 | TYPE = NONE
+p#1               -->  D/sq
+
+Partition #10 | SIZE = 1 | TYPE = NONE
+p#35              -->  0b . T/append/1 . D/all
+
+Partition #11 | SIZE = 1 | TYPE = NONE
+p#36              -->  D/all
+
+Partition #12 | SIZE = 1 | TYPE = NONE
+p#38              -->  D/all
+
+Partition #13 | SIZE = 1 | TYPE = NONE
+T/double/1        -->  e
+
+Partition #14 | SIZE = 1 | TYPE = NONE
+p#40              -->  T/double/1 . T/sq/1 . 0b . 1b . T/append/1 . D/all
+
+Partition #15 | SIZE = 1 | TYPE = NONE
+p#64              -->  T/append/1 . D/all
+
+Partition #16 | SIZE = 1 | TYPE = RIGHT
+D/append          -->  D/all | 1b . D/append
+
+Partition #17 | SIZE = 1 | TYPE = NONE
+p#17              -->  Xb . D/append
+
+Partition #18 | SIZE = 1 | TYPE = NONE
+p#15              -->  Xb . D/append
+
+Partition #19 | SIZE = 1 | TYPE = NONE
+p#3               -->  D/sq
+
+Partition #20 | SIZE = 1 | TYPE = NONE
+p#37              -->  T/double/1 . T/sq/1 . 0b . 1b . T/append/1 . D/all
+
+Partition #21 | SIZE = 1 | TYPE = NONE
+p#63              -->  D/all
+
+Partition #22 | SIZE = 1 | TYPE = NONE
+p#39              -->  T/sq/1 . 0b . 1b . T/append/1 . D/all
+
+Partition #23 | SIZE = 1 | TYPE = NONE
+p#5               -->  D/sq
+
+Partition #24 | SIZE = 1 | TYPE = NONE
+p#58              -->  D/all
+
+Partition #25 | SIZE = 1 | TYPE = NONE
+p#16              -->  D/append
+
+Partition #26 | SIZE = 1 | TYPE = NONE
+p#43              -->  T/sq/1 . 0b . 1b . T/append/1 . D/all
+
+Partition #27 | SIZE = 1 | TYPE = NONE
+p#8               -->  D/double
+
+Partition #28 | SIZE = 1 | TYPE = NONE
+p#54              -->  D/all
+
+Partition #29 | SIZE = 1 | TYPE = NONE
+p#34              -->  D/all
+
+Partition #30 | SIZE = 1 | TYPE = NONE
+p#42              -->  0b . 1b . T/append/1 . D/all
+
+Partition #31 | SIZE = 1 | TYPE = NONE
+p#44              -->  D/all
+
+Partition #32 | SIZE = 1 | TYPE = NONE
+p#41              -->  D/all
+
+Partition #33 | SIZE = 1 | TYPE = LEFT
+T/append/2        -->  e | T/append/2 . 1b
+
+Partition #34 | SIZE = 1 | TYPE = NONE
+p#59              -->  T/append/2 . D/all
+
+Partition #35 | SIZE = 1 | TYPE = NONE
+p#26              -->  1b . D/append
+
+Partition #36 | SIZE = 1 | TYPE = NONE
+p#22              -->  D/append
+
+Partition #37 | SIZE = 1 | TYPE = NONE
+p#30              -->  D/append
+
+Partition #38 | SIZE = 1 | TYPE = NONE
+p#25              -->  D/append
+
+Partition #39 | SIZE = 1 | TYPE = NONE
+p#24              -->  1 . T/append/1 . 1b . D/append
+
+Partition #40 | SIZE = 1 | TYPE = NONE
+p#23              -->  T/append/1 . 1b . D/append
+
+Partition #41 | SIZE = 1 | TYPE = NONE
+p#32              -->  1b . D/append
+
+Partition #42 | SIZE = 1 | TYPE = NONE
+p#29              -->  D/append
+
+Partition #43 | SIZE = 1 | TYPE = NONE
+p#50              -->  D/all
+
+Partition #44 | SIZE = 1 | TYPE = NONE
+p#4               -->  D/sq
+
+Partition #45 | SIZE = 1 | TYPE = NONE
+p#18              -->  D/append
+
+Partition #46 | SIZE = 1 | TYPE = NONE
+p#66              -->  D/all
+
+Partition #47 | SIZE = 1 | TYPE = NONE
+D/append/1        -->  Xb . D/append | 0 . 0b . D/append | 1 . T/append/1 . 1b . D/append
+
+Partition #48 | SIZE = 1 | TYPE = NONE
+p#19              -->  D/append
+
+Partition #49 | SIZE = 1 | TYPE = NONE
+D/append/2        -->  T/append/2 . 1b . D/append | D/append
+
+Partition #50 | SIZE = 1 | TYPE = NONE
+p#49              -->  1b . 1b . T/append/1 . D/all
+
+Partition #51 | SIZE = 1 | TYPE = NONE
+p#21              -->  0 . 0b . D/append
+
+Partition #52 | SIZE = 1 | TYPE = NONE
+p#33              -->  D/append
+
+Partition #53 | SIZE = 1 | TYPE = NONE
+p#20              -->  0b . D/append
+
+Partition #54 | SIZE = 1 | TYPE = NONE
+p#60              -->  0b . T/append/2 . D/all
+
+Partition #55 | SIZE = 1 | TYPE = NONE
+p#57              -->  1b . T/append/2 . D/all
+
+Partition #56 | SIZE = 1 | TYPE = NONE
+D/double/1        -->  D/double
+
+Partition #57 | SIZE = 1 | TYPE = NONE
+D/sq/1            -->  D/sq
+
+Partition #58 | SIZE = 1 | TYPE = NONE
+p#61              -->  1b . T/append/2 . D/all
+
+Partition #59 | SIZE = 1 | TYPE = NONE
+p#9               -->  D/double
+
+Partition #60 | SIZE = 1 | TYPE = NONE
+p#28              -->  T/append/2 . 1b . D/append
+
+Partition #61 | SIZE = 1 | TYPE = NONE
+p#27              -->  T/append/1 . 1b . D/append
+
+Partition #62 | SIZE = 1 | TYPE = NONE
+p#48              -->  0b . 1b . T/append/1 . D/all
+
+Partition #63 | SIZE = 1 | TYPE = NONE
+p#10              -->  D/double
+
+Partition #64 | SIZE = 1 | TYPE = NONE
+p#47              -->  1b . T/append/1 . D/all
+
+Partition #65 | SIZE = 1 | TYPE = NONE
+p#52              -->  0b . T/append/1 . D/all
+
+Partition #66 | SIZE = 1 | TYPE = NONE
+p#45              -->  1b . 1b . T/append/1 . D/all
+
+Partition #67 | SIZE = 1 | TYPE = NONE
+p#51              -->  T/append/1 . D/all
+
+Partition #68 | SIZE = 1 | TYPE = NONE
+p#62              -->  D/all
+
+Partition #69 | SIZE = 1 | TYPE = NONE
+p#13              -->  D/append
+
+Partition #70 | SIZE = 1 | TYPE = NONE
+p#56              -->  D/all
+
+Partition #71 | SIZE = 1 | TYPE = NONE
+p#65              -->  T/append/2 . D/all
+
+Partition #72 | SIZE = 1 | TYPE = NONE
+p#53              -->  1b . T/append/1 . D/all
+
+Partition #73 | SIZE = 1 | TYPE = NONE
+p#55              -->  0b . T/append/2 . D/all
+
+Partition #74 | SIZE = 1 | TYPE = NONE
+p#31              -->  0b . D/append
+
+Partition #75 | SIZE = 1 | TYPE = NONE
+p#46              -->  D/all
+
+Partition #76 | SIZE = 1 | TYPE = NONE
+p#14              -->  Xb . D/append
+

@@ -1,0 +1,2190 @@
+{
+  "type": "program",
+  "defines": [
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "and" },
+      "args": [
+        { "type": "id", "value": "anx" },
+        { "type": "id", "value": "any" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var0" },
+        "expr": { "type": "bconst", "value": "#t" },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var1" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "anx" },
+              { "type": "id", "value": "_var0" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var1" },
+            "then": {
+              "type": "return",
+              "value": { "type": "id", "value": "any" }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var2" },
+              "expr": { "type": "bconst", "value": "#f" },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var2" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "or" },
+      "args": [
+        { "type": "id", "value": "orx" },
+        { "type": "id", "value": "ory" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var3" },
+        "expr": { "type": "bconst", "value": "#t" },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var4" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "orx" },
+              { "type": "id", "value": "_var3" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var4" },
+            "then": {
+              "type": "return",
+              "value": { "type": "id", "value": "orx" }
+            },
+            "else": {
+              "type": "return",
+              "value": { "type": "id", "value": "ory" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "append" },
+      "args": [
+        { "type": "id", "value": "ax" },
+        { "type": "id", "value": "ay" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var5" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "ax" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var5" },
+          "then": {
+            "type": "return",
+            "value": { "type": "id", "value": "ay" }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var6" },
+            "expr": {
+              "type": "prim",
+              "oper": "car",
+              "args": [{ "type": "id", "value": "ax" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var8" },
+              "expr": {
+                "type": "prim",
+                "oper": "cdr",
+                "args": [{ "type": "id", "value": "ax" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var9" },
+                "expr": {
+                  "type": "call",
+                  "id": { "type": "id", "value": "append" },
+                  "args": [
+                    { "type": "id", "value": "_var8" },
+                    { "type": "id", "value": "ay" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var7" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cons",
+                    "args": [
+                      { "type": "id", "value": "_var6" },
+                      { "type": "id", "value": "_var9" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var7" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "divide1" },
+      "args": [
+        { "type": "id", "value": "a" },
+        { "type": "id", "value": "b" },
+        { "type": "id", "value": "n" },
+        { "type": "id", "value": "op" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var11" },
+        "expr": {
+          "type": "prim",
+          "oper": "<",
+          "args": [
+            { "type": "id", "value": "a" },
+            { "type": "id", "value": "b" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var11" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var12" },
+            "expr": { "type": "iconst", "value": 0 },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var13" },
+              "expr": {
+                "type": "prim",
+                "oper": "eq?",
+                "args": [
+                  { "type": "id", "value": "op" },
+                  { "type": "id", "value": "_var12" }
+                ]
+              },
+              "body": {
+                "type": "if",
+                "cond": { "type": "id", "value": "_var13" },
+                "then": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "n" }
+                },
+                "else": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "a" }
+                }
+              }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var14" },
+            "expr": {
+              "type": "prim",
+              "oper": "-",
+              "args": [
+                { "type": "id", "value": "a" },
+                { "type": "id", "value": "b" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var16" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var17" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "+",
+                  "args": [
+                    { "type": "id", "value": "_var16" },
+                    { "type": "id", "value": "n" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var15" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "divide1" },
+                    "args": [
+                      { "type": "id", "value": "_var14" },
+                      { "type": "id", "value": "b" },
+                      { "type": "id", "value": "_var17" },
+                      { "type": "id", "value": "op" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var15" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "divide" },
+      "args": [
+        { "type": "id", "value": "a" },
+        { "type": "id", "value": "b" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var19" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var21" },
+          "expr": { "type": "iconst", "value": 0 },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var20" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "divide1" },
+              "args": [
+                { "type": "id", "value": "a" },
+                { "type": "id", "value": "b" },
+                { "type": "id", "value": "_var19" },
+                { "type": "id", "value": "_var21" }
+              ]
+            },
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var20" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "take" },
+      "args": [
+        { "type": "id", "value": "n" },
+        { "type": "id", "value": "lst" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var23" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var24" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "_var23" },
+              { "type": "id", "value": "n" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var24" },
+            "then": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var25" },
+              "expr": {"type": "nil"},
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var25" }
+              }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var26" },
+              "expr": {
+                "type": "prim",
+                "oper": "car",
+                "args": [{ "type": "id", "value": "lst" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var28" },
+                "expr": { "type": "iconst", "value": 1 },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var29" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "-",
+                    "args": [
+                      { "type": "id", "value": "n" },
+                      { "type": "id", "value": "_var28" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var31" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cdr",
+                      "args": [{ "type": "id", "value": "lst" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var30" },
+                      "expr": {
+                        "type": "call",
+                        "id": { "type": "id", "value": "take" },
+                        "args": [
+                          { "type": "id", "value": "_var29" },
+                          { "type": "id", "value": "_var31" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var27" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "cons",
+                          "args": [
+                            { "type": "id", "value": "_var26" },
+                            { "type": "id", "value": "_var30" }
+                          ]
+                        },
+                        "body": {
+                          "type": "return",
+                          "value": { "type": "id", "value": "_var27" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "drop" },
+      "args": [
+        { "type": "id", "value": "n" },
+        { "type": "id", "value": "lst" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var34" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var35" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "_var34" },
+              { "type": "id", "value": "n" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var35" },
+            "then": {
+              "type": "return",
+              "value": { "type": "id", "value": "lst" }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var36" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var37" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "-",
+                  "args": [
+                    { "type": "id", "value": "n" },
+                    { "type": "id", "value": "_var36" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var39" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cdr",
+                    "args": [{ "type": "id", "value": "lst" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var38" },
+                    "expr": {
+                      "type": "call",
+                      "id": { "type": "id", "value": "drop" },
+                      "args": [
+                        { "type": "id", "value": "_var37" },
+                        { "type": "id", "value": "_var39" }
+                      ]
+                    },
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var38" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "reverse" },
+      "args": [
+        { "type": "id", "value": "lst" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var41" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "lst" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var41" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var42" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var42" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var43" },
+            "expr": {
+              "type": "prim",
+              "oper": "cdr",
+              "args": [{ "type": "id", "value": "lst" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var44" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "reverse" },
+                "args": [
+                  { "type": "id", "value": "_var43" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var46" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "car",
+                  "args": [{ "type": "id", "value": "lst" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var48" },
+                  "expr": {"type": "nil"},
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var47" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cons",
+                      "args": [
+                        { "type": "id", "value": "_var46" },
+                        { "type": "id", "value": "_var48" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var45" },
+                      "expr": {
+                        "type": "call",
+                        "id": { "type": "id", "value": "append" },
+                        "args": [
+                          { "type": "id", "value": "_var44" },
+                          { "type": "id", "value": "_var47" }
+                        ]
+                      },
+                      "body": {
+                        "type": "return",
+                        "value": { "type": "id", "value": "_var45" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "zip" },
+      "args": [
+        { "type": "id", "value": "xs" },
+        { "type": "id", "value": "ys" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var51" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "xs" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var53" },
+          "expr": {
+            "type": "prim",
+            "oper": "null?",
+            "args": [{ "type": "id", "value": "ys" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var52" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "or" },
+              "args": [
+                { "type": "id", "value": "_var51" },
+                { "type": "id", "value": "_var53" }
+              ]
+            },
+            "body": {
+              "type": "if",
+              "cond": { "type": "id", "value": "_var52" },
+              "then": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var55" },
+                "expr": {"type": "nil"},
+                "body": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "_var55" }
+                }
+              },
+              "else": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var56" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "car",
+                  "args": [{ "type": "id", "value": "xs" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var58" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "car",
+                    "args": [{ "type": "id", "value": "ys" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var57" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cons",
+                      "args": [
+                        { "type": "id", "value": "_var56" },
+                        { "type": "id", "value": "_var58" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var61" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "cdr",
+                        "args": [{ "type": "id", "value": "xs" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var63" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "cdr",
+                          "args": [{ "type": "id", "value": "ys" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var62" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "zip" },
+                            "args": [
+                              { "type": "id", "value": "_var61" },
+                              { "type": "id", "value": "_var63" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var60" },
+                            "expr": {
+                              "type": "prim",
+                              "oper": "cons",
+                              "args": [
+                                { "type": "id", "value": "_var57" },
+                                { "type": "id", "value": "_var62" }
+                              ]
+                            },
+                            "body": {
+                              "type": "return",
+                              "value": { "type": "id", "value": "_var60" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "getLength" },
+      "args": [
+        { "type": "id", "value": "lst" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var66" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "lst" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var66" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var67" },
+            "expr": { "type": "iconst", "value": 0 },
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var67" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var68" },
+            "expr": { "type": "iconst", "value": 1 },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var70" },
+              "expr": {
+                "type": "prim",
+                "oper": "cdr",
+                "args": [{ "type": "id", "value": "lst" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var71" },
+                "expr": {
+                  "type": "call",
+                  "id": { "type": "id", "value": "getLength" },
+                  "args": [
+                    { "type": "id", "value": "_var70" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var69" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "+",
+                    "args": [
+                      { "type": "id", "value": "_var68" },
+                      { "type": "id", "value": "_var71" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var69" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "findk" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "km" },
+        { "type": "id", "value": "m" },
+        { "type": "id", "value": "pairs" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var73" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "pairs" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var73" },
+          "then": {
+            "type": "return",
+            "value": { "type": "id", "value": "km" }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var74" },
+            "expr": {
+              "type": "prim",
+              "oper": "car",
+              "args": [{ "type": "id", "value": "pairs" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var75" },
+              "expr": {
+                "type": "prim",
+                "oper": "car",
+                "args": [{ "type": "id", "value": "_var74" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var77" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "car",
+                  "args": [{ "type": "id", "value": "pairs" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var78" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cdr",
+                    "args": [{ "type": "id", "value": "_var77" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "s" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "+",
+                      "args": [
+                        { "type": "id", "value": "_var75" },
+                        { "type": "id", "value": "_var78" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var80" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "<",
+                        "args": [
+                          { "type": "id", "value": "s" },
+                          { "type": "id", "value": "m" }
+                        ]
+                      },
+                      "body": {
+                        "type": "if",
+                        "cond": { "type": "id", "value": "_var80" },
+                        "then": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var81" },
+                          "expr": { "type": "iconst", "value": 1 },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var82" },
+                            "expr": {
+                              "type": "prim",
+                              "oper": "+",
+                              "args": [
+                                { "type": "id", "value": "_var81" },
+                                { "type": "id", "value": "k" }
+                              ]
+                            },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var84" },
+                              "expr": {
+                                "type": "prim",
+                                "oper": "cdr",
+                                "args": [{ "type": "id", "value": "pairs" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var83" },
+                                "expr": {
+                                  "type": "call",
+                                  "id": { "type": "id", "value": "findk" },
+                                  "args": [
+                                    { "type": "id", "value": "_var82" },
+                                    { "type": "id", "value": "km" },
+                                    { "type": "id", "value": "m" },
+                                    { "type": "id", "value": "_var84" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "return",
+                                  "value": { "type": "id", "value": "_var83" }
+                                }
+                              }
+                            }
+                          }
+                        },
+                        "else": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var86" },
+                          "expr": { "type": "iconst", "value": 1 },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var87" },
+                            "expr": {
+                              "type": "prim",
+                              "oper": "+",
+                              "args": [
+                                { "type": "id", "value": "_var86" },
+                                { "type": "id", "value": "k" }
+                              ]
+                            },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var89" },
+                              "expr": {
+                                "type": "prim",
+                                "oper": "cdr",
+                                "args": [{ "type": "id", "value": "pairs" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var88" },
+                                "expr": {
+                                  "type": "call",
+                                  "id": { "type": "id", "value": "findk" },
+                                  "args": [
+                                    { "type": "id", "value": "_var87" },
+                                    { "type": "id", "value": "k" },
+                                    { "type": "id", "value": "s" },
+                                    { "type": "id", "value": "_var89" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "return",
+                                  "value": { "type": "id", "value": "_var88" }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "elem" },
+      "args": [
+        { "type": "id", "value": "n" },
+        { "type": "id", "value": "lst" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var91" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "lst" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var91" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var92" },
+            "expr": { "type": "iconst", "value": 0 },
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var92" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var93" },
+            "expr": {
+              "type": "prim",
+              "oper": "car",
+              "args": [{ "type": "id", "value": "lst" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var94" },
+              "expr": {
+                "type": "prim",
+                "oper": "eq?",
+                "args": [
+                  { "type": "id", "value": "_var93" },
+                  { "type": "id", "value": "n" }
+                ]
+              },
+              "body": {
+                "type": "if",
+                "cond": { "type": "id", "value": "_var94" },
+                "then": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var95" },
+                  "expr": { "type": "iconst", "value": 1 },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var95" }
+                  }
+                },
+                "else": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var96" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cdr",
+                    "args": [{ "type": "id", "value": "lst" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var97" },
+                    "expr": {
+                      "type": "call",
+                      "id": { "type": "id", "value": "elem" },
+                      "args": [
+                        { "type": "id", "value": "n" },
+                        { "type": "id", "value": "_var96" }
+                      ]
+                    },
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var97" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "zip0" },
+      "args": [
+        { "type": "id", "value": "lst" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var98" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "lst" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var98" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var99" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var99" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var100" },
+            "expr": {
+              "type": "prim",
+              "oper": "car",
+              "args": [{ "type": "id", "value": "lst" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var102" },
+              "expr": { "type": "iconst", "value": 0 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var101" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "cons",
+                  "args": [
+                    { "type": "id", "value": "_var100" },
+                    { "type": "id", "value": "_var102" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var105" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cdr",
+                    "args": [{ "type": "id", "value": "lst" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var106" },
+                    "expr": {
+                      "type": "call",
+                      "id": { "type": "id", "value": "zip0" },
+                      "args": [
+                        { "type": "id", "value": "_var105" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var104" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "cons",
+                        "args": [
+                          { "type": "id", "value": "_var101" },
+                          { "type": "id", "value": "_var106" }
+                        ]
+                      },
+                      "body": {
+                        "type": "return",
+                        "value": { "type": "id", "value": "_var104" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "mapsnd" },
+      "args": [
+        { "type": "id", "value": "pairs" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var108" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "pairs" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var108" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var109" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var109" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var110" },
+            "expr": {
+              "type": "prim",
+              "oper": "car",
+              "args": [{ "type": "id", "value": "pairs" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var111" },
+              "expr": {
+                "type": "prim",
+                "oper": "cdr",
+                "args": [{ "type": "id", "value": "_var110" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var113" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "cdr",
+                  "args": [{ "type": "id", "value": "pairs" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var114" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "mapsnd" },
+                    "args": [
+                      { "type": "id", "value": "_var113" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var112" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cons",
+                      "args": [
+                        { "type": "id", "value": "_var111" },
+                        { "type": "id", "value": "_var114" }
+                      ]
+                    },
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var112" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "max" },
+      "args": [
+        { "type": "id", "value": "a" },
+        { "type": "id", "value": "b" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var116" },
+        "expr": {
+          "type": "prim",
+          "oper": ">",
+          "args": [
+            { "type": "id", "value": "a" },
+            { "type": "id", "value": "b" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var116" },
+          "then": {
+            "type": "return",
+            "value": { "type": "id", "value": "a" }
+          },
+          "else": {
+            "type": "return",
+            "value": { "type": "id", "value": "b" }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "algb2" },
+      "args": [
+        { "type": "id", "value": "k0j1" },
+        { "type": "id", "value": "k1j1" },
+        { "type": "id", "value": "pairs" },
+        { "type": "id", "value": "x" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var117" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "pairs" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var117" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var118" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var118" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var119" },
+            "expr": {
+              "type": "prim",
+              "oper": "car",
+              "args": [{ "type": "id", "value": "pairs" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "k0j" },
+              "expr": {
+                "type": "prim",
+                "oper": "cdr",
+                "args": [{ "type": "id", "value": "_var119" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var121" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "car",
+                  "args": [{ "type": "id", "value": "pairs" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "y" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "car",
+                    "args": [{ "type": "id", "value": "_var121" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var123" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "eq?",
+                      "args": [
+                        { "type": "id", "value": "x" },
+                        { "type": "id", "value": "y" }
+                      ]
+                    },
+                    "body": {
+                      "type": "if",
+                      "cond": { "type": "id", "value": "_var123" },
+                      "then": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var124" },
+                        "expr": { "type": "iconst", "value": 1 },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "kjcurr" },
+                          "expr": {
+                            "type": "prim",
+                            "oper": "+",
+                            "args": [
+                              { "type": "id", "value": "_var124" },
+                              { "type": "id", "value": "k0j1" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var127" },
+                            "expr": {
+                              "type": "prim",
+                              "oper": "cons",
+                              "args": [
+                                { "type": "id", "value": "y" },
+                                { "type": "id", "value": "kjcurr" }
+                              ]
+                            },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var129" },
+                              "expr": {
+                                "type": "prim",
+                                "oper": "cdr",
+                                "args": [{ "type": "id", "value": "pairs" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var130" },
+                                "expr": {
+                                  "type": "call",
+                                  "id": { "type": "id", "value": "algb2" },
+                                  "args": [
+                                    { "type": "id", "value": "k0j" },
+                                    { "type": "id", "value": "kjcurr" },
+                                    { "type": "id", "value": "_var129" },
+                                    { "type": "id", "value": "x" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "let",
+                                  "id": { "type": "id", "value": "_var128" },
+                                  "expr": {
+                                    "type": "prim",
+                                    "oper": "cons",
+                                    "args": [
+                                      { "type": "id", "value": "_var127" },
+                                      { "type": "id", "value": "_var130" }
+                                    ]
+                                  },
+                                  "body": {
+                                    "type": "return",
+                                    "value": { "type": "id", "value": "_var128" }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      },
+                      "else": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "kjcurr" },
+                        "expr": {
+                          "type": "call",
+                          "id": { "type": "id", "value": "max" },
+                          "args": [
+                            { "type": "id", "value": "k1j1" },
+                            { "type": "id", "value": "k0j" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var127" },
+                          "expr": {
+                            "type": "prim",
+                            "oper": "cons",
+                            "args": [
+                              { "type": "id", "value": "y" },
+                              { "type": "id", "value": "kjcurr" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var129" },
+                            "expr": {
+                              "type": "prim",
+                              "oper": "cdr",
+                              "args": [{ "type": "id", "value": "pairs" }
+                              ]
+                            },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var130" },
+                              "expr": {
+                                "type": "call",
+                                "id": { "type": "id", "value": "algb2" },
+                                "args": [
+                                  { "type": "id", "value": "k0j" },
+                                  { "type": "id", "value": "kjcurr" },
+                                  { "type": "id", "value": "_var129" },
+                                  { "type": "id", "value": "x" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var128" },
+                                "expr": {
+                                  "type": "prim",
+                                  "oper": "cons",
+                                  "args": [
+                                    { "type": "id", "value": "_var127" },
+                                    { "type": "id", "value": "_var130" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "return",
+                                  "value": { "type": "id", "value": "_var128" }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "algb1" },
+      "args": [
+        { "type": "id", "value": "xs" },
+        { "type": "id", "value": "pairs" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var132" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "xs" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var132" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var133" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "mapsnd" },
+              "args": [
+                { "type": "id", "value": "pairs" }
+              ]
+            },
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var133" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var134" },
+            "expr": { "type": "iconst", "value": 0 },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var136" },
+              "expr": { "type": "iconst", "value": 0 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var138" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "car",
+                  "args": [{ "type": "id", "value": "xs" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "n" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "algb2" },
+                    "args": [
+                      { "type": "id", "value": "_var134" },
+                      { "type": "id", "value": "_var136" },
+                      { "type": "id", "value": "pairs" },
+                      { "type": "id", "value": "_var138" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var140" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cdr",
+                      "args": [{ "type": "id", "value": "xs" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var141" },
+                      "expr": {
+                        "type": "call",
+                        "id": { "type": "id", "value": "algb1" },
+                        "args": [
+                          { "type": "id", "value": "_var140" },
+                          { "type": "id", "value": "n" }
+                        ]
+                      },
+                      "body": {
+                        "type": "return",
+                        "value": { "type": "id", "value": "_var141" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "algb" },
+      "args": [
+        { "type": "id", "value": "xs" },
+        { "type": "id", "value": "ys" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var142" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var144" },
+          "expr": {
+            "type": "call",
+            "id": { "type": "id", "value": "zip0" },
+            "args": [
+              { "type": "id", "value": "ys" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var145" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "algb1" },
+              "args": [
+                { "type": "id", "value": "xs" },
+                { "type": "id", "value": "_var144" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var143" },
+              "expr": {
+                "type": "prim",
+                "oper": "cons",
+                "args": [
+                  { "type": "id", "value": "_var142" },
+                  { "type": "id", "value": "_var145" }
+                ]
+              },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var143" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "algc" },
+      "args": [
+        { "type": "id", "value": "m" },
+        { "type": "id", "value": "n" },
+        { "type": "id", "value": "xs" },
+        { "type": "id", "value": "ys" },
+        { "type": "id", "value": "lst" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var147" },
+        "expr": {
+          "type": "prim",
+          "oper": "null?",
+          "args": [{ "type": "id", "value": "ys" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var147" },
+          "then": {
+            "type": "return",
+            "value": { "type": "id", "value": "lst" }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var148" },
+            "expr": { "type": "iconst", "value": 1 },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var150" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "getLength" },
+                "args": [
+                  { "type": "id", "value": "xs" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var149" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "eq?",
+                  "args": [
+                    { "type": "id", "value": "_var148" },
+                    { "type": "id", "value": "_var150" }
+                  ]
+                },
+                "body": {
+                  "type": "if",
+                  "cond": { "type": "id", "value": "_var149" },
+                  "then": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var152" },
+                    "expr": { "type": "iconst", "value": 1 },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var154" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "car",
+                        "args": [{ "type": "id", "value": "xs" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var155" },
+                        "expr": {
+                          "type": "call",
+                          "id": { "type": "id", "value": "elem" },
+                          "args": [
+                            { "type": "id", "value": "_var154" },
+                            { "type": "id", "value": "ys" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var153" },
+                          "expr": {
+                            "type": "prim",
+                            "oper": "eq?",
+                            "args": [
+                              { "type": "id", "value": "_var152" },
+                              { "type": "id", "value": "_var155" }
+                            ]
+                          },
+                          "body": {
+                            "type": "if",
+                            "cond": { "type": "id", "value": "_var153" },
+                            "then": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var157" },
+                              "expr": {
+                                "type": "prim",
+                                "oper": "car",
+                                "args": [{ "type": "id", "value": "xs" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var158" },
+                                "expr": {
+                                  "type": "prim",
+                                  "oper": "cons",
+                                  "args": [
+                                    { "type": "id", "value": "_var157" },
+                                    { "type": "id", "value": "lst" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "return",
+                                  "value": { "type": "id", "value": "_var158" }
+                                }
+                              }
+                            },
+                            "else": {
+                              "type": "return",
+                              "value": { "type": "id", "value": "lst" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "else": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var159" },
+                    "expr": { "type": "iconst", "value": 2 },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "m2" },
+                      "expr": {
+                        "type": "call",
+                        "id": { "type": "id", "value": "divide" },
+                        "args": [
+                          { "type": "id", "value": "m" },
+                          { "type": "id", "value": "_var159" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "xs1" },
+                        "expr": {
+                          "type": "call",
+                          "id": { "type": "id", "value": "take" },
+                          "args": [
+                            { "type": "id", "value": "m2" },
+                            { "type": "id", "value": "xs" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "xs2" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "drop" },
+                            "args": [
+                              { "type": "id", "value": "m2" },
+                              { "type": "id", "value": "xs" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "l1" },
+                            "expr": {
+                              "type": "call",
+                              "id": { "type": "id", "value": "algb" },
+                              "args": [
+                                { "type": "id", "value": "xs1" },
+                                { "type": "id", "value": "ys" }
+                              ]
+                            },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var161" },
+                              "expr": {
+                                "type": "call",
+                                "id": { "type": "id", "value": "reverse" },
+                                "args": [
+                                  { "type": "id", "value": "xs2" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var163" },
+                                "expr": {
+                                  "type": "call",
+                                  "id": { "type": "id", "value": "reverse" },
+                                  "args": [
+                                    { "type": "id", "value": "ys" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "let",
+                                  "id": { "type": "id", "value": "_var162" },
+                                  "expr": {
+                                    "type": "call",
+                                    "id": { "type": "id", "value": "algb" },
+                                    "args": [
+                                      { "type": "id", "value": "_var161" },
+                                      { "type": "id", "value": "_var163" }
+                                    ]
+                                  },
+                                  "body": {
+                                    "type": "let",
+                                    "id": { "type": "id", "value": "l2" },
+                                    "expr": {
+                                      "type": "call",
+                                      "id": { "type": "id", "value": "reverse" },
+                                      "args": [
+                                        { "type": "id", "value": "_var162" }
+                                      ]
+                                    },
+                                    "body": {
+                                      "type": "let",
+                                      "id": { "type": "id", "value": "_var166" },
+                                      "expr": { "type": "iconst", "value": 0 },
+                                      "body": {
+                                        "type": "let",
+                                        "id": { "type": "id", "value": "_var168" },
+                                        "expr": { "type": "iconst", "value": 0 },
+                                        "body": {
+                                          "type": "let",
+                                          "id": { "type": "id", "value": "_var170" },
+                                          "expr": { "type": "iconst", "value": 0 },
+                                          "body": {
+                                            "type": "let",
+                                            "id": { "type": "id", "value": "_var172" },
+                                            "expr": { "type": "iconst", "value": 1 },
+                                            "body": {
+                                              "type": "let",
+                                              "id": { "type": "id", "value": "_var171" },
+                                              "expr": {
+                                                "type": "prim",
+                                                "oper": "-",
+                                                "args": [
+                                                  { "type": "id", "value": "_var170" },
+                                                  { "type": "id", "value": "_var172" }
+                                                ]
+                                              },
+                                              "body": {
+                                                "type": "let",
+                                                "id": { "type": "id", "value": "_var175" },
+                                                "expr": {
+                                                  "type": "call",
+                                                  "id": { "type": "id", "value": "zip" },
+                                                  "args": [
+                                                    { "type": "id", "value": "l1" },
+                                                    { "type": "id", "value": "l2" }
+                                                  ]
+                                                },
+                                                "body": {
+                                                  "type": "let",
+                                                  "id": { "type": "id", "value": "k" },
+                                                  "expr": {
+                                                    "type": "call",
+                                                    "id": { "type": "id", "value": "findk" },
+                                                    "args": [
+                                                      { "type": "id", "value": "_var166" },
+                                                      { "type": "id", "value": "_var168" },
+                                                      { "type": "id", "value": "_var171" },
+                                                      { "type": "id", "value": "_var175" }
+                                                    ]
+                                                  },
+                                                  "body": {
+                                                    "type": "let",
+                                                    "id": { "type": "id", "value": "_var177" },
+                                                    "expr": {
+                                                      "type": "prim",
+                                                      "oper": "-",
+                                                      "args": [
+                                                        { "type": "id", "value": "m" },
+                                                        { "type": "id", "value": "m2" }
+                                                      ]
+                                                    },
+                                                    "body": {
+                                                      "type": "let",
+                                                      "id": { "type": "id", "value": "_var179" },
+                                                      "expr": {
+                                                        "type": "prim",
+                                                        "oper": "-",
+                                                        "args": [
+                                                          { "type": "id", "value": "n" },
+                                                          { "type": "id", "value": "k" }
+                                                        ]
+                                                      },
+                                                      "body": {
+                                                        "type": "let",
+                                                        "id": { "type": "id", "value": "_var181" },
+                                                        "expr": {
+                                                          "type": "call",
+                                                          "id": { "type": "id", "value": "drop" },
+                                                          "args": [
+                                                            { "type": "id", "value": "k" },
+                                                            { "type": "id", "value": "ys" }
+                                                          ]
+                                                        },
+                                                        "body": {
+                                                          "type": "let",
+                                                          "id": { "type": "id", "value": "ex1" },
+                                                          "expr": {
+                                                            "type": "call",
+                                                            "id": { "type": "id", "value": "algc" },
+                                                            "args": [
+                                                              { "type": "id", "value": "_var177" },
+                                                              { "type": "id", "value": "_var179" },
+                                                              { "type": "id", "value": "xs2" },
+                                                              { "type": "id", "value": "_var181" },
+                                                              { "type": "id", "value": "lst" }
+                                                            ]
+                                                          },
+                                                          "body": {
+                                                            "type": "let",
+                                                            "id": { "type": "id", "value": "_var183" },
+                                                            "expr": {
+                                                              "type": "call",
+                                                              "id": { "type": "id", "value": "take" },
+                                                              "args": [
+                                                                { "type": "id", "value": "k" },
+                                                                { "type": "id", "value": "ys" }
+                                                              ]
+                                                            },
+                                                            "body": {
+                                                              "type": "let",
+                                                              "id": { "type": "id", "value": "_var184" },
+                                                              "expr": {
+                                                                "type": "call",
+                                                                "id": { "type": "id", "value": "algc" },
+                                                                "args": [
+                                                                  { "type": "id", "value": "m2" },
+                                                                  { "type": "id", "value": "k" },
+                                                                  { "type": "id", "value": "xs1" },
+                                                                  { "type": "id", "value": "_var183" },
+                                                                  { "type": "id", "value": "ex1" }
+                                                                ]
+                                                              },
+                                                              "body": {
+                                                                "type": "return",
+                                                                "value": { "type": "id", "value": "_var184" }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "lcss" },
+      "args": [
+        { "type": "id", "value": "xs" },
+        { "type": "id", "value": "ys" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var185" },
+        "expr": {
+          "type": "call",
+          "id": { "type": "id", "value": "getLength" },
+          "args": [
+            { "type": "id", "value": "xs" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var187" },
+          "expr": {
+            "type": "call",
+            "id": { "type": "id", "value": "getLength" },
+            "args": [
+              { "type": "id", "value": "ys" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var189" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var186" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "algc" },
+                "args": [
+                  { "type": "id", "value": "_var185" },
+                  { "type": "id", "value": "_var187" },
+                  { "type": "id", "value": "xs" },
+                  { "type": "id", "value": "ys" },
+                  { "type": "id", "value": "_var189" }
+                ]
+              },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var186" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "makeList" },
+      "args": [
+        { "type": "id", "value": "n" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var191" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var192" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "_var191" },
+              { "type": "id", "value": "n" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var192" },
+            "then": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var193" },
+              "expr": {"type": "nil"},
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var193" }
+              }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var194" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var195" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "-",
+                  "args": [
+                    { "type": "id", "value": "n" },
+                    { "type": "id", "value": "_var194" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var196" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "makeList" },
+                    "args": [
+                      { "type": "id", "value": "_var195" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var197" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cons",
+                      "args": [
+                        { "type": "id", "value": "n" },
+                        { "type": "id", "value": "_var196" }
+                      ]
+                    },
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var197" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "body": {
+    "type": "let",
+    "id": { "type": "id", "value": "_var198" },
+    "expr": { "type": "iconst", "value": 1000 },
+    "body": {
+      "type": "let",
+      "id": { "type": "id", "value": "a" },
+      "expr": {
+        "type": "call",
+        "id": { "type": "id", "value": "makeList" },
+        "args": [
+          { "type": "id", "value": "_var198" }
+        ]
+      },
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var200" },
+        "expr": { "type": "iconst", "value": 50 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "b" },
+          "expr": {
+            "type": "call",
+            "id": { "type": "id", "value": "makeList" },
+            "args": [
+              { "type": "id", "value": "_var200" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var202" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "lcss" },
+              "args": [
+                { "type": "id", "value": "a" },
+                { "type": "id", "value": "b" }
+              ]
+            },
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var202" }
+            }
+          }
+        }
+      }
+    }
+  }}

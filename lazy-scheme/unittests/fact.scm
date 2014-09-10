@@ -1,0 +1,15 @@
+(define (fact n)
+  (let ((k 0))
+    (let ((cond (eq? n k)))
+      (if cond
+	  (let ((res 1))
+	    res)
+	  (let ((k 1))
+	    (let ((m (- n k)))
+	      (let ((res1 (fact m)))
+		(let ((res (* n res1)))
+		  res))))))))
+
+(let ((a 5))
+  (let ((res (fact a)))
+    res))
