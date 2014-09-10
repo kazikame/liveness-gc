@@ -35,6 +35,14 @@
 %\usepackage{algorithmic}
 %\usepackage{anysize}     
 \input{fh_defs}
+\def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
+      0pt width #2\hfill\vrule height #3 depth 0pt width #2\hfill
+      }}\vbox to #3{\vfill\hrule height #2 depth 0pt width
+      #1 \vfill}}
+      %Poor man's typography
+\def\concat{\mathrel{\drawplusplus {12pt}{0.4pt}{5pt}}}
+      %It would be better to specify these in font-relative measures, but it 
+      %probably doesn't scale anyway.
 %\newcommand{\comment}[1]{}
 \definecolor{Myblue}{rgb}{0.0,0.0,0.5}
 \newcommand{\comment}[1]{{\color{Myblue}{\medskip \hrule\medskip
@@ -44,7 +52,7 @@
 \newcommand{\scmpair}{\mbox{\sf\em pair?}}
 \newcommand{\scmprim}{\ensuremath{\mathsf{+}}}
 \newcommand{\sh}[1]{{\colorbox{gray!20}{\framebox{$#1$}}}}
-
+\nonstopmode
 \def\myvec{\mathaccent"017E } % wretched springer mode redefines \vec as bold!
 \newcommand{\stk}{\mbox{S}}       % stack
 \newcommand{\ID}{\mbox{$\mathbf{ id}$}} % identity function
@@ -107,6 +115,8 @@
 %% \end{figure}
 
 \input{sections/intro}
+\input{sections/syntax-and-semantics}
+\input{sections/liveness}
 
 %\input{sections/restOfOldPaper}
 \bibliography{fun_hra}{}
