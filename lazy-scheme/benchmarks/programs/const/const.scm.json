@@ -1,0 +1,105 @@
+{
+  "type": "program",
+  "defines": [
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "fact" },
+      "args": [
+        { "type": "id", "value": "x" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var0" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var1" },
+          "expr": {
+            "type": "prim",
+            "oper": "=",
+            "args": [
+              { "type": "id", "value": "x" },
+              { "type": "id", "value": "_var0" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var1" },
+            "then": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var2" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var2" }
+              }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var3" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var4" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "-",
+                  "args": [
+                    { "type": "id", "value": "x" },
+                    { "type": "id", "value": "_var3" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var5" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "fact" },
+                    "args": [
+                      { "type": "id", "value": "_var4" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var6" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "*",
+                      "args": [
+                        { "type": "id", "value": "x" },
+                        { "type": "id", "value": "_var5" }
+                      ]
+                    },
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var6" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "body": {
+    "type": "let",
+    "id": { "type": "id", "value": "_var7" },
+    "expr": { "type": "iconst", "value": 4 },
+    "body": {
+      "type": "let",
+      "id": { "type": "id", "value": "_var8" },
+      "expr": {
+        "type": "call",
+        "id": { "type": "id", "value": "fact" },
+        "args": [
+          { "type": "id", "value": "_var7" }
+        ]
+      },
+      "body": {
+        "type": "return",
+        "value": { "type": "id", "value": "_var8" }
+      }
+    }
+  }}

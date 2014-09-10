@@ -1,0 +1,111 @@
+Calling /home/pk/APS-2014/repos/lgc/src/Simulator with /home/pk/APS-2014/repos/lgc/src/../benchmarks/programs/testgc/testgc.scm 143370 1
+Simulator created successfully
+Parsing /home/pk/APS-2014/repos/lgc/src/../benchmarks/programs/testgc/testgc.scm
+The anf file is being written to  /home/pk/APS-2014/repos/lgc/src/../benchmarks/programs/testgc/anf_testgc.scm
+Reading data from cached files 
+Num of states 150
+Done initializing
+Number of cells copied 35
+Number of cells copied 40
+Number of cells copied 40
+Number of cells copied 40
+Number of cells copied 40
+Number of cells copied 40
+Number of cells copied 40
+Number of cells copied 40
+Number of cells copied 33
+Number of cells copied 38
+Number of cells copied 38
+Number of cells copied 38
+Number of cells copied 38
+Number of cells copied 38
+Number of cells copied 38
+Number of cells copied 38
+Number of cells copied 30
+Number of cells copied 35
+Number of cells copied 35
+Number of cells copied 35
+Number of cells copied 35
+Number of cells copied 35
+Number of cells copied 35
+Number of cells copied 35
+Number of cells copied 27
+Number of cells copied 32
+Number of cells copied 32
+Number of cells copied 32
+Number of cells copied 32
+Number of cells copied 32
+Number of cells copied 32
+Number of cells copied 32
+Number of cells copied 32
+Number of cells copied 29
+Number of cells copied 29
+Number of cells copied 29
+Number of cells copied 29
+Number of cells copied 29
+Number of cells copied 29
+Number of cells copied 29
+Number of cells copied 29
+Number of cells copied 21
+Number of cells copied 26
+Number of cells copied 26
+Number of cells copied 26
+Number of cells copied 26
+Number of cells copied 26
+Number of cells copied 26
+Number of cells copied 26
+Number of cells copied 18
+Number of cells copied 23
+Number of cells copied 23
+Number of cells copied 23
+Number of cells copied 23
+Number of cells copied 23
+Number of cells copied 23
+Number of cells copied 23
+Number of cells copied 15
+Number of cells copied 20
+Number of cells copied 20
+Number of cells copied 20
+Number of cells copied 20
+Number of cells copied 20
+Number of cells copied 20
+Number of cells copied 20
+Number of cells copied 20
+Number of cells copied 17
+Number of cells copied 17
+Number of cells copied 17
+Number of cells copied 17
+Number of cells copied 17
+Number of cells copied 17
+Number of cells copied 17
+Number of cells copied 17
+Number of cells copied 9
+Number of cells copied 14
+Number of cells copied 14
+Number of cells copied 14
+Number of cells copied 14
+Number of cells copied 14
+Number of cells copied 14
+Number of cells copied 14
+Number of cells copied 6
+Number of cells copied 11
+Number of cells copied 11
+Number of cells copied 11
+Number of cells copied 11
+Number of cells copied 11
+Number of cells copied 11
+Number of cells copied 11
+Number of cells copied 3
+Number of cells copied 8
+Number of cells copied 8
+Number of cells copied 8
+Number of cells copied 8
+Number of cells copied 8
+Number of cells copied 8
+Number of cells copied 8
+loc ans = (4195.(4194.(4193.(4192.(4191.(4190.(4189.(4188.(4187.(4186.(4185.(4184.()
+))))))))))))
+Completed program evaluation
+Heap total=143370 Heap left=6556 Heap used=136814
+GC Invocations=98 GC Time=0.18
+Program Execution Time=166.34 seconds

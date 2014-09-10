@@ -1,0 +1,1 @@
+fft3.scm is same as fft2.scm, just comments have been removed and '() has been changed to () .

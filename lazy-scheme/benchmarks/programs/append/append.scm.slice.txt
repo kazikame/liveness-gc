@@ -1,0 +1,39 @@
+PROGRAM:
+(DEFINE (sq x)
+        (LET (_var0 = (* x
+                         x)) IN
+             _var0))
+
+(DEFINE (double x)
+        (LET (_var1 = (+ x
+                         x)) IN
+             _var1))
+
+(DEFINE (append ax ay)
+        (LET (_var2 = (NULL? ax)) IN
+             (IF _var2
+                 ay
+                 (LET (_var3 = (CAR ax)) IN
+                      (LET (_var5 = (CDR ax)) IN
+                           (LET (_var6 = (append _var5
+                                                 ay)) IN
+                                (LET (_var4 = (cons _var3
+                                                    _var6)) IN
+                                     _var4)))))))
+
+(LET (_var8 = 1) IN
+     (LET (_var10 = 2) IN
+          (LET (_var11 = (double _var10)) IN
+               (LET (_var12 = (sq _var11)) IN
+                    (LET (_var14 = NIL) IN
+                         (LET (_var13 = (cons _var12
+                                              _var14)) IN
+                              (LET (_var9 = (cons _var8
+                                                  _var13)) IN
+                                   (LET (_var18 = 3) IN
+                                        (LET (_var20 = NIL) IN
+                                             (LET (_var19 = (cons _var18
+                                                                  _var20)) IN
+                                                  (LET (_var17 = (append _var9
+                                                                         _var19)) IN
+                                                       _var17)))))))))))

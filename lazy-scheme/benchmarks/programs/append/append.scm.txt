@@ -1,0 +1,39 @@
+PROGRAM:
+p#0: (DEFINE (sq x)
+             p#1: (LET (_var0 = p#2: (* p#3: x
+                                        p#4: x)) IN
+                       (RETURN p#5: _var0)))
+
+p#6: (DEFINE (double x)
+             p#7: (LET (_var1 = p#8: (+ p#9: x
+                                        p#10: x)) IN
+                       (RETURN p#11: _var1)))
+
+p#12: (DEFINE (append ax ay)
+              p#13: (LET (_var2 = p#14: (NULL? p#15: ax)) IN
+                         p#16: (IF p#17: _var2
+                                   (RETURN p#18: ay)
+                                   p#19: (LET (_var3 = p#20: (CAR p#21: ax)) IN
+                                              p#22: (LET (_var5 = p#23: (CDR p#24: ax)) IN
+                                                         p#25: (LET (_var6 = p#26: (append p#27: _var5
+                                                                                           p#28: ay)) IN
+                                                                    p#29: (LET (_var4 = p#30: (cons p#31: _var3
+                                                                                                    p#32: _var6)) IN
+                                                                               (RETURN p#33: _var4))))))))
+
+p#34: (LET (_var8 = p#35: 1) IN
+           p#36: (LET (_var10 = p#37: 2) IN
+                      p#38: (LET (_var11 = p#39: (double p#40: _var10)) IN
+                                 p#41: (LET (_var12 = p#42: (sq p#43: _var11)) IN
+                                            p#44: (LET (_var14 = p#45: NIL) IN
+                                                       p#46: (LET (_var13 = p#47: (cons p#48: _var12
+                                                                                        p#49: _var14)) IN
+                                                                  p#50: (LET (_var9 = p#51: (cons p#52: _var8
+                                                                                                  p#53: _var13)) IN
+                                                                             p#54: (LET (_var18 = p#55: 3) IN
+                                                                                        p#56: (LET (_var20 = p#57: NIL) IN
+                                                                                                   p#58: (LET (_var19 = p#59: (cons p#60: _var18
+                                                                                                                                    p#61: _var20)) IN
+                                                                                                              p#62: (LET (_var17 = p#63: (append p#64: _var9
+                                                                                                                                                 p#65: _var19)) IN
+                                                                                                                         (RETURN p#66: _var17))))))))))))
