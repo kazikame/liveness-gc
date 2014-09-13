@@ -99,6 +99,7 @@ void IdExprNode::doLabel(bool shouldAddLabel)
 cons* IdExprNode::evaluate(cons* heap_cell = NULL)
 {
 	std::string varName = *(this->pID);
+	//cout << "Evaluating " << varName << endl;
 	if (heap_cell->inWHNF)
 	{
 		return heap_cell;
@@ -140,7 +141,6 @@ cons* ReturnExprNode::evaluate(cons* heap_cell = NULL)
 {
 
 	std::string varName = this->pID->getName();
-	cout << "returning the value of " << varName << endl;
 	cons* retval = (cons*)lookup_addr(varName.c_str());
 	if (retval->inWHNF)
 	{
@@ -188,7 +188,6 @@ cons* NilConstExprNode::make_closure()
 
 cons* NilConstExprNode::evaluate(cons* heap_cell = NULL)
 {
-	//cout << "Evaluating nil expr " << this << endl;
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
@@ -196,6 +195,7 @@ cons* NilConstExprNode::evaluate(cons* heap_cell = NULL)
 		while (!heap_cell->inWHNF)
 			heap_cell = heap_cell->val.closure.expr->evaluate(heap_cell);
 		heap_cell->inWHNF = true;
+		heap_cell->typecell = nilExprClosure;
 
 		return heap_cell;
 	}
@@ -218,7 +218,7 @@ cons* IntConstExprNode::evaluate(cons* heap_cell = NULL)
 {
 	if (heap_cell->inWHNF)
 	{
-		//cout << "Returning " << heap_ptr << " with value " << heap_ptr->val.intVal << endl;
+		//cout << "Returning " << heap_cell << " with value " << heap_cell->val.intVal << endl;
 		return heap_cell;
 	}
 
@@ -370,6 +370,7 @@ cons* IfExprNode::evaluate(cons* heap_cell = NULL)
 	}
 	else
 	{
+		//cout << "Processing if-then-else"<<endl;
 		//The condition is always a variable. Get the heap location associated with it
 		//by looking up in the stack.
 		IdExprNode* i = (IdExprNode*)this->pCond;
@@ -383,13 +384,16 @@ cons* IfExprNode::evaluate(cons* heap_cell = NULL)
 
 		if (cond_resultValue->val.boolval)
 		{
-			retval = this->pThen->evaluate();
+			retval = this->pThen->evaluate(heap_cell);
 		}
 		else
 		{
-			retval = this->pElse->evaluate();
+			retval = this->pElse->evaluate(heap_cell);
 		}
-		return retval;
+		heap_cell->typecell = retval->typecell;
+		heap_cell->val = retval->val;
+		heap_cell->inWHNF = true;
+		return heap_cell;
 	}
 }
 
@@ -443,7 +447,7 @@ LetExprNode * LetExprNode::clone() const
 
 cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 {
-	cout << "Processing let variable " << this->pID->getIDStr() << endl;
+	//cout << "Processing let variable " << this->pID->getIDStr() << endl;
 
 	if (gc_status != gc_disable && current_heap() == 0)
 		reachability_gc();
@@ -452,12 +456,12 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 	make_reference_addr(this->getVar().c_str(), getfree());
 
 	cons* var_res = this->getVarExpr()->make_closure();
-	cout << "Created closure for variable " << this->pID->getIDStr() <<" at " << var_res << " with type " << var_res->typecell <<endl;
+	//cout << "Created closure for variable " << this->pID->getIDStr() <<" at " << var_res << " with type " << var_res->typecell <<endl;
 
-	//cout << "Evaluating let expression " << this->pBody->heap_ptr << endl;
+	//cout << "Evaluating let expression " << this->pBody << endl;
 	var_res = this->getBody()->evaluate(var_res);
 
-	cout << "Evaluated let expression for variable "<< this->pID->getIDStr() <<" to " << var_res << " with type " << var_res->typecell << endl;
+	//cout << "Evaluated let expression for variable "<< this->pID->getIDStr() <<" to " << var_res << " with type " << var_res->typecell << endl;
 	return var_res;
 
 }
@@ -542,6 +546,7 @@ cons* UnaryPrimExprNode::make_closure()
 	retval->val.closure.expr = this;
 	retval->val.closure.arg1 = pArg->make_closure();
 	retval->inWHNF = false;
+	//cout << "created closure at " << retval << " with closure at " << retval->val.closure.arg1 << endl;
 
 	return retval;
 }
@@ -549,7 +554,7 @@ cons* UnaryPrimExprNode::make_closure()
 
 cons* UnaryPrimExprNode::evaluateCarExpr(cons* heap_cell = NULL)
 {
-	cout << "Evaluating car for " << heap_cell << endl;
+	//cout << "Evaluating car for " << heap_cell << endl;
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
@@ -593,10 +598,12 @@ cons* UnaryPrimExprNode::evaluateNullqExpr(cons* heap_cell = NULL)
 		return heap_cell;
 	else
 	{
+		//cout << heap_cell->val.closure.arg1 << endl;
 		cons* arg1 = reduceParamToWHNF(heap_cell->val.closure.arg1);
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
+		//cout << "Type of heap_cell is " << arg1->typecell << endl;
 		heap_cell->inWHNF = true;
-		heap_cell->val.boolval = (arg1->val.closure.arg1->typecell == nilExprClosure);
+		heap_cell->val.boolval = (arg1->typecell == nilExprClosure)? true:false;
 		heap_cell->typecell = constBoolExprClosure;
 		return heap_cell;
 	}
@@ -613,7 +620,8 @@ cons* UnaryPrimExprNode::evaluatePairqExpr(cons* heap_cell = NULL)
 		cons* arg1 = reduceParamToWHNF(heap_cell->val.closure.arg1);
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
 		heap_cell->inWHNF = true;
-		heap_cell->val.boolval = (arg1->val.closure.arg1->typecell == consExprClosure);
+		//cout << "Type of heap_cell is " << arg1->typecell << endl;
+		heap_cell->val.boolval = (arg1->typecell == consExprClosure);
 		heap_cell->typecell = constBoolExprClosure;
 		return heap_cell;
 	}
@@ -835,9 +843,9 @@ cons* BinaryPrimExprNode::evaluateEQ(cons* heap_cell = NULL)
 		break;
 		case constIntExprClosure: isequal = (arg1->val.intVal==arg2->val.intVal);
 		break;
-		case consExpr: isequal = (arg1->val.cell == arg2->val.cell);
+		case consExpr: isequal = (arg1 == arg2);
 		break;
-		default : isequal = (arg1->val.closure == arg2->val.closure);
+		default : isequal = (arg1 == arg2);
 		break;
 		}
 	}
@@ -890,8 +898,27 @@ std::string FuncExprNode::getFunction()
 
 cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
 {
-
 	//cout << "Evaluating function " << this->getFunction() << endl;
+	if (heap_cell->inWHNF)
+		return heap_cell;
+	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
+	make_environment(funcDef->getFuncName().c_str(), "");
+	auto num_args = pListArgs->size();
+	auto curr = heap_cell;
+	while(num_args > 0)
+	{
+		make_reference_addr((funcDef->getArgs()[num_args-1]).c_str(), curr->val.closure.arg2);
+		--num_args;
+		if (num_args > 0)
+		{
+			curr = curr->val.closure.arg1;
+		}
+	}
+	heap_cell = funcDef->getFunctionBody()->evaluate(heap_cell);
+	assert(heap_cell->inWHNF);
+	heap_cell->inWHNF = true;
+	delete_environment();
+	return heap_cell;
 //	if (!this->heap_ptr->inWHNF)
 //	{
 //		cout << "Calling function " << this->getFunction() << endl;
@@ -932,17 +959,31 @@ cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
 cons* FuncExprNode::make_closure()
 {
 	cons* retval = (cons*)allocate_cons();
-	int i = 0;
-//	for(std::list<ExprNode*>::iterator arg = this->pListArgs->begin(); arg != this->pListArgs->end(); ++arg, ++i)
-//	{
-//		argsClosureList.insert(argsClosureList.end(), (*arg)->make_closure());
-//	}
+	auto rarglistiter = this->pListArgs->rbegin();
+	int num_args = pListArgs->size() - 1;
+	//cout << "Num of arguments " << pListArgs->size() << " for fn call " << this->getFunction()<<endl;
 	retval->typecell=funcApplicationExprClosure;
-	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
-	//DO NOT CLONE THE FUNCTION BODY
-	this->fBody = funcDef->getFunctionBody()->clone();
-//	retval->val.expr = this;
-//	this->heap_ptr = retval;
+	retval->val.closure.expr = this;
+	retval->val.closure.arg1 = NULL;
+	retval->val.closure.arg2 = NULL;
+	if (pListArgs->size() > 0)
+	{
+		retval->val.closure.arg2 = lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
+		retval->inWHNF = false;
+		auto prev = retval;
+		while(num_args > 0)
+		{
+			++rarglistiter;
+			auto curr = allocate_cons();
+			curr->inWHNF = false;
+			curr->val.closure.arg2 =  lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
+			curr->val.closure.expr = this;
+			curr->val.closure.arg1 = NULL;
+			prev->val.closure.arg1 = curr;
+			prev = curr;
+			--num_args;
+		}
+	}
 	return retval;
 }
 
