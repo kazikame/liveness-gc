@@ -11,6 +11,7 @@
 #include <cstring>
 #include<utility>
 #include<set>
+
 using namespace std;
 
 namespace Scheme {
@@ -32,6 +33,7 @@ enum cell_type
 	consExprClosure,
 	unaryprimopExprClosure,
 	binaryprimopExprClosure,
+	funcArgClosure,
 	defaultClosure
 };
 typedef unsigned long clock_tick;
@@ -59,6 +61,8 @@ struct cons
   stateset *setofStates;
   int depth;
   bool inWHNF;
+  unsigned int closure_id;
+  unsigned int reduction_id;
 #ifdef GC_ENABLE_STATS
     /*----------------------------------------------------------------------
      * Following fields are added by Amey Karkare to
@@ -105,6 +109,8 @@ enum exprType
 	ifExpr,
 	defaultType
 };
+
+
 
 class Node {
 public:

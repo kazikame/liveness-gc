@@ -63,6 +63,7 @@ typedef struct activationRecord
 	string funcname;
 	vector<var_heap> heapRefs;
 	vector<var_stack> nonRefs;
+
 }actRec;
 
 
@@ -174,4 +175,7 @@ typedef struct activationRecord
  void liveness_gc();
  void dump_heap(string label);
  void print_accessible_heap();
+ int is_valid_address(void* addr);
+ void create_heap_bft(ostream&);
+ string print_cell_type(cell_type t);
 #endif
