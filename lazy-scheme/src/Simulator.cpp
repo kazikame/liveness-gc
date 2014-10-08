@@ -188,25 +188,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	printval(r);
 	cout << endl;
 
-//	if (r.type == heap)
-//	{
-//		cout << "loc ans = ";
-//		printval(r.val.addrVal);
-//		cout << endl;
-//	}
-//	else
-//	{
-//		cout << "ans = ";
-//		switch(r.type)
-//		{
-//		case intType : cout << r.val.intVal << endl;
-//		break;
-//		case stringType :  cout << r.val.stringVal << endl;
-//		break;
-//		case boolType : cout << r.val.boolVal << endl;
-//		break;
-//		}
-//	}
+
 	cout << "Completed program evaluation" << endl;
 	clock_t pend = clock();
 	if (gc_type != gc_disable)

@@ -12,6 +12,7 @@
 #include <set>
 #include <utility>
 #include <algorithm>
+#include <stack>
 #include "gc.h"
 using namespace std;
 
@@ -32,9 +33,9 @@ unsigned long newheapcells,oldheapcells;
 unsigned long copycells,heapslot,garbagecells;
 actRec *stack_start, *stack_top;
 GCStatus gc_status = gc_plain;
-int gccount = 1;
+int gccount = 0;
 
-
+ofstream gout("gc_addr.txt", ios::app);
 
 //Use only push_front and pop_front to insert and remove elements from actRecStack
 //Use iterator to iterate over the elements of actRecStack during garbage collection
@@ -46,6 +47,11 @@ stateMap statemap;
 state_index **state_transition_table; //Dynamically allocating a 2-D array might be error prone. See if vectors can be used instead.
 //call_next_data call_next; //Should we use a map?
 std::unordered_map<std::string, std::string> call_next;
+stack<cons*> update_heap_refs;
+stack<cons*> print_stack;
+unsigned int num_of_allocations = 0;
+map<cons*, int> heap_map;
+map<int, string> root_var_map;
 
 //ofstream gcout;
 
@@ -234,8 +240,8 @@ cons* allocate_cons()
     newheapcells=newheapcells+1;
     conscell->forward=NULL;
     conscell->setofStates = new stateset();
-
-
+    ++num_of_allocations;
+//    cout << "Num allocated " <<  num_of_allocations << endl;
  #ifdef GC_ENABLE_STATS
     conscell->created = gc_clock();
     conscell->is_reachable = 0;
@@ -547,13 +553,21 @@ void printval(void *ref)
 	update_last_use(cref);
 #endif
 //
-//	cout << "Printing value in " << cref << " with type " << cref->typecell << endl;
+	//cout << "Printing value in " << cref << " with type " << cref->typecell << endl;
 //	cout << "Is in WHNF?" << cref->inWHNF << endl;
-	while (!cref->inWHNF)
-		{
-			//cout << "value of cref " << cref << endl;
-			cref = cref->val.closure.expr->evaluate(cref);
-		}
+	if(!cref->inWHNF)
+	{
+		//cout << "value of cref " << cref << endl;
+		//cout << "(Printval)Pushing on to stack " << cref << endl;
+		update_heap_refs.push(cref);
+		cons *temp = cref->val.closure.expr->evaluate(cref);
+		//cout << "(Printval)Popping " << update_heap_refs.top()<< " value of temp = "<< temp <<endl;
+		cref = update_heap_refs.top();
+		cref->typecell = temp->typecell;
+		cref->inWHNF = temp->inWHNF;
+		cref->val = temp->val;
+		update_heap_refs.pop();
+	}
 
 	if (cref->typecell == nilExprClosure)
 	{
@@ -565,12 +579,17 @@ void printval(void *ref)
 	{
 		//cout << "Printing the cons cell car -> " << cref->val.cell.car << " cdr -> "<< cref->val.cell.cdr << endl;
 		//cout << "Car is of type  " << cref->val.cell.car->typecell << endl;
+		//Save the cdr pointer on stack. This might be updated if a GC happens during the printing of the car field.
+
+		print_stack.push(cref->val.cell.cdr);
 		cout<<"(";
 		printval(cref->val.cell.car);
 
-		//cout << "Cdr is of type  " << cref->val.cell.cdr->typecell << endl;
+		cons* cdr = print_stack.top();
+		//cout << "Cdr is of type  " << cdr->typecell << endl;
 		cout<<".";
-		printval(cref->val.cell.cdr);
+		printval(cdr);
+		print_stack.pop();
 		cout<<")";
 	}
 	else if(cref->typecell == constIntExprClosure)
@@ -686,13 +705,59 @@ void end_GC_dump()
 	 //gcout.close();
 	++gccount;
 }
+void update_heap_ref_stack()
+{
+	stack<cons*> temp;
+	//cout << "Number of elements in stack is " << update_heap_refs.size()<<endl;
+	//cout << buffer_live << " " << boundary_live << endl;
+	int i = 0;
+	while(!update_heap_refs.empty())
+	{
+		cons* heap_ref = update_heap_refs.top();
+		//cout << ++i << " " << heap_ref << "  " << heap_ref->forward << endl;
+		//cout << heap_ref->typecell << endl;
+		assert(heap_ref->forward != NULL);
+		heap_ref = heap_ref->forward;
+		assert(is_valid_address(heap_ref));
+		temp.push(heap_ref);
+		update_heap_refs.pop();
+	}
+	while(!temp.empty())
+	{
+		update_heap_refs.push(temp.top());
+		temp.pop();
+	}
+
+	assert(temp.empty());
+	//Update print stack
+	while(!print_stack.empty())
+	{
+		cons* heap_ref = print_stack.top();
+		//cout << ++i << " " << heap_ref << "  " << heap_ref->forward << endl;
+		//cout << heap_ref->typecell << endl;
+		assert(heap_ref->forward != NULL);
+		heap_ref = heap_ref->forward;
+		assert(is_valid_address(heap_ref));
+		temp.push(heap_ref);
+		print_stack.pop();
+	}
+	while(!temp.empty())
+	{
+		print_stack.push(temp.top());
+		temp.pop();
+	}
+}
+
 //garbage collector functions
 cons* copy(cons* node)
 {
 	void *addr;
 	if(node==NULL) return NULL;
 	if(!(node >= buffer_dead && node < boundary_dead))
+	{
+		cout << "Returning the same pointer as node is already in live buffer "<< node <<endl;
 		return node;
+	}
 	else
 	{
 		heapslot=heapslot+1;
@@ -702,9 +767,14 @@ cons* copy(cons* node)
 #endif
 		if((conscell->forward >= buffer_live) &&
 				(boundary_live > conscell->forward))
+		{
+			//cout << "Using forwarding pointer " << conscell->forward << " for " << conscell << endl;
 			return (conscell->forward);
+		}
+
 
 		addr = dup_cons(conscell);
+//		gout << conscell << " with type " << print_cell_type(conscell->typecell) << " copied to " << addr << endl;
 		conscell->forward=addr;
 		copycells=copycells+1;
 		++numcopied;
@@ -724,24 +794,17 @@ int copy_scan_children(cons* node)
 
 	if (conscell->typecell == consExprClosure)
 	{
+		//cout << "Copying contents of conscell " << conscell << endl;
 		cons* oldcar = conscell->val.cell.car;
 		addr=copy(conscell->val.cell.car);
 		conscell->val.cell.car=addr;
-		//cout << "Copied car part of cons cell " << oldcar << " to " << addr << endl;
-
-		//TODO : Fix this code to update it properly
-		//		if (!conscell->val.cell.car->inWHNF)
-//			conscell->val.cell.car->val.closure.expr->heap_ptr = addr;
+		//cout << "copied car from " << oldcar << " to " << addr << endl;
 
 
 		cons* oldcdr = conscell->val.cell.cdr;
 		addr=copy(conscell->val.cell.cdr);
 		conscell->val.cell.cdr=addr;
-		//TODO : Fix this code to update it properly
-//		if (!conscell->val.cell.cdr->inWHNF)
-//			conscell->val.cell.cdr->val.expr->heap_ptr = addr;
-
-		//cout << "Copied cdr part of cons cell " << oldcdr << " to " << addr << endl;
+		//cout << "copied cdr from " << oldcdr << " to " << addr << endl;
 	}
 	else
 	{
@@ -751,56 +814,27 @@ int copy_scan_children(cons* node)
 		case constBoolExprClosure:
 		case constStringExprClosure:
 		case nilExprClosure:
-//			if (!conscell->inWHNF)
-//				conscell->val.expr->heap_ptr = conscell;
 			break;
 		case unaryprimopExprClosure:
-		if(!conscell->inWHNF)
-		{
-			cons* arg1;
-			UnaryPrimExprNode* e = conscell->val.closure.expr;
-			cons* oldaddr = conscell->val.closure.arg1;
-			arg1 = copy(conscell->val.closure.arg1);
-			//((UnaryPrimExprNode*)conscell->val.expr)->argClosure = arg1;
-			//cout << "Updating expr pointer from " << e->heap_ptr << " to " << conscell<<endl;
-			//conscell->val.expr->heap_ptr = conscell;
-			cout << "Copied arg1 " << oldaddr << " to " << arg1 << endl;
-		}
-		break;
 		case binaryprimopExprClosure:
-		if(!conscell->inWHNF)
-		{
-//			cons *arg1, *arg2;
-//			BinaryPrimExprNode* e = conscell->val.expr;
-//			cons* oldarg1 = e->arg1Closure;
-//			arg1 = copy(e->arg1Closure);
-//			((BinaryPrimExprNode*)conscell->val.expr)->arg1Closure = arg1;
-//			cons* oldarg2 = e->arg2Closure;
-//			arg2 = copy((cons*)e->arg2Closure);
-//			((BinaryPrimExprNode*)conscell->val.expr)->arg2Closure = arg2;
-//			cout << "Updating expr pointer from " << e->heap_ptr << " to " << conscell<<endl;
-//			conscell->val.expr->heap_ptr = conscell;
-//			cout << "Copied arg1 " << oldarg1 << " to " << arg1 << endl;
-//			cout << "Copied arg1 " << oldarg2 << " to " << arg2 << endl;
-		}
-		break;
 		case funcApplicationExprClosure:
-		if (!conscell->inWHNF)
+		case funcArgClosure:
 		{
-//			FuncExprNode *e = conscell->val.expr;
-//			std::list<cons*> &argList = e->argsClosureList;
-//			for(std::list<cons*>::iterator arg = argList.begin(); arg != argList.end(); ++arg)
-//			{
-//				cons* oldarg = *arg;
-//				(*arg) = copy(*arg);
-//				//cout << "Copied arg " << oldarg << " to " << *arg << endl;
-//			}
-//			//cout << "Updating expr pointer from " << e->heap_ptr << " to " << conscell<<endl;
-//			conscell->val.expr->heap_ptr = conscell;
+			//cout << "Processing closure at " << conscell << " with type " << conscell->typecell<< endl;
+			cons* oldarg1 = conscell->val.closure.arg1;
+			addr=copy(conscell->val.closure.arg1);
+			conscell->val.closure.arg1=addr;
+			//cout << "Copied arg1 from " << oldarg1 << " to " << addr << endl;
 
+			cons* oldarg2 = conscell->val.closure.arg2;
+			addr=copy(conscell->val.closure.arg2);
+			conscell->val.closure.arg2=addr;
+			//cout << "Copied arg2 from " << oldarg2 << " to " << addr << endl;
 		}
+
 		break;
 		default : cout << "Should not have come to this point"<<endl;
+				  cout << "Processing " << conscell << " with type " << conscell->typecell << endl;
 		break;
 		}
 	}
@@ -902,27 +936,38 @@ void set_max_reachability()
 void reachability_gc()
 {
 
-	cout << "Doing Reachability based GC"<<endl;
-	cout << "Buffer Live " << buffer_live << endl;
-	cout << "Boundary Live" << boundary_live << endl;
-	cout << "Heap before RGC " << endl;
-	print_accessible_heap();
+//	cout << "Doing Reachability based GC"<<endl;
+//	cout << "Buffer Live " << buffer_live << endl;
+//	cout << "Boundary Live" << boundary_live << endl;
+//	cout << "Heap before RGC " << endl;
+//	print_accessible_heap();
+//	cout << "GC #"<<++gccount<<" after allocation# " << num_of_allocations << endl;
+//	ofstream pre("PreGC" + to_string(gccount) + ".txt", ios_base::app);
+//	create_heap_bft(pre);
+//	pre.close();
+
 	swap_buffer();
 	numcopied = 0;
+	int index = 0;
+	cout << "Starting reachability based GC after " <<  num_of_allocations << " allocations."<<endl;
+//	for(vector<var_heap>::iterator vhit = actRecStack.begin()->heapRefs.begin(); vhit != actRecStack.begin()->heapRefs.end(); ++vhit)
+//		cout << "heap_ref " << vhit->varname << " points to " << vhit->ref << endl;
+
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
 	{
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
 			cons *reference=vhit->ref;
-			//cout << "Processing root variable " << vhit->varname << " of type " << reference->typecell << endl;
+			//cout << "Processing root variable " << vhit->varname << " at " << reference << endl;
 			cons *addr=copy((cons*)reference);
-			cout << vhit->varname << " was copied from " << vhit->ref << " to " << addr << endl;
+			//cout << index++ <<" "<< vhit->varname << " with type "<< print_cell_type(reference->typecell)<<" was copied from " << vhit->ref << " to " << addr << endl;
 			vhit->ref = addr;
-			if (!addr->inWHNF)
-			{
-				//cout << "Updating heap ptr for expr from " << addr->val.expr->heap_ptr << " to " << addr << endl;
-				//addr->val.expr->heap_ptr = addr;
-			}
+
+//			if (!addr->inWHNF)
+//			{
+//				//cout << "Updating heap ptr for expr from " << addr->val.expr->heap_ptr << " to " << addr << endl;
+//				//addr->val.expr->heap_ptr = addr;
+//			}
 		}
 	}
 
@@ -937,8 +982,12 @@ void reachability_gc()
 #ifdef TEST_RUN
 	cout << "Max heap reachability till now "<< gmaxheapreachability << endl;
 #endif
-	cout << "Heap after RGC " << endl;
-	print_accessible_heap();
+//	cout << "Heap after RGC " << endl;
+//	print_accessible_heap();
+	update_heap_ref_stack();
+//	ofstream post("PostGC" + to_string(gccount) + ".txt" , ios_base::app);
+//	create_heap_bft(post);
+//	post.close();
 	return;
 }
 #endif
@@ -1213,20 +1262,229 @@ void clear_liveness_data()
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //For debugging
-void print_accessible_heap()
+void print_accessible_heap(string& filename)
 {
-	cout <<"----------------------------------------------------------------------------"<<endl;
+	ofstream out(filename);
+	int index = 0;
+	out <<"----------------------------------------------------------------------------"<<endl;
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
 	{
-		cout << "In function " << stackit->funcname << endl;
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
 			cons* conscell = vhit->ref;
-			cout << vhit->varname << " points to " << conscell << " and has type " << conscell->typecell << endl;
+			out << vhit->varname << " points to " << conscell << " and has type " << conscell->typecell << endl;
 		}
 	}
-	cout <<"----------------------------------------------------------------------------"<<endl;
+	out <<"----------------------------------------------------------------------------"<<endl;
 }
+
+
+struct heap_data
+{
+	int index;
+	enum cell_type ct;
+	cons* arg1;
+	cons* arg2;
+	union
+	{
+		int intval;
+		bool boolval;
+		std::string* stringval;
+	}val;
+};
+
+string print_cell_type(cell_type t)
+{
+	switch(t)
+	{
+	case constIntExprClosure : return "Integer";
+	case constBoolExprClosure: return "Boolean";
+	case constStringExprClosure: return "String";
+	case nilExprClosure: return "()";
+	case consExprClosure: return "cons cell";
+	case unaryprimopExprClosure : return "UnaryPrimOp";
+	case binaryprimopExprClosure: return "BinaryPrimOp";
+	case funcApplicationExprClosure:
+	case funcArgClosure: return "FuncApp";
+	default : cout << "Trying to print cell type " << t << endl ; return " error ";
+	}
+}
+
+void add_elements_to_vector(vector<cons*> &v, stack<cons*> st)
+{
+	vector<cons*> temp;
+	while(!st.empty())
+	{
+		temp.push_back(st.top());
+		st.pop();
+	}
+	v.insert(v.end(), temp.begin(), temp.end());
+	std::reverse(temp.begin(), temp.end());
+	for(auto ele : temp)
+		st.push(ele);
+
+}
+
+int num_root_vars = 0;
+void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map, ostream& out)
+{
+
+	int index = 0;
+//	out << "Starting GC " << gccount << endl;
+	//Add elements from the other stacks also
+	out << "Number of root variables = " << heap_cell_list.size() << endl;
+	out << "Number of references to be updated on stack = " << update_heap_refs.size() << endl;
+	out << "Number of references on print stack = " << print_stack.size() << endl;
+	add_elements_to_vector(heap_cell_list, update_heap_refs);
+	add_elements_to_vector(heap_cell_list, print_stack);
+
+	out << "Starting GC " << endl;
+	for(auto elem : heap_cell_list)
+	{
+		if (index < num_root_vars)
+		{
+			out << index << "(" << elem << ")" << "("<< root_var_map[index]<< ")\t" << print_cell_type(elem->typecell)<<"\t\t";
+			++index;
+		}
+		else
+			out << index++ << "(" << elem << ")" << "\t" << print_cell_type(elem->typecell)<<"\t\t";
+
+		switch(elem->typecell)
+		{
+		case constIntExprClosure:out << "X\tX\t"<< elem->val.intVal<< endl; break;
+		case constBoolExprClosure:out << "X\tX\t"<< elem->val.boolval<<endl; break;
+		case constStringExprClosure:out << "X\tX\t"<< *(elem->val.stringVal)<<endl; break;
+		case nilExprClosure: out << "X\tX\t()"<< endl; break;
+		case unaryprimopExprClosure: out << heap_map[elem->val.closure.arg1]<<"\tX\t"<<endl;break;
+		case binaryprimopExprClosure:out << heap_map[elem->val.closure.arg1]<<"\t"
+				                         << heap_map[elem->val.closure.arg2] << endl;break;
+		case consExprClosure: out << heap_map[elem->val.cell.car]<<"\t"
+                				  << heap_map[elem->val.cell.cdr] << endl;break;
+		case funcApplicationExprClosure:
+		case funcArgClosure:
+		{
+			if (elem->val.closure.arg1 == NULL)
+			{
+				FuncExprNode* f = (FuncExprNode*)elem->val.closure.expr;
+				out << f->getFunction() << "\t";
+			}
+			else
+				out << heap_map[elem->val.closure.arg1] << "\t";
+			if (elem->val.closure.arg2 != NULL)
+			{
+				out << heap_map[elem->val.closure.arg2] << "\t";
+			}
+		}
+		out  << endl;
+		break;
+		default : out << endl;
+				break;
+		}
+
+	}
+
+	ofstream pre_gc_addr_list("pre_gc_addr.txt", ios::app);
+	for(auto ele: heap_cell_list)
+	{
+		pre_gc_addr_list << ele << " with type "<< print_cell_type(ele->typecell) << endl;
+	}
+	pre_gc_addr_list.close();
+
+	//out << "Completed writing GC " << gccount << endl;
+	out << "Completed writing GC " <<  endl;
+
+}
+
+void create_heap_bft(ostream& out)
+{
+
+	vector<cons*> heap_cell_list;
+
+	heap_map.clear();
+	root_var_map.clear();
+	unsigned long base = buffer_live;
+	int index = 0;
+//	for(vector<var_heap>::iterator vhit = actRecStack.begin()->heapRefs.begin(); vhit != actRecStack.begin()->heapRefs.end(); ++vhit)
+//			cout << "heap_ref " << vhit->varname << " points to " << vhit->ref << endl;
+	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
+	{
+		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
+		{
+			cons* conscell = vhit->ref;
+			if (heap_map.find(conscell) == heap_map.end())
+			{
+				heap_map[conscell] = index;
+				heap_cell_list.push_back(conscell);
+				//cout << "Pushing address " << conscell << endl;
+				root_var_map[index] = vhit->varname;
+				++index;
+			}
+
+		}
+	}
+	num_root_vars = index;
+	int curr_index = 0;
+	while (curr_index < heap_cell_list.size())
+	{
+		cons* curr_cell = heap_cell_list[curr_index];
+		switch(curr_cell->typecell)
+		{
+		case consExprClosure: {
+			cons* car_part = curr_cell->val.cell.car;
+
+			if (heap_map.find(car_part) == heap_map.end())
+			{
+				heap_map[car_part] = index;
+				++index;
+				heap_cell_list.push_back(car_part);
+			}
+			cons* cdr_part = curr_cell->val.cell.cdr;
+			if (heap_map.find(cdr_part) == heap_map.end())
+			{
+				heap_map[cdr_part] = index;
+				++index;
+				heap_cell_list.push_back(cdr_part);
+			}
+			//cout << "car = " << car_part << " and cdr = " << cdr_part << " for " << curr_cell << endl;
+		}
+		break;
+		case unaryprimopExprClosure: {
+			cons* arg1 = curr_cell->val.closure.arg1;
+			if (arg1 && (heap_map.find(arg1) == heap_map.end()))
+			{
+				heap_map[arg1] = index;
+				++index;
+				heap_cell_list.push_back(arg1);
+			}
+		}
+		break;
+		case binaryprimopExprClosure:
+		case funcApplicationExprClosure:
+		case funcArgClosure: {
+			cons* arg1 = curr_cell->val.closure.arg1;
+			if (arg1 && (heap_map.find(arg1) == heap_map.end()))
+			{
+				heap_map[arg1] = index;
+				++index;
+				heap_cell_list.push_back(arg1);
+			}
+			cons* arg2 = curr_cell->val.closure.arg2;
+			if (arg2 && (heap_map.find(arg2) == heap_map.end()))
+			{
+				heap_map[arg2] = index;
+				++index;
+				heap_cell_list.push_back(arg2);
+			}
+		}
+		break;
+		default : break;
+
+		}
+		++curr_index;
+	}
+	print_heap_cell_list(heap_cell_list, heap_map, out);
+}
+
 void print_buffer_data()
 {
   cout << "Buffer Live "<< buffer_live << endl;
