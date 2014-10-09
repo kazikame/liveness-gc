@@ -43,29 +43,18 @@ std::string getNextLabel()
 cons* reduceParamToWHNF(cons* cell)
 {
 	cons* heap_cell = update_heap_refs.top();
-//	cout << "Processing heap_cell " << heap_map[heap_cell]<< " with type " << print_cell_type(heap_cell->typecell) <<endl;
+
 	assert(is_valid_address(heap_cell));
 	if (heap_cell->inWHNF)
 	{
-//		cout << "Already in WHNF " << heap_map[heap_cell] << endl;
-//		if (heap_cell->typecell == constStringExprClosure)
-//			cout << "The value of the string being returned is " << (*heap_cell->val.stringVal) << endl;
 		return heap_cell;
 	}
 	else
 	{
 		cons* retval = heap_cell;
-		//cout << "Reducing to WHNF " << retval << endl;
 		cons *temp = (retval->val.closure.expr->evaluate());
-		//cout << "Pre retval = " << retval << " temp = " <<temp << endl;
 		retval=temp;
-//		cout << "Updating heap cell " << heap_map[retval] << "(" << retval << ")" << endl;
-		//cout << "Post retval = " << retval << " temp = " <<temp << endl;
-		//cout << "Reduced to WHNF " << retval << endl;
-//		if (!(is_valid_address(retval)))
-//			cout << "Address not valid !!!" << endl;
-//		else
-//			cout << "Valid addr :("<<endl;
+
 		assert(retval->inWHNF);
 		assert(is_valid_address(retval));
 
@@ -73,7 +62,7 @@ cons* reduceParamToWHNF(cons* cell)
 		heap_cell->typecell = retval->typecell;
 		heap_cell->val = retval->val;
 		heap_cell->inWHNF = retval->inWHNF;
-//		cout << "Returning from reduceParamtoWHNF " << heap_map[heap_cell] << " with type " << print_cell_type(heap_cell->typecell) << endl;
+
 		return heap_cell;
 	}
 }
@@ -136,22 +125,19 @@ cons* IdExprNode::evaluate(cons* heap_cell = NULL)
 	}
 	else
 	{
-		//cout << varName << " pushing onto stack in IdExpr " << retval << " with type " << retval->typecell << endl;
+
 		update_heap_refs.push(retval);
 		cons* temp = retval->val.closure.expr->evaluate();
-		//cout << "Popping in IdExpr " << update_heap_refs.top()<<endl;
+
 		heap_cell = update_heap_refs.top();
 		update_heap_refs.pop();
 		assert(is_valid_address(temp) && is_valid_address(heap_cell));
 		assert(temp->inWHNF);
-//		cout << "Updating value of variable " << varName << " at location " << heap_map[heap_cell]
-//				     << " with type " << print_cell_type(heap_cell->typecell)<< endl;
+
 		heap_cell->inWHNF = true;
 		heap_cell->typecell = temp->typecell;
 		heap_cell->val = temp->val;
-//		cout << "Updated value of variable " << varName << " at location " << heap_map[heap_cell]
-//				     << " with type " << print_cell_type(heap_cell->typecell)<< endl;
-		//cout << "returning " << heap_cell << " from idexpr" << endl;
+
 		return heap_cell;
 	}
 }
@@ -528,10 +514,13 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 {
 	//cout << "Processing let variable " << this->pID->getIDStr() << endl;
 
-	if ((gc_status != gc_disable && current_heap() == 5) ||
-			(getVarExpr()->isFunctionCallExpression() && (current_heap == (5 +((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) )
+	if ((gc_status != gc_disable && current_heap() < 5) ||
+			(getVarExpr()->isFunctionCallExpression() && (current_heap < (5 +((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) )
 	{
-		cout << "Calling GC from let"<<endl;
+		ofstream out("GC.txt", ios::app);
+		out << "reachable stack before calling GC " << num_of_allocations << endl;
+		create_heap_bft(out);
+		out.close();
 		reachability_gc();
 	}
 
@@ -546,24 +535,11 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 	cons* var_res = this->getVarExpr()->make_closure();
 
 
-//	cout << "Created closure for variable " << this->pID->getIDStr() <<" at " << heap_map[var_res]
-//	     << "(" << var_res  << ")"<< " with type " << print_cell_type(var_res->typecell) <<endl;
-//
-//
-//	ofstream out("func_call.txt", ios::app);
-//	out << "Evaluation stack after creating closure for " << this->pID->getIDStr() << " after " << num_of_allocations << endl;
-//	create_heap_bft(out);
-//	out.close();
 
-	//cout << "Evaluating let expression " << this->pBody << endl;
+
+
 	cons* retval = this->getBody()->evaluate();
-
-
-//	cout << "Evaluated let expression for variable "<< this->pID->getIDStr() <<" to " << heap_map[retval]
-//         << "(" << retval  << ")"<< " with type " << print_cell_type(retval->typecell) << endl;
-
 	assert(retval->inWHNF && is_valid_address(retval));
-
 
 //	out.open("func_call.txt", ios::app);
 //	out << "Evaluation stack after evaluating let body " << this->pID->getIDStr() << " after " << num_of_allocations << endl;

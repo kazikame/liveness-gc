@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.5.  */
+/* A Bison parser, made by GNU Bison 2.7.12-4996.  */
 
 /* Skeleton interface for Bison LALR(1) parsers in C++
    
-      Copyright (C) 2002-2011 Free Software Foundation, Inc.
+      Copyright (C) 2002-2013 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,14 +30,18 @@
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
+/**
+ ** \file scheme.tab.h
+ ** Define the Scheme::parser class.
+ */
+
 /* C++ LALR(1) parser skeleton written by Akim Demaille.  */
 
-#ifndef PARSER_HEADER_H
-# define PARSER_HEADER_H
+#ifndef YY_YY_SCHEME_TAB_H_INCLUDED
+# define YY_YY_SCHEME_TAB_H_INCLUDED
 
 /* "%code requires" blocks.  */
-
-/* Line 35 of lalr1.cc  */
+/* Line 33 of lalr1.cc  */
 #line 9 "scheme.y"
 
     #include "SchemeAST.h"
@@ -50,9 +54,8 @@
     }
 
 
-
-/* Line 35 of lalr1.cc  */
-#line 56 "scheme.tab.h"
+/* Line 33 of lalr1.cc  */
+#line 59 "scheme.tab.h"
 
 
 #include <string>
@@ -65,26 +68,11 @@
 # define YYDEBUG 1
 #endif
 
-/* Enabling verbose error messages.  */
-#ifdef YYERROR_VERBOSE
-# undef YYERROR_VERBOSE
-# define YYERROR_VERBOSE 1
-#else
-# define YYERROR_VERBOSE 0
-#endif
-
-/* Enabling the token table.  */
-#ifndef YYTOKEN_TABLE
-# define YYTOKEN_TABLE 0
-#endif
-
-
-/* Line 35 of lalr1.cc  */
+/* Line 33 of lalr1.cc  */
 #line 6 "scheme.y"
 namespace Scheme {
-
-/* Line 35 of lalr1.cc  */
-#line 88 "scheme.tab.h"
+/* Line 33 of lalr1.cc  */
+#line 76 "scheme.tab.h"
 
   /// A Bison parser.
   class SchemeParser
@@ -94,8 +82,7 @@ namespace Scheme {
 #ifndef YYSTYPE
     union semantic_type
     {
-
-/* Line 35 of lalr1.cc  */
+/* Line 33 of lalr1.cc  */
 #line 37 "scheme.y"
 
     int         *ival;
@@ -114,9 +101,8 @@ namespace Scheme {
     std::list<Scheme::AST::DefineNode *>    *dnodes;
 
 
-
-/* Line 35 of lalr1.cc  */
-#line 120 "scheme.tab.h"
+/* Line 33 of lalr1.cc  */
+#line 106 "scheme.tab.h"
     };
 #else
     typedef YYSTYPE semantic_type;
@@ -183,6 +169,10 @@ namespace Scheme {
 #endif
 
   private:
+    /// This class is not copyable.
+    SchemeParser (const SchemeParser&);
+    SchemeParser& operator= (const SchemeParser&);
+
     /// Report a syntax error.
     /// \param loc    where the syntax error is found.
     /// \param msg    a description of the syntax error.
@@ -266,14 +256,12 @@ namespace Scheme {
     /// For a rule, its LHS.
     static const unsigned char yyr1_[];
     /// For a rule, its RHS length.
-    static const unsigned char yyr2_[];
-
-#if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
-    /// For a symbol, its name in clear.
-    static const char* const yytname_[];
-#endif
+    static const unsigned char yyr2_[]; 
 
 #if YYDEBUG
+    /// For a symbol, its name in clear.
+    static const char* const yytname_[];
+
     /// A type to store symbol numbers and -1.
     typedef signed char rhs_number_type;
     /// A `-1'-separated list of the rules' RHS.
@@ -299,6 +287,7 @@ namespace Scheme {
 
     /// \brief Reclaim the memory associated to a symbol.
     /// \param yymsg        Why this token is reclaimed.
+    ///                     If null, do not display the symbol, just free it.
     /// \param yytype       The symbol type.
     /// \param yyvaluep     Its semantic value.
     /// \param yylocationp  Its location.
@@ -327,14 +316,12 @@ namespace Scheme {
     SchemeScanner &scanner;
     SchemeDriver &driver;
   };
-
-/* Line 35 of lalr1.cc  */
+/* Line 33 of lalr1.cc  */
 #line 6 "scheme.y"
 } // Scheme
-
-/* Line 35 of lalr1.cc  */
-#line 337 "scheme.tab.h"
-
+/* Line 33 of lalr1.cc  */
+#line 324 "scheme.tab.h"
 
 
-#endif /* ! defined PARSER_HEADER_H */
+
+#endif /* !YY_YY_SCHEME_TAB_H_INCLUDED  */
