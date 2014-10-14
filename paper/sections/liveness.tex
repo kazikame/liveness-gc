@@ -158,32 +158,48 @@ the corresponding tuple of demands the function makes on its arguments.
 \mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
           &=& \{x.\alpha \mid \acar\alpha \in \sigma\} \cup \{y.\alpha \mid \acdr\alpha \in \sigma\} \\
 \mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
-          &=& \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in \sigma\} \\
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in
+\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
 \mathit{ref\/}((\CDR~x),\sigma,\Lfonly)
-          &=& \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in \sigma\} \\
-\mathit{ref\/}((\ID~x),\sigma,\Lfonly)
-          &=& \{x.\sigma\} \\
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in
+\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
 \mathit{ref\/}((\PRIM~x~y),\sigma,\Lfonly)
-          &=& \{x.\epsilon,y.\epsilon\} \\
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon, y.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
 \mathit{ref\/}((\NULLQ~x),\sigma,\Lfonly)
-          &=& \{x.\epsilon\} \\
-\mathit{ref\/}((f~y_1~\cdots~y_n),\sigma,\Lfonly)
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
+\mathit{ref\/}((f~\myvec{x}),\sigma,\Lfonly)
 %          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
           &=&  \begin{array}{@{}l}  % to discourage \displaystyle
-               \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
+               \bigcup_{i=1}^n x_i.\Lf{f}{i}{\sigma}
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
 \mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& x.\sigma \\
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
-        \mathcal{L}(e_1,\sigma,\Lfonly) \cup
+        \begin{array}{l l}
+                    \mathcal{L}(e_1,\sigma,\Lfonly) \cup
         \mathcal{L}(e_2,\sigma,\Lfonly) \cup
-        \{x.\epsilon\} \\
-\mathcal{L}((\LET~x \leftarrow  s~\IN~e),\sigma,\Lfonly) &=&
+        \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+                    \mathcal{L}(e_1,\sigma,\Lfonly) \cup
+        \mathcal{L}(e_2,\sigma,\Lfonly)  & \mbox{otherwise}
+                 \end{array} \\
+\mathcal{L}(\LET~\myvec{x} \leftarrow \myvec{s}}~\IN~e),\sigma,\Lfonly) &=&
         \Lv
-           \setminus \{x.*\}
-           \cup \mathit{ref\/}(s,\Lv(x),\Lfonly)
-\mbox{ where } \Lv = \mathcal{L}(e,\sigma,\Lfonly)
+           \setminus \{\myvec{x}.*\}
+           \cup LE(L)
+\mbox{ where } \Lv = \lfloor\mathcal{L}(e,\sigma,\Lfonly)\rfloor_{\myvec{x}}
 \end{eqnarray*}
 
 \begin{minipage}{0.85\textwidth}
@@ -196,7 +212,15 @@ the corresponding tuple of demands the function makes on its arguments.
 \\ \makebox[0mm]{where
      $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
 \end{minipage}
-
+\begin{minipage}{0.85\textwidth}
+\infrule[live-define]
+        {\Le{L} = \biguplus_{i=1}^n \Le{ref(s_i, L(x_i), \Lfonly)}
+              \mbox{ for each $L$}
+        }
+        { \myvec{x} \leftarrow \myvec{s} \len \Leonly
+\\ \makebox[0mm]{where
+     $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
+\end{minipage}
 \normalsize
   \caption{Liveness equations and judgement rule}\label{fig:live-judge}
 \end{figure}
