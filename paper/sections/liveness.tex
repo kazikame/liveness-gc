@@ -186,15 +186,14 @@ the corresponding tuple of demands the function makes on its arguments.
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
-\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& x.\sigma \\
+\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& x.\sigma \mbox{, Create a new label \textit{l} and associate liveness corresponding to x}\\
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
         \begin{array}{l l}
                     \mathcal{L}(e_1,\sigma,\Lfonly) \cup
         \mathcal{L}(e_2,\sigma,\Lfonly) \cup
-        \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+        \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset        \mbox{, Create new label \textit{l} } = \textit{l}_{then} \bigcup \textit{l}_{else}}\\
                     \mathcal{L}(e_1,\sigma,\Lfonly) \cup
-        \mathcal{L}(e_2,\sigma,\Lfonly)  & \mbox{otherwise}
-                 \end{array} \\
+        \mathcal{L}(e_2,\sigma,\Lfonly)  & \mbox{otherwise} \end{array}  \\
 \mathcal{L}(\LET~\myvec{x} \leftarrow \myvec{s}}~\IN~e),\sigma,\Lfonly) &=&
         \Lv
            \setminus \{\myvec{x}.*\}
@@ -213,9 +212,9 @@ the corresponding tuple of demands the function makes on its arguments.
      $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
 \end{minipage}
 \begin{minipage}{0.85\textwidth}
-\infrule[live-define]
+\infrule[live-letblock]
         {\Le{L} = \biguplus_{i=1}^n \Le{ref(s_i, L(x_i), \Lfonly)}
-              \mbox{ for each $L$}
+              \mbox{ for any $L$}
         }
         { \myvec{x} \leftarrow \myvec{s} \len \Leonly
 \\ \makebox[0mm]{where
