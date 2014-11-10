@@ -252,20 +252,25 @@ the corresponding tuple of demands the function makes on its arguments.
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
-\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& x.\sigma \\
+\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& \{l \mapsto x.\sigma\}, \makebox[0mm]{\hspace*{3cm} where $l$ is a new label} \\
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
         \begin{array}{l l}
-                    \mathcal{L}(e_1,\sigma,\Lfonly) \cup
-        \mathcal{L}(e_2,\sigma,\Lfonly) \cup
-        \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
-                    \mathcal{L}(e_1,\sigma,\Lfonly) \cup
-        \mathcal{L}(e_2,\sigma,\Lfonly)  & \mbox{otherwise}
+                    \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
+        \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
+        \{l \mapsto  \{x.\epsilon\}\},  & \mbox{if}~\sigma \ne \emptyset\\
+        \emptyset  & \mbox{otherwise}
                  \end{array} \\
-        \mathcal{L}(\LET~\myvec{x} \leftarrow \myvec{s}~\IN~e),\sigma,\Lfonly) &=&
-        \Lv
-           \setminus \{\myvec{x}.*\}
-           \cup LE(L)
-\mbox{ where } \Lv = \lfloor\mathcal{L}(e,\sigma,\Lfonly)\rfloor_{\myvec{x}}
+ \makebox[0mm]{\hspace*{3.8cm} where $l$ is a new label}\\
+\mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+        \{ l \mapsto \Ldonly_{x \leftarrow s}(\Lv(x)) \mid l \mapsto \Lv
+        \in \mathcal{M}\}
+\mbox{ where } \mathcal{M} = \mathcal{L}(e,\sigma,\Lfonly)\\
+\Ldonly_{x \leftarrow s} &=& \Lfonly_f, \mbox{where}~f~\mbox{is a new function}\\
+ \makebox[0mm]{\hspace*{7cm}   
+ $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
+           x_2\, \ldots\, x_n)/x]))$,} \\
+ \makebox[0mm]{\hspace*{5.5cm} and 
+     $(\ x_1\, \ldots\, x_n)$ are the variables in $s$}
 \end{eqnarray*}
 
 \begin{minipage}{0.85\textwidth}
@@ -278,11 +283,21 @@ the corresponding tuple of demands the function makes on its arguments.
 \\ \makebox[0mm]{where
      $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
 \end{minipage}
+
+\bigskip
+\begin{center}
 \begin{minipage}{0.85\textwidth}
- \infrule[live-let-define]
-         {f~\stackrel{\text{\tiny def}}{=}~(\DEFINE~(f~ x)~(\SIF~*~x~s[(f~ x)/x],~\mbox{and}~\Ldonly_{x \leftarrow s}~\stackrel{\text{\tiny def}}{=}~\Lfonly_f}       
-         { x \leftarrow s \len \Ldonly_{x \leftarrow s}}
 \end{minipage}
+\end{center}
+%% \begin{minipage}{0.85\textwidth}
+%%  \infrule[live-let-define]
+%%          {f~\stackrel{\text{\tiny def}}{=}~(\DEFINE~(f~x_1
+%%            ~x_2 \ldots x_n)~(\SIF~*~x~s[(f~x_1~
+%%            x_2\ldots x_n)/x]),~\mbox{and}~\Ldonly_{x \leftarrow s}~\stackrel{\text{\tiny def}}{=}~\Lfonly_f}       
+%%          { x \leftarrow s \len \Ldonly_{x \leftarrow s}
+%% \\ \makebox[0mm]{where
+%%      $(\ x_1\ \ldots\ x_n)$ are the variables in $s$}}
+%% \end{minipage}
 \normalsize
   \caption{Liveness equations and judgement rule}\label{fig:live-judge}
 \end{figure}
