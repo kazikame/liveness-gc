@@ -1,0 +1,1256 @@
+{
+  "type": "program",
+  "defines": [
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "and" },
+      "args": [
+        { "type": "id", "value": "anx" },
+        { "type": "id", "value": "any" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var0" },
+        "expr": { "type": "bconst", "value": "#t" },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var1" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "anx" },
+              { "type": "id", "value": "_var0" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var1" },
+            "then": {
+              "type": "return",
+              "value": { "type": "id", "value": "any" }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var2" },
+              "expr": { "type": "bconst", "value": "#f" },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var2" }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "or" },
+      "args": [
+        { "type": "id", "value": "orx" },
+        { "type": "id", "value": "ory" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var3" },
+        "expr": { "type": "bconst", "value": "#t" },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var4" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "orx" },
+              { "type": "id", "value": "_var3" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var4" },
+            "then": {
+              "type": "return",
+              "value": { "type": "id", "value": "orx" }
+            },
+            "else": {
+              "type": "return",
+              "value": { "type": "id", "value": "ory" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "divide" },
+      "args": [
+        { "type": "id", "value": "a" },
+        { "type": "id", "value": "b" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var5" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var6" },
+          "expr": {
+            "type": "call",
+            "id": { "type": "id", "value": "divide1" },
+            "args": [
+              { "type": "id", "value": "a" },
+              { "type": "id", "value": "b" },
+              { "type": "id", "value": "_var5" }
+            ]
+          },
+          "body": {
+            "type": "return",
+            "value": { "type": "id", "value": "_var6" }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "divide1" },
+      "args": [
+        { "type": "id", "value": "a" },
+        { "type": "id", "value": "b" },
+        { "type": "id", "value": "i" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var7" },
+        "expr": {
+          "type": "prim",
+          "oper": "<",
+          "args": [
+            { "type": "id", "value": "a" },
+            { "type": "id", "value": "b" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var7" },
+          "then": {
+            "type": "return",
+            "value": { "type": "id", "value": "i" }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var8" },
+            "expr": {
+              "type": "prim",
+              "oper": "-",
+              "args": [
+                { "type": "id", "value": "a" },
+                { "type": "id", "value": "b" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var10" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var11" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "+",
+                  "args": [
+                    { "type": "id", "value": "i" },
+                    { "type": "id", "value": "_var10" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var9" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "divide1" },
+                    "args": [
+                      { "type": "id", "value": "_var8" },
+                      { "type": "id", "value": "b" },
+                      { "type": "id", "value": "_var11" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var9" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "Node" },
+      "args": [
+        { "type": "id", "value": "left" },
+        { "type": "id", "value": "right" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var13" },
+        "expr": {
+          "type": "prim",
+          "oper": "cons",
+          "args": [
+            { "type": "id", "value": "left" },
+            { "type": "id", "value": "right" }
+          ]
+        },
+        "body": {
+          "type": "return",
+          "value": { "type": "id", "value": "_var13" }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "Power2" },
+      "args": [
+        { "type": "id", "value": "i" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var14" },
+        "expr": { "type": "iconst", "value": 1 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var15" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "_var14" },
+              { "type": "id", "value": "i" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var15" },
+            "then": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var16" },
+              "expr": { "type": "iconst", "value": 2 },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var16" }
+              }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var17" },
+              "expr": { "type": "iconst", "value": 2 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var19" },
+                "expr": { "type": "iconst", "value": 1 },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var20" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "-",
+                    "args": [
+                      { "type": "id", "value": "i" },
+                      { "type": "id", "value": "_var19" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var21" },
+                    "expr": {
+                      "type": "call",
+                      "id": { "type": "id", "value": "Power2" },
+                      "args": [
+                        { "type": "id", "value": "_var20" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var18" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "*",
+                        "args": [
+                          { "type": "id", "value": "_var17" },
+                          { "type": "id", "value": "_var21" }
+                        ]
+                      },
+                      "body": {
+                        "type": "return",
+                        "value": { "type": "id", "value": "_var18" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "TreeSize" },
+      "args": [
+        { "type": "id", "value": "i" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var23" },
+        "expr": { "type": "iconst", "value": 1 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var24" },
+          "expr": {
+            "type": "prim",
+            "oper": "+",
+            "args": [
+              { "type": "id", "value": "i" },
+              { "type": "id", "value": "_var23" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var25" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "Power2" },
+              "args": [
+                { "type": "id", "value": "_var24" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var27" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var26" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "-",
+                  "args": [
+                    { "type": "id", "value": "_var25" },
+                    { "type": "id", "value": "_var27" }
+                  ]
+                },
+                "body": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "_var26" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "NumIters" },
+      "args": [
+        { "type": "id", "value": "i" },
+        { "type": "id", "value": "kStretchTreeDepth" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var29" },
+        "expr": { "type": "iconst", "value": 2 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var31" },
+          "expr": {
+            "type": "call",
+            "id": { "type": "id", "value": "TreeSize" },
+            "args": [
+              { "type": "id", "value": "kStretchTreeDepth" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var33" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "TreeSize" },
+              "args": [
+                { "type": "id", "value": "i" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var32" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "divide" },
+                "args": [
+                  { "type": "id", "value": "_var31" },
+                  { "type": "id", "value": "_var33" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var30" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "*",
+                  "args": [
+                    { "type": "id", "value": "_var29" },
+                    { "type": "id", "value": "_var32" }
+                  ]
+                },
+                "body": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "_var30" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "MakeTree" },
+      "args": [
+        { "type": "id", "value": "iDepth" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var36" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var37" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "_var36" },
+              { "type": "id", "value": "iDepth" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var37" },
+            "then": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var38" },
+              "expr": {"type": "nil"},
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var40" },
+                "expr": {"type": "nil"},
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var39" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "Node" },
+                    "args": [
+                      { "type": "id", "value": "_var38" },
+                      { "type": "id", "value": "_var40" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var39" }
+                  }
+                }
+              }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var42" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var43" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "-",
+                  "args": [
+                    { "type": "id", "value": "iDepth" },
+                    { "type": "id", "value": "_var42" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var44" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "MakeTree" },
+                    "args": [
+                      { "type": "id", "value": "_var43" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var46" },
+                    "expr": { "type": "iconst", "value": 1 },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var47" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "-",
+                        "args": [
+                          { "type": "id", "value": "iDepth" },
+                          { "type": "id", "value": "_var46" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var48" },
+                        "expr": {
+                          "type": "call",
+                          "id": { "type": "id", "value": "MakeTree" },
+                          "args": [
+                            { "type": "id", "value": "_var47" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var45" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "Node" },
+                            "args": [
+                              { "type": "id", "value": "_var44" },
+                              { "type": "id", "value": "_var48" }
+                            ]
+                          },
+                          "body": {
+                            "type": "return",
+                            "value": { "type": "id", "value": "_var45" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "BottomUp" },
+      "args": [
+        { "type": "id", "value": "depth" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var50" },
+        "expr": {
+          "type": "call",
+          "id": { "type": "id", "value": "MakeTree" },
+          "args": [
+            { "type": "id", "value": "depth" }
+          ]
+        },
+        "body": {
+          "type": "return",
+          "value": { "type": "id", "value": "_var50" }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "LoopBottomUp" },
+      "args": [
+        { "type": "id", "value": "i" },
+        { "type": "id", "value": "depth" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var51" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var52" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "i" },
+              { "type": "id", "value": "_var51" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var52" },
+            "then": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var53" },
+              "expr": {"type": "nil"},
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var53" }
+              }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "tempTree" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "MakeTree" },
+                "args": [
+                  { "type": "id", "value": "depth" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "tempTree" },
+                "expr": {"type": "nil"},
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var54" },
+                  "expr": { "type": "iconst", "value": 1 },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var55" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "-",
+                      "args": [
+                        { "type": "id", "value": "i" },
+                        { "type": "id", "value": "_var54" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var56" },
+                      "expr": {
+                        "type": "call",
+                        "id": { "type": "id", "value": "LoopBottomUp" },
+                        "args": [
+                          { "type": "id", "value": "_var55" },
+                          { "type": "id", "value": "depth" }
+                        ]
+                      },
+                      "body": {
+                        "type": "return",
+                        "value": { "type": "id", "value": "_var56" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "TimeConstruction" },
+      "args": [
+        { "type": "id", "value": "depth" },
+        { "type": "id", "value": "kStretchTreeDepth" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "iNumIters" },
+        "expr": {
+          "type": "call",
+          "id": { "type": "id", "value": "NumIters" },
+          "args": [
+            { "type": "id", "value": "depth" },
+            { "type": "id", "value": "kStretchTreeDepth" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var57" },
+          "expr": {
+            "type": "call",
+            "id": { "type": "id", "value": "LoopBottomUp" },
+            "args": [
+              { "type": "id", "value": "iNumIters" },
+              { "type": "id", "value": "depth" }
+            ]
+          },
+          "body": {
+            "type": "return",
+            "value": { "type": "id", "value": "_var57" }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "loopTimeConstruction" },
+      "args": [
+        { "type": "id", "value": "kMinTreeDepth" },
+        { "type": "id", "value": "kMaxTreeDepth" },
+        { "type": "id", "value": "kStretchTreeDepth" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var58" },
+        "expr": {
+          "type": "prim",
+          "oper": ">",
+          "args": [
+            { "type": "id", "value": "kMinTreeDepth" },
+            { "type": "id", "value": "kMaxTreeDepth" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var58" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var59" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "return",
+              "value": { "type": "id", "value": "_var59" }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "iter" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "TimeConstruction" },
+              "args": [
+                { "type": "id", "value": "kMinTreeDepth" },
+                { "type": "id", "value": "kStretchTreeDepth" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var60" },
+              "expr": { "type": "iconst", "value": 2 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var61" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "+",
+                  "args": [
+                    { "type": "id", "value": "kMinTreeDepth" },
+                    { "type": "id", "value": "_var60" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var62" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "loopTimeConstruction" },
+                    "args": [
+                      { "type": "id", "value": "_var61" },
+                      { "type": "id", "value": "kMaxTreeDepth" },
+                      { "type": "id", "value": "kStretchTreeDepth" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var62" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "createArray" },
+      "args": [
+        { "type": "id", "value": "kArraySize" },
+        { "type": "id", "value": "i" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var63" },
+        "expr": {
+          "type": "prim",
+          "oper": "eq?",
+          "args": [
+            { "type": "id", "value": "i" },
+            { "type": "id", "value": "kArraySize" }
+          ]
+        },
+        "body": {
+          "type": "if",
+          "cond": { "type": "id", "value": "_var63" },
+          "then": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var64" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var66" },
+              "expr": {"type": "nil"},
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var65" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "cons",
+                  "args": [
+                    { "type": "id", "value": "_var64" },
+                    { "type": "id", "value": "_var66" }
+                  ]
+                },
+                "body": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "_var65" }
+                }
+              }
+            }
+          },
+          "else": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var68" },
+            "expr": { "type": "iconst", "value": 2 },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var69" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "divide" },
+                "args": [
+                  { "type": "id", "value": "kArraySize" },
+                  { "type": "id", "value": "_var68" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var70" },
+                "expr": {
+                  "type": "prim",
+                  "oper": ">",
+                  "args": [
+                    { "type": "id", "value": "i" },
+                    { "type": "id", "value": "_var69" }
+                  ]
+                },
+                "body": {
+                  "type": "if",
+                  "cond": { "type": "id", "value": "_var70" },
+                  "then": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var71" },
+                    "expr": {"type": "nil"},
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var73" },
+                      "expr": { "type": "iconst", "value": 1 },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var74" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "+",
+                          "args": [
+                            { "type": "id", "value": "i" },
+                            { "type": "id", "value": "_var73" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var75" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "createArray" },
+                            "args": [
+                              { "type": "id", "value": "kArraySize" },
+                              { "type": "id", "value": "_var74" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var72" },
+                            "expr": {
+                              "type": "prim",
+                              "oper": "cons",
+                              "args": [
+                                { "type": "id", "value": "_var71" },
+                                { "type": "id", "value": "_var75" }
+                              ]
+                            },
+                            "body": {
+                              "type": "return",
+                              "value": { "type": "id", "value": "_var72" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "else": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var77" },
+                    "expr": { "type": "iconst", "value": 1 },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var78" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "+",
+                        "args": [
+                          { "type": "id", "value": "i" },
+                          { "type": "id", "value": "_var77" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var79" },
+                        "expr": {
+                          "type": "call",
+                          "id": { "type": "id", "value": "createArray" },
+                          "args": [
+                            { "type": "id", "value": "kArraySize" },
+                            { "type": "id", "value": "_var78" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var80" },
+                          "expr": {
+                            "type": "prim",
+                            "oper": "cons",
+                            "args": [
+                              { "type": "id", "value": "i" },
+                              { "type": "id", "value": "_var79" }
+                            ]
+                          },
+                          "body": {
+                            "type": "return",
+                            "value": { "type": "id", "value": "_var80" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "checkArray" },
+      "args": [
+        { "type": "id", "value": "array" },
+        { "type": "id", "value": "index" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var81" },
+        "expr": { "type": "iconst", "value": 1 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var82" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "index" },
+              { "type": "id", "value": "_var81" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var82" },
+            "then": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var83" },
+              "expr": {
+                "type": "prim",
+                "oper": "car",
+                "args": [{ "type": "id", "value": "array" }
+                ]
+              },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var83" }
+              }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var84" },
+              "expr": {
+                "type": "prim",
+                "oper": "cdr",
+                "args": [{ "type": "id", "value": "array" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var86" },
+                "expr": { "type": "iconst", "value": 1 },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var87" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "-",
+                    "args": [
+                      { "type": "id", "value": "index" },
+                      { "type": "id", "value": "_var86" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var85" },
+                    "expr": {
+                      "type": "call",
+                      "id": { "type": "id", "value": "checkArray" },
+                      "args": [
+                        { "type": "id", "value": "_var84" },
+                        { "type": "id", "value": "_var87" }
+                      ]
+                    },
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var85" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "main" },
+      "args": [
+        { "type": "id", "value": "kStretchTreeDepth" },
+        { "type": "id", "value": "kLongLivedTreeDepth" },
+        { "type": "id", "value": "kArraySize" },
+        { "type": "id", "value": "kMinTreeDepth" },
+        { "type": "id", "value": "kMaxTreeDepth" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "tempTree" },
+        "expr": {
+          "type": "call",
+          "id": { "type": "id", "value": "MakeTree" },
+          "args": [
+            { "type": "id", "value": "kStretchTreeDepth" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "tempTree" },
+          "expr": {"type": "nil"},
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "longLivedTree" },
+            "expr": {
+              "type": "call",
+              "id": { "type": "id", "value": "MakeTree" },
+              "args": [
+                { "type": "id", "value": "kLongLivedTreeDepth" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var89" },
+              "expr": { "type": "iconst", "value": 1 },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "array" },
+                "expr": {
+                  "type": "call",
+                  "id": { "type": "id", "value": "createArray" },
+                  "args": [
+                    { "type": "id", "value": "kArraySize" },
+                    { "type": "id", "value": "_var89" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "loopTC" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "loopTimeConstruction" },
+                    "args": [
+                      { "type": "id", "value": "kMinTreeDepth" },
+                      { "type": "id", "value": "kMaxTreeDepth" },
+                      { "type": "id", "value": "kStretchTreeDepth" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var91" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "null?",
+                      "args": [{ "type": "id", "value": "longLivedTree" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var93" },
+                      "expr": { "type": "bconst", "value": "#f" },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var95" },
+                        "expr": { "type": "iconst", "value": 1 },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var96" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "checkArray" },
+                            "args": [
+                              { "type": "id", "value": "array" },
+                              { "type": "id", "value": "_var95" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var98" },
+                            "expr": { "type": "iconst", "value": 1 },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var97" },
+                              "expr": {
+                                "type": "prim",
+                                "oper": "eq?",
+                                "args": [
+                                  { "type": "id", "value": "_var96" },
+                                  { "type": "id", "value": "_var98" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var94" },
+                                "expr": {
+                                  "type": "prim",
+                                  "oper": "eq?",
+                                  "args": [
+                                    { "type": "id", "value": "_var93" },
+                                    { "type": "id", "value": "_var97" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "let",
+                                  "id": { "type": "id", "value": "_var92" },
+                                  "expr": {
+                                    "type": "call",
+                                    "id": { "type": "id", "value": "or" },
+                                    "args": [
+                                      { "type": "id", "value": "_var91" },
+                                      { "type": "id", "value": "_var94" }
+                                    ]
+                                  },
+                                  "body": {
+                                    "type": "if",
+                                    "cond": { "type": "id", "value": "_var92" },
+                                    "then": {
+                                      "type": "let",
+                                      "id": { "type": "id", "value": "_var102" },
+                                      "expr": {"type": "nil"},
+                                      "body": {
+                                        "type": "return",
+                                        "value": { "type": "id", "value": "_var102" }
+                                      }
+                                    },
+                                    "else": {
+                                      "type": "let",
+                                      "id": { "type": "id", "value": "_var103" },
+                                      "expr": { "type": "iconst", "value": 100 },
+                                      "body": {
+                                        "type": "let",
+                                        "id": { "type": "id", "value": "_var105" },
+                                        "expr": { "type": "iconst", "value": 100 },
+                                        "body": {
+                                          "type": "let",
+                                          "id": { "type": "id", "value": "_var104" },
+                                          "expr": {
+                                            "type": "prim",
+                                            "oper": "cons",
+                                            "args": [
+                                              { "type": "id", "value": "_var103" },
+                                              { "type": "id", "value": "_var105" }
+                                            ]
+                                          },
+                                          "body": {
+                                            "type": "return",
+                                            "value": { "type": "id", "value": "_var104" }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "body": {
+    "type": "let",
+    "id": { "type": "id", "value": "_var107" },
+    "expr": { "type": "iconst", "value": 16 },
+    "body": {
+      "type": "let",
+      "id": { "type": "id", "value": "_var109" },
+      "expr": { "type": "iconst", "value": 10 },
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var111" },
+        "expr": { "type": "iconst", "value": 5 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var113" },
+          "expr": { "type": "iconst", "value": 4 },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var115" },
+            "expr": { "type": "iconst", "value": 10 },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var108" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "main" },
+                "args": [
+                  { "type": "id", "value": "_var107" },
+                  { "type": "id", "value": "_var109" },
+                  { "type": "id", "value": "_var111" },
+                  { "type": "id", "value": "_var113" },
+                  { "type": "id", "value": "_var115" }
+                ]
+              },
+              "body": {
+                "type": "return",
+                "value": { "type": "id", "value": "_var108" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }}

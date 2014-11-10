@@ -1,0 +1,6 @@
+(let ((a 1))
+  (let ((b ()))
+    (let ((c (cons a b)))
+      (let ((d (car c)))
+	(let ((e (+ d d)))
+     e)))))

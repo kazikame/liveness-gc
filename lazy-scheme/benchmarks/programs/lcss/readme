@@ -1,0 +1,16 @@
+---The program file present in this folder has been used to calculate data during garbage collection.
+---fsm folder contains the corresponding cache files.
+---data folder contains the files with data calculated during garbage collection process.
+	---garbage-dump_<name>.txt file has been generated from gc.c file. (see detail_gc function inside it).
+	   Its format is: current cells, current memory, copy cells, copy memory, garbage cells, garbage memory, heap slots
+	   Each line corresponds to a instance of GC durin program execution.
+	---csv file adds one more filed to each line of garbage-dump file, i.e. , time taken in that particular instance of 
+	   GC. Second last line it has been generated from gc.c which ha been calculated at the end of program.
+	---Last line has starting tag final in it and its format is : no. of gc invocations , total gc time, program 		   execution time (excluding GC).
+	For more details, see function 'generateData' in file collector_gc.py. 
+
+Heap Memory for no Gc (Total Heap Memory required by the program): 12495360 Bytes
+
+Heap Memory set for Garbage Collection Test: 3145728 Bytes.
+
+--------------------------------------------------------

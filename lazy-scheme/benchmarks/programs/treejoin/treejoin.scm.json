@@ -1,0 +1,1900 @@
+{
+  "type": "program",
+  "defines": [
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "or" },
+      "args": [
+        { "type": "id", "value": "orx" },
+        { "type": "id", "value": "ory" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var0" },
+        "expr": { "type": "bconst", "value": "#t" },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var1" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "orx" },
+              { "type": "id", "value": "_var0" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var1" },
+            "then": {
+              "type": "return",
+              "value": { "type": "id", "value": "orx" }
+            },
+            "else": {
+              "type": "return",
+              "value": { "type": "id", "value": "ory" }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "makeNode" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "t1" },
+        { "type": "id", "value": "t2" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var2" },
+        "expr": { "type": "sconst", "value": "node" },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var3" },
+          "expr": {
+            "type": "prim",
+            "oper": "cons",
+            "args": [
+              { "type": "id", "value": "_var2" },
+              { "type": "id", "value": "k" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var5" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var6" },
+              "expr": {
+                "type": "prim",
+                "oper": "cons",
+                "args": [
+                  { "type": "id", "value": "t2" },
+                  { "type": "id", "value": "_var5" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var7" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "cons",
+                  "args": [
+                    { "type": "id", "value": "t1" },
+                    { "type": "id", "value": "_var6" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var4" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cons",
+                    "args": [
+                      { "type": "id", "value": "_var3" },
+                      { "type": "id", "value": "_var7" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var4" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "makeLeaf" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "e" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var9" },
+        "expr": { "type": "sconst", "value": "leaf" },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var10" },
+          "expr": {
+            "type": "prim",
+            "oper": "cons",
+            "args": [
+              { "type": "id", "value": "_var9" },
+              { "type": "id", "value": "k" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var12" },
+            "expr": {"type": "nil"},
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var13" },
+              "expr": {
+                "type": "prim",
+                "oper": "cons",
+                "args": [
+                  { "type": "id", "value": "e" },
+                  { "type": "id", "value": "_var12" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var11" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "cons",
+                  "args": [
+                    { "type": "id", "value": "_var10" },
+                    { "type": "id", "value": "_var13" }
+                  ]
+                },
+                "body": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "_var11" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "insertT" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "e" },
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var15" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "t" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var17" },
+          "expr": { "type": "sconst", "value": "empty" },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var16" },
+            "expr": {
+              "type": "prim",
+              "oper": "eq?",
+              "args": [
+                { "type": "id", "value": "_var15" },
+                { "type": "id", "value": "_var17" }
+              ]
+            },
+            "body": {
+              "type": "if",
+              "cond": { "type": "id", "value": "_var16" },
+              "then": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var19" },
+                "expr": {
+                  "type": "call",
+                  "id": { "type": "id", "value": "makeLeaf" },
+                  "args": [
+                    { "type": "id", "value": "k" },
+                    { "type": "id", "value": "e" }
+                  ]
+                },
+                "body": {
+                  "type": "return",
+                  "value": { "type": "id", "value": "_var19" }
+                }
+              },
+              "else": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var20" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "car",
+                  "args": [{ "type": "id", "value": "t" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var21" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "car",
+                    "args": [{ "type": "id", "value": "_var20" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var23" },
+                    "expr": { "type": "sconst", "value": "node" },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var22" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "eq?",
+                        "args": [
+                          { "type": "id", "value": "_var21" },
+                          { "type": "id", "value": "_var23" }
+                        ]
+                      },
+                      "body": {
+                        "type": "if",
+                        "cond": { "type": "id", "value": "_var22" },
+                        "then": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var25" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "insertTNode" },
+                            "args": [
+                              { "type": "id", "value": "k" },
+                              { "type": "id", "value": "e" },
+                              { "type": "id", "value": "t" }
+                            ]
+                          },
+                          "body": {
+                            "type": "return",
+                            "value": { "type": "id", "value": "_var25" }
+                          }
+                        },
+                        "else": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var26" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "insertTLeaf" },
+                            "args": [
+                              { "type": "id", "value": "k" },
+                              { "type": "id", "value": "e" },
+                              { "type": "id", "value": "t" }
+                            ]
+                          },
+                          "body": {
+                            "type": "return",
+                            "value": { "type": "id", "value": "_var26" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "insertTLeaf" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "e" },
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var27" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "t" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "key" },
+          "expr": {
+            "type": "prim",
+            "oper": "cdr",
+            "args": [{ "type": "id", "value": "_var27" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var29" },
+            "expr": {
+              "type": "prim",
+              "oper": "<",
+              "args": [
+                { "type": "id", "value": "k" },
+                { "type": "id", "value": "key" }
+              ]
+            },
+            "body": {
+              "type": "if",
+              "cond": { "type": "id", "value": "_var29" },
+              "then": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var30" },
+                "expr": {
+                  "type": "call",
+                  "id": { "type": "id", "value": "makeLeaf" },
+                  "args": [
+                    { "type": "id", "value": "k" },
+                    { "type": "id", "value": "e" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var31" },
+                  "expr": {
+                    "type": "call",
+                    "id": { "type": "id", "value": "makeNode" },
+                    "args": [
+                      { "type": "id", "value": "k" },
+                      { "type": "id", "value": "_var30" },
+                      { "type": "id", "value": "t" }
+                    ]
+                  },
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var31" }
+                  }
+                }
+              },
+              "else": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var32" },
+                "expr": {
+                  "type": "prim",
+                  "oper": ">",
+                  "args": [
+                    { "type": "id", "value": "k" },
+                    { "type": "id", "value": "key" }
+                  ]
+                },
+                "body": {
+                  "type": "if",
+                  "cond": { "type": "id", "value": "_var32" },
+                  "then": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var33" },
+                    "expr": {
+                      "type": "call",
+                      "id": { "type": "id", "value": "makeLeaf" },
+                      "args": [
+                        { "type": "id", "value": "k" },
+                        { "type": "id", "value": "e" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var34" },
+                      "expr": {
+                        "type": "call",
+                        "id": { "type": "id", "value": "makeNode" },
+                        "args": [
+                          { "type": "id", "value": "key" },
+                          { "type": "id", "value": "t" },
+                          { "type": "id", "value": "_var33" }
+                        ]
+                      },
+                      "body": {
+                        "type": "return",
+                        "value": { "type": "id", "value": "_var34" }
+                      }
+                    }
+                  },
+                  "else": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var35" },
+                    "expr": { "type": "iconst", "value": 99 },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var37" },
+                      "expr": { "type": "iconst", "value": 99 },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var36" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "cons",
+                          "args": [
+                            { "type": "id", "value": "_var35" },
+                            { "type": "id", "value": "_var37" }
+                          ]
+                        },
+                        "body": {
+                          "type": "return",
+                          "value": { "type": "id", "value": "_var36" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "insertTNode" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "e" },
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var39" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "t" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "key" },
+          "expr": {
+            "type": "prim",
+            "oper": "cdr",
+            "args": [{ "type": "id", "value": "_var39" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var41" },
+            "expr": {
+              "type": "prim",
+              "oper": "cdr",
+              "args": [{ "type": "id", "value": "t" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "tree1" },
+              "expr": {
+                "type": "prim",
+                "oper": "car",
+                "args": [{ "type": "id", "value": "_var41" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var43" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "cdr",
+                  "args": [{ "type": "id", "value": "t" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var44" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cdr",
+                    "args": [{ "type": "id", "value": "_var43" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "tree2" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "car",
+                      "args": [{ "type": "id", "value": "_var44" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var46" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": ">",
+                        "args": [
+                          { "type": "id", "value": "k" },
+                          { "type": "id", "value": "key" }
+                        ]
+                      },
+                      "body": {
+                        "type": "if",
+                        "cond": { "type": "id", "value": "_var46" },
+                        "then": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var47" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "insertT" },
+                            "args": [
+                              { "type": "id", "value": "k" },
+                              { "type": "id", "value": "e" },
+                              { "type": "id", "value": "tree2" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var48" },
+                            "expr": {
+                              "type": "call",
+                              "id": { "type": "id", "value": "makeNode" },
+                              "args": [
+                                { "type": "id", "value": "key" },
+                                { "type": "id", "value": "tree1" },
+                                { "type": "id", "value": "_var47" }
+                              ]
+                            },
+                            "body": {
+                              "type": "return",
+                              "value": { "type": "id", "value": "_var48" }
+                            }
+                          }
+                        },
+                        "else": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var49" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "insertT" },
+                            "args": [
+                              { "type": "id", "value": "k" },
+                              { "type": "id", "value": "e" },
+                              { "type": "id", "value": "tree1" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var50" },
+                            "expr": {
+                              "type": "call",
+                              "id": { "type": "id", "value": "makeNode" },
+                              "args": [
+                                { "type": "id", "value": "key" },
+                                { "type": "id", "value": "_var49" },
+                                { "type": "id", "value": "tree2" }
+                              ]
+                            },
+                            "body": {
+                              "type": "return",
+                              "value": { "type": "id", "value": "_var50" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "lookupT" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var51" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "t" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var52" },
+          "expr": {
+            "type": "prim",
+            "oper": "car",
+            "args": [{ "type": "id", "value": "_var51" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var54" },
+            "expr": { "type": "sconst", "value": "empty" },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var53" },
+              "expr": {
+                "type": "prim",
+                "oper": "eq?",
+                "args": [
+                  { "type": "id", "value": "_var52" },
+                  { "type": "id", "value": "_var54" }
+                ]
+              },
+              "body": {
+                "type": "if",
+                "cond": { "type": "id", "value": "_var53" },
+                "then": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var56" },
+                  "expr": {"type": "nil"},
+                  "body": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "_var56" }
+                  }
+                },
+                "else": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var57" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "car",
+                    "args": [{ "type": "id", "value": "t" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var58" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "car",
+                      "args": [{ "type": "id", "value": "_var57" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var60" },
+                      "expr": { "type": "sconst", "value": "node" },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var59" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "eq?",
+                          "args": [
+                            { "type": "id", "value": "_var58" },
+                            { "type": "id", "value": "_var60" }
+                          ]
+                        },
+                        "body": {
+                          "type": "if",
+                          "cond": { "type": "id", "value": "_var59" },
+                          "then": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var62" },
+                            "expr": {
+                              "type": "call",
+                              "id": { "type": "id", "value": "lookupTNode" },
+                              "args": [
+                                { "type": "id", "value": "k" },
+                                { "type": "id", "value": "t" }
+                              ]
+                            },
+                            "body": {
+                              "type": "return",
+                              "value": { "type": "id", "value": "_var62" }
+                            }
+                          },
+                          "else": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var63" },
+                            "expr": {
+                              "type": "call",
+                              "id": { "type": "id", "value": "lookupTLeaf" },
+                              "args": [
+                                { "type": "id", "value": "k" },
+                                { "type": "id", "value": "t" }
+                              ]
+                            },
+                            "body": {
+                              "type": "return",
+                              "value": { "type": "id", "value": "_var63" }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "lookupTLeaf" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var64" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "t" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "key" },
+          "expr": {
+            "type": "prim",
+            "oper": "cdr",
+            "args": [{ "type": "id", "value": "_var64" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var66" },
+            "expr": {
+              "type": "prim",
+              "oper": "cdr",
+              "args": [{ "type": "id", "value": "t" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "e" },
+              "expr": {
+                "type": "prim",
+                "oper": "car",
+                "args": [{ "type": "id", "value": "_var66" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var68" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "eq?",
+                  "args": [
+                    { "type": "id", "value": "k" },
+                    { "type": "id", "value": "key" }
+                  ]
+                },
+                "body": {
+                  "type": "if",
+                  "cond": { "type": "id", "value": "_var68" },
+                  "then": {
+                    "type": "return",
+                    "value": { "type": "id", "value": "e" }
+                  },
+                  "else": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var69" },
+                    "expr": {"type": "nil"},
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var69" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "lookupTNode" },
+      "args": [
+        { "type": "id", "value": "k" },
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var70" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "t" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "key" },
+          "expr": {
+            "type": "prim",
+            "oper": "cdr",
+            "args": [{ "type": "id", "value": "_var70" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var72" },
+            "expr": {
+              "type": "prim",
+              "oper": "cdr",
+              "args": [{ "type": "id", "value": "t" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "tree1" },
+              "expr": {
+                "type": "prim",
+                "oper": "car",
+                "args": [{ "type": "id", "value": "_var72" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var74" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "cdr",
+                  "args": [{ "type": "id", "value": "t" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var75" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cdr",
+                    "args": [{ "type": "id", "value": "_var74" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "tree2" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "car",
+                      "args": [{ "type": "id", "value": "_var75" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var77" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": ">",
+                        "args": [
+                          { "type": "id", "value": "k" },
+                          { "type": "id", "value": "key" }
+                        ]
+                      },
+                      "body": {
+                        "type": "if",
+                        "cond": { "type": "id", "value": "_var77" },
+                        "then": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var78" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "lookupT" },
+                            "args": [
+                              { "type": "id", "value": "k" },
+                              { "type": "id", "value": "tree2" }
+                            ]
+                          },
+                          "body": {
+                            "type": "return",
+                            "value": { "type": "id", "value": "_var78" }
+                          }
+                        },
+                        "else": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var79" },
+                          "expr": {
+                            "type": "call",
+                            "id": { "type": "id", "value": "lookupT" },
+                            "args": [
+                              { "type": "id", "value": "k" },
+                              { "type": "id", "value": "tree1" }
+                            ]
+                          },
+                          "body": {
+                            "type": "return",
+                            "value": { "type": "id", "value": "_var79" }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "forceTree" },
+      "args": [
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var80" },
+        "expr": {"type": "nil"},
+        "body": {
+          "type": "return",
+          "value": { "type": "id", "value": "_var80" }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "readTree" },
+      "args": [
+        { "type": "id", "value": "n" },
+        { "type": "id", "value": "t" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var81" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var82" },
+          "expr": {
+            "type": "prim",
+            "oper": "eq?",
+            "args": [
+              { "type": "id", "value": "_var81" },
+              { "type": "id", "value": "n" }
+            ]
+          },
+          "body": {
+            "type": "if",
+            "cond": { "type": "id", "value": "_var82" },
+            "then": {
+              "type": "return",
+              "value": { "type": "id", "value": "t" }
+            },
+            "else": {
+              "type": "let",
+              "id": { "type": "id", "value": "en" },
+              "expr": {
+                "type": "call",
+                "id": { "type": "id", "value": "makeEntity" },
+                "args": [
+                  { "type": "id", "value": "n" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var83" },
+                "expr": {
+                  "type": "prim",
+                  "oper": "car",
+                  "args": [{ "type": "id", "value": "en" }
+                  ]
+                },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var85" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "cdr",
+                    "args": [{ "type": "id", "value": "en" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var86" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "car",
+                      "args": [{ "type": "id", "value": "_var85" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var88" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "cdr",
+                        "args": [{ "type": "id", "value": "en" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var89" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "cdr",
+                          "args": [{ "type": "id", "value": "_var88" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var90" },
+                          "expr": {
+                            "type": "prim",
+                            "oper": "car",
+                            "args": [{ "type": "id", "value": "_var89" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var92" },
+                            "expr": {"type": "nil"},
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var91" },
+                              "expr": {
+                                "type": "prim",
+                                "oper": "cons",
+                                "args": [
+                                  { "type": "id", "value": "_var90" },
+                                  { "type": "id", "value": "_var92" }
+                                ]
+                              },
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var87" },
+                                "expr": {
+                                  "type": "prim",
+                                  "oper": "cons",
+                                  "args": [
+                                    { "type": "id", "value": "_var86" },
+                                    { "type": "id", "value": "_var91" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "let",
+                                  "id": { "type": "id", "value": "e" },
+                                  "expr": {
+                                    "type": "prim",
+                                    "oper": "cons",
+                                    "args": [
+                                      { "type": "id", "value": "_var83" },
+                                      { "type": "id", "value": "_var87" }
+                                    ]
+                                  },
+                                  "body": {
+                                    "type": "let",
+                                    "id": { "type": "id", "value": "k" },
+                                    "expr": {
+                                      "type": "call",
+                                      "id": { "type": "id", "value": "makeKey" },
+                                      "args": [
+                                        { "type": "id", "value": "e" }
+                                      ]
+                                    },
+                                    "body": {
+                                      "type": "let",
+                                      "id": { "type": "id", "value": "_var96" },
+                                      "expr": { "type": "iconst", "value": 3 },
+                                      "body": {
+                                        "type": "let",
+                                        "id": { "type": "id", "value": "_var97" },
+                                        "expr": {
+                                          "type": "prim",
+                                          "oper": "-",
+                                          "args": [
+                                            { "type": "id", "value": "n" },
+                                            { "type": "id", "value": "_var96" }
+                                          ]
+                                        },
+                                        "body": {
+                                          "type": "let",
+                                          "id": { "type": "id", "value": "_var99" },
+                                          "expr": {
+                                            "type": "call",
+                                            "id": { "type": "id", "value": "insertT" },
+                                            "args": [
+                                              { "type": "id", "value": "k" },
+                                              { "type": "id", "value": "e" },
+                                              { "type": "id", "value": "t" }
+                                            ]
+                                          },
+                                          "body": {
+                                            "type": "let",
+                                            "id": { "type": "id", "value": "_var98" },
+                                            "expr": {
+                                              "type": "call",
+                                              "id": { "type": "id", "value": "readTree" },
+                                              "args": [
+                                                { "type": "id", "value": "_var97" },
+                                                { "type": "id", "value": "_var99" }
+                                              ]
+                                            },
+                                            "body": {
+                                              "type": "return",
+                                              "value": { "type": "id", "value": "_var98" }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "makeEntity" },
+      "args": [
+        { "type": "id", "value": "n" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var101" },
+        "expr": { "type": "iconst", "value": 2 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "f" },
+          "expr": {
+            "type": "prim",
+            "oper": "-",
+            "args": [
+              { "type": "id", "value": "n" },
+              { "type": "id", "value": "_var101" }
+            ]
+          },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var103" },
+            "expr": { "type": "iconst", "value": 1 },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "g" },
+              "expr": {
+                "type": "prim",
+                "oper": "-",
+                "args": [
+                  { "type": "id", "value": "n" },
+                  { "type": "id", "value": "_var103" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "h" },
+                "expr": { "type": "id", "value": "n" },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var105" },
+                  "expr": {"type": "nil"},
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var106" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cons",
+                      "args": [
+                        { "type": "id", "value": "h" },
+                        { "type": "id", "value": "_var105" }
+                      ]
+                    },
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var107" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "cons",
+                        "args": [
+                          { "type": "id", "value": "g" },
+                          { "type": "id", "value": "_var106" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var108" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "cons",
+                          "args": [
+                            { "type": "id", "value": "f" },
+                            { "type": "id", "value": "_var107" }
+                          ]
+                        },
+                        "body": {
+                          "type": "return",
+                          "value": { "type": "id", "value": "_var108" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "makeKey" },
+      "args": [
+        { "type": "id", "value": "e" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var109" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "e" }
+          ]
+        },
+        "body": {
+          "type": "return",
+          "value": { "type": "id", "value": "_var109" }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "join" },
+      "args": [
+        { "type": "id", "value": "t1" },
+        { "type": "id", "value": "t2" },
+        { "type": "id", "value": "tj" }
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var110" },
+        "expr": {
+          "type": "prim",
+          "oper": "car",
+          "args": [{ "type": "id", "value": "t1" }
+          ]
+        },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var112" },
+          "expr": { "type": "sconst", "value": "empty" },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var111" },
+            "expr": {
+              "type": "prim",
+              "oper": "eq?",
+              "args": [
+                { "type": "id", "value": "_var110" },
+                { "type": "id", "value": "_var112" }
+              ]
+            },
+            "body": {
+              "type": "let",
+              "id": { "type": "id", "value": "_var115" },
+              "expr": {
+                "type": "prim",
+                "oper": "car",
+                "args": [{ "type": "id", "value": "t2" }
+                ]
+              },
+              "body": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var117" },
+                "expr": { "type": "sconst", "value": "empty" },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var116" },
+                  "expr": {
+                    "type": "prim",
+                    "oper": "eq?",
+                    "args": [
+                      { "type": "id", "value": "_var115" },
+                      { "type": "id", "value": "_var117" }
+                    ]
+                  },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var114" },
+                    "expr": {
+                      "type": "call",
+                      "id": { "type": "id", "value": "or" },
+                      "args": [
+                        { "type": "id", "value": "_var111" },
+                        { "type": "id", "value": "_var116" }
+                      ]
+                    },
+                    "body": {
+                      "type": "if",
+                      "cond": { "type": "id", "value": "_var114" },
+                      "then": {
+                        "type": "return",
+                        "value": { "type": "id", "value": "tj" }
+                      },
+                      "else": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "_var120" },
+                        "expr": {
+                          "type": "prim",
+                          "oper": "car",
+                          "args": [{ "type": "id", "value": "t1" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var121" },
+                          "expr": {
+                            "type": "prim",
+                            "oper": "car",
+                            "args": [{ "type": "id", "value": "_var120" }
+                            ]
+                          },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var123" },
+                            "expr": { "type": "sconst", "value": "node" },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var122" },
+                              "expr": {
+                                "type": "prim",
+                                "oper": "eq?",
+                                "args": [
+                                  { "type": "id", "value": "_var121" },
+                                  { "type": "id", "value": "_var123" }
+                                ]
+                              },
+                              "body": {
+                                "type": "if",
+                                "cond": { "type": "id", "value": "_var122" },
+                                "then": {
+                                  "type": "let",
+                                  "id": { "type": "id", "value": "_var125" },
+                                  "expr": {
+                                    "type": "prim",
+                                    "oper": "cdr",
+                                    "args": [{ "type": "id", "value": "t1" }
+                                    ]
+                                  },
+                                  "body": {
+                                    "type": "let",
+                                    "id": { "type": "id", "value": "tree1" },
+                                    "expr": {
+                                      "type": "prim",
+                                      "oper": "car",
+                                      "args": [{ "type": "id", "value": "_var125" }
+                                      ]
+                                    },
+                                    "body": {
+                                      "type": "let",
+                                      "id": { "type": "id", "value": "_var127" },
+                                      "expr": {
+                                        "type": "prim",
+                                        "oper": "cdr",
+                                        "args": [{ "type": "id", "value": "t1" }
+                                        ]
+                                      },
+                                      "body": {
+                                        "type": "let",
+                                        "id": { "type": "id", "value": "_var128" },
+                                        "expr": {
+                                          "type": "prim",
+                                          "oper": "cdr",
+                                          "args": [{ "type": "id", "value": "_var127" }
+                                          ]
+                                        },
+                                        "body": {
+                                          "type": "let",
+                                          "id": { "type": "id", "value": "tree2" },
+                                          "expr": {
+                                            "type": "prim",
+                                            "oper": "car",
+                                            "args": [{ "type": "id", "value": "_var128" }
+                                            ]
+                                          },
+                                          "body": {
+                                            "type": "let",
+                                            "id": { "type": "id", "value": "_var130" },
+                                            "expr": {
+                                              "type": "call",
+                                              "id": { "type": "id", "value": "join" },
+                                              "args": [
+                                                { "type": "id", "value": "tree2" },
+                                                { "type": "id", "value": "t2" },
+                                                { "type": "id", "value": "tj" }
+                                              ]
+                                            },
+                                            "body": {
+                                              "type": "let",
+                                              "id": { "type": "id", "value": "_var131" },
+                                              "expr": {
+                                                "type": "call",
+                                                "id": { "type": "id", "value": "join" },
+                                                "args": [
+                                                  { "type": "id", "value": "tree1" },
+                                                  { "type": "id", "value": "t2" },
+                                                  { "type": "id", "value": "_var130" }
+                                                ]
+                                              },
+                                              "body": {
+                                                "type": "return",
+                                                "value": { "type": "id", "value": "_var131" }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                },
+                                "else": {
+                                  "type": "let",
+                                  "id": { "type": "id", "value": "_var132" },
+                                  "expr": {
+                                    "type": "prim",
+                                    "oper": "car",
+                                    "args": [{ "type": "id", "value": "t1" }
+                                    ]
+                                  },
+                                  "body": {
+                                    "type": "let",
+                                    "id": { "type": "id", "value": "key" },
+                                    "expr": {
+                                      "type": "prim",
+                                      "oper": "cdr",
+                                      "args": [{ "type": "id", "value": "_var132" }
+                                      ]
+                                    },
+                                    "body": {
+                                      "type": "let",
+                                      "id": { "type": "id", "value": "_var134" },
+                                      "expr": {
+                                        "type": "prim",
+                                        "oper": "cdr",
+                                        "args": [{ "type": "id", "value": "t1" }
+                                        ]
+                                      },
+                                      "body": {
+                                        "type": "let",
+                                        "id": { "type": "id", "value": "e" },
+                                        "expr": {
+                                          "type": "prim",
+                                          "oper": "car",
+                                          "args": [{ "type": "id", "value": "_var134" }
+                                          ]
+                                        },
+                                        "body": {
+                                          "type": "let",
+                                          "id": { "type": "id", "value": "a" },
+                                          "expr": {
+                                            "type": "prim",
+                                            "oper": "car",
+                                            "args": [{ "type": "id", "value": "e" }
+                                            ]
+                                          },
+                                          "body": {
+                                            "type": "let",
+                                            "id": { "type": "id", "value": "_var136" },
+                                            "expr": {
+                                              "type": "prim",
+                                              "oper": "cdr",
+                                              "args": [{ "type": "id", "value": "e" }
+                                              ]
+                                            },
+                                            "body": {
+                                              "type": "let",
+                                              "id": { "type": "id", "value": "b" },
+                                              "expr": {
+                                                "type": "prim",
+                                                "oper": "car",
+                                                "args": [{ "type": "id", "value": "_var136" }
+                                                ]
+                                              },
+                                              "body": {
+                                                "type": "let",
+                                                "id": { "type": "id", "value": "_var138" },
+                                                "expr": {
+                                                  "type": "prim",
+                                                  "oper": "cdr",
+                                                  "args": [{ "type": "id", "value": "e" }
+                                                  ]
+                                                },
+                                                "body": {
+                                                  "type": "let",
+                                                  "id": { "type": "id", "value": "_var139" },
+                                                  "expr": {
+                                                    "type": "prim",
+                                                    "oper": "cdr",
+                                                    "args": [{ "type": "id", "value": "_var138" }
+                                                    ]
+                                                  },
+                                                  "body": {
+                                                    "type": "let",
+                                                    "id": { "type": "id", "value": "c" },
+                                                    "expr": {
+                                                      "type": "prim",
+                                                      "oper": "car",
+                                                      "args": [{ "type": "id", "value": "_var139" }
+                                                      ]
+                                                    },
+                                                    "body": {
+                                                      "type": "let",
+                                                      "id": { "type": "id", "value": "entity" },
+                                                      "expr": {
+                                                        "type": "call",
+                                                        "id": { "type": "id", "value": "lookupT" },
+                                                        "args": [
+                                                          { "type": "id", "value": "a" },
+                                                          { "type": "id", "value": "t2" }
+                                                        ]
+                                                      },
+                                                      "body": {
+                                                        "type": "let",
+                                                        "id": { "type": "id", "value": "_var141" },
+                                                        "expr": {
+                                                          "type": "prim",
+                                                          "oper": "null?",
+                                                          "args": [{ "type": "id", "value": "entity" }
+                                                          ]
+                                                        },
+                                                        "body": {
+                                                          "type": "if",
+                                                          "cond": { "type": "id", "value": "_var141" },
+                                                          "then": {
+                                                            "type": "return",
+                                                            "value": { "type": "id", "value": "tj" }
+                                                          },
+                                                          "else": {
+                                                            "type": "let",
+                                                            "id": { "type": "id", "value": "d" },
+                                                            "expr": {
+                                                              "type": "prim",
+                                                              "oper": "car",
+                                                              "args": [{ "type": "id", "value": "entity" }
+                                                              ]
+                                                            },
+                                                            "body": {
+                                                              "type": "let",
+                                                              "id": { "type": "id", "value": "_var142" },
+                                                              "expr": {
+                                                                "type": "prim",
+                                                                "oper": "cdr",
+                                                                "args": [{ "type": "id", "value": "entity" }
+                                                                ]
+                                                              },
+                                                              "body": {
+                                                                "type": "let",
+                                                                "id": { "type": "id", "value": "f" },
+                                                                "expr": {
+                                                                  "type": "prim",
+                                                                  "oper": "car",
+                                                                  "args": [{ "type": "id", "value": "_var142" }
+                                                                  ]
+                                                                },
+                                                                "body": {
+                                                                  "type": "let",
+                                                                  "id": { "type": "id", "value": "_var144" },
+                                                                  "expr": {"type": "nil"},
+                                                                  "body": {
+                                                                    "type": "let",
+                                                                    "id": { "type": "id", "value": "_var145" },
+                                                                    "expr": {
+                                                                      "type": "prim",
+                                                                      "oper": "cons",
+                                                                      "args": [
+                                                                        { "type": "id", "value": "f" },
+                                                                        { "type": "id", "value": "_var144" }
+                                                                      ]
+                                                                    },
+                                                                    "body": {
+                                                                      "type": "let",
+                                                                      "id": { "type": "id", "value": "_var146" },
+                                                                      "expr": {
+                                                                        "type": "prim",
+                                                                        "oper": "cons",
+                                                                        "args": [
+                                                                          { "type": "id", "value": "d" },
+                                                                          { "type": "id", "value": "_var145" }
+                                                                        ]
+                                                                      },
+                                                                      "body": {
+                                                                        "type": "let",
+                                                                        "id": { "type": "id", "value": "_var147" },
+                                                                        "expr": {
+                                                                          "type": "prim",
+                                                                          "oper": "cons",
+                                                                          "args": [
+                                                                            { "type": "id", "value": "c" },
+                                                                            { "type": "id", "value": "_var146" }
+                                                                          ]
+                                                                        },
+                                                                        "body": {
+                                                                          "type": "let",
+                                                                          "id": { "type": "id", "value": "_var148" },
+                                                                          "expr": {
+                                                                            "type": "prim",
+                                                                            "oper": "cons",
+                                                                            "args": [
+                                                                              { "type": "id", "value": "b" },
+                                                                              { "type": "id", "value": "_var147" }
+                                                                            ]
+                                                                          },
+                                                                          "body": {
+                                                                            "type": "let",
+                                                                            "id": { "type": "id", "value": "newe" },
+                                                                            "expr": {
+                                                                              "type": "prim",
+                                                                              "oper": "cons",
+                                                                              "args": [
+                                                                                { "type": "id", "value": "a" },
+                                                                                { "type": "id", "value": "_var148" }
+                                                                              ]
+                                                                            },
+                                                                            "body": {
+                                                                              "type": "let",
+                                                                              "id": { "type": "id", "value": "_var150" },
+                                                                              "expr": {
+                                                                                "type": "call",
+                                                                                "id": { "type": "id", "value": "insertT" },
+                                                                                "args": [
+                                                                                  { "type": "id", "value": "c" },
+                                                                                  { "type": "id", "value": "newe" },
+                                                                                  { "type": "id", "value": "tj" }
+                                                                                ]
+                                                                              },
+                                                                              "body": {
+                                                                                "type": "return",
+                                                                                "value": { "type": "id", "value": "_var150" }
+                                                                              }
+                                                                            }
+                                                                          }
+                                                                        }
+                                                                      }
+                                                                    }
+                                                                  }
+                                                                }
+                                                              }
+                                                            }
+                                                          }
+                                                        }
+                                                      }
+                                                    }
+                                                  }
+                                                }
+                                              }
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "define",
+      "id": { "type": "id", "value": "main" },
+      "args": [
+      ],
+      "body": {
+        "type": "let",
+        "id": { "type": "id", "value": "_var151" },
+        "expr": { "type": "iconst", "value": 0 },
+        "body": {
+          "type": "let",
+          "id": { "type": "id", "value": "_var153" },
+          "expr": { "type": "iconst", "value": 0 },
+          "body": {
+            "type": "let",
+            "id": { "type": "id", "value": "_var152" },
+            "expr": {
+              "type": "prim",
+              "oper": "eq?",
+              "args": [
+                { "type": "id", "value": "_var151" },
+                { "type": "id", "value": "_var153" }
+              ]
+            },
+            "body": {
+              "type": "if",
+              "cond": { "type": "id", "value": "_var152" },
+              "then": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var155" },
+                "expr": { "type": "iconst", "value": 516 },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var157" },
+                  "expr": { "type": "sconst", "value": "empty" },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var159" },
+                    "expr": {"type": "nil"},
+                    "body": {
+                      "type": "let",
+                      "id": { "type": "id", "value": "_var158" },
+                      "expr": {
+                        "type": "prim",
+                        "oper": "cons",
+                        "args": [
+                          { "type": "id", "value": "_var157" },
+                          { "type": "id", "value": "_var159" }
+                        ]
+                      },
+                      "body": {
+                        "type": "let",
+                        "id": { "type": "id", "value": "a" },
+                        "expr": {
+                          "type": "call",
+                          "id": { "type": "id", "value": "readTree" },
+                          "args": [
+                            { "type": "id", "value": "_var155" },
+                            { "type": "id", "value": "_var158" }
+                          ]
+                        },
+                        "body": {
+                          "type": "let",
+                          "id": { "type": "id", "value": "_var162" },
+                          "expr": { "type": "iconst", "value": 1530 },
+                          "body": {
+                            "type": "let",
+                            "id": { "type": "id", "value": "_var164" },
+                            "expr": { "type": "sconst", "value": "empty" },
+                            "body": {
+                              "type": "let",
+                              "id": { "type": "id", "value": "_var166" },
+                              "expr": {"type": "nil"},
+                              "body": {
+                                "type": "let",
+                                "id": { "type": "id", "value": "_var165" },
+                                "expr": {
+                                  "type": "prim",
+                                  "oper": "cons",
+                                  "args": [
+                                    { "type": "id", "value": "_var164" },
+                                    { "type": "id", "value": "_var166" }
+                                  ]
+                                },
+                                "body": {
+                                  "type": "let",
+                                  "id": { "type": "id", "value": "b" },
+                                  "expr": {
+                                    "type": "call",
+                                    "id": { "type": "id", "value": "readTree" },
+                                    "args": [
+                                      { "type": "id", "value": "_var162" },
+                                      { "type": "id", "value": "_var165" }
+                                    ]
+                                  },
+                                  "body": {
+                                    "type": "let",
+                                    "id": { "type": "id", "value": "_var169" },
+                                    "expr": { "type": "sconst", "value": "empty" },
+                                    "body": {
+                                      "type": "let",
+                                      "id": { "type": "id", "value": "_var171" },
+                                      "expr": {"type": "nil"},
+                                      "body": {
+                                        "type": "let",
+                                        "id": { "type": "id", "value": "_var170" },
+                                        "expr": {
+                                          "type": "prim",
+                                          "oper": "cons",
+                                          "args": [
+                                            { "type": "id", "value": "_var169" },
+                                            { "type": "id", "value": "_var171" }
+                                          ]
+                                        },
+                                        "body": {
+                                          "type": "let",
+                                          "id": { "type": "id", "value": "_var173" },
+                                          "expr": {
+                                            "type": "call",
+                                            "id": { "type": "id", "value": "join" },
+                                            "args": [
+                                              { "type": "id", "value": "a" },
+                                              { "type": "id", "value": "b" },
+                                              { "type": "id", "value": "_var170" }
+                                            ]
+                                          },
+                                          "body": {
+                                            "type": "return",
+                                            "value": { "type": "id", "value": "_var173" }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              "else": {
+                "type": "let",
+                "id": { "type": "id", "value": "_var174" },
+                "expr": { "type": "iconst", "value": 9 },
+                "body": {
+                  "type": "let",
+                  "id": { "type": "id", "value": "_var176" },
+                  "expr": { "type": "iconst", "value": 9 },
+                  "body": {
+                    "type": "let",
+                    "id": { "type": "id", "value": "_var175" },
+                    "expr": {
+                      "type": "prim",
+                      "oper": "cons",
+                      "args": [
+                        { "type": "id", "value": "_var174" },
+                        { "type": "id", "value": "_var176" }
+                      ]
+                    },
+                    "body": {
+                      "type": "return",
+                      "value": { "type": "id", "value": "_var175" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "body": {
+    "type": "let",
+    "id": { "type": "id", "value": "_var178" },
+    "expr": {
+      "type": "call",
+      "id": { "type": "id", "value": "main" },
+      "args": [
+      ]
+    },
+    "body": {
+      "type": "return",
+      "value": { "type": "id", "value": "_var178" }
+    }
+  }}
