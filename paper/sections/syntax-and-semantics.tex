@@ -145,20 +145,20 @@ Condition & Transition & Rule name \\
           & \shortstack[l]{$\rho, (\rho', z, e)\!:\!S, H, (\CONS~x~y)  \rightsquigarrow
 $ \\  $\rho', S, H[z \mapsto (H(\rho(x)),H(\rho(y)))], e$}     &  \sc{cons} \\
 \hline
-$H(\rho(x)) \mbox{ is } (v_1, v_2) & \rho, (\rho', z, e)\!:\!S, H,
+$H(\rho(x)) \mbox{ is } (v_1, v_2)$ & $\rho, (\rho', z, e)\!:\!S, H,
 (\CAR~x)  \rightsquigarrow \rho', S, H[\rho(z) \mapsto v_1], e$      &  \sc{car-whnf} \\
 \hline
-$H(\rho(x)) \mbox{ is } (e, \rho') & \rho, S, H, (\CAR~x)  \rightsquigarrow
+$H(\rho(x)) \mbox{ is } (e, \rho')$ & $\rho, S, H, (\CAR~x)  \rightsquigarrow
 \rho'\oplus\rho, (\rho, x, (\CAR~x))\!:\!S, H, e$      &  \sc{car-clo} \\
 \hline
 $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
  & \shortstack[l]{$\rho, (\rho', z, e)\!:\!S, H, (+~x~y)  \rightsquigarrow$ \\
 $\rho', S, H[\rho(z) \mapsto H(\rho(x)) + H(\rho(y))], e$}      &  \sc{prim-whnf} \\
 \hline
-$H(\rho(x)) \mbox{ is } (e, \rho') & \rho, S, H, (+~x~y)  \rightsquigarrow
+$H(\rho(x)) \mbox{ is } (e, \rho')$ & $\rho, S, H, (+~x~y)  \rightsquigarrow
 \rho'\oplus\rho, (\rho, x, (+~x~y))\!:\!S, H, e$      &  \sc{prim-1-clo} \\
 \hline
-$H(\rho(y)) \mbox{ is } (e, \rho') & \rho, S, H, (+~x~y)  \rightsquigarrow
+$H(\rho(y)) \mbox{ is } (e, \rho')$ & $\rho, S, H, (+~x~y)  \rightsquigarrow
 \rho'\oplus\rho, (\rho, x, (+~x~y))\!:\!S, H, e$      &  \sc{prim-2-clo} \\
 \hline
 \shortstack[l]{$\mathit{f}~\mbox{defined as}$ \\ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho, S, H, (f~\myvec{x})  \rightsquigarrow

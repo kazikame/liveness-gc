@@ -1,5 +1,71 @@
 \section{Liveness}\label{sec:liveness}
+%\comment{
+To describe the issues that arise while formulating liveness of a lazy
+language, consider the example shown in Figure ???
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{verbatim}
+pi_0: let pi_1: x = (cons 1 x)
+      in let  pi_2: y = (cdr x)
+         in  let  pi_3: z = (car y)
+             in pi_4: if (z > 0) then 
+                       pi_5: let pi_6: w = (take 5 x)
+                             in let pi_7: u = (cdr  w)
+                                in l1:return u
+                      else l2:return y
+
+\end{verbatim}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+
+The program is annotated with symbols standing for program points. For
+reasons that will  become clear later, we use  different symbols for
+the program points corresponding to return points (l instead of $\pi$)
+Similar  to classical  liveness  analysis for  imperative programs,  a
+demand  of  $\sigma$ on  the  expression  propagates  to a  demand  of
+$\sigma$  on the return  values $u$  and $y$.  This gives  liveness of
+$\lbrace u.\sigma \rbrace$ and $\{y.\sigma\}$ for the program points l1 and l2. We now
+show how the liveness at l1 is propagated backwards; l2 can be treated
+similarly.
+
+Since u is (cdr w), a liveness of $\sigma$ for u translates into a
+demand of $\sigma$ on $(cdr~w)$. This is turn translates into a liveness
+of $\{\epsilon,~1.\sigma\}$ of $w$. In the case of eager evaluation, we
+would have the livenesses of $\pi_7$ and l1 as $\{\epsilon,~1.\sigma\}$ and
+${u.\sigma}$. The liveness of $u$ would have been killed at $\pi_7$. The
+liveness of lazy evaluation differs in the following two respects:
+\begin{enumerate}
+\item The definition  $u = (cdr~w)$, does not  result in an evaluation
+  of $(cdr~w)$; rather a  closure is created.  The evaluation actually
+  takes place  while evaluating $(return~u)$. Thus it  is necessary to
+  record the liveness of $\{\epsilon,  1.\sigma\}$ for $w$ also at the
+  program point l1.
+  
+  Regard the  expression as a  tree and consider  paths from
+  the  root  to   program  points  corresponding  to  return
+  expressions.   The  above discussion  shows  that there  a
+  single liveness  environment for each  such path. Further,
+  if a program  point happens to fall on  more than one such
+  path, then  the liveness environment of  the program point
+  is the variable-wise union of the liveness environments of
+  the individual paths.
+\item The second difference is that since our lets are lazy,
+  the let  definition can be  recursive as at  program point
+  $\pi_1$. In such a case, the liveness has to be formulated
+  as a fix-point computation.
+\end{enumerate}
+
+We therefore  formulate the per-program-point  liveness that
+we require for garbage collection in terms of two ....
+
+A  map $\cal{M}$  that gives  the common  liveness  for each
+return path.
+
+A  map that  gives  the  return paths  that  pass through  a
+program point.
+
+ 
+
+%}
 In classical liveness analysis a  variable is either `live' (its value
 may be  used in future  computation) or `dead' (definitely  not used).
 Semantically, a variable is dead at a given program point if arbitrary
@@ -186,15 +252,16 @@ the corresponding tuple of demands the function makes on its arguments.
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
-\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& x.\sigma \mbox{, Create a new label \textit{l} and associate liveness corresponding to x}\\
+\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& x.\sigma \\
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
         \begin{array}{l l}
                     \mathcal{L}(e_1,\sigma,\Lfonly) \cup
         \mathcal{L}(e_2,\sigma,\Lfonly) \cup
-        \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset        \mbox{, Create new label \textit{l} } = \textit{l}_{then} \bigcup \textit{l}_{else}}\\
+        \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
                     \mathcal{L}(e_1,\sigma,\Lfonly) \cup
-        \mathcal{L}(e_2,\sigma,\Lfonly)  & \mbox{otherwise} \end{array}  \\
-\mathcal{L}(\LET~\myvec{x} \leftarrow \myvec{s}}~\IN~e),\sigma,\Lfonly) &=&
+        \mathcal{L}(e_2,\sigma,\Lfonly)  & \mbox{otherwise}
+                 \end{array} \\
+        \mathcal{L}(\LET~\myvec{x} \leftarrow \myvec{s}~\IN~e),\sigma,\Lfonly) &=&
         \Lv
            \setminus \{\myvec{x}.*\}
            \cup LE(L)
@@ -212,13 +279,9 @@ the corresponding tuple of demands the function makes on its arguments.
      $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
 \end{minipage}
 \begin{minipage}{0.85\textwidth}
-\infrule[live-letblock]
-        {\Le{L} = \biguplus_{i=1}^n \Le{ref(s_i, L(x_i), \Lfonly)}
-              \mbox{ for any $L$}
-        }
-        { \myvec{x} \leftarrow \myvec{s} \len \Leonly
-\\ \makebox[0mm]{where
-     $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
+ \infrule[live-let-define]
+         {f~\stackrel{\text{\tiny def}}{=}~(\DEFINE~(f~ x)~(\SIF~*~x~s[(f~ x)/x],~\mbox{and}~\Ldonly_{x \leftarrow s}~\stackrel{\text{\tiny def}}{=}~\Lfonly_f}       
+         { x \leftarrow s \len \Ldonly_{x \leftarrow s}}
 \end{minipage}
 \normalsize
   \caption{Liveness equations and judgement rule}\label{fig:live-judge}
