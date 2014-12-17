@@ -28,7 +28,7 @@ We write  $\pi\!:\!e$ to  associate the label  $\pi$ (not part  of the
 language syntax) with the program point just before expression $e$.
 
 % \paragraph{Inlining.}
-{\color{blue}In spite of the ANF  restrictions it is still possible to
+{\color{Myblue}In spite of the ANF  restrictions it is still possible to
   inline non-recursive functions (a fact we use to prove the safety of
   liveness  analysis).  A user-function  call $(\LET\,\,  x \leftarrow
   (f\,y_1\,\ldots\,y_n) \,\, \IN\,\, e)$  to a function defined (after
@@ -96,32 +96,43 @@ or a {\em closure}.   A closure is a pair $(s, \rho)$  in which $s$ is
 an  unevaluated application  with  the values  of  its free  variables
 given by $\rho$.
 
-The  semantics of  expressions  (and applications)  are  given by  the
-judgement form $\rho, \stk, \heap, e \rightarrow \rho', \stk', \heap',
-e'$.  Here \stk\ is a stack  a list of continuation frames viewed as a
-list.   Each continuation  is of  the form  $(\rho, x,  e)$  where the
-location of $x$ is updated when the expression that is currently being
-evaluated reaches WHNF, and $e$ is the next expression to be evaluated
-in  the  environment  $\rho$.    The  start  state  is  $(\{\},[(\{\},
-  \mainpgm,  \HALT)], \{\},  e_\mainpgm)$, and  the  program terminates
-successfully on  reaching the  halt state $(\rho,[\,],  \heap, \HALT)$
-with $\rho(\mainpgm)$ containing the  final result. Note that since we
+The semantics of expressions (and similarly applications) are given by
+the  judgement form $\rho,  \stk, \heap,  e \rightarrow  \rho', \stk',
+\heap', e'$.  Here \stk\ is a stack of continuation frames represented
+as  a list  in the  description of  the semantics.   Each continuation
+frame  is of the  form $(\rho,  x, e)$  where the  location of  $x$ is
+updated when the expression  that is currently being evaluated reaches
+WHNF,  and  $e$  is  the  next  expression  to  be  evaluated  in  the
+environment  $\rho$.   The  start  state is  $(\{\},[(\{\},  \mainpgm,
+  \HALT)], \{\}, e_\mainpgm)$, and the program terminates successfully
+on  reaching   the  halt   state  $(\rho,[\,],  \heap,   \HALT)$  with
+$\rho(\mainpgm)$  containing  the final  result.  Note  that since  we
 assume that our language is not statically typed, a program with other
 than syntactic errors (including those that could have been eliminated
-using a static type system) lead to {\em stuck states} i.e. states not
-covered by any rules in the small-step semantics.
+using a  static type system) lead  to {\em stuck  states} i.e.  states
+not covered by any rules in the small-step semantics.
 
-Notation: we write $\rho[x \mapsto v]$ for the environment which is as
-$\rho$ but  has value $v$ at  $x$.  We also  write $[\myvec{x} \mapsto
-  \myvec{v}]$  which respectively  has  values $v_1,  \ldots, v_n$  at
-$x_1,  \ldots, x_n$  and write  $[\myvec{x}  \mapsto \rho(\myvec{y})]$
-when $v_1, \ldots, v_n$ are $\rho(y_1), \ldots, \rho(y_n)$.
+The  notation $[\myvec{x} \mapsto  \myvec{\ell}]$ represents
+an  environment that maps  variables $x_1,  \ldots, x_n$  to locations
+$\ell_1,  \ldots,  \ell_n$.   The  notation  $\heap[\ell  \mapsto  d]$
+indicates the  updation of  a heap \heap\  at $\ell$ with  $d$.  $\rho
+\oplus \rho'$  represents the  environment $\rho$ shadowed  by $\rho'$
+and $\lfloor \rho \rfloor_X$  represents the environment restricted to
+the locations in $X$. Finally $FV(s)$ represents the free variables in
+the application $s$.
 
-
+As an example, consider the rules related to the application $(+~x~y)$
+involving a strict binary operator.  When both $x$ and $y$ are already
+in WHNF  ({\sc prim-whnf}), the  heap is updated  with the sum  of the
+arguments  and  the  continuation  gives  the next  expression  to  be
+evaluated.   If  either  of  the   arguments  is  not  in  WHNF  ({\sc
+  prim-1-clo} and {\sc prim-2-clo}), it  is sent for evaluation, and a
+continuation marks that the evaluation  of $(+~x~y)$ has to be resumed
+after the argument is evaluated.
 
 \begin{figure}[t!]
 \begin{tabular}{|c|c|c|}
-\hline
+
 \hline
 Premise & Transition & Rule name \\
 \hline
@@ -149,12 +160,12 @@ $H(\rho(y)) \mbox{ is } (s, \rho')$ & $\rho, S, H, (+~x~y)  \rightsquigarrow
 \rho'\oplus\rho, (\rho, x, (+~x~y))\!:\!S, H, e$      &  \sc{prim-2-clo} \\
 \hline
 \shortstack[c]{$\mathit{f}~\mbox{defined as}$ \\ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho, S, H, (f~\myvec{x})  \rightsquigarrow
-[\rho(\myvec{x})/\myvec{y}], S, H, e_{\mathit{f}}$      &  \sc{funcall} \\
+[\myvec{y} \mapsto \rho(\myvec{x})], S, H, e_{\mathit{f}}$      &  \sc{funcall} \\
 \hline
 $\ell$ is a new location& \shortstack[c]{$\rho, S, H, (\LET~x\leftarrow s~\IN~e)
   \rightsquigarrow$ \\
 $[x \mapsto \ell]\oplus\rho, S, H[\ell \mapsto (s, (x \mapsto
-  \ell)\oplus\lfloor \rho\rfloor_{FV(S)-\{x\}})], e$} & \sc{let} \\ 
+  \ell)\oplus\lfloor \rho\rfloor_{FV(S)\setminus\{x\}})], e$} & \sc{let} \\ 
 \hline
 $H(\rho(x)) \ne 0$ & $\rho, S, H, (\SIF~x~e_1~e_2)   \rightsquigarrow
 \rho, S, H,  e_1$ & \sc{if-true} \\ 
