@@ -40,44 +40,44 @@ typedef unsigned long clock_tick;
 
 struct cons
 {
-  cell_type typecell;
-  union
-  {
-	  struct
-	  {
-		 cons *car, *cdr;
-	  }cell;
-	  int intVal;
-	  bool boolval;
-	  std::string* stringVal;
-	  struct
-	  {
-		  ExprNode* expr;
-		  cons* arg1;
-		  cons* arg2;
-	  }closure;
-  }val;
-  void *forward;
-  stateset *setofStates;
-  int depth;
-  bool inWHNF;
-  unsigned int closure_id;
-  unsigned int reduction_id;
+	cell_type typecell;
+	union
+	{
+		struct
+		{
+			cons *car, *cdr;
+		}cell;
+		int intVal;
+		bool boolval;
+		std::string* stringVal;
+		struct
+		{
+			ExprNode* expr;
+			cons* arg1;
+			cons* arg2;
+		}closure;
+	}val;
+	void *forward;
+	stateset *setofStates;
+	int depth;
+	bool inWHNF;
+	unsigned int closure_id;
+	unsigned int reduction_id;
 #ifdef GC_ENABLE_STATS
-    /*----------------------------------------------------------------------
-     * Following fields are added by Amey Karkare to
-     * generate gc related statistics
-     */
-    /* size is used only if we support vectors */
-    clock_tick created;       /* creation time of cell */
-    clock_tick first_use;     /* first use time of cell */
-    clock_tick last_use;      /* last use time of cell */
-    char       is_reachable:1,  /* true if cell is reachable during current gc */
-               is_used:1;       /* true if cell is dereferenced for use */
-    /*----------------------------------------------------------------------*/
+	/*----------------------------------------------------------------------
+	 * Following fields are added by Amey Karkare to
+	 * generate gc related statistics
+	 */
+	/* size is used only if we support vectors */
+	clock_tick created;       /* creation time of cell */
+	clock_tick first_use;     /* first use time of cell */
+	clock_tick last_use;      /* last use time of cell */
+	char       is_reachable:1,  /* true if cell is reachable during current gc */
+	is_used:1;       /* true if cell is dereferenced for use */
+	/*----------------------------------------------------------------------*/
 #endif
 #ifdef ENABLE_SHARING_STATS
-    int visited;
+	int visited;
 #endif
 
 
@@ -124,14 +124,28 @@ public:
 
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const = 0;
+	transformDemandRef(const Scheme::Demands::rule&) const
+	{
+		Scheme::Demands::expr_demand_grammars *r;
+		std::cout << "Error : should not be called" << std::endl;
+		return r;
+	}
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+	transformDemand(const Scheme::Demands::rule&) const
+	{
+		std::unordered_map<string, Scheme::Demands::expr_demand_grammars*> r;
+		std::cout << "Error : should not be called" << std::endl;
+		return r;
+	}
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const = 0;
 	enum exprType type;
 	const std::string node_name;
+	std::unordered_set<std::string> label_set;
 protected:
 	std::string label;
+
 
 
 	Node(const std::string);
@@ -173,7 +187,7 @@ public:
 	virtual ReturnExprNode * clone() const;
 	virtual ReturnExprNode * getANF() const;
 
-	virtual Scheme::Demands::expr_demand_grammars *
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
 	transformDemand(const Scheme::Demands::rule&) const;
 	virtual cons* evaluate(struct cons* heap_cell = NULL);
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -200,8 +214,8 @@ public:
 
 	std::string getIDStr() const;
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::expr_demand_grammars *
+	transformDemandRef(const Scheme::Demands::rule&) const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -229,8 +243,8 @@ public:
 
 	virtual LetExprNode * fillHoleWith(ExprNode * pSubExpr);
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+	transformDemand(const Scheme::Demands::rule&) const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -239,11 +253,11 @@ public:
 	ExprNode* getBody();
 	virtual cons* evaluate(struct cons* heap_cell = NULL);
 	virtual cons* make_closure();
+	bool isExpressionRecursive(const std::string var, ExprNode* expr) const;
 
 protected:
 	IdExprNode * pID;
 	ExprNode * pExpr, * pBody;
-	//cons *varExprClosure, *bodyExprClosure;
 	friend ExprNode * pushDown(ExprNode *, ExprNode *);
 };
 
@@ -260,8 +274,8 @@ public:
 
 	virtual IfExprNode * fillHoleWith(IdExprNode * pSubExpr);
 	//
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+	transformDemand(const Scheme::Demands::rule&) const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -289,7 +303,7 @@ public:
 	virtual void doLabel(bool = true);
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+	transformDemandRef(const Scheme::Demands::rule&) const;
 protected:
 	ConstExprNode(const std::string);
 };
@@ -390,7 +404,7 @@ public:
 	virtual UnaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+	transformDemandRef(const Scheme::Demands::rule&) const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -424,7 +438,7 @@ public:
 	virtual BinaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+	transformDemandRef(const Scheme::Demands::rule&) const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -463,8 +477,8 @@ public:
 
 	virtual FuncExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::expr_demand_grammars *
+	transformDemandRef(const Scheme::Demands::rule&) const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -475,6 +489,7 @@ public:
 	void setNextExpr(std::string);
 	std::string getNextExpr();
 	virtual cons* make_closure();
+	std::string parent_let_pgmpt;
 	//std::list<cons*> argsClosureList;
 protected:
 	IdExprNode * pID;
@@ -499,8 +514,8 @@ public:
 	virtual DefineNode * getANF() const;
 
 	virtual std::string getFuncName() const;
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+	transformDemand(const Scheme::Demands::rule&) const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -525,8 +540,8 @@ public:
 	virtual ProgramNode * clone() const;
 	virtual ProgramNode * getANF() const;
 
-	virtual Scheme::Demands::expr_demand_grammars *
-            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+	transformDemand(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -535,6 +550,9 @@ public:
 	Node* getFunction(std::string);
 
 	void doLivenessAnalysis();
+
+	std::unordered_map<string, Node*> *progpt_map;
+	Scheme::Demands::demand_grammar liveness_data;
 
 	//TODO : Add a function to process function definitions (Similar to the LE function in python)
 protected:

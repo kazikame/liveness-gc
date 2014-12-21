@@ -272,6 +272,7 @@ void empty_environment(string functionname)
 
 void make_environment(const char *functionname, std::string returnpoint)
 {
+	std::cout << "Creating new environment for function " << functionname << " with return " << returnpoint << endl;
 	actRec newenv;
     actRecStack.front().return_point = returnpoint;
     newenv.return_point=-1;
@@ -282,6 +283,7 @@ void make_environment(const char *functionname, std::string returnpoint)
 
 void delete_environment()
 {
+	
 	actRecStack.pop_front();
     mmc=mmc-(sizeof(actRec));
     actRecStack.front().return_point=-1; //reset
@@ -582,6 +584,7 @@ void printval(void *ref)
 		//Save the cdr pointer on stack. This might be updated if a GC happens during the printing of the car field.
 
 		print_stack.push(cref->val.cell.cdr);
+		//cout << "Printing car value " << endl;
 		cout<<"(";
 		printval(cref->val.cell.car);
 
@@ -593,16 +596,18 @@ void printval(void *ref)
 		cout<<")";
 	}
 	else if(cref->typecell == constIntExprClosure)
-		cout << cref->val.intVal;
+	  {
+	    //cout << "Printing integer value"<<endl;
+	    cout << cref->val.intVal;
+	    cout << endl;
+	  }
 	else if(cref->typecell == constBoolExprClosure)
 		cout << cref->val.boolval;
 	else if(cref->typecell == constStringExprClosure)
 			cout << *(cref->val.stringVal);
 	else
 		cout << "Unknown type at " << cref << endl;
-//	int i;
-//	cout << "Enter an integer " << endl;
-//	cin >> i;
+
 }
 
 int current_heap()
@@ -1018,6 +1023,7 @@ void print_sharing_stats()
 #ifdef LIVENESS_DFS
 void liveness_gc()
 {
+	cout << "Doing liveness GC" << endl;
 #ifdef ENABLE_SHARING_STATS
 	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
 			  ((cons*)i)->visited = 0;
@@ -1029,7 +1035,8 @@ void liveness_gc()
     {
 	  for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
       {
-    	  string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
+    	  cout << "Doing gc at return point " << stackit->return_point << endl;
+		  string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
     	  stateMapIter got = statemap.find(nodeName);
 
     	  if (got != statemap.end())
@@ -1115,8 +1122,9 @@ void liveness_gc()
 	{
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
+			cout << "Doing gc at return point " << stackit->return_point << endl;
 			string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
-
+			cout << nodeName << endl;
 			stateMapIter got = statemap.find(nodeName);
 
 			if (got != statemap.end())
@@ -1900,6 +1908,7 @@ void liveness_gc()
 	{
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
+			cout << "Doing gc at return point " << stackit->return_point << endl;
 			string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
 
 			stateMapIter got = statemap.find(nodeName);

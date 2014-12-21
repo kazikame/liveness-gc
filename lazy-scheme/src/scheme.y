@@ -138,9 +138,11 @@ prim_app    : PAIRQ expr        { $$ = new Scheme::AST::UnaryPrimExprNode("pair?
             ;
 
 %%
-
+//DO NOT USE bison 3.9 TO BUILD. BISON 3.0 BREAKS scheme.y FILE USE bison 2.7
 void Scheme::SchemeParser::error(const Scheme::SchemeParser::location_type &loc, const std::string &err) {
     driver.getErrorStream() << "ERROR near Line " << scanner.get_yylineno() << " [" << err << "]: " << scanner.get_yytext() << std::endl;
+
+
 }
 
 #include "SchemeScanner.hpp"

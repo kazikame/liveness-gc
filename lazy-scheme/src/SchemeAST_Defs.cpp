@@ -119,6 +119,7 @@ cons* IdExprNode::evaluate(cons* heap_cell = NULL)
 	std::string varName = *(this->pID);
 	//cout << "Evaluating " << varName << endl;
 	cons* retval = lookup_addr(this->pID->c_str());
+			
 	if (retval->inWHNF)
 	{
 		return retval;
@@ -157,7 +158,9 @@ ReturnExprNode::ReturnExprNode(IdExprNode * pId) : ExprNode("RETURN"), pID(pId) 
 
 void ReturnExprNode::doLabel(bool shouldAddLabel)
 {
+	//label = (shouldAddLabel) ? getNextLabel() : "";
 	pID->doLabel(shouldAddLabel);
+	label = pID->getLabel();
 }
 
 ReturnExprNode * ReturnExprNode::clone() const
@@ -195,6 +198,7 @@ cons* ReturnExprNode::evaluate(cons* heap_cell = NULL)
 		//create_heap_bft(cout);
 		//out.close();
 	}
+	
 	return retval;
 }
 cons* ReturnExprNode::make_closure()
@@ -413,13 +417,14 @@ IfExprNode * IfExprNode::clone() const
 
 cons* IfExprNode::evaluate(cons* heap_cell = NULL)
 {
-	heap_cell = update_heap_refs.top();
-	if (heap_cell->inWHNF)
-	{
-		//cout << "returning already evaluated result"<<endl;
-		return heap_cell;
-	}
-	else
+//	assert(update_heap_refs.size());
+//	heap_cell = update_heap_refs.top();
+//	if (heap_cell->inWHNF)
+//	{
+//		//cout << "returning already evaluated result"<<endl;
+//		return heap_cell;
+//	}
+//	else
 	{
 		//cout << "Processing if-then-else"<<endl;
 		//The condition is always a variable. Get the heap location associated with it
@@ -452,11 +457,15 @@ cons* IfExprNode::evaluate(cons* heap_cell = NULL)
 
 		assert(retval->inWHNF);
 //		cout << "Updating heap cell " << heap_map[retval] << "(" << retval << ")" <<endl;
-		heap_cell = update_heap_refs.top();
-		heap_cell->val = retval->val;
-		heap_cell->inWHNF = retval->inWHNF;
-		heap_cell->typecell = retval->typecell;
+
+		//Commented the below code to check if having a condition as the main expression works		
+		
+//		heap_cell = update_heap_refs.top();
+//		heap_cell->val = retval->val;
+//		heap_cell->inWHNF = retval->inWHNF;
+//		heap_cell->typecell = retval->typecell;
 //		cout << "If body Updating heap cell " << heap_map[heap_cell] << "(" << heap_cell << ")" <<endl;
+		
 		//cout << "returning " << retval << " from ifexpr"<<endl;
 		return retval;
 	}
@@ -512,32 +521,46 @@ LetExprNode * LetExprNode::clone() const
 
 cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 {
-	//cout << "Processing let variable " << this->pID->getIDStr() << endl;
-
+	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
+	
 	if ((gc_status != gc_disable && current_heap() < 5) ||
 			(getVarExpr()->isFunctionCallExpression() && (current_heap < (5 +((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) )
 	{
-		ofstream out("GC.txt", ios::app);
-		out << "reachable stack before calling GC " << num_of_allocations << endl;
-		create_heap_bft(out);
-		out.close();
-		reachability_gc();
+//		ofstream out("GC.txt", ios::app);
+//		out << "reachable stack before calling GC " << num_of_allocations << endl;
+//		create_heap_bft(out);
+//		out.close();
+		if (gc_status != gc_live)
+		{
+			std::cout << "Reachability based GC" << endl;
+			reachability_gc();
+		}
+		else
+		{
+			std::cout << "Liveness based GC at pgm pt " << getLabel() << endl;
+			std::string curr_let_pgmpt = return_stack().return_point;
+			return_stack().return_point = getLabel();
+			liveness_gc();
+			return_stack().return_point = curr_let_pgmpt;
+		}
 	}
 
+	
+	
 	//Create an entry for the variable where it will be allocated on the heap
 	make_reference_addr(this->getVar().c_str(), getfree());
 	//ensure that the pointer does not get forwarded unnecessarily.
 	cons* temp = getfree();
 	temp->forward=NULL;
 
-	//TODO: The assumption is that no GC happens during the creation of the closure. This is not correct and hence we
-	//have to find a better way to implement the lazy list.
+	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
+	if (getVarExpr()->isFunctionCallExpression())
+	{
+		FuncExprNode* funExpr = (FuncExprNode*)getVarExpr();
+		funExpr->parent_let_pgmpt = getLabel();
+	}
+	
 	cons* var_res = this->getVarExpr()->make_closure();
-
-
-
-
-
 	cons* retval = this->getBody()->evaluate();
 	assert(retval->inWHNF && is_valid_address(retval));
 
@@ -545,7 +568,9 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 //	out << "Evaluation stack after evaluating let body " << this->pID->getIDStr() << " after " << num_of_allocations << endl;
 //	create_heap_bft(out);
 //	out.close();
-
+	
+	
+	
 	return retval;
 
 }
@@ -1300,7 +1325,8 @@ cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
-	make_environment(funcDef->getFuncName().c_str(), "");
+	//TODO : WHAT SHOULD BE THE PROGRAM POINT TO BE PASSED? 
+	make_environment(funcDef->getFuncName().c_str(), this->parent_let_pgmpt);
 	auto num_args = pListArgs->size();
 	auto curr = heap_cell;
 	while(num_args > 0)
@@ -1461,12 +1487,14 @@ void ProgramNode::doLabel(bool shouldAddLabel)
 {
 
 	if(shouldAddLabel == (label != "")) return;
-	label = (shouldAddLabel ? "LABELLED" : "");
+	//label = (shouldAddLabel ? "LABELLED" : "");
 	lbl_count = 0;
-//	for(std::list<DefineNode *>::iterator i = pListDefines->begin(); i != pListDefines->end(); ++i)
-//		(*i)->doLabel(shouldAddLabel);
+	
+	for(std::list<DefineNode *>::iterator i = pListDefines->begin(); i != pListDefines->end(); ++i)
+		(*i)->doLabel(shouldAddLabel);
 //	cout << pExpr << endl;
-//	pExpr->doLabel(true); //Always add label
+	cout << "Adding label " << label << " " << shouldAddLabel << endl;
+	pExpr->doLabel(true); //Always add label
 }
 
 ProgramNode::ProgramNode(std::list<DefineNode *> * defines, ExprNode * expr)

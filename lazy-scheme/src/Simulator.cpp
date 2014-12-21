@@ -124,8 +124,12 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 
 	if (gc_type == gc_live && !filesCached)
 	{
+		
+		//Instead of driver.process returning an integer why cant it return the grammar?
 		int resint = driver.process();
 		//convert LFs into IFs and DFs
+		//Use pgm->liveness_data as the final grammar
+		gLivenessData.insert(pgm->liveness_data.begin(), pgm->liveness_data.end()) ;
 		for (auto elem: gLivenessData)
 		{
 			rule r;
@@ -136,6 +140,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 			}
 			gLivenessData[elem.first] = r;
 		}
+		cout << "program name " << pgmname << endl;
 		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
 		//Simplify grammar
 		simplifyCFG(&gLivenessData);

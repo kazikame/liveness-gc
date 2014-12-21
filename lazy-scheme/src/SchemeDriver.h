@@ -28,6 +28,9 @@ namespace Scheme {
         bool printAST(std::ostream &, std::ostream &);
         bool printGrammar(std::ostream &, std::ostream &);
 
+        std::unordered_map<std::string, Scheme::Demands::expr_demand_grammars *> convertLivenessMap(std::unordered_map<std::string, Scheme::Demands::expr_demand_grammars*>,
+        		std::unordered_map<std::string, Scheme::AST::Node*> *);
+
       private:
         SchemeParser * parser;
         SchemeScanner * scanner;
@@ -35,7 +38,7 @@ namespace Scheme {
         AST::ProgramNode * program;
         AST::ProgramNode * anf_program;
 
-        Scheme::Demands::demand_grammar * approx_grammar;
+        Scheme::Demands::regular_demand_grammar * approx_grammar;
         Scheme::Demands::demand_grammar * combined_grammar;
         Scheme::Demands::expr_demand_grammars * program_grammars;
 

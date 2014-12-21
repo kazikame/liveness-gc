@@ -365,7 +365,8 @@ bool isTerminal(std::string sym)
 		   (sym == "0") ||
 		   (sym == "1") ||
 		   (sym == "0b")||
-		   (sym == "1b");
+		   (sym == "1b") ||
+		   (sym == "Xb");
 
 }
 
@@ -1157,6 +1158,9 @@ regular_demand_grammar * Scheme::Demands::regularize(const demand_grammar * gram
     return new regular_demand_grammar(new_gram, parts);
 }
 
+
+
+
 void print_path (path prod_path)
 {
 
@@ -1168,6 +1172,8 @@ void print_path (path prod_path)
 		//std::cout << "Current production is " << a << std::endl;
 	}
 }
+
+
 
 //This should be called store LF in global var or something like that
 void print_split_lf(std::pair<rule,rule> res, std::string trans_demand_key)
@@ -1379,11 +1385,19 @@ demand_grammar * Scheme::Demands::sanitize(demand_grammar * gram) {
 
 /* THIS FUNCTION DELETES THE SECOND GRAMMAR AFTER MERGING. */
 expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
-                                              expr_demand_grammars * grams_from) {
+                                              expr_demand_grammars * grams_from)
+{
     // Merge the program point demands. There should be no intersection within
     // the argument grammars.
+
+//Do we need this merging?
+	
     for(auto & non_terminal : *(grams_from->first))
-        assert(grams_to->first->emplace(non_terminal.first, non_terminal.second).second);
+        //assert(grams_to->first->emplace(non_terminal.first, non_terminal.second).second);
+    {
+    	std::cout << "Emplacing liveness for " << non_terminal.first << std::endl;
+    	grams_to->first->emplace(non_terminal.first, non_terminal.second);
+    }
 
     // Merge the variable name demands. There might be intersections here. In
     // that case, we take the union of the demands.
@@ -1392,15 +1406,16 @@ expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
     	//This condition was added to prevent null constants from being propagated during liveness propagation
     	if(non_terminal.first.size() > 0) //merge only if the non_terminal is a variable
     	{
-			auto res = grams_to->second->emplace(non_terminal.first, non_terminal.second);
+    		std::cout << "Emplacing liveness for " << non_terminal.first << std::endl;
+    		auto res = grams_to->second->emplace(non_terminal.first, non_terminal.second);
 			if(!res.second)
 				res.first->second.insert(non_terminal.second.begin(), non_terminal.second.end());
     	}
     }
 
-    delete grams_from->second;
-    delete grams_from->first;
-    delete grams_from;
+//    delete grams_from->second;
+//    delete grams_from->first;
+//    delete grams_from;
 
     return grams_to;
 }

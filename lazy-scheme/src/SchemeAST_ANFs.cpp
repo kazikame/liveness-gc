@@ -7,14 +7,16 @@
 using namespace Scheme::AST;
 
 
-bool isStatement(const ExprNode * pExpr) {
+bool isStatement(const ExprNode * pExpr)
+{
     return  isOfClass<Node, ConstExprNode>(pExpr)   ||
             isOfClass<Node, PrimExprNode>(pExpr)        ||
             isOfClass<Node, FuncExprNode>(pExpr);
 }
 
 
-bool isExpression(const ExprNode * pExpr) {
+bool isExpression(const ExprNode * pExpr)
+{
     return isOfClass<Node, ReturnExprNode>(pExpr)   ||
            isOfClass<Node, LetExprNode>(pExpr)         ||
            isOfClass<Node, IfExprNode>(pExpr);
@@ -146,6 +148,8 @@ ExprNode * LetExprNode::getANF() const {
         return new LetExprNode(pID->clone(), pExpr->clone(), pBody->getANF());
 //    return pushDown(new LetExprNode(pID->clone(), new HoleConstExprNode(), pBody->getANF()),
 //                    pExpr->getANF());
+    else //TODO:Added it to get infinte lazy list programs to work. Need to check if this is the correct thing to do
+    	return new LetExprNode(pID->clone(), pExpr->clone(), pBody->getANF());
 }
 
 LetExprNode * LetExprNode::fillHoleWith(ExprNode * pSubExpr) {
