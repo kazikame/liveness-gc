@@ -62,7 +62,7 @@ Simulator::Simulator(int gctype)
 	gc_invoke = 0;
 	gc_type = (GCStatus)gctype;
 	heap_size = 0;
-	cout << "Simulator created successfully" << endl;
+	//cout << "Simulator created successfully" << endl;
 	//Do all global initialization here
 }
 
@@ -155,12 +155,12 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		std::cout << "Sanitized the regular grammar"<<std::endl;
 		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
 		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-nfa.txt");
-		//auto start_states = nfa->second.at("START")[E];
+
 		std::unordered_set<std::string> start_states;
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
-		Scheme::Demands::simplifyNFA(start_states, nfa);
-		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
+//		Scheme::Demands::simplifyNFA(start_states, nfa);
+//		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
 		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
 		Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
 		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);

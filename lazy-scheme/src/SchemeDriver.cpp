@@ -88,17 +88,6 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
     return std::make_pair(true, getElapsedTimeInUS(start, end));
 }
 
-//void print_path (Scheme::Demands::path prod_path)
-//{
-//
-//	std::stringstream ss;
-//	for_each(prod_path.begin(), prod_path.end(), [&ss] (const std::string& s) { ss << "." << s; });
-//	if (ss.str().size() > 1)
-//	{
-//		std::string a = ss.str().substr(1);
-//		std::cout << "Current production is " << a << std::endl;
-//	}
-//}
 
 //void print_path (Scheme::Demands::path prod_path)
 //{
@@ -123,31 +112,23 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 
 	std::unordered_map<string, Scheme::Demands::expr_demand_grammars*> livenessData;
 	std::unordered_map<std::string, Scheme::AST::Node*> prog_pts = *prog_pt_map;
-	//cout << "Number of elements in livenessMap " << livenessMap.size() << endl;
+
 	for(auto p : prog_pts)
 	{
-		//cout << "Processing prog pt " << p.first << endl;
-		//TODO: Replace this code with code to get the label set corresponding to the program point
+
 		std::unordered_set<std::string> label_set = p.second->label_set;
-		//std::cout << "Number of labels " << label_set.size() << std::endl;
+
 		livenessData[p.first] = new Scheme::Demands::expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
 		for (auto l : label_set)
 		{
 			assert(livenessMap[l]);
 			if (livenessMap[l])
 			{
-				//std::cout << "Processing label " << l << " prog pt " << p.first << std::endl;
-				//cout << "Printing liveness Map" << endl;
-				//Scheme::output::dumpGrammar(cout, livenessMap[l]);
-				
 				livenessData[p.first] = Scheme::Demands::merge(livenessData[p.first], livenessMap[l]);
-				//Scheme::output::dumpGrammar(cout, livenessMap[l]);
-				//cout << "Printing liveness Data" << endl;
-				//Scheme::output::dumpGrammar(cout, livenessData[p.first]);
 			}
 		}
 	}
-	//Scheme::Demands::demand_grammar gram;
+
 	combined_grammar = new Scheme::Demands::demand_grammar;
 	for (auto p : livenessData)
 	{

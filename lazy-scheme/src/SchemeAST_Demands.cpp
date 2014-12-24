@@ -20,7 +20,7 @@ void print_label_set(unordered_set<string> s)
 {
 	cout << "Printing label set " << endl;
 	for(auto l : s)
-	  std::cout << l << endl;
+	  std::cout << l << std::endl;
 }
 
 /* D( (return x), s, T ) = x.s  */
@@ -35,7 +35,7 @@ unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(con
 	//cout << "Processing return statement with label " << label << endl; 
 	gLivenessMap[label] =  pID->transformDemandRef(demand);
 	
-	cout << "Created new label for return " << label << endl;
+	//cout << "Created new label for return " << label << endl;
 	label_set.insert(label);
 	pID->label_set.insert(label);
 	return gLivenessMap;
@@ -46,8 +46,8 @@ unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(con
 expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand) const
 {
 	//prog_pt_map[getLabel()] = this;
-	
-	auto retval = new expr_demand_grammars({ new demand_grammar({{ label, demand }}),
+	cout << "Adding Id " << *pID << " for label " << label << endl;
+ 	auto retval = new expr_demand_grammars({ new demand_grammar({{ label, demand }}),
         new demand_grammar({{ *pID, demand }})
     });
 	return retval;
@@ -104,11 +104,11 @@ expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand
     }
 
     expr_demand_grammars * result = pArg->transformDemandRef(arg_demand);
+
+    cout << "Adding Id " << ((IdExprNode*)pArg)->getIDStr() << " for label " << label << endl;
     result->first->emplace(label, demand);
 
     demand_grammar* var_grammar = result->second;
-
-
 
     label_set.insert(pArg->label_set.begin(), pArg->label_set.end());
     //print_label_set(this->label_set);
@@ -150,7 +150,8 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
     expr_demand_grammars * result =  merge(pArg1->transformDemandRef(arg_1_demand),
                                            pArg2->transformDemandRef(arg_2_demand));
     result->first->emplace(label, demand);
-    Scheme::output::dumpGrammar(cout, result);
+    cout << "Printing result of BinaryPrimOp Demand transform " << endl;
+    Scheme::output::dumpGrammar(cout, result->second);
     
 
     return result;
@@ -223,6 +224,7 @@ bool LetExprNode::isExpressionRecursive(const std::string var, ExprNode* expr) c
 unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const rule & demand) const
 {
 	auto result = pBody->transformDemand(demand);
+
 	if (in_function_define)
 		gfunc_prog_pts[getLabel()] = this;
 	else
@@ -232,7 +234,7 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 	//Check if the let definition is recursive and if true create a function "f" and
 	//get its transformer
 	std::string let_var = pID->getIDStr();
-	cout << "Processing demand for let variable " << let_var << endl;
+	//cout << "Processing demand for let variable " << let_var << endl;
 	bool isLetExprRecursive = isExpressionRecursive(let_var, pExpr);
 	if (isLetExprRecursive)
 	{
@@ -243,7 +245,7 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 	for (auto l: pBody->label_set)
 	{
 
-		cout << "Processing label " << l << endl;
+		//cout << "Processing label " << l << endl;
 		if (isLetExprRecursive)
 		{
 			//Use the LF of the function created to get the liveness of the variables in the expr.
@@ -253,15 +255,20 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 			//Call the transformDemandRef function to get the liveness
 			//auto let_var_demand_it = gLivenessMap[l]->second->find(let_var);
 			auto curr_expr_gram = gLivenessMap[l];
-			Scheme::output::dumpGrammar(cout, curr_expr_gram->second);
+			//Scheme::output::dumpGrammar(cout, curr_expr_gram->second);
+			//cout << endl;
+			//Process demand only if the let variable has a non-null demand
 			auto dem_gram = *(curr_expr_gram->second);
-			auto let_var_demand_it = dem_gram[let_var];
-			//auto let_var_demand_it = rule({path({TXb})});
-			auto let_expr_demand = pExpr->transformDemandRef(let_var_demand_it);
+			if (dem_gram.find(let_var) != dem_gram.end())
+			{
+				auto let_var_demand_it = dem_gram[let_var];
+				//auto let_var_demand_it = rule({path({TXb})});
+				auto let_expr_demand = pExpr->transformDemandRef(let_var_demand_it);
 
-			//Merge the new demands with the existing demands
-			expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);
-			gLivenessMap[l] = res;
+				//Merge the new demands with the existing demands
+				expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);
+				gLivenessMap[l] = res;
+			}
 
 		}
 //		if (pExpr->isFunctionCallExpression())
@@ -386,7 +393,7 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     	liveness_map[p.first] = new expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
     	for(auto l : labels)
     	{
-    		cout << "Processing prog pt " << p.first << " with label " << l << endl;
+    		//cout << "Processing prog pt " << p.first << " with label " << l << endl;
     		liveness_map[p.first] = merge(liveness_map[p.first], expr_map[l]);
     	}
     }
@@ -413,7 +420,7 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
 
     			arg_demands->emplace(func_demand_prefix + SEPARATOR + std::to_string(++index),
     					arg_demand_pair->second);
-    			std::cout << "Demand for argument " << (func_demand_prefix + SEPARATOR + std::to_string(index)) << std::endl;
+    			//std::cout << "Demand for argument " << (func_demand_prefix + SEPARATOR + std::to_string(index)) << std::endl;
     			gLivenessData[func_demand_prefix + SEPARATOR + std::to_string(index)] = arg_demand_pair->second;
 
     		}

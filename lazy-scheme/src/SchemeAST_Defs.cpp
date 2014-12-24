@@ -177,26 +177,18 @@ cons* ReturnExprNode::evaluate(cons* heap_cell = NULL)
 	if (!retval->inWHNF)
 	{
 
-		//cout << "Pushing onto stack return expr " << retval << endl;
 		update_heap_refs.push(retval);
 		cons* temp = retval->val.closure.expr->evaluate();
 		retval = update_heap_refs.top();
+
 		assert(temp->inWHNF && retval->inWHNF);
-		//cout << "Value of temp " << temp->inWHNF << " and retval " << retval << " and type "<< temp->typecell<<endl;
-//		cout << "Updating value of variable " << varName << " at location " << heap_map[retval]
-//		     << " with type " << print_cell_type(retval->typecell)<< endl;
+
 		retval->inWHNF = true;
 		retval->typecell = temp->typecell;
 		retval->val = temp->val;\
-//		cout << "Updated value of variable " << varName << " at location " << heap_map[retval]
-//				     << " with type " << print_cell_type(retval->typecell)<< endl;
-		//cout << "Popping return expr " << update_heap_refs.top()<<endl;
+
 		update_heap_refs.pop();
-		//cout << "returning " << retval << " from returnexpr" << endl;
-		//ofstream out("func_call.txt", ios::app);
-		//cout << "Finished processing return " << this->type <<endl;
-		//create_heap_bft(cout);
-		//out.close();
+
 	}
 	
 	return retval;
@@ -545,7 +537,6 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 		}
 	}
 
-	
 	
 	//Create an entry for the variable where it will be allocated on the heap
 	make_reference_addr(this->getVar().c_str(), getfree());
@@ -925,15 +916,15 @@ cons* BinaryPrimExprNode::evaluateCons(cons*cell = NULL)
 
 cons* BinaryPrimExprNode::evaluateAdd(cons* cell = NULL)
 {
-	//cout << "In function add" << endl;
+
 	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 		return heap_cell;
 
-	//cout << "Pushing onto stack " << heap_cell->val.closure.arg1 << endl;
+
 	update_heap_refs.push(heap_cell->val.closure.arg1);
 	cons* temp = reduceParamToWHNF(heap_cell->val.closure.arg1);
-	//cout << "Popping " << update_heap_refs.top()<<endl;
+
 	//CANNOT IMMEDIATELY POP THE FIRST PARAMETER. NEED TO KEEP IT ON THE STACK
 	//SO THAT IF A GC HAPPENS DURING THE PROCESSING OF THE SECOND PARAMETER
 	//THE POINTER TO THE FIRST PARAMETER ALSO GETS UPDATED.
@@ -942,22 +933,22 @@ cons* BinaryPrimExprNode::evaluateAdd(cons* cell = NULL)
 	arg1->val = temp->val;
 	arg1->typecell = temp->typecell;
 	//POP IT TO ACCESS THE HEAP CELL
-//	cout << "Updating heap cell " << heap_map[arg1] << "(" << arg1 << ")" << endl;
+
 	update_heap_refs.pop();
 
-	//cout << "Completed processing arg1"<<endl;
+
 	heap_cell = update_heap_refs.top();
 	//PUSH IT BACK AGAIN !!!!!!
-	update_heap_refs.push(arg1);	//cout << "Pushing onto stack " << heap_cell->val.closure.arg2 << endl;
+	update_heap_refs.push(arg1);
 	update_heap_refs.push(heap_cell->val.closure.arg2);
 	cons* temp2 = reduceParamToWHNF(heap_cell->val.closure.arg2);
-	//cout << "Popping " << update_heap_refs.top()<<endl;
+
 	cons* arg2 = update_heap_refs.top();
 	arg2->val = temp2->val;
 	arg2->inWHNF = temp2->inWHNF;
 	arg2->typecell = temp2->typecell;
 	update_heap_refs.pop();
-//	cout << "Updating heap cell " << heap_map[arg2] << "(" << arg2 << ")" << endl;
+
 	//NOW IT CAN BE SAFELY TRANSFERRED. THEN POP THE FIRST ARGUMENT ALSO.
 	arg1 = update_heap_refs.top();
 	update_heap_refs.pop();
@@ -968,9 +959,9 @@ cons* BinaryPrimExprNode::evaluateAdd(cons* cell = NULL)
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal + arg2->val.intVal;
-	//cout << "returning " << heap_cell << " from addexpr"<<endl;
+
 	heap_cell->reduction_id = ++reduction_count;
-//	cout << "Updating heap cell " << heap_map[heap_cell] << "(" << heap_cell << ")" << endl;
+
 	return heap_cell;
 }
 
@@ -980,10 +971,10 @@ cons* BinaryPrimExprNode::evaluateSub(cons* heap_cell = NULL)
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
-	//cout << "Pushing onto stack " << heap_cell->val.closure.arg1 << endl;
+
 	update_heap_refs.push(heap_cell->val.closure.arg1);
 	cons* arg1 = reduceParamToWHNF(heap_cell->val.closure.arg1);
-	//cout << "Popping " << update_heap_refs.top()<<endl;
+
 	//CANNOT IMMEDIATELY POP THE FIRST PARAMETER. NEED TO KEEP IT ON THE STACK
 	//SO THAT IF A GC HAPPENS DURING THE PROCESSING OF THE SECOND PARAMETER
 	//THE POINTER TO THE FIRST PARAMETER ALSO GETS UPDATED.
@@ -991,13 +982,13 @@ cons* BinaryPrimExprNode::evaluateSub(cons* heap_cell = NULL)
 	//POP IT TO ACCESS THE HEAP CELL
 	update_heap_refs.pop();
 
-	//cout << "Completed processing arg1"<<endl;
+
 	heap_cell = update_heap_refs.top();
 	//PUSH IT BACK AGAIN !!!!!!
-	update_heap_refs.push(arg1);	//cout << "Pushing onto stack " << heap_cell->val.closure.arg2 << endl;
+	update_heap_refs.push(arg1);
 	update_heap_refs.push(heap_cell->val.closure.arg2);
 	cons* arg2 = reduceParamToWHNF(heap_cell->val.closure.arg2);
-	//cout << "Popping " << update_heap_refs.top()<<endl;
+
 	update_heap_refs.pop();
 	//NOW IT CAN BE SAFELY TRANSFERRED. THEN POP THE FIRST ARGUMENT ALSO.
 	arg1 = update_heap_refs.top();
@@ -1008,7 +999,7 @@ cons* BinaryPrimExprNode::evaluateSub(cons* heap_cell = NULL)
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal - arg2->val.intVal;
-	//cout << "returning " << heap_cell << " from subexpr"<<endl;
+
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
 }
@@ -1321,7 +1312,7 @@ cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
 
 
 	heap_cell = update_heap_refs.top();
-//	cout << "heap cell type before updating " << print_cell_type(heap_cell->typecell) << endl;
+
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
@@ -1331,8 +1322,6 @@ cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
 	auto curr = heap_cell;
 	while(num_args > 0)
 	{
-//		cout << "Creating reference for " << (funcDef->getArgs()[num_args-1]) << " at "
-//				<< heap_map[curr->val.closure.arg2] << "(" << heap_cell  << ")" << endl;
 		make_reference_addr((funcDef->getArgs()[num_args-1]).c_str(), curr->val.closure.arg2);
 		--num_args;
 		if (curr->val.closure.arg1 != NULL)
@@ -1345,27 +1334,13 @@ cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
 	assert(temp->inWHNF);
 
 	heap_cell = update_heap_refs.top();
-//	if (heap_map[heap_cell] < root_var_map.size())
-//		cout << "Updating root varibale " << root_var_map[heap_map[heap_cell]] << " at " <<
-//		      heap_map[heap_cell] << "(" << heap_cell  << ")"<<" from type " << print_cell_type(heap_cell->typecell) << endl;
-//	else
-//		cout << "Updating " << heap_map[heap_cell] << " from type " << print_cell_type(heap_cell->typecell) << endl;
+
 	heap_cell->val = temp->val;
 	heap_cell->typecell = temp->typecell;
 	heap_cell->inWHNF = true;
-//	cout << "returning " << heap_map[heap_cell] << " from funcall " << funcDef->getFuncName()<<
-//					" with type "<< print_cell_type(heap_cell->typecell)<<endl;
-
-//	if (heap_cell->typecell == consExprClosure)
-//	{
-//		cout << "car = " << heap_map[heap_cell->val.cell.car] << " & cdr = " << heap_map[heap_cell->val.cell.cdr] << endl;
-//	}
-//	cout << "eval stack after updating func return value " << endl;
-//	create_heap_bft(cout);
-//	cout << endl;
 	delete_environment();
+
 	assert(heap_cell->typecell == temp->typecell);
-//	cout << "heap_cell  " << heap_map[heap_cell] << " temp type " << heap_map[temp] << endl;
 	heap_cell->reduction_id = ++reduction_count;
 
 	return heap_cell;
@@ -1379,16 +1354,15 @@ cons* FuncExprNode::make_closure()
 	cons* retval = (cons*)allocate_cons();
 	auto rarglistiter = this->pListArgs->rbegin();
 
-	//cout << "Num of arguments " << pListArgs->size() << " for fn call " << this->getFunction()<<endl;
+
 	retval->typecell=funcApplicationExprClosure;
 	retval->val.closure.expr = this;
 	retval->val.closure.arg1 = NULL;
 	retval->val.closure.arg2 = NULL;
 	if (pListArgs->size() > 0)
 	{
-		//cout << lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str()) << " " << retval << endl;
+
 		retval->val.closure.arg2 = lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
-		//cout << "Creating argument " << (((IdExprNode*)(*rarglistiter))->getIDStr()) << " at " << retval->val.closure.arg2 << endl;
 		retval->inWHNF = false;
 		auto prev = retval;
 		while(num_args > 0)
@@ -1398,7 +1372,6 @@ cons* FuncExprNode::make_closure()
 			curr->inWHNF = false;
 			curr->typecell = funcArgClosure;
 			curr->val.closure.arg2 =  lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
-			//cout << "Creating argument " << (((IdExprNode*)(*rarglistiter))->getIDStr()) << " at " << curr->val.closure.arg2 << endl;
 			curr->val.closure.expr = this;
 			curr->val.closure.arg1 = NULL;
 			prev->val.closure.arg1 = curr;
@@ -1492,8 +1465,6 @@ void ProgramNode::doLabel(bool shouldAddLabel)
 	
 	for(std::list<DefineNode *>::iterator i = pListDefines->begin(); i != pListDefines->end(); ++i)
 		(*i)->doLabel(shouldAddLabel);
-//	cout << pExpr << endl;
-	cout << "Adding label " << label << " " << shouldAddLabel << endl;
 	pExpr->doLabel(true); //Always add label
 }
 

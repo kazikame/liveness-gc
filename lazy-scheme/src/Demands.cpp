@@ -375,6 +375,7 @@ automaton* Scheme::Demands::getNFAsFromRegularGrammar(const demand_grammar* gram
 	auto nfa = new automaton();
 	state_transitions &trans = nfa->second;
 	std::unordered_set<std::string> start_states;
+
 	for(auto &nt:(*gram))
 	{
 		std::string startstate = nt.first;
@@ -429,70 +430,13 @@ automaton* Scheme::Demands::getNFAsFromRegularGrammar(const demand_grammar* gram
 			trans.at(current_state)[previousSymbol].insert(finalstate);
 		}
 	}
-	//create a dummy start state and insert epsilon transitions from this state to all start states
-//	std::string st("START");
-//    trans[st];
-//    trans.at(st)[E].insert(start_states.begin(), start_states.end());
+
     std::cout << "Completed creating NFAs"<<std::endl;
-//    for (auto nt: nfa->second)
-//    		print_fa_to_graphviz_file("../benchmarks/programs/" + pgmname + "/nfa", nt.first, nfa);
+    removeXbEdgesFrom(nfa);
 
 	return nfa;
 }
 
-//automaton* Scheme::Demands::getNFAsFromRegularGrammar(const demand_grammar* gram)
-//{
-//	auto nfa = new automaton();
-//	state_transitions &trans = nfa->second;
-//	std::unordered_set<std::string> start_states;
-//	for(auto &nt:(*gram))
-//	{
-//		std::string startstate = nt.first;
-//		start_states.insert(startstate);
-//		std::string finalstate = nt.first + "_f";
-//	}
-//
-//	for(auto &nt:(*gram)) //For each non-terminal
-//	{
-//		std::string startstate = nt.first;
-//		std::string finalstate = nt.first + "_f";
-//		nfa->first.insert(nfa->first.end(), nt.first + "_f");
-//
-//		for (auto p:nt.second)//For each production for the non-terminal
-//		{
-//			std::string current_state = startstate;
-//			for (auto sym:p) //For each symbol in p
-//			{
-//
-//				if (isTerminal(sym))
-//				{
-//					std::string newstate = createNewState(nt.first);
-//					trans[current_state];
-//					trans.at(current_state)[sym].insert(newstate);
-//					current_state = newstate;
-//				}
-//				else
-//				{
-//					trans[current_state];
-//					trans.at(current_state)[E].insert(sym);
-//					//std::string newstate = createNewState(nt.first);
-//					trans[sym + "_f"];
-//					//trans.at(sym + "_f")[E].insert(newstate);
-//					//current_state = newstate;
-//					current_state = sym + "_f";
-//				}
-//			}
-//			trans[current_state];
-//			trans.at(current_state)[E].insert(finalstate);
-//		}
-//	}
-//	//create a dummy start state and insert epsilon transitions from this state to all start states
-//	std::string st("START");
-//    trans[st];
-//    trans.at(st)[E].insert(start_states.begin(), start_states.end());
-//
-//	return nfa;
-//}
 
 
 void Scheme::Demands::printNFAToFile(automaton *nfa, std::string filename)
@@ -534,7 +478,7 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 			continue;
 		else
 			st = st_tuple.first;
-		//std::cout << "Processing set start state " << st << std::endl;
+
 		auto new_s = epsilonClosure(st, nfa);
 		std::vector<std::unordered_set<std::string> > processed;
 		std::string s = st;
@@ -546,8 +490,19 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 		{
 			auto curr_state = q.front();
 			q.pop();
-
+			std::cout << "Processing state " << curr_state << std::endl;
 			//for(auto term:{T0, T1, T0b, T1b})
+
+			//TODO: What to do if the start state is the final state and has no other transitions?
+			//Insert the state in the final state list of the dfa and insert a dummy transition
+			if (nfa->first.find(curr_state) != nfa->first.end())
+			{
+				std::cout << "Inserting state in dfa " << curr_state << std::endl;
+				dfa->first.insert(curr_state);
+				dfa->second[curr_state];
+			}
+
+
 			for(auto term:{T0, T1})//Remove the 0b and 1b edges
 			{
 				std::unordered_set<std::string> nexts;
@@ -560,11 +515,15 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 						nexts.insert(temp.begin(), temp.end());
 					}
 					if(nfa->first.find(next_state) != nfa->first.end())
+					{
+
 						dfa->first.insert(s);
+					}
 
 				}
 
 				dfa->second[curr_state];
+				std::cout << "Is nexts empty?" << nexts.empty()<<std::endl;
 				if (!nexts.empty())
 				{
 					if (std::find(processed.begin(), processed.end(), nexts) == processed.end())
@@ -572,10 +531,10 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 						auto new_name = createNewState(st);
 						new_state_map[new_name] = nexts;
 						processed.push_back(new_state_map.at(new_name));
-						//std::cout << "Creating new state " << new_name << " for ";
-						//printSetofStates(nexts);
+
 
 						dfa->second.at(curr_state)[term] = {new_name};
+						std::cout << "Inserting transition " << curr_state << "-- " << term << "->"<< new_name<<std::endl;
 						q.push(new_name);
 					}
 					else
@@ -590,46 +549,27 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 							}
 						}
 						dfa->second.at(curr_state)[term] = {new_name};
-						//std::cout << "Setting transition " << curr_state << "--" << term << "-->" << new_name <<std::endl;
+						std::cout << "Inserting transition " << curr_state << "-- " << term << "->"<< new_name<<std::endl;
+
 					}
 				}
 			}
-			//std::cout << "Adding state " << curr_state << " to set of processed states" << std::endl;
+
 		}
 
 	}
-
-	std::vector<std::string> useless_states;
-	for (auto nt:dfa->second)
-	{
-		if(nt.second.size() <= 0)
-		{
-			//std::cout<< "No transition for " << nt.first << std::endl;
-			useless_states.push_back(nt.first);
-
-		}
-//		else
+//Removing useless states. There might be a bug so commenting it for now
+//	std::vector<std::string> useless_states;
+//	for (auto nt:dfa->second)
+//	{
+//		if(nt.second.size() <= 0)
 //		{
-//			//If the automaton has no final state in its reachable state delete the automaton
-//			auto rchable_states = reachable_states(nt.first, dfa);
-//			bool has_final_state = false;
-//			auto final_states = dfa->first;
-//			for (auto state:rchable_states)
-//			{
-//				if (final_states.find(state) != final_states.end())
-//					has_final_state = true;
-//			}
-//			if (!has_final_state)
-//				//dfa->second.erase(nt.first);
-//				useless_states.push_back(nt.first);
+//			useless_states.push_back(nt.first);
+//
 //		}
-
-	}
-	for (auto state:useless_states)
-		dfa->second.erase(state);
-
-//	for (auto nt: dfa->second)
-//		print_fa_to_graphviz_file("../benchmarks/programs/" + pgmname + "/dfa", nt.first, dfa);
+//	}
+//	for (auto state:useless_states)
+//		dfa->second.erase(state);
 
 	return dfa;
 }
@@ -694,8 +634,7 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		state_queue.swap(temp_queue);
 		eps_closure.insert(nexts.begin(), nexts.end());
 	}
-	//std::cout << "Epsilon closure of state " << state;
-	//printSetofStates(eps_closure);
+
 
 	bool hasfinalState = false;
 	for(auto st:eps_closure)
@@ -705,7 +644,10 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 			break;
 		}
 	if (hasfinalState)
+	{
+		std::cout << "Marking state as final state " << state << std::endl;
 		nfa->first.insert(state);
+	}
 
 	return eps_closure;
 }
@@ -729,69 +671,6 @@ void removeUnreachableStates(std::unordered_set<std::string> reachable_states,  
 
 
 
-//DO NOT USE THIS METHOD FOR LGC
-//TODO : Remove this method
-automaton * Scheme::Demands::getNFAsFromRegCFG(const regular_demand_grammar * /*rgram*/)
-{
-    //auto gram = rgram->first;
-    auto final_nfa = new automaton();
-
-//    std::unordered_map<std::string, unsigned> nt_parts(rgram->first->size());
-//    for(auto part  = 0; part < rgram->second->size(); ++part)
-//        for(auto & nt : rgram->second->at(part).second)
-//            nt_parts.emplace(nt, part);
-//
-//    internal_counter = 0;
-//    std::cout << std::endl;
-//
-//    for(auto & non_terminal : *(rgram->first))
-//    {
-//
-//    	if(non_terminal.first.find(SUFFIX_APPROX) != std::string::npos)
-//    		continue;
-//
-//    	auto expand_nt = path({{non_terminal.first}});
-//    	auto nt_final_state = non_terminal.first + SUFFIX_FSTATE;
-//
-//    	automaton nfa;
-//    	auto nfa_iter = nfa_map.find(non_terminal);
-//    	//First search for the nfa in the map. If not found then create it otherwise re-use the nfa.
-//    	if (nfa_iter == nfa_map.end())
-//    	{
-//    		nfa.second[non_terminal.first];
-//    		nfa.first.insert(nt_final_state);
-//
-//    		make_fa(non_terminal.first, expand_nt, nt_final_state,
-//    				rgram->first, rgram->second, & nt_parts, & nfa.second);
-//
-//    		std::cout << "\r" << std::string(80, ' ')
-//    		<< "\r  -> Approx. Regular CFG to NFA Conversion: "
-//    		<< ++internal_counter << "/" << rgram->first->size()
-//    		<< " (" << nfa.second.size() << ")" << std::flush;
-//    	}
-//    	else
-//    		nfa = *nfa_iter;
-//
-//    	marked_states.clear();
-//    	combineEpsilonEdgesFrom(non_terminal.first, &nfa);
-//    	removeDeadStatesFrom(non_terminal.first, &nfa);
-//    	simplifyWithoutEpsilonEdges(non_terminal.first, &nfa);
-//
-//    	marked_states.clear();
-//    	combineEpsilonEdgesFrom(non_terminal.first, &nfa);
-//    	removeDeadStatesFrom(non_terminal.first, &nfa);
-//    	removeXbEdgesFrom(&nfa);
-//    	removeDeadStatesFrom(non_terminal.first, &nfa);
-//
-//    	for(auto & state : nfa.first)
-//    		final_nfa->first.emplace(state);
-//    	for(auto & state : nfa.second)
-//    		final_nfa->second.emplace(state.first, move(state.second));
-//
-//    }
-
-    return final_nfa;
-}
 
 void Scheme::Demands::printSetofStates(std::unordered_set<std::string> states)
 {
@@ -846,7 +725,6 @@ bool replaceEdgesWithEpsilonEdge(std::pair<std::string, transitions> ts, state_t
 						if(trans.at(src)[E].find(d) == trans.at(src)[E].end())
 						{
 							//Add only if the edge is not present
-							//std::cout<< "Adding an epsilon edge between " << src << " and " << d <<std::endl;
 							trans.at(src)[E].insert(d);
 							changed = true;
 						}
@@ -890,15 +768,12 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 		while(!states.empty())
 		{
 			std::string curr_state = states.top();
-			//std::cout << "Removing state " << states.top() << " from stack" << std::endl;
 			states.pop();//Remove it from the stack
-			//std::cout << "Number of states in stack " << states.size() << std::endl;
+
 			processed.insert(curr_state); //Add it to the list of states already processed.
 			reachable_states.insert(curr_state);
 			auto eps_closure = epsilonClosure(curr_state, nfa);
-			//std::cout << "Epsilon closure of " << curr_state ;
-			//printSetofStates(eps_closure);
-			//std::cout << "Removing epsilon edges for state " << curr_state << std::endl;
+
 			for (auto s:eps_closure)
 			{
 				if (nfa->second.find(s) != nfa->second.end())
@@ -907,7 +782,6 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 				if (nfa->first.find(s) != nfa->first.end())
 					nfa->first.insert(curr_state);
 			}
-			//std::cout << "Completed adding transitions" <<std::endl;
 			//remove all epsilon transitions from the non_terminal
 			//This check is required to see if the current state has any transitions otherwise there won't be an entry in the map.
 
@@ -921,16 +795,12 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 						for(auto st:ts.second)
 							if(processed.find(st) == processed.end())
 							{
-								//std::cout << "Adding state " << st << " for processing" << std::endl;
 								states.push(st);
 								reachable_states.insert(st);
 							}
 				}
 			}
-			//std::cout << "completed updating the state queue & current size is " << states.size() << std::endl;
 		}
-		//std::cout << "Completed processing non_terminal " << non_terminal << " " << i << std::endl;
-		//std::cout << "Number of non_terminals " << start_states.size() << std::endl;
 	}
 	std::cout << "Completed processing all non_terminals" << std::endl;
 	removeUnreachableStates(reachable_states, nfa);
@@ -949,17 +819,7 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
 		changed = removeEpsilonEdges(start_states, nfa) &&
 				  barEdgeSimplification(nfa);
 		std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
-		//std::cout << "Changed =  " << changed <<std::endl;
 	}
-//	std::unordered_set<std::string> rchable_states;
-//	for(auto st:start_states)
-//	{
-//		partition temp = reachable_states(st, nfa);
-//		rchable_states.insert(temp.begin(), temp.end());
-//	}
-//	removeUnreachableStates(rchable_states, nfa);
-//	std::cout << "Removed unreachable states" << std::endl;
-
 	return nfa;
 }
 
@@ -1183,15 +1043,8 @@ void print_split_lf(std::pair<rule,rule> res, std::string trans_demand_key)
 
 	gLivenessData[trans_demand_key] = res.first;
 
-    //for(auto path: res.first)
-    //	print_path(path);
-
-    //std::cout << std::endl << "Printing the DF part " << std::endl;
     trans_demand_key.replace(0, 2, "DF");
     gLivenessData[trans_demand_key] = res.second;
-    //for(auto path: res.second)
-    //	print_path(path);
-    //std::cout << std::endl;
 
 }
 
@@ -1212,8 +1065,8 @@ demand_grammar * Scheme::Demands::solve_functions_and_combine(expr_demand_gramma
 
     auto final_gram = new demand_grammar(*(grams->first));
     // Merge the two grammars. There should be no conflicts.
-//    for(auto & non_terminal : *(grams->second))
-//        assert(final_gram->emplace(non_terminal.first, non_terminal.second).second);
+    //    for(auto & non_terminal : *(grams->second))
+    //        assert(final_gram->emplace(non_terminal.first, non_terminal.second).second);
 
     return sanitize(final_gram);
 }
@@ -1392,11 +1245,13 @@ expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
 
 //Do we need this merging?
 	
+	expr_demand_grammars *res =  new expr_demand_grammars;
+	*res = *grams_to;
+
     for(auto & non_terminal : *(grams_from->first))
         //assert(grams_to->first->emplace(non_terminal.first, non_terminal.second).second);
     {
-    	std::cout << "Emplacing liveness for " << non_terminal.first << std::endl;
-    	grams_to->first->emplace(non_terminal.first, non_terminal.second);
+    	res->first->emplace(non_terminal.first, non_terminal.second);
     }
 
     // Merge the variable name demands. There might be intersections here. In
@@ -1406,18 +1261,13 @@ expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
     	//This condition was added to prevent null constants from being propagated during liveness propagation
     	if(non_terminal.first.size() > 0) //merge only if the non_terminal is a variable
     	{
-    		std::cout << "Emplacing liveness for " << non_terminal.first << std::endl;
-    		auto res = grams_to->second->emplace(non_terminal.first, non_terminal.second);
-			if(!res.second)
-				res.first->second.insert(non_terminal.second.begin(), non_terminal.second.end());
+    		auto result = res->second->emplace(non_terminal.first, non_terminal.second);
+			if(!result.second)
+				result.first->second.insert(non_terminal.second.begin(), non_terminal.second.end());
     	}
     }
 
-//    delete grams_from->second;
-//    delete grams_from->first;
-//    delete grams_from;
-
-    return grams_to;
+    return res;
 }
 
 /////////////////////////////////////////////DFA Minimization code/////////////////////////////////////////////////////////
@@ -1474,8 +1324,7 @@ partition reachable_states(std::string nt, automaton* nfa)
 
 		}
 	}
-//	std::cout << "Set of reachable states from " << nt << std::endl;
-//	printSetofStates(p);
+
 	return p;
 }
 
@@ -1663,7 +1512,7 @@ void print_fa_to_graphviz_file(std::string pgmname, std::string non_terminal, au
 	std::string filename = non_terminal;
 	std::replace(filename.begin(), filename.end(), '/', '_');
 	filename = filename + ".gv";
-	//std::cout << "File written to " << (std::string(cCurrentPath) + "/output/" + pgmname + "/" + filename) << std::endl;
+
 	std::ofstream gvizfile(std::string(cCurrentPath) + "/output/" + pgmname + "/" + filename);
 	gvizfile << "digraph finite_state_machine {\n";
 	gvizfile << "rankdir=LR;\n";
@@ -1672,10 +1521,10 @@ void print_fa_to_graphviz_file(std::string pgmname, std::string non_terminal, au
 	auto final_states = nfa->first;
 	partition rchable_states = reachable_states(non_terminal, nfa);
 	std::string final_state_string;
-	//std::cout << "Building final state string for " << non_terminal << std::endl;
+
 	for(auto st:rchable_states)
 	{
-		//std::cout << "Processing state " << st << std::endl;
+
 		if (final_states.find(st) != final_states.end())
 		{
 			std::string fst = st;
@@ -1684,12 +1533,12 @@ void print_fa_to_graphviz_file(std::string pgmname, std::string non_terminal, au
 			std::replace(fst.begin(), fst.end(), '(', '_');
 			std::replace(fst.begin(), fst.end(), ')', '_');
 			std::replace(fst.begin(), fst.end(), '-', '_');
-			//gvizfile << fst << " ";
+
 			final_state_string = final_state_string + fst + " ";
-			//std::cout << "final state string =  " << final_state_string << std::endl;
+
 		}
 	}
-	//std::cout << "Final state string for " << non_terminal << " is " << final_state_string << std::endl;
+
 	if(final_state_string.length() > 0)
 	{
 		gvizfile << "node [shape = doublecircle]; ";

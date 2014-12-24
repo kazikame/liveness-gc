@@ -1,4 +1,4 @@
-CC = g++
+CC = g++-4.8
 CFLAGS = -g -Wall -fPIC -std=c++11 -fpermissive
 OBJ_FLAGS=-c
 DBG_FLAGS=-pg -O0
@@ -55,4 +55,4 @@ remove:
 	rm -rf *~ *.ghc
 	rm -rf *.o scheme_lexer.cc
 	rm -rf location.hh position.hh stack.hh
-	rm -rf scheme.tab.h scheme.tab.c scheme.output
+#	rm -rf scheme.tab.h scheme.tab.c scheme.output

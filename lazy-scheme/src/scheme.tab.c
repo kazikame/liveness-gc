@@ -1,8 +1,8 @@
-/* A Bison parser, made by GNU Bison 2.5.  */
+/* A Bison parser, made by GNU Bison 2.7.12-4996.  */
 
 /* Skeleton implementation for Bison LALR(1) parsers in C++
    
-      Copyright (C) 2002-2011 Free Software Foundation, Inc.
+      Copyright (C) 2002-2013 Free Software Foundation, Inc.
    
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,21 +33,18 @@
 
 /* First part of user declarations.  */
 
-
-/* Line 293 of lalr1.cc  */
-#line 39 "scheme.tab.c"
+/* Line 283 of lalr1.cc  */
+#line 38 "scheme.tab.c"
 
 
 #include "scheme.tab.h"
 
 /* User implementation prologue.  */
 
-
-/* Line 299 of lalr1.cc  */
-#line 48 "scheme.tab.c"
+/* Line 289 of lalr1.cc  */
+#line 46 "scheme.tab.c"
 /* Unqualified %code blocks.  */
-
-/* Line 300 of lalr1.cc  */
+/* Line 290 of lalr1.cc  */
 #line 25 "scheme.y"
 
     #include <iostream>
@@ -61,9 +58,17 @@
                      Scheme::SchemeDriver &driver);
 
 
+/* Line 290 of lalr1.cc  */
+#line 63 "scheme.tab.c"
 
-/* Line 300 of lalr1.cc  */
-#line 67 "scheme.tab.c"
+
+# ifndef YY_NULL
+#  if defined __cplusplus && 201103L <= __cplusplus
+#   define YY_NULL nullptr
+#  else
+#   define YY_NULL 0
+#  endif
+# endif
 
 #ifndef YY_
 # if defined YYENABLE_NLS && YYENABLE_NLS
@@ -77,25 +82,26 @@
 # endif
 #endif
 
+#define YYRHSLOC(Rhs, K) ((Rhs)[K])
 /* YYLLOC_DEFAULT -- Set CURRENT to span from RHS[1] to RHS[N].
    If N is 0, then set CURRENT to the empty location which ends
    the previous symbol: RHS[0] (always defined).  */
 
-#define YYRHSLOC(Rhs, K) ((Rhs)[K])
-#ifndef YYLLOC_DEFAULT
-# define YYLLOC_DEFAULT(Current, Rhs, N)                               \
- do                                                                    \
-   if (N)                                                              \
-     {                                                                 \
-       (Current).begin = YYRHSLOC (Rhs, 1).begin;                      \
-       (Current).end   = YYRHSLOC (Rhs, N).end;                        \
-     }                                                                 \
-   else                                                                \
-     {                                                                 \
-       (Current).begin = (Current).end = YYRHSLOC (Rhs, 0).end;        \
-     }                                                                 \
- while (false)
-#endif
+# ifndef YYLLOC_DEFAULT
+#  define YYLLOC_DEFAULT(Current, Rhs, N)                               \
+    do                                                                  \
+      if (N)                                                            \
+        {                                                               \
+          (Current).begin  = YYRHSLOC (Rhs, 1).begin;                   \
+          (Current).end    = YYRHSLOC (Rhs, N).end;                     \
+        }                                                               \
+      else                                                              \
+        {                                                               \
+          (Current).begin = (Current).end = YYRHSLOC (Rhs, 0).end;      \
+        }                                                               \
+    while (/*CONSTCOND*/ false)
+# endif
+
 
 /* Suppress unused-variable warnings by "using" E.  */
 #define YYUSE(e) ((void) (e))
@@ -131,9 +137,9 @@ do {					\
 #else /* !YYDEBUG */
 
 # define YYCDEBUG if (false) std::cerr
-# define YY_SYMBOL_PRINT(Title, Type, Value, Location)
-# define YY_REDUCE_PRINT(Rule)
-# define YY_STACK_PRINT()
+# define YY_SYMBOL_PRINT(Title, Type, Value, Location) YYUSE(Type)
+# define YY_REDUCE_PRINT(Rule)        static_cast<void>(0)
+# define YY_STACK_PRINT()             static_cast<void>(0)
 
 #endif /* !YYDEBUG */
 
@@ -145,13 +151,11 @@ do {					\
 #define YYERROR		goto yyerrorlab
 #define YYRECOVERING()  (!!yyerrstatus_)
 
-
-/* Line 382 of lalr1.cc  */
+/* Line 357 of lalr1.cc  */
 #line 6 "scheme.y"
 namespace Scheme {
-
-/* Line 382 of lalr1.cc  */
-#line 155 "scheme.tab.c"
+/* Line 357 of lalr1.cc  */
+#line 159 "scheme.tab.c"
 
   /// Build a parser object.
   SchemeParser::SchemeParser (SchemeScanner &scanner_yyarg, SchemeDriver &driver_yyarg)
@@ -180,11 +184,10 @@ namespace Scheme {
   {
     YYUSE (yylocationp);
     YYUSE (yyvaluep);
-    switch (yytype)
-      {
-         default:
-	  break;
-      }
+    std::ostream& yyo = debug_stream ();
+    std::ostream& yyoutput = yyo;
+    YYUSE (yyoutput);
+    YYUSE (yytype);
   }
 
 
@@ -208,140 +211,113 @@ namespace Scheme {
     YYUSE (yymsg);
     YYUSE (yyvaluep);
 
-    YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
+    if (yymsg)
+      YY_SYMBOL_PRINT (yymsg, yytype, yyvaluep, yylocationp);
 
     switch (yytype)
-      {
-        case 24: /* "ICONST" */
-
-/* Line 480 of lalr1.cc  */
+    {
+      case 24: /* ICONST */
+/* Line 452 of lalr1.cc  */
 #line 75 "scheme.y"
-	{ delete((yyvaluep->ival)); };
-
-/* Line 480 of lalr1.cc  */
-#line 223 "scheme.tab.c"
-	break;
-      case 25: /* "BCONST" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).ival)); };
+/* Line 452 of lalr1.cc  */
+#line 225 "scheme.tab.c"
+        break;
+      case 25: /* BCONST */
+/* Line 452 of lalr1.cc  */
 #line 75 "scheme.y"
-	{ delete((yyvaluep->bval)); };
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).bval)); };
+/* Line 452 of lalr1.cc  */
 #line 232 "scheme.tab.c"
-	break;
-      case 26: /* "SCONST" */
-
-/* Line 480 of lalr1.cc  */
+        break;
+      case 26: /* SCONST */
+/* Line 452 of lalr1.cc  */
 #line 75 "scheme.y"
-	{ delete((yyvaluep->sval)); };
-
-/* Line 480 of lalr1.cc  */
-#line 241 "scheme.tab.c"
-	break;
-      case 27: /* "ID" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).sval)); };
+/* Line 452 of lalr1.cc  */
+#line 239 "scheme.tab.c"
+        break;
+      case 27: /* ID */
+/* Line 452 of lalr1.cc  */
 #line 75 "scheme.y"
-	{ delete((yyvaluep->sval)); };
-
-/* Line 480 of lalr1.cc  */
-#line 250 "scheme.tab.c"
-	break;
-      case 30: /* "list_of_defines" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).sval)); };
+/* Line 452 of lalr1.cc  */
+#line 246 "scheme.tab.c"
+        break;
+      case 30: /* list_of_defines */
+/* Line 452 of lalr1.cc  */
 #line 76 "scheme.y"
-	{ delete((yyvaluep->dnodes)); };
-
-/* Line 480 of lalr1.cc  */
-#line 259 "scheme.tab.c"
-	break;
-      case 31: /* "define" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).dnodes)); };
+/* Line 452 of lalr1.cc  */
+#line 253 "scheme.tab.c"
+        break;
+      case 31: /* define */
+/* Line 452 of lalr1.cc  */
 #line 74 "scheme.y"
-	{ delete((yyvaluep->dnode)); };
-
-/* Line 480 of lalr1.cc  */
-#line 268 "scheme.tab.c"
-	break;
-      case 32: /* "list_of_identifiers" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).dnode)); };
+/* Line 452 of lalr1.cc  */
+#line 260 "scheme.tab.c"
+        break;
+      case 32: /* list_of_identifiers */
+/* Line 452 of lalr1.cc  */
 #line 76 "scheme.y"
-	{ delete((yyvaluep->inodes)); };
-
-/* Line 480 of lalr1.cc  */
-#line 277 "scheme.tab.c"
-	break;
-      case 33: /* "expr" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).inodes)); };
+/* Line 452 of lalr1.cc  */
+#line 267 "scheme.tab.c"
+        break;
+      case 33: /* expr */
+/* Line 452 of lalr1.cc  */
 #line 74 "scheme.y"
-	{ delete((yyvaluep->enode)); };
-
-/* Line 480 of lalr1.cc  */
-#line 286 "scheme.tab.c"
-	break;
-      case 34: /* "if_expr" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).enode)); };
+/* Line 452 of lalr1.cc  */
+#line 274 "scheme.tab.c"
+        break;
+      case 34: /* if_expr */
+/* Line 452 of lalr1.cc  */
 #line 77 "scheme.y"
-	{ delete((yyvaluep->enode)); };
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).enode)); };
+/* Line 452 of lalr1.cc  */
+#line 281 "scheme.tab.c"
+        break;
+      case 35: /* let_expr */
+/* Line 452 of lalr1.cc  */
+#line 77 "scheme.y"
+        { delete(((*yyvaluep).enode)); };
+/* Line 452 of lalr1.cc  */
+#line 288 "scheme.tab.c"
+        break;
+      case 36: /* list_of_exprs */
+/* Line 452 of lalr1.cc  */
+#line 76 "scheme.y"
+        { delete(((*yyvaluep).enodes)); };
+/* Line 452 of lalr1.cc  */
 #line 295 "scheme.tab.c"
-	break;
-      case 35: /* "let_expr" */
-
-/* Line 480 of lalr1.cc  */
+        break;
+      case 37: /* primapp_expr */
+/* Line 452 of lalr1.cc  */
 #line 77 "scheme.y"
-	{ delete((yyvaluep->enode)); };
-
-/* Line 480 of lalr1.cc  */
-#line 304 "scheme.tab.c"
-	break;
-      case 36: /* "list_of_exprs" */
-
-/* Line 480 of lalr1.cc  */
-#line 76 "scheme.y"
-	{ delete((yyvaluep->enodes)); };
-
-/* Line 480 of lalr1.cc  */
-#line 313 "scheme.tab.c"
-	break;
-      case 37: /* "primapp_expr" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).enode)); };
+/* Line 452 of lalr1.cc  */
+#line 302 "scheme.tab.c"
+        break;
+      case 38: /* funapp_expr */
+/* Line 452 of lalr1.cc  */
 #line 77 "scheme.y"
-	{ delete((yyvaluep->enode)); };
-
-/* Line 480 of lalr1.cc  */
-#line 322 "scheme.tab.c"
-	break;
-      case 38: /* "funapp_expr" */
-
-/* Line 480 of lalr1.cc  */
+        { delete(((*yyvaluep).enode)); };
+/* Line 452 of lalr1.cc  */
+#line 309 "scheme.tab.c"
+        break;
+      case 39: /* prim_app */
+/* Line 452 of lalr1.cc  */
 #line 77 "scheme.y"
-	{ delete((yyvaluep->enode)); };
+        { delete(((*yyvaluep).enode)); };
+/* Line 452 of lalr1.cc  */
+#line 316 "scheme.tab.c"
+        break;
 
-/* Line 480 of lalr1.cc  */
-#line 331 "scheme.tab.c"
-	break;
-      case 39: /* "prim_app" */
-
-/* Line 480 of lalr1.cc  */
-#line 77 "scheme.y"
-	{ delete((yyvaluep->enode)); };
-
-/* Line 480 of lalr1.cc  */
-#line 340 "scheme.tab.c"
-	break;
-
-	default:
-	  break;
-      }
+      default:
+        break;
+    }
   }
 
   void
@@ -398,17 +374,18 @@ namespace Scheme {
     int yychar = yyempty_;
     int yytoken = 0;
 
-    /* State.  */
+    // State.
     int yyn;
     int yylen = 0;
     int yystate = 0;
 
-    /* Error handling.  */
+    // Error handling.
     int yynerrs_ = 0;
     int yyerrstatus_ = 0;
 
     /// Semantic value of the lookahead.
-    semantic_type yylval;
+    static semantic_type yyval_default;
+    semantic_type yylval = yyval_default;
     /// Location of the lookahead.
     location_type yylloc;
     /// The locations where the error started and ended.
@@ -421,6 +398,10 @@ namespace Scheme {
 
     int yyresult;
 
+    // FIXME: This shoud be completely indented.  It is not yet to
+    // avoid gratuitous conflicts when merging into the master branch.
+    try
+      {
     YYCDEBUG << "Starting parse" << std::endl;
 
 
@@ -428,9 +409,9 @@ namespace Scheme {
        yynewstate, since the latter expects the semantical and the
        location values to have been already stored, initialize these
        stacks with a primary value.  */
-    yystate_stack_ = state_stack_type (0);
-    yysemantic_stack_ = semantic_stack_type (0);
-    yylocation_stack_ = location_stack_type (0);
+    yystate_stack_.clear ();
+    yysemantic_stack_.clear ();
+    yylocation_stack_.clear ();
     yysemantic_stack_.push (yylval);
     yylocation_stack_.push (yylloc);
 
@@ -456,10 +437,9 @@ namespace Scheme {
     /* Read a lookahead token.  */
     if (yychar == yyempty_)
       {
-	YYCDEBUG << "Reading a token: ";
-	yychar = yylex (&yylval, scanner, driver);
+        YYCDEBUG << "Reading a token: ";
+        yychar = yylex (&yylval, scanner, driver);
       }
-
 
     /* Convert token to internal form.  */
     if (yychar <= yyeof_)
@@ -531,265 +511,233 @@ namespace Scheme {
     else
       yyval = yysemantic_stack_[0];
 
+    // Compute the default @$.
     {
       slice<location_type, location_stack_type> slice (yylocation_stack_, yylen);
       YYLLOC_DEFAULT (yyloc, slice, yylen);
     }
+
+    // Perform the reduction.
     YY_REDUCE_PRINT (yyn);
     switch (yyn)
       {
-	  case 2:
-
-/* Line 690 of lalr1.cc  */
+          case 2:
+/* Line 664 of lalr1.cc  */
 #line 83 "scheme.y"
     { (yyval.pnode) = new Scheme::AST::ProgramNode((yysemantic_stack_[(2) - (1)].dnodes), (yysemantic_stack_[(2) - (2)].enode)); driver.set_prog((yyval.pnode)); }
     break;
 
   case 3:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 86 "scheme.y"
     { (yyval.dnodes) = new std::list<Scheme::AST::DefineNode *>(); }
     break;
 
   case 4:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 87 "scheme.y"
     { (yyval.dnodes) = (yysemantic_stack_[(2) - (1)].dnodes); (yyval.dnodes)->push_back((yysemantic_stack_[(2) - (2)].dnode)); }
     break;
 
   case 5:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 90 "scheme.y"
     { (yyval.dnode) = new Scheme::AST::DefineNode(new Scheme::AST::IdExprNode((yysemantic_stack_[(8) - (4)].sval)), (yysemantic_stack_[(8) - (5)].inodes), (yysemantic_stack_[(8) - (7)].enode)); }
     break;
 
   case 6:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 93 "scheme.y"
     { (yyval.inodes) = new std::list<Scheme::AST::IdExprNode *>(); }
     break;
 
   case 7:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 94 "scheme.y"
     { (yyval.inodes) = (yysemantic_stack_[(2) - (1)].inodes); (yyval.inodes)->push_back(new Scheme::AST::IdExprNode((yysemantic_stack_[(2) - (2)].sval))); }
     break;
 
   case 8:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 97 "scheme.y"
     { (yyval.enode) = new Scheme::AST::IdExprNode((yysemantic_stack_[(1) - (1)].sval)); }
     break;
 
   case 9:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 98 "scheme.y"
     { (yyval.enode) = new Scheme::AST::IntConstExprNode((yysemantic_stack_[(1) - (1)].ival)); }
     break;
 
   case 10:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 99 "scheme.y"
     { (yyval.enode) = new Scheme::AST::StrConstExprNode((yysemantic_stack_[(1) - (1)].sval)); }
     break;
 
   case 11:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 100 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BoolConstExprNode((yysemantic_stack_[(1) - (1)].bval)); }
     break;
 
   case 12:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 101 "scheme.y"
     { (yyval.enode) = new Scheme::AST::NilConstExprNode(); }
     break;
 
   case 13:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 102 "scheme.y"
     { (yyval.enode) = (yysemantic_stack_[(1) - (1)].enode); }
     break;
 
   case 14:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 103 "scheme.y"
     { (yyval.enode) = (yysemantic_stack_[(1) - (1)].enode); }
     break;
 
   case 15:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 104 "scheme.y"
     { (yyval.enode) = (yysemantic_stack_[(1) - (1)].enode); }
     break;
 
   case 16:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 105 "scheme.y"
     { (yyval.enode) = (yysemantic_stack_[(1) - (1)].enode); }
     break;
 
   case 17:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 108 "scheme.y"
     { (yyval.enode) = new Scheme::AST::IfExprNode((yysemantic_stack_[(6) - (3)].enode), (yysemantic_stack_[(6) - (4)].enode), (yysemantic_stack_[(6) - (5)].enode)); }
     break;
 
   case 18:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 111 "scheme.y"
     { (yyval.enode) = new Scheme::AST::LetExprNode(new Scheme::AST::IdExprNode((yysemantic_stack_[(10) - (5)].sval)), (yysemantic_stack_[(10) - (6)].enode), (yysemantic_stack_[(10) - (9)].enode)); }
     break;
 
   case 19:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 114 "scheme.y"
     { (yyval.enodes) = new std::list<Scheme::AST::ExprNode *>(); }
     break;
 
   case 20:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 115 "scheme.y"
     { (yyval.enodes) = (yysemantic_stack_[(2) - (1)].enodes); (yyval.enodes)->push_back((yysemantic_stack_[(2) - (2)].enode)); }
     break;
 
   case 21:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 118 "scheme.y"
     { (yyval.enode) = (yysemantic_stack_[(3) - (2)].enode); }
     break;
 
   case 22:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 121 "scheme.y"
     { (yyval.enode) = new Scheme::AST::FuncExprNode(new Scheme::AST::IdExprNode((yysemantic_stack_[(4) - (2)].sval)), (yysemantic_stack_[(4) - (3)].enodes)); }
     break;
 
   case 23:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 124 "scheme.y"
     { (yyval.enode) = new Scheme::AST::UnaryPrimExprNode("pair?", (yysemantic_stack_[(2) - (2)].enode)); }
     break;
 
   case 24:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 125 "scheme.y"
     { (yyval.enode) = new Scheme::AST::UnaryPrimExprNode("null?", (yysemantic_stack_[(2) - (2)].enode)); }
     break;
 
   case 25:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 126 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("eq?", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 26:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 127 "scheme.y"
     { (yyval.enode) = new Scheme::AST::UnaryPrimExprNode("car", (yysemantic_stack_[(2) - (2)].enode)); }
     break;
 
   case 27:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 128 "scheme.y"
     { (yyval.enode) = new Scheme::AST::UnaryPrimExprNode("cdr", (yysemantic_stack_[(2) - (2)].enode)); }
     break;
 
   case 28:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 129 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("cons", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 29:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 130 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("+", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 30:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 131 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("-", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 31:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 132 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("*", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 32:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 133 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("/", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 33:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 134 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("mod", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 34:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 135 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("<", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 35:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 136 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode(">", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
   case 36:
-
-/* Line 690 of lalr1.cc  */
+/* Line 664 of lalr1.cc  */
 #line 137 "scheme.y"
     { (yyval.enode) = new Scheme::AST::BinaryPrimExprNode("=", (yysemantic_stack_[(3) - (2)].enode), (yysemantic_stack_[(3) - (3)].enode)); }
     break;
 
 
-
-/* Line 690 of lalr1.cc  */
-#line 790 "scheme.tab.c"
-	default:
-          break;
+/* Line 664 of lalr1.cc  */
+#line 737 "scheme.tab.c"
+      default:
+        break;
       }
+
     /* User semantic actions sometimes alter yychar, and that requires
        that yytoken be updated with the new translation.  We take the
        approach of translating immediately before every use of yytoken.
@@ -840,20 +788,19 @@ namespace Scheme {
     yyerror_range[1] = yylloc;
     if (yyerrstatus_ == 3)
       {
-	/* If just tried and failed to reuse lookahead token after an
-	 error, discard it.  */
-
-	if (yychar <= yyeof_)
-	  {
-	  /* Return failure if at end of input.  */
-	  if (yychar == yyeof_)
-	    YYABORT;
-	  }
-	else
-	  {
-	    yydestruct_ ("Error: discarding", yytoken, &yylval, &yylloc);
-	    yychar = yyempty_;
-	  }
+        /* If just tried and failed to reuse lookahead token after an
+           error, discard it.  */
+        if (yychar <= yyeof_)
+          {
+            /* Return failure if at end of input.  */
+            if (yychar == yyeof_)
+              YYABORT;
+          }
+        else
+          {
+            yydestruct_ ("Error: discarding", yytoken, &yylval, &yylloc);
+            yychar = yyempty_;
+          }
       }
 
     /* Else will try to reuse lookahead token after shifting the error
@@ -902,7 +849,7 @@ namespace Scheme {
 
 	/* Pop the current state because it cannot handle the error token.  */
 	if (yystate_stack_.height () == 1)
-	YYABORT;
+	  YYABORT;
 
 	yyerror_range[1] = yylocation_stack_[0];
 	yydestruct_ ("Error: popping",
@@ -950,16 +897,42 @@ namespace Scheme {
     /* Do not reclaim the symbols of the rule which action triggered
        this YYABORT or YYACCEPT.  */
     yypop_ (yylen);
-    while (yystate_stack_.height () != 1)
+    while (1 < yystate_stack_.height ())
       {
-	yydestruct_ ("Cleanup: popping",
-		   yystos_[yystate_stack_[0]],
-		   &yysemantic_stack_[0],
-		   &yylocation_stack_[0]);
-	yypop_ ();
+        yydestruct_ ("Cleanup: popping",
+                     yystos_[yystate_stack_[0]],
+                     &yysemantic_stack_[0],
+                     &yylocation_stack_[0]);
+        yypop_ ();
       }
 
     return yyresult;
+    }
+    catch (...)
+      {
+        YYCDEBUG << "Exception caught: cleaning lookahead and stack"
+                 << std::endl;
+        // Do not try to display the values of the reclaimed symbols,
+        // as their printer might throw an exception.
+        if (yychar != yyempty_)
+          {
+            /* Make sure we have latest lookahead translation.  See
+               comments at user semantic actions for why this is
+               necessary.  */
+            yytoken = yytranslate_ (yychar);
+            yydestruct_ (YY_NULL, yytoken, &yylval, &yylloc);
+          }
+
+        while (1 < yystate_stack_.height ())
+          {
+            yydestruct_ (YY_NULL,
+                         yystos_[yystate_stack_[0]],
+                         &yysemantic_stack_[0],
+                         &yylocation_stack_[0]);
+            yypop_ ();
+          }
+        throw;
+      }
   }
 
   // Generate an error message.
@@ -1107,7 +1080,7 @@ namespace Scheme {
        3,     3,     3,     3,     3,     3,     3
   };
 
-#if YYDEBUG || YYERROR_VERBOSE || YYTOKEN_TABLE
+#if YYDEBUG
   /* YYTNAME[SYMBOL-NUM] -- String name of the symbol SYMBOL-NUM.
      First, the terminals, then, starting at \a yyntokens_, nonterminals.  */
   const char*
@@ -1118,11 +1091,10 @@ namespace Scheme {
   "CDR", "LT", "GT", "EQ", "DEFINE", "LET", "IF", "NIL", "ICONST",
   "BCONST", "SCONST", "ID", "$accept", "program", "list_of_defines",
   "define", "list_of_identifiers", "expr", "if_expr", "let_expr",
-  "list_of_exprs", "primapp_expr", "funapp_expr", "prim_app", 0
+  "list_of_exprs", "primapp_expr", "funapp_expr", "prim_app", YY_NULL
   };
-#endif
 
-#if YYDEBUG
+
   /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
   const SchemeParser::rhs_number_type
   SchemeParser::yyrhs_[] =
@@ -1248,25 +1220,22 @@ namespace Scheme {
   const unsigned int SchemeParser::yyuser_token_number_max_ = 282;
   const SchemeParser::token_number_type SchemeParser::yyundef_token_ = 2;
 
-
-/* Line 1136 of lalr1.cc  */
+/* Line 1135 of lalr1.cc  */
 #line 6 "scheme.y"
 } // Scheme
-
+/* Line 1135 of lalr1.cc  */
+#line 1228 "scheme.tab.c"
 /* Line 1136 of lalr1.cc  */
-#line 1258 "scheme.tab.c"
-
-
-/* Line 1138 of lalr1.cc  */
 #line 140 "scheme.y"
 
-
+//DO NOT USE bison 3.9 TO BUILD. BISON 3.0 BREAKS scheme.y FILE USE bison 2.7
 void Scheme::SchemeParser::error(const Scheme::SchemeParser::location_type &loc, const std::string &err) {
     driver.getErrorStream() << "ERROR near Line " << scanner.get_yylineno() << " [" << err << "]: " << scanner.get_yytext() << std::endl;
+
+
 }
 
 #include "SchemeScanner.hpp"
 static int yylex(Scheme::SchemeParser::semantic_type *yylval, Scheme::SchemeScanner &scanner, Scheme::SchemeDriver &driver) {
     return scanner.yylex(yylval);
 }
-
