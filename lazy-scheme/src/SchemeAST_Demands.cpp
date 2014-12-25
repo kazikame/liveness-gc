@@ -63,6 +63,16 @@ expr_demand_grammars * ConstExprNode::transformDemandRef(const rule & demand) co
 }
 
 
+bool UnaryPrimExprNode::isExpressionRecursive(const std::string var) const
+{
+	bool isRecursive = false;
+	std::string argString = ((IdExprNode*)pArg)->getIDStr();
+	if (0==argString.compare(var))
+		isRecursive = true;
+	return isRecursive;
+}
+
+
 /* ref( (car x), s, T) = x.(0 s) U {x.eps}
    ref( (cdr x), s, T) = x.(1 s)
    ref( (null? x), s, T) = x.s     This should have been x.eps. Why are we putting the demand s on x?        */
@@ -114,6 +124,21 @@ expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand
     //print_label_set(this->label_set);
 
     return result;
+}
+
+bool BinaryPrimExprNode::isExpressionRecursive(const std::string var) const
+{
+	bool isRecursive = false;
+	std::string arg1String = ((IdExprNode*)pArg1)->getIDStr();
+	if (0==arg1String.compare(var))
+		isRecursive = true;
+	else
+	{
+		std::string arg2String = ((IdExprNode*)pArg2)->getIDStr();
+		if (0==arg2String.compare(var))
+			isRecursive = true;
+	}
+	return isRecursive;
 }
 
 
@@ -210,10 +235,7 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
     return gLivenessMap;
 }
 
-bool LetExprNode::isExpressionRecursive(const std::string var, ExprNode* expr) const
-{
-	return false;
-}
+
 
 //This needs to change to handle multiple labels. How are the labels returned?
 //Are they stored at each program point?
@@ -235,10 +257,11 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 	//get its transformer
 	std::string let_var = pID->getIDStr();
 	//cout << "Processing demand for let variable " << let_var << endl;
-	bool isLetExprRecursive = isExpressionRecursive(let_var, pExpr);
+	bool isLetExprRecursive = pExpr->isExpressionRecursive(let_var);
 	if (isLetExprRecursive)
 	{
 		//Create required function and LFs corresponding to the let expr
+		cout << "Recursive expression at " << getLabel() << endl;
 	}
 
 
@@ -271,47 +294,33 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 			}
 
 		}
-//		if (pExpr->isFunctionCallExpression())
-//		{
-//			demand_grammar* var_grammar = result->second;
-//			for (auto &var : (*var_grammar))
-//			{
-//				string nt = "L/" + pBody->getLabel() +  "/" + var.first;
-//				gLivenessData[nt] = var.second;
-//				//((FuncExprNode*)pExpr)->setNextExpr(pBody->getLabel());
-//			}
-//		}
-
-//		std::string let_var = pID->getIDStr();
-//		auto let_var_demand_it = result->second->find(let_var);
-//
-//		if(let_var_demand_it != result->second->end())
-//		{
-//			rule let_var_demand = let_var_demand_it->second;
-//			//DO NOT ERASE the liveness
-//			//result->second->erase(let_var_demand_it);
-//			expr_demand_grammars* let_body = pExpr->transformDemandRef(let_var_demand);
-//
-//			//result = merge(result, let_body);
-//			if (pExpr->isConsExpression())
-//			{
-//				demand_grammar* var_grammar = result->second;
-//				for (auto &var : (*var_grammar))
-//				{
-//					string nt = "L/" + pExpr->getLabel() +  "/" + var.first;
-//					gLivenessData[nt] = var.second;
-//				}
-//			}
-//		}
-//
-//		result->first->emplace(label, demand);
-		//Update the map with current label with the new demand
 
 	}
 	//Copy the label set
 	label_set.insert(pBody->label_set.begin(), pBody->label_set.end());
     //print_label_set(this->label_set);
 	return gLivenessMap;
+}
+
+
+bool FuncExprNode::isExpressionRecursive(const std::string var) const
+{
+	bool isRecursive = false;
+	if(pListArgs->size())
+	{
+
+		 auto iter = pListArgs->begin();
+		 while(++iter != pListArgs->end())
+		 {
+			 std::string argName = ((IdExprNode*)*iter)->getIDStr();
+			 if (0==argName.compare(var))
+			 {
+				 isRecursive = true;
+				 break;
+			 }
+		 }
+	}
+	return isRecursive;
 }
 
 

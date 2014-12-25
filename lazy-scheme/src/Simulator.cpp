@@ -130,6 +130,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		//convert LFs into IFs and DFs
 		//Use pgm->liveness_data as the final grammar
 		gLivenessData.insert(pgm->liveness_data.begin(), pgm->liveness_data.end()) ;
+		gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
 		for (auto elem: gLivenessData)
 		{
 			rule r;

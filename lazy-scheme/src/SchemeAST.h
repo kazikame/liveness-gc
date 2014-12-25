@@ -168,6 +168,7 @@ public:
 	virtual bool isFunctionCallExpression()	{return false;}
 	virtual bool isConsExpression() {return false;}
 	virtual cons* make_closure() = 0;
+	virtual bool isExpressionRecursive(const std::string) const {return false;}
 	//cons* heap_ptr;
 protected:
 	ExprNode(const std::string name);
@@ -253,7 +254,7 @@ public:
 	ExprNode* getBody();
 	virtual cons* evaluate(struct cons* heap_cell = NULL);
 	virtual cons* make_closure();
-	bool isExpressionRecursive(const std::string var, ExprNode* expr) const;
+
 
 protected:
 	IdExprNode * pID;
@@ -410,6 +411,7 @@ public:
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual cons* evaluate(struct cons* heap_cell = NULL);
 	virtual cons* make_closure();
+	virtual bool isExpressionRecursive(const std::string) const;
 	//cons *argClosure;
 
 
@@ -446,6 +448,7 @@ public:
 	virtual cons* make_closure();
 
 	virtual bool isConsExpression() {return (node_name == "cons");}
+	virtual bool isExpressionRecursive(const std::string) const;
 	//cons *arg1Closure, *arg2Closure;
 protected:
 	ExprNode * pArg1, * pArg2;
@@ -490,6 +493,7 @@ public:
 	std::string getNextExpr();
 	virtual cons* make_closure();
 	std::string parent_let_pgmpt;
+	virtual bool isExpressionRecursive(const std::string) const;
 	//std::list<cons*> argsClosureList;
 protected:
 	IdExprNode * pID;

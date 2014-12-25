@@ -513,10 +513,10 @@ LetExprNode * LetExprNode::clone() const
 
 cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 {
-	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
+//	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 	
-	if ((gc_status != gc_disable && current_heap() < 5) ||
-			(getVarExpr()->isFunctionCallExpression() && (current_heap < (5 +((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) )
+	if ((gc_status != gc_disable && current_heap() < 1) ||
+			(getVarExpr()->isFunctionCallExpression() && (current_heap < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) )
 	{
 //		ofstream out("GC.txt", ios::app);
 //		out << "reachable stack before calling GC " << num_of_allocations << endl;
@@ -530,6 +530,7 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 		else
 		{
 			std::cout << "Liveness based GC at pgm pt " << getLabel() << endl;
+			std::cout << "Number of elements in  heap ref stack = " << update_heap_refs.size() << endl;
 			std::string curr_let_pgmpt = return_stack().return_point;
 			return_stack().return_point = getLabel();
 			liveness_gc();
