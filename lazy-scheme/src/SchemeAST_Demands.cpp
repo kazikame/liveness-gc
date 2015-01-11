@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 #include "SchemeAST.h"
 
 using namespace Scheme::AST;
@@ -295,3 +296,509 @@ expr_demand_grammars * ProgramNode::transformDemand(const rule & demand) const {
 
     return result;
 }
+=======
+#include "SchemeAST.h"
+#include <map>
+#include <string>
+using namespace Scheme::AST;
+using namespace Scheme::Demands;
+using namespace std;
+
+
+demand_grammar function_call_demands;
+demand_grammar gLivenessData; //Global map which stores the liveness at cons points and the next statement after a function call only.
+unordered_map<string, expr_demand_grammars*> gLivenessMap;
+unordered_map<string, Node*> prog_pt_map;
+/////////////////////////////////////////////////////////
+// the following variables are used to compute the liveness for user defined functions
+unordered_map<string, Node*> gfunc_prog_pts;
+bool in_function_define = false;
+
+
+void print_label_set(unordered_set<string> s)
+{
+	cout << "Printing label set " << endl;
+	for(auto l : s)
+	  std::cout << l << std::endl;
+}
+
+/* D( (return x), s, T ) = x.s  */
+unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(const rule & demand) const
+{
+
+     //Create a new label corresponding to the return statement
+	if (in_function_define)
+		gfunc_prog_pts[getLabel()] = this;
+	else
+		prog_pt_map[getLabel()] = this;
+	//cout << "Processing return statement with label " << label << endl; 
+	gLivenessMap[label] =  pID->transformDemandRef(demand);
+	
+	//cout << "Created new label for return " << label << endl;
+	label_set.insert(label);
+	pID->label_set.insert(label);
+	return gLivenessMap;
+}
+
+
+/* ref( (id x), s, T ) = x.s  */
+expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand) const
+{
+	//prog_pt_map[getLabel()] = this;
+	cout << "Adding Id " << *pID << " for label " << label << endl;
+ 	auto retval = new expr_demand_grammars({ new demand_grammar({{ label, demand }}),
+        new demand_grammar({{ *pID, demand }})
+    });
+	return retval;
+}
+
+
+/* ref( k, s, T ) = {k.s}  */
+expr_demand_grammars * ConstExprNode::transformDemandRef(const rule & demand) const
+{
+	//prog_pt_map[getLabel()] = this;
+	return new expr_demand_grammars({ new demand_grammar({{ label, demand }}), new demand_grammar({{ }}) }); //TODO: verify this rule
+
+}
+
+
+bool UnaryPrimExprNode::isExpressionRecursive(const std::string var) const
+{
+	bool isRecursive = false;
+	std::string argString = ((IdExprNode*)pArg)->getIDStr();
+	if (0==argString.compare(var))
+		isRecursive = true;
+	return isRecursive;
+}
+
+
+/* ref( (car x), s, T) = x.(0 s) U {x.eps}
+   ref( (cdr x), s, T) = x.(1 s)
+   ref( (null? x), s, T) = x.s     This should have been x.eps. Why are we putting the demand s on x?        */
+expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand) const
+{
+    rule arg_demand;
+    //prog_pt_map[getLabel()] = this;
+    if(node_name == "car")
+    { /* x.(0 s) */
+        for(auto p : demand)
+        {
+            p.push_front(T0);
+            arg_demand.insert(p);
+        }
+        //Add Xb demand
+        path p;
+        p.push_front(TXb);
+        arg_demand.insert(p);
+
+    }
+    else if(node_name == "cdr")
+    { /* x.(1 s) */
+        for(auto p : demand) {
+            p.push_front(T1);
+            arg_demand.insert(p);
+        }
+        //Add Xb demand
+        path p;
+        p.push_front(TXb);
+        arg_demand.insert(p);
+    }
+    else
+    {
+        /* x.s */  /* should be x.eps */
+    	//TODO : Should we add a epsilon demand or a Xb demand here?
+    	path p;
+    	p.push_front(E);
+    	arg_demand.insert(p);
+    }
+
+    expr_demand_grammars * result = pArg->transformDemandRef(arg_demand);
+
+    cout << "Adding Id " << ((IdExprNode*)pArg)->getIDStr() << " for label " << label << endl;
+    result->first->emplace(label, demand);
+
+    demand_grammar* var_grammar = result->second;
+
+    label_set.insert(pArg->label_set.begin(), pArg->label_set.end());
+    //print_label_set(this->label_set);
+
+    return result;
+}
+
+bool BinaryPrimExprNode::isExpressionRecursive(const std::string var) const
+{
+	bool isRecursive = false;
+	std::string arg1String = ((IdExprNode*)pArg1)->getIDStr();
+	if (0==arg1String.compare(var))
+		isRecursive = true;
+	else
+	{
+		std::string arg2String = ((IdExprNode*)pArg2)->getIDStr();
+		if (0==arg2String.compare(var))
+			isRecursive = true;
+	}
+	return isRecursive;
+}
+
+
+/* ref( (cons x y), s, T) = x.(0b s) + y.(1b s)
+   ref( (eq? x y), s, T) = x.s + y.s            */
+expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & demand) const
+{
+    rule arg_1_demand, arg_2_demand;
+    //prog_pt_map[getLabel()] = this;
+    if(node_name == "cons")
+    { /* x.(0b s) + y.(1b s) */
+    	for(auto p : demand)
+        {
+            p.push_front(T0b);
+            arg_1_demand.insert(p);
+        }
+        for(auto p : demand) {
+            p.push_front(T1b);
+            arg_2_demand.insert(p);
+        }
+
+    }
+    else
+    {
+    	//Shouldn't this be epsilon demand for all the cases?
+        /* x.s + y .s */
+    	//Inserting epsilon demands for arguments for primitive functions other than cons
+    	path p;
+    	p.push_front(E);
+    	arg_1_demand.insert(p);
+    	arg_2_demand.insert(p);
+    }
+    
+    expr_demand_grammars * result =  merge(pArg1->transformDemandRef(arg_1_demand),
+                                           pArg2->transformDemandRef(arg_2_demand));
+    result->first->emplace(label, demand);
+    cout << "Printing result of BinaryPrimOp Demand transform " << endl;
+    Scheme::output::dumpGrammar(cout, result->second);
+    
+
+    return result;
+ 
+}
+
+
+//TODO : Return type of these functions will change from expr_demand_grammars to a map :: label -> expr_demand_grammars
+
+/* D( (if x e1 e2), s, T) = D(e1, s, T) + D(e2, s, T) + x.(Xb s) */
+unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const rule & demand) const
+{
+    rule cond_demand; // TODO Add an epsilon demand instead of Xb demand.
+    if (in_function_define)
+    	gfunc_prog_pts[getLabel()] = this;
+    else
+    	prog_pt_map[getLabel()] = this;
+    
+    for(auto p : demand)
+    {
+    	p.push_front(TXb);
+    	cond_demand.insert(p);
+    }
+
+
+    //Create a new label and insert it in the map, along with the liveness for the condition variable
+    demand_grammar *cond_grammar = new demand_grammar();
+    string cond_variable = ((IdExprNode*)pCond)->getIDStr();
+    //cond_grammar[cond_variable] = cond_demand;
+
+    //gLivenessMap[label] = cond_grammar;
+
+
+    //No merging is needed, verify and remove this statement
+//    expr_demand_grammars * result =  merge(pCond->transformDemandRef(cond_demand),
+//                                           merge(pThen->transformDemandRef(demand),
+//                                                 pElse->transformDemandRef(demand)));
+    pThen->transformDemand(demand);
+    pElse->transformDemand(demand);
+
+
+   auto result = new expr_demand_grammars({ new demand_grammar({{ label, rule({path({TXb})})}}),
+            new demand_grammar({{ cond_variable, rule({path({TXb})})}})});
+
+
+    //Update the liveness map to hold the liveness corresponding to the condition variable
+   	gLivenessMap[label] = result;
+
+   	//Update label set to correspond to the union of labels of the condition, then part & the else part
+   	//cout << "Created new label for if condition " << label << endl;
+    label_set.insert(label);
+    label_set.insert(pThen->label_set.begin(), pThen->label_set.end());
+    label_set.insert(pElse->label_set.begin(), pElse->label_set.end());
+    //print_label_set(this->label_set);
+
+    return gLivenessMap;
+}
+
+
+
+//This needs to change to handle multiple labels. How are the labels returned?
+//Are they stored at each program point?
+//Let, If and Return nodes will change, rest remain unchanged.
+
+
+/* D( (let x <- st in e), s, T) = E - E(x) + ref(st, E(x), T) where E = D(e, s, T) */
+unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const rule & demand) const
+{
+	auto result = pBody->transformDemand(demand);
+
+	if (in_function_define)
+		gfunc_prog_pts[getLabel()] = this;
+	else
+		prog_pt_map[getLabel()] = this;
+	//cout << "Adding prog pt " << getLabel() << " for let node" << endl;
+	
+	//Check if the let definition is recursive and if true create a function "f" and
+	//get its transformer
+	std::string let_var = pID->getIDStr();
+	//cout << "Processing demand for let variable " << let_var << endl;
+	bool isLetExprRecursive = pExpr->isExpressionRecursive(let_var);
+	if (isLetExprRecursive)
+	{
+		//Create required function and LFs corresponding to the let expr
+		cout << "Recursive expression at " << getLabel() << endl;
+	}
+
+
+	for (auto l: pBody->label_set)
+	{
+
+		//cout << "Processing label " << l << endl;
+		if (isLetExprRecursive)
+		{
+			//Use the LF of the function created to get the liveness of the variables in the expr.
+		}
+		else
+		{
+			//Call the transformDemandRef function to get the liveness
+			//auto let_var_demand_it = gLivenessMap[l]->second->find(let_var);
+			auto curr_expr_gram = gLivenessMap[l];
+			//Scheme::output::dumpGrammar(cout, curr_expr_gram->second);
+			//cout << endl;
+			//Process demand only if the let variable has a non-null demand
+			auto dem_gram = *(curr_expr_gram->second);
+			if (dem_gram.find(let_var) != dem_gram.end())
+			{
+				auto let_var_demand_it = dem_gram[let_var];
+				//auto let_var_demand_it = rule({path({TXb})});
+				auto let_expr_demand = pExpr->transformDemandRef(let_var_demand_it);
+
+				//Merge the new demands with the existing demands
+				expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);
+				gLivenessMap[l] = res;
+			}
+
+		}
+
+	}
+	//Copy the label set
+	label_set.insert(pBody->label_set.begin(), pBody->label_set.end());
+    //print_label_set(this->label_set);
+	return gLivenessMap;
+}
+
+
+bool FuncExprNode::isExpressionRecursive(const std::string var) const
+{
+	bool isRecursive = false;
+	if(pListArgs->size())
+	{
+
+		 auto iter = pListArgs->begin();
+		 while(++iter != pListArgs->end())
+		 {
+			 std::string argName = ((IdExprNode*)*iter)->getIDStr();
+			 if (0==argName.compare(var))
+			 {
+				 isRecursive = true;
+				 break;
+			 }
+		 }
+	}
+	return isRecursive;
+}
+
+
+/* D( (f x1 x2 ... xn), s, T) = T_1(x1, s) + T_2(x2, s) + ... + T_n(xn, s) */
+expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand) const
+{
+   	rule temp_demand = demand;
+   	//prog_pt_map[getLabel()] = this;
+    if(function_call_demands.find(pID->getIDStr()) != function_call_demands.end())
+        function_call_demands[pID->getIDStr()].insert(temp_demand.begin(), temp_demand.end());
+    else
+        function_call_demands[pID->getIDStr()] =  demand;
+
+    if(pListArgs->size())
+    {
+        unsigned index = 1;
+        std::string prefix = PREFIX_TRANSFORMER + SEPARATOR + pID->getIDStr() + SEPARATOR;
+
+        rule arg_demand;
+        //This should be done for the DF's only
+        for(auto p : demand)
+        {
+            p.push_front(prefix + std::to_string(index));
+            arg_demand.insert(p);
+        }
+
+        auto iter = pListArgs->begin();
+        auto result = (*iter)->transformDemandRef(arg_demand);
+
+        while(++iter != pListArgs->end())
+        {
+            ++index;
+            arg_demand.clear();
+            for(auto p : demand) {
+                p.push_front(prefix + std::to_string(index));
+                arg_demand.insert(p);
+            }
+            result = merge(result, (*iter)->transformDemandRef(arg_demand));
+        }
+
+        result->first->emplace(label, demand);
+
+        return result;
+    }
+    else
+    {
+
+    	return new expr_demand_grammars({new demand_grammar({{label, demand}}), new demand_grammar});
+    }
+}
+
+
+
+
+unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const rule & demand) const
+{
+    // The demand argument is unnecessary for this function.
+	//prog_pt_map[getLabel()] = this;
+	gfunc_prog_pts.clear();
+	in_function_define = true;
+	
+	
+	cout << "Processing function " << pID->getIDStr() << endl;
+    std::string func_demand_prefix = PREFIX_DEMAND + SEPARATOR + pID->getIDStr();
+    cout << "Function demand prefix is " << func_demand_prefix << endl;
+    //TODO : Replace it with functional code
+    //expr_demand_grammars * result = pExpr->transformDemand(rule({{ func_demand_prefix }}));
+    expr_demand_grammars * result = new expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
+    unordered_map<string, expr_demand_grammars *> liveness_map;
+    
+    auto expr_map = pExpr->transformDemand(rule({{ func_demand_prefix }}));
+    
+    cout << "Number of POI " << gfunc_prog_pts.size() << endl;
+    //exit(1);
+    
+    for (auto p : gfunc_prog_pts)
+    {
+    	auto labels = p.second->label_set;
+    	liveness_map[p.first] = new expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
+    	for(auto l : labels)
+    	{
+    		//cout << "Processing prog pt " << p.first << " with label " << l << endl;
+    		liveness_map[p.first] = merge(liveness_map[p.first], expr_map[l]);
+    	}
+    }
+
+    
+    auto &dem_grams = result->second; 
+    for (auto p: liveness_map)
+    {
+    	Scheme::Demands::demand_grammar* var_gram = p.second->second;
+    	for (auto g : (*var_gram))
+    	{
+    		std::string liveness_label = "L/" + p.first + "/" + g.first;
+    		(*dem_grams)[liveness_label] = g.second;
+    	}
+    
+    
+    	int index = 0;
+    	demand_grammar * arg_demands = new demand_grammar;
+    	for(auto & arg : *pListArgs)
+    	{
+    		auto arg_demand_pair = var_gram->find(arg->getIDStr());
+    		if(arg_demand_pair != var_gram->end())
+    		{
+
+    			arg_demands->emplace(func_demand_prefix + SEPARATOR + std::to_string(++index),
+    					arg_demand_pair->second);
+    			//std::cout << "Demand for argument " << (func_demand_prefix + SEPARATOR + std::to_string(index)) << std::endl;
+    			gLivenessData[func_demand_prefix + SEPARATOR + std::to_string(index)] = arg_demand_pair->second;
+
+    		}
+    		else
+    			cout << "Argument not found " << arg->getIDStr() << endl;
+
+    	}
+    }
+//The map containing the variable -> demand mapping is being deleted and is overwritten by symbolic demand on arguments.
+//TODO Have to see how this has to be updated to handle liveness.
+//    demand_grammar* var_grammar = result->second;
+//    for (auto &var : (*var_grammar))
+//    {
+//    	string nt = "L/" + getLabel() +  "/" + var.first;
+//    	gLivenessData[nt] = var.second;
+//    }
+
+    
+    for (auto &var : (*dem_grams))
+    {
+    	string nt = var.first;
+    	gLivenessData[nt] = var.second;
+    }
+
+//    delete result->second;
+//    result->second = arg_demands;
+
+    //return result;
+    in_function_define = false;
+    return gLivenessMap;
+}
+
+
+
+
+unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const rule & demand)
+{
+    // The demand argument is unnecessary for this function.
+	prog_pt_map[getLabel()] = this;
+	cout << "Adding prog pt " << getLabel() << " for prog node" << endl;
+    function_call_demands.clear();
+
+    rule symbolic_demand = rule({{ PREFIX_DEMAND + SEPARATOR + "all" }});
+
+    //TODO : Replace it with functional code
+    //expr_demand_grammars * result = pExpr->transformDemand(symbolic_demand);
+
+    expr_demand_grammars * result = new expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
+    pExpr->transformDemand(symbolic_demand);
+
+    //gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
+
+    //delete result->second;
+    //result->second = new demand_grammar;
+
+    for(auto & def : *pListDefines)
+    {
+    	auto define_map = def->transformDemand(symbolic_demand);
+//    	for (auto d: define_map)
+//    		result = merge(result, d.second);
+    }
+
+    for(auto & func : function_call_demands)
+    {
+        result->first->emplace(PREFIX_DEMAND + SEPARATOR + func.first, func.second);
+        gLivenessData[PREFIX_DEMAND + SEPARATOR + func.first] = func.second;
+    }
+    this->label_set.insert(pExpr->label_set.begin(), pExpr->label_set.end());
+    //print_label_set(this->label_set);
+    this->progpt_map = &prog_pt_map;
+    return gLivenessMap;
+}
+>>>>>>> 4bb03a5c3d7b9f8e48b056d77b2ef7801e7effa3
