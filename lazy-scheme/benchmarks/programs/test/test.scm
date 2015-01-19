@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+(define (f l)
+ (if (null? l) l
+     (cons (f (car l)) 2)))
+
+(f ())
+=======
 (define (mapsq l)
   (let ((c (null? l)))
    (if  c
@@ -21,3 +28,4 @@
 		  g)
 		(let ((h (cons 0 a)))
 		  h)))))))))
+>>>>>>> 4bb03a5c3d7b9f8e48b056d77b2ef7801e7effa3

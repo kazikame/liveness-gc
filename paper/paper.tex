@@ -1,3 +1,132 @@
+<<<<<<< HEAD
+%------------------------------------------------------------%
+\documentclass{llncs}
+\pagestyle{plain}
+\usepackage{longtable} 
+%------------------------------------------------------------%
+%- common stuff starts here....
+\usepackage{etex}
+\usepackage{float}
+\usepackage{mathrsfs}
+\usepackage{booktabs}
+\usepackage{boxedminipage}
+\usepackage[T1]{fontenc}
+%\usepackage[pdf]{pstricks}
+\usepackage{epsfig}
+\usepackage{multirow}
+\usepackage{url}
+\usepackage[normalem]{ulem}
+\usepackage{schemepgm}
+\usepackage{graphicx}
+\usepackage{graphpap}
+\usepackage{tabularx}
+%\usepackage{esvect}
+%\usepackage[libertine]{newtxmath}
+%\usepackage{color}
+%\usepackage{xcolor}
+\usepackage{algorithmic}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{pstricks}
+\usepackage{pst-text}
+\usepackage{pst-node}
+\usepackage{pst-tree}
+\usepackage{pst-rel-points}
+%\usepackage{pst-all}
+\usepackage{bcprules}
+%\usepackage{subfigure}
+%\usepackage{algorithmic}
+%\usepackage{anysize}     
+\input{fh_defs}
+\def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
+      0pt width #2\hfill\vrule height #3 depth 0pt width #2\hfill
+      }}\vbox to #3{\vfill\hrule height #2 depth 0pt width
+      #1 \vfill}}
+      %Poor man's typography
+\def\concat{\mathrel{\drawplusplus {12pt}{0.4pt}{5pt}}}
+      %It would be better to specify these in font-relative measures, but it 
+      %probably doesn't scale anyway.
+%\newcommand{\comment}[1]{}
+\definecolor{Myblue}{rgb}{0.0,0.0,0.5}
+\newcommand{\comment}[1]{{\color{Myblue}{\medskip \hrule\medskip
+    #1 \medskip \hrule \medskip}}}
+\newcommand{\scmin} {\mbox{\sf\em in}}
+\newcommand{\scmnull}{\mbox{\sf\em null?}}
+\newcommand{\scmpair}{\mbox{\sf\em pair?}}
+\newcommand{\scmprim}{\ensuremath{\mathsf{+}}}
+\newcommand{\sh}[1]{{\colorbox{gray!20}{\framebox{$#1$}}}}
+\nonstopmode
+\def\myvec{\mathaccent"017E } % wretched springer mode redefines \vec as bold!
+\newcommand{\stk}{\mbox{S}}       % stack
+\newcommand{\ID}{\mbox{$\mathbf{ id}$}} % identity function
+\newcommand{\bang}{\mbox{\sc bang}}
+ 
+\begin{document}
+%  \title{Heap  Reference  Analysis  for Functional  Programs}
+\title{Liveness-Based Garbage Collection}
+
+% make a proper TOC despite llncs
+\setcounter{tocdepth}{2}
+\makeatletter
+\renewcommand*\l@author[2]{}
+\renewcommand*\l@title[2]{}
+\makeatletter
+
+
+
+  \author{K. Prasanna Kumar\inst{1} \and Amey Karkare\inst{2}
+    \and   Amitabha Sanyal\inst{1}}
+  \institute{IIT Bombay, Mumbai 400076, India\\
+    \email{$\{$prasanna,as$\}$@cse.iitb.ac.in}, \and 
+             IIT Kanpur, Kanpur 208016, India\\
+    \email{karkare@cse.iitk.ac.in}}
+\maketitle
+
+\begin{abstract}
+\input{sections/abstract}
+\end{abstract}
+
+%------------------------------------------------------------%
+
+
+%% \begin{figure}
+%% \tableofcontents       %%%%%%% BEWARE: find the \setcounter{page}{2}
+%%                        %%%%%%% and comment it out when deleting this TOC.
+%% \vspace{5cm}
+
+%% \section*{Page Budget}
+%% CC'2014 and ESOP'2014 have a limit of 20 pages.
+%% A draft page budget is:
+%% \begin{itemize}
+%% \item 1. abstract/introduction (3 pages)
+%% {\color{red}Currently 2.5 pages.}
+%% \item 2. core language syntax and semantics (2 pages).
+%% {\color{red}Currently 2 pages.}
+%% \item 3. liveness analysis and correctness (3 pages)
+%% {\color{red}Currently 3.8 pages.}
+%% \item 4. practical liveness computation (6 pages)
+%% {\color{red}Currently 6.2 pages.}
+%% \\ I think this is where should do all 3 of: the context-insensitive analysis
+%% (one which has a summary demand for each function), then the
+%% solving like differential equations, then using Mohri-Nederhof to
+%% get a NFA for each (call/cons) program point.
+%% \item 5. experimental framework and results (4 pages)
+%% \item 6. (optional) monotonicity of GC (0.5 page)---our technique can never
+%% cause more collections.
+%% \item 7. conclusions/acknowledgements/bibliography (1.5 page)
+%% \end{itemize}
+%% \end{figure}
+
+\input{sections/intro}
+\input{sections/syntax-and-semantics}
+\input{sections/liveness}
+
+%\input{sections/restOfOldPaper}
+\bibliography{fun_hra}{}
+\bibliographystyle{splncs}
+
+\end{document}
+=======
 %------------------------------------------------------------%
 \documentclass{llncs}
 \pagestyle{plain}
@@ -125,3 +254,4 @@
 \bibliographystyle{splncs}
 
 \end{document}
+>>>>>>> 4bb03a5c3d7b9f8e48b056d77b2ef7801e7effa3

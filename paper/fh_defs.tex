@@ -1,3 +1,525 @@
+<<<<<<< HEAD
+%%%%%%%%%% IMPERATIVE %%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Comment out a part of latex document
+\newcommand{\cmt}[1]{}
+\newcommand{\akadd}[1]{\protect{\red  #1}}
+\newcommand{\akdel}[1]{\protect{\blue #1}}
+\newcommand{\del}[1]{\protect{\magenta #1}}
+
+\newcommand{\mybox}{\hfill\ensuremath{\Diamond}}
+\newcommand{\NDIn}[1]{\mbox{\sf In$_#1$}}
+\newcommand{\NDOut}[1]{\mbox{\sf Out$_#1$}}
+%\newcommand{\x}{\cx}
+%\newcommand{\y}{\cy}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%% Programs in latex 
+\protect{\newlength{\FTABL}}
+\protect{\newlength{\TABL}}
+\protect{\newlength{\BRACE}}
+\settowidth{\BRACE}{\{}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% HRA specific thingies
+\newcommand{\entrynode}{\mbox{\sf\em Entry\/}}
+\newcommand{\exitnode}{\mbox{\sf\em Exit\/}}
+\newcommand{\Global}{\mbox{\sf\em Globals\/}}
+\newcommand{\param}{\mbox{\sf\em Params\/}}
+\newcommand{\ret}{\mbox{\sf\em Returns\/}}
+\newcommand{\lptr}{\mbox{\em lptr\/}}
+\newcommand{\rptr}{\mbox{\em rptr\/}}
+\newcommand{\lptrm}{\mbox{lptr\/}} % for use in examples...
+\newcommand{\rptrm}{\mbox{rptr\/}} % --do--
+\newcommand{\onepath}{\psi}
+\newcommand{\ntbar}{\ensuremath{\overline\nt}}
+\newcommand{\redd}[1]{\ensuremath{\mbox{\sf reduced}(#1)}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Special pictures
+\newcommand{\myarrow}{\mbox{%
+ \psset{unit=1cm}%
+ \begin{pspicture}(0,0)(.27,.2)%
+  \psline[linewidth=.15mm]%
+  (0,.1)(.125,.1)(.125,.035)(.25,.1)(.125,.165)(.125,.1)%
+  \end{pspicture}}%
+} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% HRA operations
+\newcommand{\extend}[2]{\mbox{$#1\#\, #2$}}
+\newcommand{\minus}{\ominus}
+\newcommand{\Base}{\mbox{\sf\em Base\/}}
+\newcommand{\Front}{\mbox{\sf\em Frontier\/}}
+\newcommand{\appendG}[2]{\mbox{$#1 \cdot #2$}}
+
+\newcommand{\cupG}{{\uplus}}
+\newcommand{\bigcupG}{{\biguplus}}
+\newcommand{\subG}[2]{\mbox{{\em RG}($#1$, $#2$)}}
+
+\newcommand{\graphA}[1]{\mbox{{\sf\em\small GAll\/}$({#1})$}}
+\newcommand{\graphO}[1]{\mbox{{\sf\em\small GOnly\/}$({#1})$}}
+\newcommand{\newGraphO}[1]{\mbox{{\sf\em\small GOnly\/}$({#1})$}}
+
+\newcommand{\states}[2]{\mbox{{\sf\em CFN\/}$({#1},{#2})$}}
+\newcommand{\cNodes}[3]{\mbox{{\sf\em CN\/}$({#1},{#2},{#3})$}}
+\newcommand{\clean}{\mbox{\sf\em CleanUp\/}}
+
+\newcommand{\LAliases}{\mbox{\sf Ln$\mathbb{A}$}}
+\newcommand{\LnG}{\mbox{\sf LnG}}
+\newcommand{\LnA}{\mbox{\sf LnA}}
+\newcommand{\closure}{\mbox{\sf\em CloseLn$\mathbb{A}$}}
+
+\newcommand{\AP}[1]{\mbox{\sf\em P$({#1})$}}
+\newcommand{\Target}{\mbox{\sf\em Target\/}}
+%\newcommand{\NULL}{\mbox{\sf\em null\/}}
+\newcommand{\new}{\mbox{\sf\em new\/}}
+\newcommand{\use}{\mbox{\sf\em use\/}}
+\newcommand{\return}{\mbox{\sf\em return\/}}
+\newcommand{\Empty}{\mbox{$\mathcal{E}$}}
+\newcommand{\EFG}{\mbox{$\scalebox{1.2}{$\epsilon$}_{RG}$}}
+
+\newcommand{\Boundary}{\mbox{\sf\em BoundaryInfo\/}}
+
+\newcommand{\Aset}{\mbox{\sf\em AS\/}}
+\newcommand{\uniquepath}{\mbox{\sf\em UniqueAccessPath$\!$?\/}}
+\newcommand{\RootVar}{\mbox{\sf\em Root\/}}
+\newcommand{\FieldName}{\mbox{\sf\em Field\/}}
+\newcommand{\lNode}[1]{\mbox{{\sf\em lastNode\/}$({#1})$}}
+
+\newcommand{\cannullify}{\mbox{\em Nullable}}
+\newcommand{\nullify}{\mbox{\em Nullify}}
+\newcommand{\cand}{\mbox{\em Candidates}}
+\newcommand{\outfield}{\mbox{\em OutField}}
+
+\newcommand{\Transp}{\mbox{\sf\em Transp\/}}
+\newcommand{\Lhs}{\mbox{\sf\em lhs\/}}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Point specific info
+\newcommand{\Lin}[1]{\mbox{{\sf E$\mathbb{L}$In}$_{#1}$}}
+\newcommand{\Lout}[1]{\mbox{{\sf E$\mathbb{L}$Out}$_{#1}$}}
+\newcommand{\Lgen}[1]{\mbox{{\sf E$\mathbb{L}$Gen}$_{#1}$}}
+\newcommand{\Lkill}[1]{\mbox{{\sf E$\mathbb{L}$KillPath}$_{#1}$}}
+\newcommand{\LD}[1]{\mbox{\sf\em LDirect$_{#1}$}}
+\newcommand{\LT}[1]{\mbox{\sf\em LTransfer$_{#1}$}}
+
+\newcommand{\CLin}[1]{\mbox{{\sf $\mathbb{L}$In}$_{#1}$}}
+\newcommand{\CLout}[1]{\mbox{{\sf $\mathbb{L}$Out}$_{#1}$}}
+
+\newcommand{\TLin}[1]{\mbox{{\sf T$\mathbb{L}$In}$_{#1}$}}
+\newcommand{\TLout}[1]{\mbox{{\sf T$\mathbb{L}$Out}$_{#1}$}}
+\newcommand{\TLgen}[1]{\mbox{{\sf T$\mathbb{L}$Gen}$_{#1}$}}
+\newcommand{\TLkill}[1]{\mbox{{\sf T$\mathbb{L}$KillPath}$_{#1}$}}
+
+\newcommand{\NodeAin}{\mbox{{\sf $\mathbb{A}$In}}}
+\newcommand{\NodeAkill}{\mbox{{\sf $\mathbb{A}$Kill}}}
+\newcommand{\NodeAgen}{\mbox{{\sf $\mathbb{A}$Gen}}}
+\newcommand{\NodeAout}{\mbox{{\sf $\mathbb{A}$Out}}}
+
+\newcommand{\Avin}[1]{\mbox{{\sf $\mathbb{A}$vIn}$_{#1}$}}
+\newcommand{\Avout}[1]{\mbox{{\sf $\mathbb{A}$vOut}$_{#1}$}}
+\newcommand{\Avgen}[1]{\mbox{{\sf $\mathbb{A}$vGen}$_{#1}$}}
+\newcommand{\Avkill}[1]{\mbox{{\sf $\mathbb{A}$vKill}$_{#1}$}}
+\newcommand{\AvD}[1]{\mbox{\sf\em AvDirect$_{#1}$}}
+\newcommand{\AvT}[1]{\mbox{\sf\em AvTransfer$_{#1}$}}
+
+\newcommand{\AV}[1]{\mbox{$AV_{\scriptsize #1}$}}
+\newcommand{\AVK}{\mbox{$Av{\mbox{\em Kill}}$}}
+\newcommand{\AVD}{\mbox{$Av{\mbox{\em Direct}}$}}
+\newcommand{\AVT}{\mbox{$Av{\mbox{\em Transfer}}$}}
+
+\newcommand{\Antin}[1]{\mbox{{\sf $\mathbb{A}$nIn}$_{#1}$}}
+\newcommand{\Antout}[1]{\mbox{{\sf $\mathbb{A}$nOut}$_{#1}$}}
+\newcommand{\Antgen}[1]{\mbox{{\sf $\mathbb{A}$nGen}$_{#1}$}}
+\newcommand{\Antkill}[1]{\mbox{{\sf $\mathbb{A}$nKill}$_{#1}$}}
+\newcommand{\AntinD}[1]{\mbox{\sf\em AnDirect$_{#1}$}}
+\newcommand{\AntinT}[1]{\mbox{\sf\em AnTransfer$_{#1}$}}
+
+\newcommand{\ANT}[1]{\mbox{$AN_{\scriptsize #1}$}}
+\newcommand{\ANTK}{\mbox{$An{\mbox{\em Kill}}$}}
+\newcommand{\ANTD}{\mbox{$An{\mbox{\em Direct}}$}}
+\newcommand{\ANTT}{\mbox{$An{\mbox{\em Transfer}}$}}
+
+\newcommand{\ELP}[1]{\mbox{$ELP_{\scriptsize #1}$}}
+\newcommand{\LP}[1]{\mbox{$LP_{\scriptsize #1}$}}
+\newcommand{\ELPK}{\mbox{$L{\mbox{\em Kill}}$}}
+\newcommand{\ELPD}{\mbox{$L{\mbox{\em Direct}}$}}
+\newcommand{\ELPT}{\mbox{$L{\mbox{\em Transfer}}$}}
+
+\newcommand{\ALP}[1]{\mbox{$AP_{\scriptsize #1}$}}
+\newcommand{\ALPK}{\mbox{$AP{\mbox{\em Kill}}$}}
+\newcommand{\ALPD}{\mbox{$AP{\mbox{\em Direct}}$}}
+\newcommand{\ALPT}{\mbox{$AP{\mbox{\em Transfer}}$}}
+
+\newcommand{\Alhs}{\mbox{\em LhsPaths}}
+\newcommand{\Arhs}{\mbox{\em RhsPaths}}
+\newcommand{\Arhsp}{\mbox{\em KillPaths}}
+
+\newcommand{\gox}{\graphO{\rho_x}} 
+\newcommand{\goy}{\graphO{\rho_y}}
+\newcommand{\Glhs}{\mbox{\sf\em LhsGraphs}}
+\newcommand{\Grhs}{\mbox{\sf\em RhsGraphs}}
+\newcommand{\Grhsp}{\mbox{$\rho_x$}}
+
+
+\newcommand{\Pa}{\mbox{$\pi_{a}$}}
+\newcommand{\Pb}{\mbox{$\pi_{b}$}}
+\newcommand{\Porg}{\mbox{$\pi^o$}}
+\newcommand{\Pmod}{\mbox{$\pi^m$}}
+\newcommand{\Paorg}{\mbox{$\pi^o_a$}}
+\newcommand{\Pborg}{\mbox{$\pi^o_b$}}
+\newcommand{\Pamod}{\mbox{$\pi^m_a$}}
+\newcommand{\Pbmod}{\mbox{$\pi^m_b$}}
+\newcommand{\Slive}{\mbox{\em StatementLiveness\/}}
+\newcommand{\Plive}{\mbox{\em PathLiveness\/}}
+\newcommand{\live}{\mbox{\em Liveness\/}}
+\newcommand{\Summary}{\mbox{\em Summary\/}}
+
+\newcommand{\Savail}{\mbox{\em StatementAvail\/}}
+\newcommand{\Pavail}{\mbox{\em PathAvail\/}}
+\newcommand{\avail}{\mbox{\em Avail\/}}
+
+\newcommand{\Sant}{\mbox{\em StatementAnt\/}}
+\newcommand{\Pant}{\mbox{\em PathAnt\/}}
+\newcommand{\ant}{\mbox{\em Ant\/}}
+%%%%%%%%%% FUNCTIONAL %%%%%%%%%%%%
+%%
+%% paths and derefs
+\newcommand{\epath}{\mathsf{P}}
+\newcommand{\paths}{{\sf paths}}
+\newcommand{\dpaths}{{\sf dpaths}}
+\newcommand{\Pf}[2]{\ensuremath{\Pfonly_{\!\!#1}^{\,#2}}}
+\newcommand{\Pfonly}{\ensuremath{\mathsf{PF}}}
+\newcommand{\Pp}[2]{\ensuremath{\Pponly_{\!\!#1}^{\,#2}}}
+\newcommand{\Pponly}{\ensuremath{\mathsf{PP}}}
+\newcommand{\Pe}[3]{\ensuremath{\Peonly(#1, #2, #3)}}
+\newcommand{\Peonly}{\ensuremath{\mathsf{PE}}}
+\newcommand{\Peb}[3]{\ensuremath{\Pebonly(#1, #2, #3)}}
+\newcommand{\Pebonly}{\ensuremath{\Peonly!}}
+\newcommand{\Pv}{\ensuremath{\mathsf{P}}}
+\newcommand{\Pvphi}{\ensuremath{\Pv^\emptyset}}
+\newcommand{\Ddf}[2]{\ensuremath{\Ddfonly_{\!\!#1}^{\,#2}}}
+\newcommand{\Ddfonly}{\ensuremath{\mathsf{DF}}}
+\newcommand{\Dp}[2]{\ensuremath{\Dponly_{\!\!#1}^{\,#2}}}
+\newcommand{\Dponly}{\ensuremath{\mathsf{DP}}}
+\newcommand{\De}[3]{\ensuremath{\Deonly(#1, #2, #3)}}
+\newcommand{\Deonly}{\ensuremath{\mathsf{DE}}}
+\newcommand{\Deb}[3]{\ensuremath{\Debonly(#1, #2, #3)}}
+\newcommand{\Debonly}{\ensuremath{\Deonly!}}
+\newcommand{\Dv}{\ensuremath{\mathsf{D}}}
+\newcommand{\Dvphi}{\ensuremath{\Dv^\emptyset}}
+\newcommand{\derefs}{{\sf derefs}}
+
+\newcommand{\bw}[1]{\ensuremath{\overline{#1}}} % backward
+\newcommand{\cat}[2]{\ensuremath{#1#2}} % concat
+\newcommand{\expshare}{\ensuremath{\mathsf{ExpS}}} % generic path
+
+%% heap location and heap cell
+\newcommand{\loc}[1]{\ensuremath{\mbox{\sf Loc}[{#1}]}}
+\newcommand{\cell}[1]{\ensuremath{\mbox{\sf Cell}[{#1}]}}
+
+%% type of labels
+\newcommand{\acar}{\ensuremath{\mathbf{0}}}
+\newcommand{\acdr}{\ensuremath{\mathbf{1}}}
+\newcommand{\bcar}{\ensuremath{\bar\acar}}
+\newcommand{\bcdr}{\ensuremath{\bar\acdr}}
+\newcommand{\acarset}{\ensuremath{\lbrace\acar\rbrace}}
+\newcommand{\acdrset}{\ensuremath{\lbrace\acdr\rbrace}}
+\newcommand{\bcarset}{\ensuremath{\lbrace\bcar\rbrace}}
+\newcommand{\bcdrset}{\ensuremath{\lbrace\bcdr\rbrace}}
+\newcommand{\epsilonset}{\ensuremath{\lbrace\epsilon\rbrace}}
+
+%%  transfer eqns - alias
+\newcommand{\Af}[2]{\ensuremath{\Afonly_{#1}^{\,#2}}}
+\newcommand{\Afonly}{\ensuremath{\mathsf{SF}}}
+\newcommand{\Ap}[2]{\ensuremath{\Aponly_{#1}^{\,#2}}}
+\newcommand{\Aponly}{\ensuremath{\mathsf{SP}}}
+\newcommand{\Ae}[3]{\ensuremath{\Aeonly(#1, #2, #3)}}
+\newcommand{\Aeonly}{\ensuremath{\mathsf{SE}}}
+\newcommand{\Aa}[2]{\ensuremath{\Aaonly(#1, #2)}}
+\newcommand{\Aaonly}{\ensuremath{\mathsf{SS}}}
+\newcommand{\Av}{\ensuremath{\mathsf{S}}}
+\newcommand{\Aphi}{\ensuremath{\Av^\emptyset}}
+\newcommand{\Dfonly}{\ensuremath{\mathsf{D}}}
+\newcommand{\Ufonly}{\ensuremath{\mathsf{I}}}
+%\newcommand{\calls}[2]{\ensuremath{{\mathit{\!c}_{{\mathit #1}_#2}}}}
+\newcommand{\calls}[2]{\ensuremath{{\mathit{\!c}_{{\mathit #1}}^#2}}}
+%%\newcommand{\calls}[2]{\ensuremath{{\overline{\mathit #1}_{#2}}}}
+%%  transfer eqns - liveness
+\newcommand{\Uf}[2]{\ensuremath{\mathsf{I}_{\mathit #1}^{#2}}}
+\newcommand{\Lfun}[3]{\ensuremath{\mathcal{L}(#1,#2,#3)}}
+\newcommand{\Lfunonly}{\ensuremath{\mathcal{L}}}
+
+\newcommand{\Df}[2]{\ensuremath{\mathsf{D}_{\mathit #1}^{#2}}}
+
+
+\newcommand{\Lf}[3]{\ensuremath{\Lfonly_{\mathit #1}^{#2}( {\mathit #3})}}
+\newcommand{\Lfonly}{\ensuremath{\mathsf{LF}}}
+\newcommand{\Le}[1]{\ensuremath{\Leonly({\mathit #1})}}
+\newcommand{\Leonly}{\ensuremath{\mathsf{LE}}}
+\newcommand{\Lp}[2]{\ensuremath{\Lponly_{#1}^{\,#2}}}
+\newcommand{\Lponly}{\ensuremath{\mathsf{LP}}}
+%\newcommand{\Le}[3]{\ensuremath{\Leonly(#1, #2, #3)}}
+%\newcommand{\Leonly}{\ensuremath{\mathsf{LE}}}
+\newcommand{\Lvc}[2]{\ensuremath{\Lv_{\mathit #1}^{\mathit #2}}}
+
+\newcommand{\Lv}{\ensuremath{\mathsf{L}}}
+\newcommand{\Lvphi}{\ensuremath{\Lv^\emptyset}}
+\newcommand{\Leb}[3]{\ensuremath{\Lebonly(#1, #2, #3)}}
+\newcommand{\Lebonly}{\ensuremath{\Leonly!}}
+\newcommand{\NFA}{\mbox{\sf nfa}}
+\newcommand{\lang}[1]{\ensuremath{\mathscr{L}({#1})}}
+\newcommand{\Lan}[1]{\ensuremath{\Lv_{{#1}}}}
+\newcommand{\Lanv}[2]{\ensuremath{\Lv_{{#1}}^{#2}}}
+\newcommand{\dfa}[2]{\ensuremath{\mathsf{dfa}_{{#1}}^{#2}}}
+%%  transfer eqns - availability
+\newcommand{\AVf}[2]{\ensuremath{\AVfonly_{#1}^{\,#2}}}
+\newcommand{\AVfonly}{\ensuremath{\mathsf{AvF}\,}}
+\newcommand{\AVp}[2]{\ensuremath{\AVponly_{#1}^{\,#2}}}
+\newcommand{\AVponly}{\ensuremath{\mathsf{AvP}\,}}
+\newcommand{\AVgp}[2]{\ensuremath{\AVgponly_{#1}^{\,#2}}}
+\newcommand{\AVgponly}{\ensuremath{{\mathsf{AvBP}}}}
+\newcommand{\AVgf}[2]{\ensuremath{\AVgfonly_{#1}^{\,#2}}}
+\newcommand{\AVgfonly}{\ensuremath{{\mathsf{AvBF}\,}}}
+\newcommand{\AVe}[3]{\ensuremath{\AVeonly(#1, #2, #3)}}
+\newcommand{\AVeonly}{\ensuremath{\mathsf{AvE}\,}}
+\newcommand{\AVv}{\ensuremath{\mathsf{AV}}}
+\newtheorem{observation}[theorem]{Observation}
+
+%%  transfer eqns - anticipability
+\newcommand{\ANf}[2]{\ensuremath{\ANfonly_{#1}^{\,#2}}}
+\newcommand{\ANfonly}{\ensuremath{\mathsf{AnF}}}
+\newcommand{\ANp}[2]{\ensuremath{\ANponly_{#1}^{\,#2}}}
+\newcommand{\ANponly}{\ensuremath{\mathsf{AnP}}}
+\newcommand{\ANgp}[2]{\ensuremath{\ANgponly_{#1}^{\,#2}}}
+\newcommand{\ANgponly}{\ensuremath{{\mathsf{AnBP}}}}
+\newcommand{\ANgf}[2]{\ensuremath{\ANgfonly_{#1}^{\,#2}}}
+\newcommand{\ANgfonly}{\ensuremath{{\mathsf{AnBF}}}}
+\newcommand{\ANe}[3]{\ensuremath{\ANeonly(#1, #2, #3)}}
+\newcommand{\ANeonly}{\ensuremath{\mathsf{AnE}}}
+\newcommand{\ANv}{\ensuremath{\mathsf{AN}}}
+\newcommand{\ANvphi}{\ensuremath{\ANv^\emptyset}}
+
+
+%% union?
+\newcommand{\plus}{$\cup$}
+
+%% -> arrows, =def
+\newcommand{\rightk}[1]{\ensuremath{\stackrel{\scriptstyle #1}{\rightarrow}}}
+\newcommand{\rightstar}{\rightk{\star}}
+%\newcommand{\eqdef}{\ensuremath{\stackrel{\scriptstyle def}{=}}}
+\newcommand{\eqdef}{\ensuremath{=}}
+
+%% functions
+
+\newcommand{\listc}{\mbox{\tt l}}
+\newcommand{\lista}{\mbox{\tt l1}}
+\newcommand{\listb}{\mbox{\tt l2}}
+
+%% nfa and cfg
+\newcommand{\nfa}{\ensuremath{\mathbf{N}}}
+\newcommand{\nfabar}{\ensuremath{\overline\nfa}}
+
+\newcommand{\start}{{\sf init}}
+\newcommand{\prim}{\ensuremath{P}}
+\newcommand{\exit}{{\sf pgm}}
+\newcommand{\gram}{\ensuremath{G}}
+\newcommand{\nt}{\ensuremath{N}}
+\newcommand{\var}[1]{\scalebox{.99}{\mbox{$\langle$#1$\rangle$}}}
+
+\newcommand{\TwoCells}[2]{%
+\psset{unit=.25mm}
+\begin{pspicture}(0,-2)(36,18)
+\psframe(0,-5)(36,15)
+\psline(18,-4)(18,15)
+\putnode{zarb1342}{origin}{9}{5}{\rnode{#1}{}}
+\putnode{zarb0102}{origin}{27}{5}{\rnode{#2}{}}
+\end{pspicture}%
+}
+
+\newcommand{\TwoCellNull}[2]{%
+\psset{unit=.25mm}
+\begin{pspicture}(0,-2)(36,18)
+\psframe(0,-5)(36,15)
+\psline(18,-4)(18,15)
+\putnode{z}{origin}{9}{5}{\rnode{#1}{}}
+\putnode{z}{origin}{27}{5}{\rnode{#2}{\sf X}}
+\end{pspicture}%
+}
+
+\newcommand{\TwoCellsD}[2]{%
+\psset{unit=.25mm}
+\begin{pspicture}(0,-2)(36,18)
+\psframe(0,-5)(36,15)
+\psline(18,-4)(18,15)
+\putnode{z}{origin}{9}{5}{\rnode{#1}{}}
+\putnode{z}{origin}{27}{5}{\rnode{#2}{}}
+\putnode{z}{origin}{9}{5}{%
+      \psframebox[linestyle=none,fillstyle=hlines,hatchsep=2,framesep=8,
+      hatchcolor=blue]{}}
+\end{pspicture}%
+}
+\newcommand{\TwoCellsA}[2]{%
+\psset{unit=.25mm}
+\begin{pspicture}(0,-2)(36,18)
+\psframe(0,-5)(36,15)
+\psline(18,-4)(18,15)
+\putnode{z}{origin}{9}{5}{\rnode{#1}{}}
+\putnode{z}{origin}{9}{5}{%
+   \psframebox[linestyle=none,fillstyle=hlines,hatchsep=2,framesep=8,
+   hatchcolor=blue]{}}
+\putnode{z}{origin}{27}{5}{\rnode{#2}{}}
+\end{pspicture}%
+}
+% meta scheme command
+\newcommand{\MIF}{\mbox{$\mathsf{if}$}}
+\newcommand{\MEQ}{\mbox{$\mathsf{eq?}$}}
+\newcommand{\MLET}{\mbox{$\mathsf{let}$}}
+\newcommand{\MIN}{\mbox{$\mathsf{in}$}} 
+\newcommand{\IF}{\mbox{$\mathsf{if}$}}
+%\newcommand{\SLET}{\mbox{$\mathsf{let}$}}
+%\newcommand{\SIN}{\mbox{$\mathsf{in}$}} 
+
+% others..
+\newcommand{\candidates}[1]{\ensuremath{\mbox{\sf Candidates}(#1)}}
+\newcommand{\scvars}[1]{\ensuremath{\mathsf{ScopeVars}(#1)}}
+\newcommand{\expvars}[1]{\ensuremath{\mathsf{FV}(#1)}}
+\newcommand{\mainpgm}{\ensuremath{\mathbf{main}}}
+\newcommand{\updateenv}[3]{{\sf update(#1, #2, #3)}}
+\newcommand{\pair}[2]{(#1, #2)}
+
+\newcommand{\pia}{\ensuremath{\pi_{a}}}
+\newcommand{\pib}{\ensuremath{\pi_{b}}}
+
+
+\newenvironment{minieqnarray}
+{\begin{minipage}{\textwidth}\begin{eqnarray}}
+{\end{eqnarray}\end{minipage}}
+
+%%% EFFECTIVENESS OF GC 
+\newcommand{\deltarch}{\mbox{%
+ \ensuremath{\delta_{\mbox{\footnotesize\sf rch}}}}}
+\newcommand{\deltagc}{\mbox{%
+ \ensuremath{\delta_{\mbox{\footnotesize\sf gc}}}}}
+\newcommand{\GCstructure}{{\tt GC\_structure}}
+\newcommand{\GCflag}{{\tt GC\_flag}}
+\newcommand{\CreateTime}{{\tt Create\_time}}
+\newcommand{\UseTime}{{\tt Use\_time}}
+\newcommand{\CollTime}{{\tt Collection\_time}}
+\newcommand{\exectime}{\mbox{\sf  T}}
+
+\newcommand{\manual}[1]{{\protect#1}}
+
+%% Benchmark names
+\newcommand{\silex}{\mbox{\tt silex}}
+\newcommand{\lalr}{\mbox{\tt lalr}}
+\newcommand{\eopl}{\mbox{\tt eopl}}
+\newcommand{\prolog}{\mbox{\tt prolog}}
+\newcommand{\sudoku}{\mbox{\tt sudoku}}
+\newcommand{\cipher}{\mbox{\tt cipher}}
+
+%% helpful definitions
+\newcommand{\citeNP}{\cite}
+\newcommand{\figtwo}{figure*}
+\newcommand{\capsize}{}
+\newcommand{\figrule}{}
+\newcommand{\figtworule}{}
+
+%% scheme program vars/constants
+%% \renewcommand{\px}{\mbox{$\mathbf{x}$}}
+%% \renewcommand{\py}{\mbox{$\mathbf{y}$}}
+%% \renewcommand{\pz}{\mbox{$\mathbf{z}$}}
+%% \renewcommand{\pw}{\mbox{$\mathbf{w}$}}
+%% \newcommand{\pthree}{\mbox{$\mathbf{3}$}}
+%% \newcommand{\pfour}{\mbox{$\mathbf{4}$}}
+%% \newcommand{\pfive}{\mbox{$\mathbf{5}$}}
+%% \newcommand{\psix}{\mbox{$\mathbf{6}$}}
+%% \newcommand{\ptwo}{\mbox{$\mathbf{2}$}}
+%% \newcommand{\append}{\mbox{$\mathbf{append}$}}
+%% \newcommand{\set}{\mbox{$\mathbf{set{\mbox{\rm \bf !}}}$}}
+%% \newcommand{\setcar}{\mbox{$\mathbf{set{\mbox{\rm \bf -}}car{\mbox{\rm \bf !}}}$}}
+%% \newcommand{\setcdr}{\mbox{$\mathbf{set{\mbox{\rm \bf -}}cdr{\mbox{\rm \bf !}}}$}}
+
+%% other defs
+\newcommand{\nullifiable}{\mbox{\sf Nullifiable}}
+\newcommand{\properprefix}{\mbox{\sf ProperPrefix}}
+\newcommand{\prefix}{\mbox{\sf  Prefix}}
+\newcommand{\linknull}{{\sf LinkNullify}}
+\newcommand{\pathnullify}{{\sf PathNullify}}
+\newcommand{\nullins}{{\sf GenNullCode}}
+\newcommand{\nullstatements}{\mbox{\sf null-statements}}
+\newcommand{\isnull}{\mbox{\sf isnull}}
+\newcommand{\mymark}{\mbox{\sf Mark}}
+\newcommand{\sbegin}{\mbox{\sf BEGIN}}
+\newcommand{\map}{\mbox{\sf map}}
+\newcommand{\nullset}{\ensuremath{\mathsf{N}}}
+\newcommand{\insnull}[2]{\mbox{$\mathsf{InsertNull(#1,#2)}$}}  
+\newcommand{\insnullfn}{\mbox{$\mathsf{InsertNull}$}}   
+
+\newcommand{\compnullfn}{\mbox{$\mathsf{Nullify}$}} 
+\newcommand{\compnull}[2]{\compnullfn(#1, #2)}
+\newcommand{\compnullpgm}[1]{\mbox{$\mathsf{Nullifypgm(#1)}$}}
+\newcommand{\compnulldef}[1]{\mbox{$\mathsf{Nullifydef(#1)}$}}
+
+\newcommand{\zz}{{\sf z}}
+\newcommand{\yy}{{\sf y}}
+\newcommand{\xx}{{\sf x}}
+\newcommand{\ww}{{\sf w}}
+
+%% \newtheorem{lemma}{Lemma}[section]
+%% \newtheorem{example}{Example}[section]
+%% \newtheorem{theorem}{Theorem}[section]
+%% \newtheorem{definition}{Definition}[section]
+%% \newtheorem{corollary}{Corollary}[section]
+%% \newtheorem{property}{Property}[section]
+%% \newcommand{\qed}{\hfill\nobreak \ifvmode \relax \else
+%%   \ifdim\lastskip<1.5em \hskip-\lastskip
+%%   \hskip1.5em plus0em minus0.5em \fi \nobreak
+%%   \vrule height0.75em width0.5em depth0.25em\  fi}
+%% \newenvironment{proof}[1][Proof]{\begin{trivlist}
+%% \item[\hskip \labelsep {\bfseries #1}]}{\hfill\qed\end{trivlist}}
+
+\newcommand{\expr}[1]{\ensuremath{#1}}
+\newcommand{\pv}[1] {\mbox{\tt #1}}
+\newcommand{\db}[1]{{\bf [\![}#1{\bf ]\!]}}
+\newcommand{\nat}{I\!\!N}
+\newcommand{\lenprime}{\ \vdash^{l'}\ }
+\newcommand{\len}{\ \vdash^l\ }
+\newcommand{\sen}{\ \vdash^s\ }
+\newcommand{\fen}{\ \vdash^f\ }
+\newcommand{\den}{\ \vdash^f\ }
+\newcommand{\argsen}{\ \vdash^{args}\ }
+\newcommand{\pen}{\ \vdash^p\ }
+\newcommand{\fsen}{\ \vdash^{fs}\ }
+\newcommand{\psen}{\ \vdash^{ps}\ }
+
+\newcommand{\last}{\mbox{last}}
+\newcommand{\rightmost}{\mbox{rightmost}}
+\newcommand{\before}{\mbox{before}}
+\newcommand{\befen}{\ \vdash^{\sf before}}
+\newcommand{\lasten}{\ \vdash^{\sf last}}
+\newcommand{\rmen}{\ \vdash^{\sf rightmost}}
+\newcommand{\rhos}{\ensuremath{\red \rho_s}}
+\newcommand{\pgmpt}[1]{\ensuremath{\red \pi_{#1}}}
+\newcommand{\multireduct}{\ensuremath{\stackrel{+}{\longrightarrow}}}
+\newcommand{\avrightarrow}{\ensuremath{\longrightarrow}}
+\newcommand{\multireductav}{\ensuremath{\stackrel{+}{\avrightarrow}}}
+\newcommand{\heap}{\mbox{H}}       % heap
+\newcommand{\ppn}[2]{\ensuremath{#2}} % prog point
+\newcommand{\pp}[2]{\ensuremath{#2}} % prog point
+\newcommand{\lvintp}{\ensuremath{\zeta}}
+\newcommand{\avintp}{\lvintp}
+\newcommand{\locs}{\mbox{\tt locs}} 
+\newcommand{\llv}{\ensuremath{\mathcal{L}}}
+\newcommand{\aav}{\ensuremath{\mathcal{A}}}
+\newcommand{\aan}{\ensuremath{\mathcal{N}}}
+\newcommand{\gl}{\mbox{\em G}}
+
+
+=======
 %%%%%%%%%% IMPERATIVE %%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -519,3 +1041,4 @@
 \newcommand{\gl}{\mbox{\em G}}
 
 
+>>>>>>> 4bb03a5c3d7b9f8e48b056d77b2ef7801e7effa3
