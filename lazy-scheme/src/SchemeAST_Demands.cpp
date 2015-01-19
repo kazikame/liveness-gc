@@ -16,6 +16,8 @@ unordered_map<string, Node*> gfunc_prog_pts;
 bool in_function_define = false;
 
 
+
+
 void print_label_set(unordered_set<string> s)
 {
 	cout << "Printing label set " << endl;
@@ -38,6 +40,8 @@ unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(con
 	//cout << "Created new label for return " << label << endl;
 	label_set.insert(label);
 	pID->label_set.insert(label);
+
+
 	return gLivenessMap;
 }
 
@@ -175,8 +179,8 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
     expr_demand_grammars * result =  merge(pArg1->transformDemandRef(arg_1_demand),
                                            pArg2->transformDemandRef(arg_2_demand));
     result->first->emplace(label, demand);
-    cout << "Printing result of BinaryPrimOp Demand transform " << endl;
-    Scheme::output::dumpGrammar(cout, result->second);
+//    cout << "Printing result of BinaryPrimOp Demand transform " << endl;
+//    Scheme::output::dumpGrammar(cout, result->second);
     
 
     return result;

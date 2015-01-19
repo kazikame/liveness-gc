@@ -32,6 +32,9 @@ extern unsigned int num_of_allocations;
 extern map<cons*, int> heap_map;
 extern map<int, string> root_var_map;
 
+
+std::string curr_return_addr;
+
 std::string getNextLabel()
 {
 	std::stringstream sstream;
@@ -160,6 +163,7 @@ void ReturnExprNode::doLabel(bool shouldAddLabel)
 {
 	//label = (shouldAddLabel) ? getNextLabel() : "";
 	pID->doLabel(shouldAddLabel);
+	idVarLabel = pID->getLabel();
 	label = pID->getLabel();
 }
 
@@ -185,12 +189,15 @@ cons* ReturnExprNode::evaluate(cons* heap_cell = NULL)
 
 		retval->inWHNF = true;
 		retval->typecell = temp->typecell;
-		retval->val = temp->val;\
+		retval->val = temp->val;
 
 		update_heap_refs.pop();
 
 	}
 	
+	cout << "Setting to current return address to " << this->pID->getLabel() << " or " << idVarLabel << endl;
+	curr_return_addr = this->getLabel();
+
 	return retval;
 }
 cons* ReturnExprNode::make_closure()
@@ -424,6 +431,7 @@ cons* IfExprNode::evaluate(cons* heap_cell = NULL)
 		IdExprNode* i = (IdExprNode*)this->pCond;
 		cons* cond_heap_ref = (cons*)lookup_addr(i->getIDStr().c_str());
 
+		cout << "Evaluating condition corrsponding to variable " << i->getIDStr() << endl;
 		update_heap_refs.push(cond_heap_ref);
 		//cout << "Pushing on to stack in if expr " << cond_heap_ref << endl;
 		cons* cond_resultValue = this->pCond->evaluate();
@@ -513,8 +521,11 @@ LetExprNode * LetExprNode::clone() const
 
 cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 {
-//	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
-	
+
+	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
+	curr_return_addr = getLabel();
+
+
 	if ((gc_status != gc_disable && current_heap() < 1) ||
 			(getVarExpr()->isFunctionCallExpression() && (current_heap < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) )
 	{
@@ -529,7 +540,7 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 		}
 		else
 		{
-			std::cout << "Liveness based GC at pgm pt " << getLabel() << endl;
+			std::cout << "Liveness based GC at pgm pt " << return_stack().return_point << " for function "<< return_stack().funcname << endl;
 			std::cout << "Number of elements in  heap ref stack = " << update_heap_refs.size() << endl;
 			std::string curr_let_pgmpt = return_stack().return_point;
 			return_stack().return_point = getLabel();
@@ -552,7 +563,9 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 		funExpr->parent_let_pgmpt = getLabel();
 	}
 	
+
 	cons* var_res = this->getVarExpr()->make_closure();
+	cout << "Address of " << this->getVar() << " = " << var_res << endl;
 	cons* retval = this->getBody()->evaluate();
 	assert(retval->inWHNF && is_valid_address(retval));
 
@@ -1317,8 +1330,10 @@ cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
+
 	//TODO : WHAT SHOULD BE THE PROGRAM POINT TO BE PASSED? 
-	make_environment(funcDef->getFuncName().c_str(), this->parent_let_pgmpt);
+	make_environment(funcDef->getFuncName().c_str(), curr_return_addr);
+
 	auto num_args = pListArgs->size();
 	auto curr = heap_cell;
 	while(num_args > 0)

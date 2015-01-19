@@ -109,6 +109,8 @@ void set_max_reachability();
 #endif
 
 
+cons* copy_deep(cons* node);
+
 /*-----Memory manager-------*/
 
 //!!!caution remove memorysize from this function
@@ -275,7 +277,7 @@ void make_environment(const char *functionname, std::string returnpoint)
 	std::cout << "Creating new environment for function " << functionname << " with return " << returnpoint << endl;
 	actRec newenv;
     actRecStack.front().return_point = returnpoint;
-    newenv.return_point=-1;
+    newenv.return_point = "-1";
     newenv.funcname=functionname;
     actRecStack.push_front(newenv);
     mmc=mmc+(sizeof(actRec));
@@ -284,6 +286,7 @@ void make_environment(const char *functionname, std::string returnpoint)
 void delete_environment()
 {
 	
+	cout << "Removing function " << actRecStack.front().funcname << endl;
 	actRecStack.pop_front();
     mmc=mmc-(sizeof(actRec));
     actRecStack.front().return_point=-1; //reset
@@ -722,7 +725,20 @@ void update_heap_ref_stack()
 		cons* heap_ref = update_heap_refs.top();
 		cout << ++i << " " << heap_ref << "  " << heap_ref->forward << endl;
 		//cout << heap_ref->typecell << endl;
-		assert(heap_ref->forward != NULL);
+
+
+		//assert(heap_ref->forward != NULL);
+
+		//forward pointer should not be NULL, so do a deep copy and update the pointer.
+		//This might be a hack, need to do something better. Maybe put the print method on stack and
+		//ensure that references that are being printed are fully copied.
+		if (heap_ref->forward == NULL)
+		{
+			cons* new_ref = copy_deep(heap_ref);
+			cout << "In heap ref stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
+			//heap_ref = new_ref;
+		}
+
 		heap_ref = heap_ref->forward;
 		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
@@ -737,13 +753,22 @@ void update_heap_ref_stack()
 	assert(temp.empty());
 	//Update print stack
 
-	cout << "Updating temp stack with size " << print_stack.size() << endl;
+	cout << "Updating print stack with size " << print_stack.size() << endl;
 	while(!print_stack.empty())
 	{
 		cons* heap_ref = print_stack.top();
 		//cout << ++i << " " << heap_ref << "  " << heap_ref->forward << endl;
 		//cout << heap_ref->typecell << endl;
-		assert(heap_ref->forward != NULL);
+
+
+		//assert(heap_ref->forward != NULL);
+		if (heap_ref->forward == NULL)
+		{
+			cons* new_ref = copy_deep(heap_ref);
+			cout << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
+		}
+
+
 		heap_ref = heap_ref->forward;
 		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
@@ -803,7 +828,11 @@ cons* copy_deep(cons* node)
 
 	if (node->typecell == consExprClosure)
 	{
+		cout << "Copying cons cell " << node << endl;
 		newaddr = copy(node);
+		newaddr->val.cell.car = copy_deep(node->val.cell.car);
+		newaddr->val.cell.cdr = copy_deep(node->val.cell.cdr);
+		return newaddr;
 	}
 	else
 	{
@@ -1173,25 +1202,32 @@ void liveness_gc()
 	//cout << "Heap before GC"<<endl;
 	//dump_heap("before");
 //	start_GC_dump();
+	++gccount;
+	ofstream pre("PreGC" + to_string(gccount) + ".txt", ios_base::app);
+	create_heap_bft(pre);
+	pre.close();
+
 	swap_buffer();
 
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
 	{
+		cout << "Processing function " << stackit->funcname << endl;
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
-//			cout << "Doing gc at return point " << stackit->return_point << endl;
+			cout << "Doing gc at return point " << stackit->return_point << endl;
 			string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
-//			cout << nodeName << endl;
+			cout << nodeName << " at " << vhit->ref << endl;
 			stateMapIter got = statemap.find(nodeName);
 
 			if (got != statemap.end())
 			{
-
+				cout << "Live cell " << nodeName << endl;
 				if (vhit->ref && ((cons*)vhit->ref)->forward == NULL) //Check to see if a new cell was allocated
 					((cons*)vhit->ref)->setofStates->clear();
 
 				//TODO : This might not be a simple copy
 				cons* addr = copy_deep((cons*)vhit->ref);
+				cout << "Copied " << vhit->ref << " to " << addr << endl;
 				if (addr)
 				{
 					cons* c = (cons*) addr;
@@ -1214,6 +1250,11 @@ void liveness_gc()
 	//dump_heap("after");
 	//++gccount;
 	cout << "Number of cells copied " << numcopied << endl;
+
+	ofstream post("PostGC" + to_string(gccount) + ".txt" , ios_base::app);
+	create_heap_bft(post);
+	post.close();
+
 	update_heap_ref_stack();
 //	end_GC_dump();
 

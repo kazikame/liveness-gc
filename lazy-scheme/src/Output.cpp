@@ -12,7 +12,8 @@ void Scheme::output::dumpGrammar(std::ostream & out,
                                  Scheme::Demands::regular_demand_grammar * rgram) {
     out << std::left;
     auto gram = rgram->first;
-    for(auto ipart = 0; ipart < rgram->second->size(); ++ipart) {
+    for(auto ipart = 0; ipart < rgram->second->size(); ++ipart)
+    {
         auto type = "NONE";
         if(rgram->second->at(ipart).first == Scheme::Demands::LEFT)         type = "LEFT";
         else if(rgram->second->at(ipart).first == Scheme::Demands::RIGHT)   type = "RIGHT";
@@ -24,14 +25,16 @@ void Scheme::output::dumpGrammar(std::ostream & out,
         for(auto & non_terminal : rgram->second->at(ipart).second) {
             out << std::setw(16) << non_terminal << arrow;
 
-            if(!gram->at(non_terminal).size()) {
+            if(!gram->at(non_terminal).size())
+            {
                 out << empty << "\n";
                 continue;
             }
 
             auto path_iter = gram->at(non_terminal).begin();
 
-            if(path_iter->size()) {
+            if(path_iter->size())
+            {
                 auto token_iter = path_iter->begin();
                 out << *token_iter;
                 while(++token_iter != path_iter->end())
@@ -41,7 +44,8 @@ void Scheme::output::dumpGrammar(std::ostream & out,
 
             while(++path_iter != gram->at(non_terminal).end()) {
                 out << vpipe;
-                if(path_iter->size()) {
+                if(path_iter->size())
+                {
                     auto token_iter = path_iter->begin();
                     out << *token_iter;
                     while(++token_iter != path_iter->end())
@@ -61,29 +65,34 @@ void Scheme::output::dumpGrammar(std::ostream & out, Scheme::Demands::demand_gra
     for(auto & non_terminal : *gram) {
         out << std::setw(16) << non_terminal.first << arrow;
 
-        if(!non_terminal.second.size()) {
+        if(!non_terminal.second.size())
+        {
             out << empty << std::endl;
             continue;
         }
 
         auto path_iter = non_terminal.second.begin();
 
-        if(path_iter->size()) {
+        if(path_iter->size())
+        {
             auto token_iter = path_iter->begin();
             out << *token_iter;
             while(++token_iter != path_iter->end())
                 out << cdot << *token_iter;
-        } else
+        }
+        else
             out << empty;
 
-        while(++path_iter != non_terminal.second.end()) {
+        while(++path_iter != non_terminal.second.end())
+        {
             out << vpipe;
             if(path_iter->size()) {
                 auto token_iter = path_iter->begin();
                 out << *token_iter;
                 while(++token_iter != path_iter->end())
                     out << cdot << *token_iter;
-            } else
+            }
+            else
                 out << empty;
         }
 

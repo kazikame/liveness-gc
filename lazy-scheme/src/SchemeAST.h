@@ -197,6 +197,8 @@ public:
 	virtual std::string getLabel() const;
 	virtual cons* make_closure();
 
+	std::string idVarLabel;
+
 protected:
 	IdExprNode * pID;
 
