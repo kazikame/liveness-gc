@@ -107,4 +107,3 @@ void Scheme::output::dumpGrammar(std::ostream & out,
             })
         dumpGrammar(out, gram);
 }
-
