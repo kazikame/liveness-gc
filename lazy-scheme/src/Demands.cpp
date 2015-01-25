@@ -489,14 +489,14 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 		{
 			auto curr_state = q.front();
 			q.pop();
-			std::cout << "Processing state " << curr_state << std::endl;
+			//std::cout << "Processing state " << curr_state << std::endl;
 			//for(auto term:{T0, T1, T0b, T1b})
 
 			//TODO: What to do if the start state is the final state and has no other transitions?
 			//Insert the state in the final state list of the dfa and insert a dummy transition
 			if (nfa->first.find(curr_state) != nfa->first.end())
 			{
-				std::cout << "Inserting state in dfa " << curr_state << std::endl;
+				//std::cout << "Inserting state in dfa " << curr_state << std::endl;
 				dfa->first.insert(curr_state);
 				dfa->second[curr_state];
 			}
@@ -641,7 +641,7 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		}
 	if (hasfinalState)
 	{
-		std::cout << "Marking state as final state " << state << std::endl;
+		//std::cout << "Marking state as final state " << state << std::endl;
 		nfa->first.insert(state);
 	}
 
@@ -1116,7 +1116,7 @@ rule Scheme::Demands::expandProd(path p)
 	std::string p1 = p.front();
 	if(p1[0] == 'T') //if it is an LF //TODO Change this condition to check whether the rule begins with "LF"
 	{
-		std::cout << "Processing " << p1 << std::endl;
+		//std::cout << "Processing " << p1 << std::endl;
 		std::pair<rule,rule> res = splitLF(p);
 		rule r = res.first;
 		r.insert(res.second.begin(), res.second.end());
@@ -1226,7 +1226,6 @@ demand_grammar * Scheme::Demands::sanitize(demand_grammar * gram) {
 }
 
 
-/* THIS FUNCTION DELETES THE SECOND GRAMMAR AFTER MERGING. */
 expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
                                               expr_demand_grammars * grams_from)
 {
@@ -1584,7 +1583,7 @@ void Scheme::Demands::simplifyCFG(demand_grammar* gram)
 		{
 			if (prod.second.size() == 0)
 			{
-				print << "Processing empty production " << prod.first << endline;
+				//print << "Processing empty production " << prod.first << endline;
 				empty_nts.push_back(prod.first);
 				changed = true;
 			}
@@ -1594,7 +1593,7 @@ void Scheme::Demands::simplifyCFG(demand_grammar* gram)
 				auto p = prod_rules.begin();
 				if (std::find(p->begin(), p->end(), prod.first) != p->end())
 				{
-					print << "non-terminating production " << prod.first << endline;
+					//print << "non-terminating production " << prod.first << endline;
 					empty_nts.push_back(prod.first);
 					changed = true;
 				}
@@ -1612,7 +1611,7 @@ void Scheme::Demands::simplifyCFG(demand_grammar* gram)
 				{
 					if (std::find(r.begin(), r.end(), nt) != r.end())
 					{
-						print << "deleting rule for " << prod.first << " which contains empty non-terminal " << nt << endline;
+						//print << "deleting rule for " << prod.first << " which contains empty non-terminal " << nt << endline;
 						prod_rules.erase(r);
 					}
 				}

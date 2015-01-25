@@ -698,7 +698,7 @@ void update_heap_ref_stack()
 	stack<cons*> temp;
 
 
-	cout << "Updating print stack with size " << print_stack.size() << endl;
+	//cout << "Updating print stack with size " << print_stack.size() << endl;
 	while(!print_stack.empty())
 	{
 		cons* heap_ref = print_stack.top();
@@ -707,7 +707,7 @@ void update_heap_ref_stack()
 		if (heap_ref->forward == NULL)
 		{
 			cons* new_ref = copy_deep(heap_ref);
-			cout << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
+			//cout << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
 		}
 		assert(heap_ref->forward != NULL);
 
@@ -807,7 +807,7 @@ cons* copy_deep(cons* node)
 
 	if (node->typecell == consExprClosure)
 	{
-		cout << "Copying cons cell " << node << endl;
+		//cout << "Copying cons cell " << node << endl;
 		newaddr = copy(node);
 		newaddr->val.cell.car = copy_deep(node->val.cell.car);
 		newaddr->val.cell.cdr = copy_deep(node->val.cell.cdr);
@@ -1159,12 +1159,12 @@ void liveness_gc()
 
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
 	{
-		cout << "Processing function " << stackit->funcname << endl;
+		//cout << "Processing function " << stackit->funcname << endl;
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
-			cout << "Doing gc at return point " << stackit->return_point << endl;
+			//cout << "Doing gc at return point " << stackit->return_point << endl;
 			string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
-			cout << nodeName << " at " << vhit->ref << endl;
+			//cout << nodeName << " at " << vhit->ref << endl;
 			stateMapIter got = statemap.find(nodeName);
 
 			if (got != statemap.end())

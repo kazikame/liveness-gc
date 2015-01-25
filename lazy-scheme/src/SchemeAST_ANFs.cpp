@@ -111,6 +111,8 @@ ExprNode * IfExprNode::getANF() const {
     if(isOfClass<Node, IdExprNode>(pCond))
         return new IfExprNode(pCond->clone(), pThen->getANF(), pElse->getANF());
 
+    cout << "The type of condition is " << pCond->type << " at " << pCond->getLabel() << endl;
+    assert(false);
 //    return pushDown(new IfExprNode(new HoleConstExprNode(),
 //                                   pThen->getANF(),
 //                                   pElse->getANF()),
@@ -165,6 +167,7 @@ ExprNode * UnaryPrimExprNode::getANF() const {
         return new LetExprNode(new IdExprNode(new std::string(newVar)), this->clone(),
                                new ReturnExprNode(new IdExprNode(new std::string(newVar))));
     }
+    assert(false);
 //    else
 //        return pushDown(new UnaryPrimExprNode(node_name, new HoleConstExprNode()), pArg->getANF());
 }
@@ -183,10 +186,12 @@ ExprNode * BinaryPrimExprNode::getANF() const {
             return new LetExprNode(new IdExprNode(new std::string(newVar)), this->clone(),
                                    new ReturnExprNode(new IdExprNode(new std::string(newVar))));
         } else {
+        	assert(false);
 //            return pushDown(new BinaryPrimExprNode(node_name, pArg1->clone(), new HoleConstExprNode()),
 //                            pArg2->getANF());
         }
     }
+    assert(false);
 //    else {
 //        ExprNode * intermediateNode = pushDown(new BinaryPrimExprNode(node_name,
 //                                               new HoleConstExprNode(), pArg2->clone()), pArg1->getANF());
@@ -216,10 +221,11 @@ ExprNode * FuncExprNode::getANF() const {
     for(std::list<ExprNode *>::const_iterator i = pListArgs->begin(); i != pListArgs->end(); ++i) {
         if(foundExpr || isOfClass<Node, IdExprNode>(* i))
             newArgs->push_back((* i)->clone());
-//        else {
+        else {
+        	assert(false);
 //            foundExpr = * i;
 //            newArgs->push_back(new HoleConstExprNode());
-//        }
+        }
     }
     if(foundExpr) {
         ExprNode * intermediateNode = pushDown(new FuncExprNode(pID->clone(), newArgs),

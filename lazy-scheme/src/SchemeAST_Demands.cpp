@@ -370,8 +370,8 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
 
 	gfunc_prog_pts.clear();
 	in_function_define = true;
-	
-	
+
+
 
     std::string func_demand_prefix = PREFIX_DEMAND + SEPARATOR + pID->getIDStr();
 
@@ -380,7 +380,7 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     
     auto expr_map = pExpr->transformDemand(rule({{ func_demand_prefix }}));
     
-    
+    //For each function point, get liveness for function variables and store it in a map
     for (auto p : gfunc_prog_pts)
     {
     	auto labels = p.second->label_set;
@@ -393,33 +393,44 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
 
     
     auto &dem_grams = result->second; 
+    //Process each variable
     for (auto p: liveness_map)
     {
+
     	Scheme::Demands::demand_grammar* var_gram = p.second->second;
     	for (auto g : (*var_gram))
     	{
     		std::string liveness_label = "L/" + p.first + "/" + g.first; //change it to LF
-    		cout << "Liveness label " << liveness_label << endl;
-    		(*dem_grams)[liveness_label] = g.second;
+    		((*dem_grams)[liveness_label]).insert(g.second.begin(), g.second.end());
     	}
     
     
     	int index = 0;
     	demand_grammar * arg_demands = new demand_grammar;
+    	cout << "Number of arguments is " << pListArgs->size() << endl;
     	for(auto & arg : *pListArgs)
     	{
+
     		auto arg_demand_pair = var_gram->find(arg->getIDStr());
     		if(arg_demand_pair != var_gram->end())
     		{
 
     			arg_demands->emplace(func_demand_prefix + SEPARATOR + std::to_string(++index),
     					arg_demand_pair->second);
-    			//std::cout << "Demand for argument " << (func_demand_prefix + SEPARATOR + std::to_string(index)) << std::endl;
-    			gLivenessData["T" + SEPARATOR + pID->getIDStr() + SEPARATOR + std::to_string(index)] = arg_demand_pair->second;
+
+    			(gLivenessData["T" + SEPARATOR + pID->getIDStr() + SEPARATOR + std::to_string(index)]).insert(arg_demand_pair->second.begin(), arg_demand_pair->second.end());
 
     		}
     		else
-    			cout << "Argument not found " << arg->getIDStr() << endl;
+    		{
+    			//This can happen when an argument to the function is not used in one of the branch.
+    			//In such a case a null demand will be added.
+    			//TODO : is there a better way?
+
+    			rule null_demand;
+    			((*arg_demands)[func_demand_prefix + SEPARATOR + std::to_string(++index)]).insert(null_demand.begin(), null_demand.end());
+
+    		}
 
     	}
     }
@@ -427,7 +438,9 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     for (auto &var : (*dem_grams))
     {
     	string nt = var.first;
-    	gLivenessData[nt] = var.second;
+    	gLivenessData[nt].insert(var.second.begin(), var.second.end());
+
+
     }
 
     in_function_define = false;
@@ -459,11 +472,16 @@ unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const 
     for(auto & func : function_call_demands)
     {
         result->first->emplace(PREFIX_DEMAND + SEPARATOR + func.first, func.second);
-        gLivenessData[PREFIX_DEMAND + SEPARATOR + func.first] = func.second;
+        gLivenessData[PREFIX_DEMAND + SEPARATOR + func.first].insert(func.second.begin(), func.second.end());
     }
 
     this->label_set.insert(pExpr->label_set.begin(), pExpr->label_set.end());
     this->progpt_map = &prog_pt_map;
+    this->liveness_data = gLivenessData;
+
+
+    cout << "Completed processing all defines " << endl;
+
 
     return gLivenessMap;
 }

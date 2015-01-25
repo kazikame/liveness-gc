@@ -129,6 +129,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		int resint = driver.process();
 		//convert LFs into IFs and DFs
 		//Use pgm->liveness_data as the final grammar
+		Scheme::output::dumpGrammar(cout, &gLivenessData);
 		gLivenessData.insert(pgm->liveness_data.begin(), pgm->liveness_data.end()) ;
 		gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
 
@@ -145,7 +146,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 //		}
 
 
-		cout << "program name " << pgmname << endl;
+		//cout << "program name " << pgmname << endl;
 		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
 		//Simplify grammar
 		simplifyCFG(&gLivenessData);
