@@ -16,6 +16,11 @@
 #include "gc.h"
 using namespace std;
 
+#ifndef __DEBUG__GC
+#define __DEBUG__GC
+#endif
+
+
 int numcopied = 0; //TODO:Delete after debugging
 
 
@@ -1003,8 +1008,10 @@ void reachability_gc()
 	swap_buffer();
 	numcopied = 0;
 	int index = 0;
-	cout << "Starting reachability based GC after " <<  num_of_allocations << " allocations."<<endl;
-
+	++gccount;
+#ifdef __DEBUG__GC
+	cout << "Starting reachability based GC #"<< gccount << " after " <<  num_of_allocations << " allocations."<<endl;
+#endif
 
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
 	{
@@ -1022,8 +1029,9 @@ void reachability_gc()
 		copy_scan_children((cons*)getscan());
 		update_scan();
 	}
-
+#ifdef __DEBUG__GC
 	cout << "Num of cells copied during garbage collection " << numcopied << endl;
+#endif
 #ifdef TEST_RUN
 	cout << "Max heap reachability till now "<< gmaxheapreachability << endl;
 #endif
@@ -1151,10 +1159,12 @@ void liveness_gc()
 #endif
 	numcopied = 0;
 	++gccount;
+#ifdef __DEBUG__GC
+	cout << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
 	ofstream pre("PreGC" + to_string(gccount) + ".txt", ios_base::app);
 	create_heap_bft(pre);
 	pre.close();
-
+#endif
 	swap_buffer();
 
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
@@ -1193,12 +1203,16 @@ void liveness_gc()
 		update_scan();
 	}
 
+	update_heap_ref_stack();
+
+#ifdef __DEBUG__GC
+	cout << "Copied " << numcopied << " cells to the live buffer." << endl;
 	ofstream post("PostGC" + to_string(gccount) + ".txt" , ios_base::app);
 	create_heap_bft(post);
 	post.close();
-
-	update_heap_ref_stack();
-
+#endif
+	
+	
 #ifdef ENABLE_SHARING_STATS
   print_sharing_stats();
 #endif

@@ -1,10 +1,3 @@
-<<<<<<< HEAD
-(define (f l)
- (if (null? l) l
-     (cons (f (car l)) 2)))
-
-(f ())
-=======
 (define (mapsq l)
   (let ((c (null? l)))
    (if  c
@@ -17,15 +10,18 @@
 		  res))))))))
 
 (let ((a ()))
-  (let ((b (cons 1 a)))
-    (let ((c (cons 2 b)))
-      (let ((d (cons 3 c)))
-	(let ((e (mapsq d)))
-	  (let ((f (null? e)))
-	    (let ((j (pair? e)))
-	    (if j
-		(let ((g (mapsq e)))
-		  g)
-		(let ((h (cons 0 a)))
-		  h)))))))))
->>>>>>> 4bb03a5c3d7b9f8e48b056d77b2ef7801e7effa3
+  (let ((a1 1))
+    (let ((b2 2))
+      (let ((c3 3))
+	(let ((a0 0))
+	  (let ((b (cons a1 a)))
+	    (let ((c (cons b2 b)))
+	      (let ((d (cons c3 c)))
+		(let ((e (mapsq d)))
+		  (let ((f (null? b)))
+		    (let ((j (pair? e)))
+		      (if j
+			  (let ((g (mapsq d)))
+			    g)
+			  (let ((h (cons a0 a)))
+			    h)))))))))))))
