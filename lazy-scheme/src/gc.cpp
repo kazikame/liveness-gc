@@ -18,6 +18,7 @@ using namespace std;
 
 #ifndef __DEBUG__GC
 #define __DEBUG__GC
+#undef __DEBUG__GC
 #endif
 
 
@@ -40,7 +41,7 @@ actRec *stack_start, *stack_top;
 GCStatus gc_status = gc_plain;
 int gccount = 0;
 
-ofstream gout("gc_addr.txt", ios::app);
+//ofstream gout("gc_addr.txt", ios::app);
 
 //Use only push_front and pop_front to insert and remove elements from actRecStack
 //Use iterator to iterate over the elements of actRecStack during garbage collection
@@ -58,7 +59,7 @@ unsigned int num_of_allocations = 0;
 map<cons*, int> heap_map;
 map<int, string> root_var_map;
 
-//ofstream gcout;
+ofstream gcout("gc_messages.txt", ios::out);
 
 
 void reachable_dfs();
@@ -573,12 +574,12 @@ void printval(void *ref)
 		//Save the cdr pointer on stack. This might be updated if a GC happens during the printing of the car field.
 
 		print_stack.push(cref->val.cell.cdr);
-
+		cref->val.cell.can_delete_car = false;
 		cout<<"(";
 		printval(cref->val.cell.car);
 
 		cons* cdr = print_stack.top();
-
+		cref->val.cell.can_delete_car = true;
 		cout<<".";
 		printval(cdr);
 		print_stack.pop();
@@ -814,7 +815,9 @@ cons* copy_deep(cons* node)
 	{
 		//cout << "Copying cons cell " << node << endl;
 		newaddr = copy(node);
-		newaddr->val.cell.car = copy_deep(node->val.cell.car);
+		//Check if car part has already been printed
+		if (newaddr->val.cell.can_delete_car == false)
+			newaddr->val.cell.car = copy_deep(node->val.cell.car);
 		newaddr->val.cell.cdr = copy_deep(node->val.cell.cdr);
 		return newaddr;
 	}
@@ -1010,7 +1013,7 @@ void reachability_gc()
 	int index = 0;
 	++gccount;
 #ifdef __DEBUG__GC
-	cout << "Starting reachability based GC #"<< gccount << " after " <<  num_of_allocations << " allocations."<<endl;
+	gcout << "Starting reachability based GC #"<< gccount << " after " <<  num_of_allocations << " allocations."<<endl;
 #endif
 
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
@@ -1030,7 +1033,7 @@ void reachability_gc()
 		update_scan();
 	}
 #ifdef __DEBUG__GC
-	cout << "Num of cells copied during garbage collection " << numcopied << endl;
+	gcout << "Num of cells copied during garbage collection " << numcopied << endl;
 #endif
 #ifdef TEST_RUN
 	cout << "Max heap reachability till now "<< gmaxheapreachability << endl;
@@ -1159,8 +1162,9 @@ void liveness_gc()
 #endif
 	numcopied = 0;
 	++gccount;
+
 #ifdef __DEBUG__GC
-	cout << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
+	gcout << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
 	ofstream pre("PreGC" + to_string(gccount) + ".txt", ios_base::app);
 	create_heap_bft(pre);
 	pre.close();
@@ -1206,7 +1210,7 @@ void liveness_gc()
 	update_heap_ref_stack();
 
 #ifdef __DEBUG__GC
-	cout << "Copied " << numcopied << " cells to the live buffer." << endl;
+	gcout << "Copied " << numcopied << " cells to the live buffer." << endl;
 	ofstream post("PostGC" + to_string(gccount) + ".txt" , ios_base::app);
 	create_heap_bft(post);
 	post.close();

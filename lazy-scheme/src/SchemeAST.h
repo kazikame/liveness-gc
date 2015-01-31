@@ -46,6 +46,7 @@ struct cons
 		struct
 		{
 			cons *car, *cdr;
+			bool can_delete_car;
 		}cell;
 		int intVal;
 		bool boolval;

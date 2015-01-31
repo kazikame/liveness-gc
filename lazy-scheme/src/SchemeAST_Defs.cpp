@@ -491,9 +491,12 @@ LetExprNode * LetExprNode::clone() const
 
 cons* LetExprNode::evaluate()
 
+#ifndef __MYDEBUG
+#define __MYDEBUG
 #undef __MYDEBUG
+#endif
 {
-#if 0 
+#ifdef __MYDEBUG 
 	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 	cout << "Allocation #" << num_of_allocations << endl;
 	cout << "Current heap = " << current_heap() << endl;
@@ -502,14 +505,13 @@ cons* LetExprNode::evaluate()
 	cout << (gc_status != gc_disable)  << endl;
 	cout << "Is func call? " << getVarExpr()->isFunctionCallExpression() << endl;
 	cout << (!(getVarExpr()->isFunctionCallExpression()) && current_heap() < 1) << endl;
-    //cout << (current_heap > (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) << endl;
 #endif
 	curr_return_addr = getLabel();
-
+	bool isFunctionCall = getVarExpr()->isFunctionCallExpression(); 
 	if ((gc_status != gc_disable) && (
-			(!(getVarExpr()->isFunctionCallExpression()) && current_heap() < 1)
+			(!isFunctionCall && (current_heap() < 1))
 			||
-			  (getVarExpr()->isFunctionCallExpression() && 
+			  (isFunctionCall && 
 					(current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) )
 	{
 
