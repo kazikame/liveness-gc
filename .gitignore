@@ -4,4 +4,21 @@ paper/paper.aux
 paper/paper.bbl
 paper/paper.blg
 paper/paper.synctex.gz
+lazy-scheme/benchmarks/anf_prog.txt
+lazy-scheme/benchmarks/gc_addr.txt
+lazy-scheme/benchmarks/output/
+lazy-scheme/gc_addr.txt
+lazy-scheme/src/SchemeAST_ANFs.o
+lazy-scheme/src/SchemeAST_Defs.o
+lazy-scheme/src/SchemeAST_Demands.o
+lazy-scheme/src/SchemeAST_Print.o
+lazy-scheme/src/SchemeDriver.o
+lazy-scheme/src/Simulator
+lazy-scheme/src/demands.o
+lazy-scheme/src/gc.o
+lazy-scheme/src/gc_addr.txt
+lazy-scheme/src/lexer.o
+lazy-scheme/src/make.log
+lazy-scheme/src/output.o
+lazy-scheme/src/parser.o
 
