@@ -127,7 +127,7 @@ typedef struct activationRecord
  cons* lookup_addr(const char *var);
  void* lookup_value(const char *var);
  void printval(void *ref);
- int current_heap();
+ unsigned int current_heap();
  int getType(void* node, int field);
  cons* copy(cons* node);
  int copy_scan_children(cons* node);

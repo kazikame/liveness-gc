@@ -9,11 +9,11 @@ using namespace std;
 demand_grammar function_call_demands;
 demand_grammar gLivenessData; //Global map which stores the liveness at cons points and the next statement after a function call only.
 unordered_map<string, expr_demand_grammars*> gLivenessMap;
-unordered_map<string, Node*> prog_pt_map;
+unordered_map<string, const Node*> prog_pt_map;
 
 /////////////////////////////////////////////////////////
 // the following variables are used to compute the liveness for user defined functions
-unordered_map<string, Node*> gfunc_prog_pts;
+unordered_map<string,  const Node*> gfunc_prog_pts;
 bool in_function_define = false;
 
 
@@ -27,7 +27,7 @@ void print_label_set(unordered_set<string> s)
 }
 
 /* D( (return x), s, T ) = x.s  */
-unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(const rule & demand) const
+unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(const rule & demand)
 {
 
      //Create a new label corresponding to the return statement
@@ -47,7 +47,7 @@ unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(con
 
 
 /* ref( (id x), s, T ) = x.s  */
-expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand) const
+expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand)
 {
 
 
@@ -59,7 +59,7 @@ expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand) const
 
 
 /* ref( k, s, T ) = {k.s}  */
-expr_demand_grammars * ConstExprNode::transformDemandRef(const rule & demand) const
+expr_demand_grammars * ConstExprNode::transformDemandRef(const rule & demand)
 {
 
 	return new expr_demand_grammars({ new demand_grammar({{ label, demand }}), new demand_grammar({{ }}) }); //TODO: verify this rule
@@ -80,7 +80,7 @@ bool UnaryPrimExprNode::isExpressionRecursive(const std::string var) const
 /* ref( (car x), s, T) = x.(0 s) U {x.eps}
    ref( (cdr x), s, T) = x.(1 s)
    ref( (null? x), s, T) = x.s     This should have been x.eps. Why are we putting the demand s on x?        */
-expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand) const
+expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand)
 {
     rule arg_demand;
 
@@ -146,7 +146,7 @@ bool BinaryPrimExprNode::isExpressionRecursive(const std::string var) const
 
 /* ref( (cons x y), s, T) = x.(0b s) + y.(1b s)
    ref( (eq? x y), s, T) = x.s + y.s            */
-expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & demand) const
+expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & demand)
 {
     rule arg_1_demand, arg_2_demand;
 
@@ -187,7 +187,7 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
 //TODO : Return type of these functions will change from expr_demand_grammars to a map :: label -> expr_demand_grammars
 
 /* D( (if x e1 e2), s, T) = D(e1, s, T) + D(e2, s, T) + x.(Xb s) */
-unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const rule & demand) const
+unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const rule & demand)
 {
     rule cond_demand; // TODO Add an epsilon demand instead of Xb demand.
     if (in_function_define)
@@ -233,7 +233,7 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
 
 
 /* D( (let x <- st in e), s, T) = E - E(x) + ref(st, E(x), T) where E = D(e, s, T) */
-unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const rule & demand) const
+unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const rule & demand)
 {
 	auto result = pBody->transformDemand(demand);
 
@@ -314,7 +314,7 @@ bool FuncExprNode::isExpressionRecursive(const std::string var) const
 
 
 /* D( (f x1 x2 ... xn), s, T) = T_1(x1, s) + T_2(x2, s) + ... + T_n(xn, s) */
-expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand) const
+expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
 {
    	rule temp_demand = demand;
 
@@ -364,7 +364,7 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand) con
 
 
 
-unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const rule & demand) const
+unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const rule & demand)
 {
     // The demand argument is unnecessary for this function.
 

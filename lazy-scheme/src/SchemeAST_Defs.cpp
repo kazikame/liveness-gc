@@ -116,7 +116,7 @@ void IdExprNode::doLabel(bool shouldAddLabel)
 	label = (shouldAddLabel ? l : "");
 }
 
-cons* IdExprNode::evaluate(cons* heap_cell = NULL)
+cons* IdExprNode::evaluate()
 {
 	std::string varName = *(this->pID);
 	cons* retval = lookup_addr(this->pID->c_str());
@@ -131,7 +131,7 @@ cons* IdExprNode::evaluate(cons* heap_cell = NULL)
 		update_heap_refs.push(retval);
 		cons* temp = retval->val.closure.expr->evaluate();
 
-		heap_cell = update_heap_refs.top();
+		cons * heap_cell = update_heap_refs.top();
 		update_heap_refs.pop();
 		assert(is_valid_address(temp) && is_valid_address(heap_cell));
 		assert(temp->inWHNF);
@@ -169,7 +169,7 @@ ReturnExprNode * ReturnExprNode::clone() const
 	return new ReturnExprNode(pID->clone());
 }
 
-cons* ReturnExprNode::evaluate(cons* heap_cell = NULL)
+cons* ReturnExprNode::evaluate()
 {
 
 
@@ -229,8 +229,10 @@ cons* NilConstExprNode::make_closure()
 	return retval;
 }
 
-cons* NilConstExprNode::evaluate(cons* heap_cell = NULL)
+cons* NilConstExprNode::evaluate()
 {
+    cons *heap_cell = NULL; assert(false && "TO BE FIXED -- Amey");
+    
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
@@ -257,9 +259,9 @@ IntConstExprNode * IntConstExprNode::clone() const {
 	return new IntConstExprNode(new int(*pIntVal));
 }
 
-cons* IntConstExprNode::evaluate(cons* heap_cell = NULL)
+cons* IntConstExprNode::evaluate()
 {
-	heap_cell = update_heap_refs.top();
+	cons *heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 	{
 		return heap_cell;
@@ -300,8 +302,10 @@ StrConstExprNode * StrConstExprNode::clone() const
 	return new StrConstExprNode(new std::string(*pStrVal));
 }
 
-cons* StrConstExprNode::evaluate(cons* heap_cell = NULL)
+cons* StrConstExprNode::evaluate()
 {
+    cons* heap_cell = NULL;
+    assert(0 && "ToBeDone-- Amey");
 	if (heap_cell->inWHNF)
 	{
 		return heap_cell;
@@ -338,8 +342,10 @@ BoolConstExprNode::~BoolConstExprNode()
 
 BoolConstExprNode::BoolConstExprNode(bool * bval) : ConstExprNode("BOOL"), pBoolVal(bval) {}
 
-cons* BoolConstExprNode::evaluate(cons* heap_cell = NULL)
+cons* BoolConstExprNode::evaluate()
 {
+    cons* heap_cell = NULL;
+    assert(0 && "ToBeDone-- Amey");
 	if (heap_cell->inWHNF)
 	{
 		return heap_cell;
@@ -401,7 +407,7 @@ IfExprNode * IfExprNode::clone() const
 
 }
 
-cons* IfExprNode::evaluate(cons* heap_cell = NULL)
+cons* IfExprNode::evaluate()
 {
 	IdExprNode* i = (IdExprNode*)this->pCond;
 	cons* cond_heap_ref = (cons*)lookup_addr(i->getIDStr().c_str());
@@ -483,16 +489,17 @@ LetExprNode * LetExprNode::clone() const
 	return new LetExprNode(pID->clone(), pExpr->clone(), pBody->clone());
 }
 
-cons* LetExprNode::evaluate(cons* heap_cell = NULL)
+cons* LetExprNode::evaluate()
 {
 
 	//cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 	curr_return_addr = getLabel();
 
-	if ((gc_status != gc_disable && current_heap() < 1) ||
-			(getVarExpr()->isFunctionCallExpression() && (current_heap < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) )
+	if ((gc_status != gc_disable)
+        && ((current_heap() < 1) ||
+            (getVarExpr()->isFunctionCallExpression()
+             && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) ))
 	{
-
 		if (gc_status != gc_live)
 		{
 			reachability_gc();
@@ -510,7 +517,7 @@ cons* LetExprNode::evaluate(cons* heap_cell = NULL)
 	//Create an entry for the variable where it will be allocated on the heap
 	make_reference_addr(this->getVar().c_str(), getfree());
 	//ensure that the pointer does not get forwarded unnecessarily.
-	cons* temp = getfree();
+	cons* temp = static_cast<cons*>(getfree());
 	temp->forward=NULL;
 
 	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
@@ -587,7 +594,7 @@ UnaryPrimExprNode * UnaryPrimExprNode::clone() const
 	return new UnaryPrimExprNode(node_name, pArg->clone());
 }
 
-cons* UnaryPrimExprNode::evaluate(cons* heap_cell = NULL)
+cons* UnaryPrimExprNode::evaluate()
 {
 	cons* retval = NULL;
 	switch(this->type)
@@ -619,10 +626,10 @@ cons* UnaryPrimExprNode::make_closure()
 }
 
 
-cons* UnaryPrimExprNode::evaluateCarExpr(cons* heap_cell = NULL)
+cons* UnaryPrimExprNode::evaluateCarExpr()
 {
 
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 
 	if (heap_cell->inWHNF)
 		return heap_cell;
@@ -646,7 +653,7 @@ cons* UnaryPrimExprNode::evaluateCarExpr(cons* heap_cell = NULL)
 
 		update_heap_refs.pop();
 
-		heap_cell = update_heap_refs.top();
+		cons* heap_cell = update_heap_refs.top();
 		assert(retval->inWHNF);
 		heap_cell->typecell = retval->typecell;
 		heap_cell->val = retval->val;
@@ -658,10 +665,10 @@ cons* UnaryPrimExprNode::evaluateCarExpr(cons* heap_cell = NULL)
 return heap_cell;
 }
 
-cons* UnaryPrimExprNode::evaluateCdrExpr(cons* heap_cell = NULL)
+cons* UnaryPrimExprNode::evaluateCdrExpr()
 {
 
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 
 	if (heap_cell->inWHNF)
 		return heap_cell;
@@ -681,7 +688,7 @@ cons* UnaryPrimExprNode::evaluateCdrExpr(cons* heap_cell = NULL)
 
 		update_heap_refs.pop();
 
-		heap_cell = update_heap_refs.top();
+		cons* heap_cell = update_heap_refs.top();
 		assert(retval->inWHNF);
 		heap_cell->typecell = retval->typecell;
 		heap_cell->val = retval->val;
@@ -695,9 +702,9 @@ cons* UnaryPrimExprNode::evaluateCdrExpr(cons* heap_cell = NULL)
 
 //TODO : Evaluation should modify the cons cell and update it. Need to have a handle for the cons cell
 // that the expression is representing
-cons* UnaryPrimExprNode::evaluateNullqExpr(cons* heap_cell = NULL)
+cons* UnaryPrimExprNode::evaluateNullqExpr()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
@@ -717,7 +724,7 @@ cons* UnaryPrimExprNode::evaluateNullqExpr(cons* heap_cell = NULL)
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
 
-		heap_cell = update_heap_refs.top();
+		cons* heap_cell = update_heap_refs.top();
 		heap_cell->inWHNF = true;
 		heap_cell->val.boolval = (arg1->typecell == nilExprClosure)? true:false;
 		heap_cell->typecell = constBoolExprClosure;
@@ -728,9 +735,9 @@ cons* UnaryPrimExprNode::evaluateNullqExpr(cons* heap_cell = NULL)
 	return heap_cell;
 }
 
-cons* UnaryPrimExprNode::evaluatePairqExpr(cons* heap_cell = NULL)
+cons* UnaryPrimExprNode::evaluatePairqExpr()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
@@ -748,7 +755,7 @@ cons* UnaryPrimExprNode::evaluatePairqExpr(cons* heap_cell = NULL)
 
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
-		heap_cell = update_heap_refs.top();
+		cons* heap_cell = update_heap_refs.top();
 		heap_cell->inWHNF = true;
 
 		heap_cell->val.boolval = (arg1->typecell == consExprClosure);
@@ -795,29 +802,28 @@ BinaryPrimExprNode * BinaryPrimExprNode::clone() const
 	return new BinaryPrimExprNode(node_name, pArg1->clone(), pArg2->clone());
 }
 
-cons* BinaryPrimExprNode::evaluate(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluate()
 {
-
 	cons* retval = NULL;
 	switch(this->type)
 	{
-	case consExpr : retval = evaluateCons(heap_cell);
+	case consExpr : retval = evaluateCons();
 	break;
-	case addExpr : retval = evaluateAdd(heap_cell);
+	case addExpr : retval = evaluateAdd();
 	break;
-	case subExpr : retval = evaluateSub(heap_cell);
+	case subExpr : retval = evaluateSub();
 	break;
-	case mulExpr : retval = evaluateMul(heap_cell);
+	case mulExpr : retval = evaluateMul();
 	break;
-	case divExpr : retval = evaluateDiv(heap_cell);
+	case divExpr : retval = evaluateDiv();
 	break;
-	case modExpr : retval = evaluateMod(heap_cell);
+	case modExpr : retval = evaluateMod();
 	break;
-	case ltExpr : retval =  evaluateLT(heap_cell);
+	case ltExpr : retval =  evaluateLT();
 	break;
-	case gtExpr : retval =  evaluateGT(heap_cell);
+	case gtExpr : retval =  evaluateGT();
 	break;
-	case eqExpr : 	retval =  evaluateEQ(heap_cell);
+	case eqExpr : 	retval =  evaluateEQ();
 	break;
 	default : retval = NULL;
 	}
@@ -839,7 +845,7 @@ cons* BinaryPrimExprNode::make_closure()
 	return retval;
 }
 
-cons* BinaryPrimExprNode::evaluateCons(cons*cell = NULL)
+cons* BinaryPrimExprNode::evaluateCons()
 {
 	cons* heap_cell = update_heap_refs.top();
 
@@ -860,7 +866,7 @@ cons* BinaryPrimExprNode::evaluateCons(cons*cell = NULL)
 
 
 
-cons* BinaryPrimExprNode::evaluateAdd(cons* cell = NULL)
+cons* BinaryPrimExprNode::evaluateAdd( )
 {
 
 	cons* heap_cell = update_heap_refs.top();
@@ -911,9 +917,9 @@ cons* BinaryPrimExprNode::evaluateAdd(cons* cell = NULL)
 	return heap_cell;
 }
 
-cons* BinaryPrimExprNode::evaluateSub(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluateSub()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
@@ -950,9 +956,9 @@ cons* BinaryPrimExprNode::evaluateSub(cons* heap_cell = NULL)
 	return heap_cell;
 }
 
-cons* BinaryPrimExprNode::evaluateMul(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluateMul()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
@@ -985,9 +991,9 @@ cons* BinaryPrimExprNode::evaluateMul(cons* heap_cell = NULL)
 	return heap_cell;
 }
 
-cons* BinaryPrimExprNode::evaluateDiv(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluateDiv()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
@@ -1023,9 +1029,9 @@ cons* BinaryPrimExprNode::evaluateDiv(cons* heap_cell = NULL)
 	return heap_cell;
 }
 
-cons* BinaryPrimExprNode::evaluateMod(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluateMod()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
@@ -1062,9 +1068,9 @@ cons* BinaryPrimExprNode::evaluateMod(cons* heap_cell = NULL)
 	return heap_cell;
 }
 
-cons* BinaryPrimExprNode::evaluateLT(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluateLT()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
@@ -1101,9 +1107,9 @@ cons* BinaryPrimExprNode::evaluateLT(cons* heap_cell = NULL)
 	return heap_cell;
 }
 
-cons* BinaryPrimExprNode::evaluateGT(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluateGT()
 {
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
@@ -1140,10 +1146,10 @@ cons* BinaryPrimExprNode::evaluateGT(cons* heap_cell = NULL)
 	return heap_cell;
 }
 
-cons* BinaryPrimExprNode::evaluateEQ(cons* heap_cell = NULL)
+cons* BinaryPrimExprNode::evaluateEQ()
 {
 
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 		return heap_cell;
 
@@ -1246,11 +1252,9 @@ std::string FuncExprNode::getFunction()
 
 
 
-cons* FuncExprNode::evaluate(cons* heap_cell = NULL)
+cons* FuncExprNode::evaluate()
 {
-
-
-	heap_cell = update_heap_refs.top();
+	cons* heap_cell = update_heap_refs.top();
 
 	if (heap_cell->inWHNF)
 		return heap_cell;
@@ -1427,7 +1431,7 @@ ProgramNode * ProgramNode::clone() const {
 	return new ProgramNode(newDefines, pExpr->clone());
 }
 
-cons* ProgramNode::evaluate(cons* heap_cell = NULL)
+cons* ProgramNode::evaluate()
 {
 	std::cout << "Evaluating main expression " << std::endl;
 	return this->pExpr->evaluate();

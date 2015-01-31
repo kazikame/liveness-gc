@@ -12,7 +12,7 @@ void Scheme::output::dumpGrammar(std::ostream & out,
                                  Scheme::Demands::regular_demand_grammar * rgram) {
     out << std::left;
     auto gram = rgram->first;
-    for(auto ipart = 0; ipart < rgram->second->size(); ++ipart)
+    for(size_t ipart = 0; ipart < rgram->second->size(); ++ipart)
     {
         auto type = "NONE";
         if(rgram->second->at(ipart).first == Scheme::Demands::LEFT)         type = "LEFT";

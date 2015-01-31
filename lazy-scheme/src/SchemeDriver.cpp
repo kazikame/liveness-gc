@@ -89,11 +89,11 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
 }
 
 std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::SchemeDriver::convertLivenessMap(std::unordered_map<std::string, Scheme::Demands::expr_demand_grammars*> livenessMap,
-		                  std::unordered_map<std::string, Scheme::AST::Node*> *prog_pt_map)
+		                  std::unordered_map<std::string, const Scheme::AST::Node*> *prog_pt_map)
 {
 
 	std::unordered_map<string, Scheme::Demands::expr_demand_grammars*> livenessData;
-	std::unordered_map<std::string, Scheme::AST::Node*> prog_pts = *prog_pt_map;
+	std::unordered_map<std::string, const Scheme::AST::Node*> prog_pts = *prog_pt_map;
 
 	for(auto p : prog_pts)
 	{

@@ -86,6 +86,8 @@ ExprNode * Scheme::AST::pushDown(ExprNode * pHoleExpr, ExprNode * pANFExpr) {
         pIfANFExpr->pElse = pushDown(pHoleExpr, pIfANFExpr->pElse);
         return pIfANFExpr;
     }
+    assert(false); // not expected to reach here!
+    return NULL;
 }
 
 
@@ -251,6 +253,8 @@ FuncExprNode * FuncExprNode::fillHoleWith(IdExprNode * pSubExpr) {
             return this;
         }
     }
+    assert(false); // not expected to reach here!
+    return NULL;
 }
 
 

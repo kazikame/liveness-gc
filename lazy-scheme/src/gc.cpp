@@ -459,7 +459,7 @@ cons* lookup_addr(const char *var)
 		{
 			if (strcmp(it->varname.c_str(),var)==0)
 			{
-				return it->ref;
+				return static_cast<cons*>(it->ref);
 			}
 			++it;
 		}
@@ -547,7 +547,7 @@ void printval(void *ref)
 	{
 
 		update_heap_refs.push(cref);
-		cons *temp = cref->val.closure.expr->evaluate(cref);
+		cons *temp = cref->val.closure.expr->evaluate();
 
 		cref = update_heap_refs.top();
 		cref->typecell = temp->typecell;
@@ -593,7 +593,7 @@ void printval(void *ref)
 
 }
 
-int current_heap()
+unsigned int current_heap()
 {
    return ((char*)boundary_live - (char*)freept)/sizeof(cons);
 }
@@ -615,7 +615,7 @@ cons* getCar(void* ref, const char fromGC)
 #endif
     if (!conscell->inWHNF)
     	conscell->val.closure.expr->evaluate();
-    assert(conscell->typecell == consExpr);
+    assert(conscell->typecell == consExprClosure);
     cons* car=conscell->val.cell.car;
     return car;
 }
@@ -633,7 +633,7 @@ cons* getCdr(void* ref, const char fromGC)
 #endif
     if(!conscell->inWHNF)
     	conscell->val.closure.expr->evaluate();
-    assert(conscell->typecell == consExpr);
+    assert(conscell->typecell == consExprClosure);
     cons* cdr=conscell->val.cell.cdr;
     return cdr;
 }
@@ -711,7 +711,7 @@ void update_heap_ref_stack()
 		}
 		assert(heap_ref->forward != NULL);
 
-		heap_ref = heap_ref->forward;
+		heap_ref = static_cast<cons*>(heap_ref->forward);
 		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
 		print_stack.pop();
@@ -745,7 +745,7 @@ void update_heap_ref_stack()
 //			//heap_ref = new_ref;
 //		}
 
-		heap_ref = heap_ref->forward;
+		heap_ref = static_cast<cons*>(heap_ref->forward);
 		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
 		update_heap_refs.pop();
@@ -782,7 +782,7 @@ cons* copy(cons* node)
 		if((conscell->forward >= buffer_live) &&
 				(boundary_live > conscell->forward))
 		{
-			return (conscell->forward);
+			return (static_cast<cons*>(conscell->forward));
 		}
 
 
@@ -790,7 +790,7 @@ cons* copy(cons* node)
 		conscell->forward=addr;
 		copycells=copycells+1;
 		++numcopied;
-		return addr;
+		return static_cast<cons*>(addr);
 	}
 
 	return return_null();
@@ -863,12 +863,12 @@ int copy_scan_children(cons* node)
 	{
 		cons* oldcar = conscell->val.cell.car;
 		addr=copy(conscell->val.cell.car);
-		conscell->val.cell.car=addr;
+		conscell->val.cell.car=static_cast<cons*>(addr);
 
 
 		cons* oldcdr = conscell->val.cell.cdr;
 		addr=copy(conscell->val.cell.cdr);
-		conscell->val.cell.cdr=addr;
+		conscell->val.cell.cdr=static_cast<cons*>(addr);
 
 	}
 	else
@@ -887,12 +887,12 @@ int copy_scan_children(cons* node)
 		{
 			cons* oldarg1 = conscell->val.closure.arg1;
 			addr=copy(conscell->val.closure.arg1);
-			conscell->val.closure.arg1=addr;
+			conscell->val.closure.arg1=static_cast<cons*>(addr);
 
 
 			cons* oldarg2 = conscell->val.closure.arg2;
 			addr=copy(conscell->val.closure.arg2);
-			conscell->val.closure.arg2=addr;
+			conscell->val.closure.arg2=static_cast<cons*>(addr);
 		}
 
 		break;
@@ -1010,7 +1010,7 @@ void reachability_gc()
 	{
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
-			cons *reference=vhit->ref;
+			cons *reference=static_cast<cons*>(vhit->ref);
 			cons *addr=copy((cons*)reference);
 			vhit->ref = addr;
 		}
@@ -1253,7 +1253,7 @@ void copy_children(void* cellptr, stateset* st)
 					((cons*)newaddr)->setofStates->insert(s_new.begin(), s_new.end());
 				}
 			}
-			((cons*)cellptr)->val.cell.car = newaddr;
+			((cons*)cellptr)->val.cell.car = static_cast<cons*>(newaddr);
 		}
 	}
 
@@ -1286,7 +1286,7 @@ void copy_children(void* cellptr, stateset* st)
 					((cons*)newaddr)->setofStates->insert(s_new.begin(), s_new.end());
 				}
 			}
-			((cons*)cellptr)->val.cell.cdr = newaddr;
+			((cons*)cellptr)->val.cell.cdr = static_cast<cons*>(newaddr);
 
 		}
 	}
@@ -1297,9 +1297,9 @@ void copy_children(void* cellptr, stateset* st)
 
 void clear_liveness_data()
 {
-	for(void* i = buffer_live; i < freept; i = i + sizeof(cons))
+	for(cons* cur = (cons*)buffer_live; cur < (cons*)freept; cur++)
 	{
-		((cons*)i)->setofStates->clear();
+		cur->setofStates->clear();
 	}
 }
 
@@ -1314,7 +1314,7 @@ void print_accessible_heap(string& filename)
 	{
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
-			cons* conscell = vhit->ref;
+			cons* conscell = static_cast<cons*>(vhit->ref);
 			out << vhit->varname << " points to " << conscell << " and has type " << conscell->typecell << endl;
 		}
 	}
@@ -1444,14 +1444,14 @@ void create_heap_bft(ostream& out)
 
 	heap_map.clear();
 	root_var_map.clear();
-	unsigned long base = buffer_live;
+	unsigned long base = (unsigned long)buffer_live;
 	int index = 0;
 
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
 	{
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
-			cons* conscell = vhit->ref;
+			cons* conscell = static_cast<cons*>(vhit->ref);
 			if (heap_map.find(conscell) == heap_map.end())
 			{
 				heap_map[conscell] = index;
@@ -1463,7 +1463,7 @@ void create_heap_bft(ostream& out)
 		}
 	}
 	num_root_vars = index;
-	int curr_index = 0;
+	unsigned int curr_index = 0;
 	while (curr_index < heap_cell_list.size())
 	{
 		cons* curr_cell = heap_cell_list[curr_index];
@@ -1536,9 +1536,9 @@ void print_buffer_data()
 }
 void print_cell_data()
 {
-	for(void* i = buffer_live; i < freept; i = i + sizeof(cons))
+	for(cons* cur = (cons*)buffer_live; cur < (cons*)freept; cur++)
 	{
-		cout << "Size of set " << ((cons*)i)->setofStates->size()<<endl;
+		cout << "Size of set " << cur->setofStates->size()<<endl;
 	}
 }
 
@@ -1550,16 +1550,16 @@ void dump_heap(string label)
 	for(i = (cons*)buffer_live; i < (cons*)boundary_live; ++i)
 	{
 		cons* conscell = i;
-		void* carval = conscell->val.cell.car;
-		void* cdrval = conscell->val.cell.cdr;
-		void* forward = conscell->forward;
-
+		cons* carval = (cons*)conscell->val.cell.car;
+		cons* cdrval = (cons*)conscell->val.cell.cdr;
+		cons* forward = (cons*)conscell->forward;
+        // TBD: Remove Warning from next few lines
 		if (is_valid_address(carval))
-			carval = (cons*)carval - (cons*)buffer_live;
+			carval = (cons*)(carval - (cons*)buffer_live);
 		if (is_valid_address(cdrval))
-			cdrval = (cons*)cdrval - (cons*)buffer_live;
+			cdrval = (cons*)(cdrval - (cons*)buffer_live);
 		if (forward != NULL)
-			forward = (cons*)forward - (cons*)buffer_live;
+			forward = (cons*)(forward - (cons*)buffer_live);
 
 		if(carval==0)
 			out << "(nil)";
@@ -1620,14 +1620,14 @@ unsigned long diff_scan_free()
 void set_car(void* loc,  void* ref)
 {
  	cons *conscell=(cons*)loc;
-	conscell->val.cell.car=ref;
+	conscell->val.cell.car=static_cast<cons*>(ref);
 }
 
 
 void set_cdr(void* loc,  void* ref)
 {
  	cons *conscell=(cons*)loc;
-	conscell->val.cell.cdr=ref;
+	conscell->val.cell.cdr=static_cast<cons*>(ref);
 }
 int is_null_stack(actRec )
 {

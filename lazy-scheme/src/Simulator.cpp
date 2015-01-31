@@ -86,7 +86,7 @@ void write_grammar_to_text_file(demand_grammar *g, string filename)
 	{
 		vector<list<string> > vec(l.second.begin(), l.second.end());
 		sort(vec.begin(), vec.end(), StringListComparer);
-		int i = 0;
+		unsigned int i = 0;
 		gram_file << l.first << "->";
 		for(auto p:vec)
 		{
@@ -176,7 +176,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	{
 		cout <<"Reading data from cached files "<<endl;
 		const int SZ = 1024 * 1024;
-		std::vector<char> buff(SZ, "");
+		std::vector<char> buff(SZ, '\0');
 		ifstream ifs( "../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map" );
 		int n = 0;
 		while( int cc = FileRead( ifs, buff ) )

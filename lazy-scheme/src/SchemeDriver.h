@@ -29,7 +29,7 @@ namespace Scheme {
         bool printGrammar(std::ostream &, std::ostream &);
 
         std::unordered_map<std::string, Scheme::Demands::expr_demand_grammars *> convertLivenessMap(std::unordered_map<std::string, Scheme::Demands::expr_demand_grammars*>,
-        		std::unordered_map<std::string, Scheme::AST::Node*> *);
+        		std::unordered_map<std::string, const Scheme::AST::Node*> *);
 
       private:
         SchemeParser * parser;

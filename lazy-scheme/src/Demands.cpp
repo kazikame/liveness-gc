@@ -991,9 +991,11 @@ regular_demand_grammar * Scheme::Demands::regularize(const demand_grammar * gram
                         break;
                     }
                 }
+
+                int prod_path_size = (int)prod_path.size(); // to avoid compiler warning!!
                 if(pos_nt > 0)                                  left = true;
-                if(pos_nt < prod_path.size()-1)                 right = true;
-                if(pos_nt > -1 && pos_nt < prod_path.size())    nt_found = true;
+                if(pos_nt < prod_path_size - 1)                 right = true;
+                if(pos_nt > -1 && pos_nt < prod_path_size)    nt_found = true;
             }
         }
 
