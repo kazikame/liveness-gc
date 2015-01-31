@@ -490,16 +490,29 @@ LetExprNode * LetExprNode::clone() const
 }
 
 cons* LetExprNode::evaluate()
-{
 
-	//cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
+#undef __MYDEBUG
+{
+#if 0 
+	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
+	cout << "Allocation #" << num_of_allocations << endl;
+	cout << "Current heap = " << current_heap() << endl;
+	if (getVarExpr()->isFunctionCallExpression())
+	cout << "Number of arguments for func " << ((FuncExprNode*)(getVarExpr()))->pListArgs->size() << endl;
+	cout << (gc_status != gc_disable)  << endl;
+	cout << "Is func call? " << getVarExpr()->isFunctionCallExpression() << endl;
+	cout << (!(getVarExpr()->isFunctionCallExpression()) && current_heap() < 1) << endl;
+    //cout << (current_heap > (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) << endl;
+#endif
 	curr_return_addr = getLabel();
 
-	if ((gc_status != gc_disable)
-        && ((current_heap() < 1) ||
-            (getVarExpr()->isFunctionCallExpression()
-             && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))) ))
+	if ((gc_status != gc_disable) && (
+			(!(getVarExpr()->isFunctionCallExpression()) && current_heap() < 1)
+			||
+			  (getVarExpr()->isFunctionCallExpression() && 
+					(current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) )
 	{
+
 		if (gc_status != gc_live)
 		{
 			reachability_gc();
