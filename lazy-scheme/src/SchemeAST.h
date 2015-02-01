@@ -62,6 +62,7 @@ struct cons
 	stateset *setofStates;
 	int depth;
 	bool inWHNF;
+	bool isLive;
 	unsigned int closure_id;
 	unsigned int reduction_id;
 #ifdef GC_ENABLE_STATS

@@ -130,6 +130,7 @@ typedef struct activationRecord
  unsigned int current_heap();
  int getType(void* node, int field);
  cons* copy(cons* node);
+ cons* copy_deep(cons* node);
  int copy_scan_children(cons* node);
  actRec& return_stack();
 
