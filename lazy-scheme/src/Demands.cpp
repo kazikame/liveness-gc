@@ -982,7 +982,7 @@ regular_demand_grammar * Scheme::Demands::regularize(const demand_grammar * gram
         {
             for(auto & prod_path : new_gram->at(non_terminal))
             {
-                auto pos_nt = -1;
+                int pos_nt = -1;
                 for(auto i = prod_path.begin(); i != prod_path.end(); ++i)
                 {
                     if(mr_set.second.find(*i) != mr_set.second.end())
@@ -991,14 +991,20 @@ regular_demand_grammar * Scheme::Demands::regularize(const demand_grammar * gram
                         break;
                     }
                 }
+                
+                if (pos_nt == -1)
+                    continue;
 
-                int prod_path_size = (int)prod_path.size(); // to avoid compiler warning!!
-                if(pos_nt > 0)                                  left = true;
-                if(pos_nt < prod_path_size - 1)                 right = true;
-                if(pos_nt > -1 && pos_nt < prod_path_size)    nt_found = true;
+                auto prod_path_size = (int)prod_path.size(); // to avoid compiler warning!!
+                if(pos_nt > 0)
+                    left = true;
+                if(pos_nt < prod_path_size -1 )
+                    right = true;
+                if(pos_nt >=0 && pos_nt <= prod_path_size - 1)
+                    nt_found = true;
             }
         }
-
+        
         assert(!(left && right));
         if(nt_found)
         {
