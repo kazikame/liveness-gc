@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <stack>
 #include "gc.h"
+//#include "dumptographviz.h"
 using namespace std;
 
 #ifndef __DEBUG__GC
@@ -21,13 +22,10 @@ using namespace std;
 #undef __DEBUG__GC
 #endif
 
-//#define PRNT_DBG
 
-#ifdef PRNT_DBG
-#define DOUT(str) cout << str << endl;
-#else
-#define DOUT(str) void();
-#endif
+#define DUMP_HEAP_AS_GRAPHVIZ
+#undef DUMP_HEAP_AS_GRAPHVIZ
+
 
 int numcopied = 0; //TODO:Delete after debugging
 
@@ -122,12 +120,43 @@ void set_max_reachability();
 #endif
 
 
+
+
 //Functions for printing heap annotated with liveness
 void traverseHeap();
 void dump_heap_as_graphviz();
+void gen_graphviz_code(Scheme::AST::cons* conscell, ostream& out);
+std::string getNodeLabel(Scheme::AST::cons* conscell, size_t idx);
+void depthfirstpaths(Scheme::AST::cons* loc, Scheme::AST::state_index index);
 
 
 
+
+void print_gc_move(cons* from, cons* to, ostream& out = cout)
+{
+
+	long int to_index = 0;
+	long int from_index = 0;
+	if (is_valid_address(from))
+		from_index = (from - (cons*)buffer_live);
+	else if (from)
+		from_index = (from - (cons*)buffer_dead);
+
+	if (to)
+		to_index = (to - (cons*)buffer_live);
+
+	out << from_index << "-->" << to_index << endl;;
+	return;
+}
+
+
+void print_activation_record_stack(ostream& out = cout)
+{
+	for (auto st_elem : actRecStack)
+	{
+		out << st_elem.funcname << " at return point " << st_elem.return_point << endl;
+	}
+}
 
 /*-----Memory manager-------*/
 
@@ -208,9 +237,6 @@ void update_free(unsigned int size)
 
 int check_space(int size)
 {
-
-
-
 	if (((char*)boundary_live - (char*)freept) >= size)
     	return 1;
     else
@@ -293,8 +319,11 @@ void empty_environment(string functionname)
 void make_environment(const char *functionname, std::string returnpoint)
 {
 	actRec newenv;
-    actRecStack.front().return_point = returnpoint;
-    newenv.return_point = "-1";
+	//TODO: In lazy programs this can be 0. Check if there is another way.
+	//if (actRecStack.size() > 0)
+	//	actRecStack.front().return_point = returnpoint;
+
+	newenv.return_point = "-1";
     newenv.funcname=functionname;
     actRecStack.push_front(newenv);
     mmc=mmc+(sizeof(actRec));
@@ -303,9 +332,14 @@ void make_environment(const char *functionname, std::string returnpoint)
 void delete_environment()
 {
 	
+	//cout << "Removing function " << actRecStack.front().funcname << " with return point " << actRecStack.front().return_point << endl;
 	actRecStack.pop_front();
     mmc=mmc-(sizeof(actRec));
-    actRecStack.front().return_point=-1; //reset
+
+    //TODO: In lazy programs this can be 0. Check if there is another way.
+    //In the case of lazy evaluation the point of liveness checking need not be the current point
+    //if (actRecStack.size() > 0)
+    //	actRecStack.front().return_point="-1"; //reset
 }
 
 void set_return_point(int pt)
@@ -545,6 +579,7 @@ int remove_reference(const char *var, var_heap)
 void printval(void *ref)
 {
 
+	//cout << "Printing " << ref << endl;
 	if (ref == NULL || ((cons*)ref)->typecell == nilExprClosure)
 	{
 		cout << "()" << endl;
@@ -562,10 +597,12 @@ void printval(void *ref)
 	update_last_use(cref);
 #endif
 
+
 	if(!cref->inWHNF)
 	{
-
+		//cout << "Evaluating expression for " << cref << endl;
 		update_heap_refs.push(cref);
+		print_stack.push(cref);
 		cons *temp = cref->val.closure.expr->evaluate();
 
 		cref = update_heap_refs.top();
@@ -573,6 +610,7 @@ void printval(void *ref)
 		cref->inWHNF = temp->inWHNF;
 		cref->val = temp->val;
 		update_heap_refs.pop();
+		print_stack.pop();
 	}
 
 	if (cref->typecell == nilExprClosure)
@@ -583,7 +621,9 @@ void printval(void *ref)
 
 	if (cref->typecell == consExprClosure)
 	{
-
+//		cout << "Printing the cons cell " << cref << endl;
+//		cout << "car part = " << cref->val.cell.car << endl;
+//		cout << "cdr part = " << cref->val.cell.cdr << endl;
 		//Save the cdr pointer on stack. This might be updated if a GC happens during the printing of the car field.
 
 		print_stack.push(cref->val.cell.cdr);
@@ -717,14 +757,15 @@ void update_heap_ref_stack()
 	stack<cons*> temp;
 
 
-	//cout << "Updating print stack with size " << print_stack.size() << endl;
+	//gcout << "Updating print stack with size " << print_stack.size() << endl;
 	while(!print_stack.empty())
 	{
 		cons* heap_ref = print_stack.top();
 
-
+		//cout << "Processing heap reference in print " << heap_ref << endl;
 		if (heap_ref->forward == NULL)
 		{
+			//cout << "Heap ref was not copied during LGC." << endl;
 			cons* new_ref = copy_deep(heap_ref);
 			//cout << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
 		}
@@ -743,16 +784,17 @@ void update_heap_ref_stack()
 
 
 
-	//cout << "Updating the heap_ref stack with size "<< update_heap_refs.size() <<  endl;
+	//gcout << "Updating the heap_ref stack with size "<< update_heap_refs.size() <<  endl;
 	int i = 0;
 	while(!update_heap_refs.empty())
 	{
 		cons* heap_ref = update_heap_refs.top();
-		if (heap_ref->forward == NULL)
+		if (!is_valid_address(heap_ref) && heap_ref->forward == NULL)
 		{
-			cout << "In heap ref stack copying " << heap_ref << " with index " << i << endl;
+			cout << "ERROR !!!! " << heap_ref << endl;
+			cout << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
 		}
-		assert(heap_ref->forward != NULL);
+		assert(!is_valid_address(heap_ref) && heap_ref->forward != NULL);
 
 		//forward pointer should not be NULL, so do a deep copy and update the pointer.
 		//This might be a hack, need to do something better. Maybe put the print method on stack and
@@ -768,6 +810,7 @@ void update_heap_ref_stack()
 		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
 		update_heap_refs.pop();
+		++i;
 	}
 	while(!temp.empty())
 	{
@@ -788,7 +831,7 @@ cons* copy(cons* node)
 	if(node==NULL) return NULL;
 	if(!(node >= buffer_dead && node < boundary_dead))
 	{
-		gcout << "Returning the same pointer as node is already in live buffer "<< node <<endl;
+		//gcout << "Returning the same pointer as node is already in live buffer "<< node <<endl;
 		return node;
 	}
 	else
@@ -809,6 +852,7 @@ cons* copy(cons* node)
 		conscell->forward=addr;
 		copycells=copycells+1;
 		++numcopied;
+		//print_gc_move(conscell, (cons*)addr);
 		return static_cast<cons*>(addr);
 	}
 
@@ -820,7 +864,7 @@ cons* copy(cons* node)
 cons* copy_deep(cons* node)
 {
 	cons* newaddr;
-
+	//gcout << "Deep copying " << (node - (cons*)buffer_dead) << endl;
 	if (node == NULL)
 		return node;
 
@@ -831,9 +875,18 @@ cons* copy_deep(cons* node)
 		
 		//Check if car part has already been printed
 		if (newaddr->val.cell.can_delete_car == false)
+		{
+			//cout << "Copying the car part as it hasnt been processed " << (node->val.cell.car-(cons*)buffer_dead) << endl;
+			cons* car_node = newaddr->val.cell.car;
 			newaddr->val.cell.car = copy_deep(node->val.cell.car);
-		
+			//print_gc_move(car_node, newaddr->val.cell.car);
+		}
+		//cout << "Copying " << (node->val.cell.cdr - (cons*)buffer_dead) << endl;
+		cons* cdr_node = newaddr->val.cell.cdr;
 		newaddr->val.cell.cdr = copy_deep(node->val.cell.cdr);
+		//print_gc_move(cdr_node, newaddr->val.cell.cdr);
+
+
 		return newaddr;
 	}
 	else
@@ -853,15 +906,19 @@ cons* copy_deep(cons* node)
 		case funcApplicationExprClosure:
 		case funcArgClosure:
 		{
+			//cout << "Processing heap address " << (is_valid_address(node)? (node - (cons*)buffer_live) : (node - (cons*)buffer_dead)) << endl;
 			newaddr = copy(node);
+			//print_gc_move(node, newaddr);
 			cons* oldarg1 = newaddr->val.closure.arg1;
 			cons* addr=copy_deep(node->val.closure.arg1);
 			newaddr->val.closure.arg1=addr;
+			//print_gc_move(oldarg1, addr);
 
 
 			cons* oldarg2 = node->val.closure.arg2;
 			addr=copy_deep(node->val.closure.arg2);
 			newaddr->val.closure.arg2=addr;
+			//print_gc_move(oldarg2, addr);
 		}
 
 		break;
@@ -1022,11 +1079,22 @@ void set_max_reachability()
 void reachability_gc()
 {
 
+	++gccount;
+	//dump_heap_as_graphviz();
+
+#ifdef __DEBUG__GC
+	gcout << "Doing reachability based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
+	gcout << " At program point " << return_stack().funcname <<  endl;
+	ofstream pre("PreGC" + to_string(gccount) + ".txt", ios_base::app);
+	create_heap_bft(pre);
+	pre.close();
+#endif
+
 
 	swap_buffer();
 	numcopied = 0;
 	int index = 0;
-	++gccount;
+
 #ifdef __DEBUG__GC
 	gcout << "Starting reachability based GC #"<< gccount << " after " <<  num_of_allocations << " allocations."<<endl;
 #endif
@@ -1038,12 +1106,14 @@ void reachability_gc()
 			cons *reference=static_cast<cons*>(vhit->ref);
 			cons *addr=copy((cons*)reference);
 			vhit->ref = addr;
+			gcout << "Processed variable " << vhit->varname << " copied it to " << ((cons*)addr - (cons*)buffer_live) << endl;
 		}
 	}
-
+	gcout << "Finished processing root variables"<<endl;
 	//chasing reachable cells from roots
 	while(lt_scan_freept()==1)
 	{
+		gcout << "Processing " << ((cons*)getscan() - (cons*)buffer_live) << endl;
 		copy_scan_children((cons*)getscan());
 		update_scan();
 	}
@@ -1366,6 +1436,8 @@ return;
 void dump_heap_as_graphviz()
 {
 	DOUT("In dump_heap_as_graphviz");
+
+
 	for (auto i = (cons*)buffer_live; i < (cons*)boundary_live; ++i)
 		i->isLive = false;
 	
@@ -1404,30 +1476,33 @@ void liveness_gc()
 	numcopied = 0;
 	++gccount;
 
+	//cout << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
 #ifdef __DEBUG__GC
 	gcout << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
 	ofstream pre("PreGC" + to_string(gccount) + ".txt", ios_base::app);
 	create_heap_bft(pre);
 	pre.close();
 #endif
-	dump_heap_as_graphviz();
 	
 	
+	//print_activation_record_stack();
 	swap_buffer();
 
 	for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
 	{
-		
+		//cout << "Processing activation record for " << stackit->funcname << endl;
+		//cout << "Return point considered " << stackit->return_point << endl;
 		for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
 		{
 		
 			string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
 			stateMapIter got = statemap.find(nodeName);
-
+			//gcout << "Doing GC at " << stackit->funcname << " & prog_pt " << stackit->return_point << endl;
+			//gcout << "Processing variable " << nodeName << endl;
 			if (got != statemap.end())
 			{
 			
-				gcout << nodeName << "is live" << endl;
+				//gcout << nodeName << " is live" << endl;
 				if (vhit->ref && ((cons*)vhit->ref)->forward == NULL) //Check to see if a new cell was allocated
 					((cons*)vhit->ref)->setofStates->clear();
 
@@ -1438,9 +1513,17 @@ void liveness_gc()
 				assert(cons_cell);
 				
 				if (cons_cell->typecell == consExprClosure)
+				{
+					//cout << "Copying only one cell as part of cons for " << (cons_cell - (cons*)buffer_dead) << endl;
 					addr = copy(cons_cell);
+					//print_gc_move(cons_cell, addr);
+				}
 				else
+				{
+					//cout << "Doing a deep copy for " << (cons_cell - (cons*)buffer_dead) << endl;
 					addr = copy_deep(cons_cell);
+					//print_gc_move(cons_cell, addr);
+				}
 				
 				if (addr)
 				{
@@ -1448,19 +1531,29 @@ void liveness_gc()
 					c->setofStates->insert(got->second);
 				}
 				vhit->ref = addr;
+				//cout << "Processed variable " << vhit->varname << " copied it to " << ((cons*)addr - (cons*)buffer_live) << endl;
+			}
+			else
+			{
+				;//cout << "Variable is not live " << vhit->varname << endl;
 			}
 		}
 	}
 
+	//cout << "Completed processing root set"<<endl;
+
 	//chasing reachable cells from roots
 	while(lt_scan_freept()==1)//
 	{
+		//cout << "Processing node " << ((cons*)scan - (cons*)buffer_live) << endl;
 		copy_children(scan, ((cons*)scan)->setofStates);
 		update_scan();
 	}
 
 	update_heap_ref_stack();
-	gcout << "Copied " << numcopied << " cells to the live buffer." << endl;
+	cout << "Copied " << numcopied << " cells to the live buffer." << endl;
+
+
 #ifdef __DEBUG__GC
 	
 	ofstream post("PostGC" + to_string(gccount) + ".txt" , ios_base::app);
@@ -1486,6 +1579,8 @@ void copy_children(void* cellptr, stateset* st)
 
 	if (((cons*)cellptr)->typecell != consExprClosure)
 	{
+		//cout << "Returning as cell is not cons " << ((cons*)cellptr - (cons*)buffer_live) << endl;
+		//cout << "Type of node is " << ((cons*)cellptr)->typecell << endl;
 		//Add an assert to ensure that if its not a cons cell, the closure has already been copied fully.
 		return;
 	}
@@ -1502,7 +1597,7 @@ void copy_children(void* cellptr, stateset* st)
 	
 	
 	assert(((cons*)cellptr)->typecell == consExprClosure);
-	
+	//cout << "Processing cons cell " << cellptr << endl;
 	//process car field
 	if(!s0.empty())
 	{
@@ -1543,6 +1638,8 @@ void copy_children(void* cellptr, stateset* st)
 			((cons*)cellptr)->val.cell.car = static_cast<cons*>(newaddr);
 		}
 	}
+	else
+		;//cout << "car part is not live for " << ((cons*)cellptr - (cons*)buffer_live) << endl;
 
 	//process cdr field
 	if(!s1.empty())
@@ -1586,6 +1683,8 @@ void copy_children(void* cellptr, stateset* st)
 
 		}
 	}
+	else
+		;//cout << "cdr part is not live for " << ((cons*)cellptr - (cons*)buffer_live) << endl;
  return;
 }
 #endif
@@ -1673,8 +1772,10 @@ void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map
 	out << "Number of root variables = " << heap_cell_list.size() << endl;
 	out << "Number of references to be updated on stack = " << update_heap_refs.size() << endl;
 	out << "Number of references on print stack = " << print_stack.size() << endl;
+	//TODO: Check if this is needed. This might not be needed at all, put asserts.
 	add_elements_to_vector(heap_cell_list, update_heap_refs);
-	add_elements_to_vector(heap_cell_list, print_stack);
+	//These have already been added to the map
+	//add_elements_to_vector(heap_cell_list, print_stack);
 
 	out << "Starting GC " << endl;
 	for(auto elem : heap_cell_list)
@@ -1763,6 +1864,23 @@ void create_heap_bft(ostream& out)
 		}
 	}
 	num_root_vars = index;
+	//Add any cells in the print_stack also to this list
+	vector<cons*> print_vector;
+	add_elements_to_vector(print_vector, print_stack);
+	for (auto ele : print_vector)
+	{
+		if (heap_map.find(ele) == heap_map.end())
+		{
+			assert(is_valid_address(ele));
+			heap_map[ele] = index;
+			ele->isLive = true;
+			heap_cell_list.push_back(ele);
+			++index;
+		}
+	}
+
+
+
 	unsigned int curr_index = 0;
 	while (curr_index < heap_cell_list.size())
 	{
@@ -2076,7 +2194,27 @@ void initialize (string program_name, state_index numkeys, GCStatus gc_type)
 		//cout << "Reading " << (filepath + "-state-transition-table") << endl;
 		read_state_transition_table_from_file(filepath + "-state-transition-table");
 	}
-	cout << "Done initializing" << endl;
+	//cout << "Done initializing" << endl;
+#ifdef DUMP_HEAP_AS_GRAPHVIZ
+	if (gc_type != gc_live)
+	{
+		state_transition_table = new state_index*[numkeys];
+		for (state_index i = 0; i < numkeys; ++i)
+		{
+			state_transition_table[i] = new state_index[2];
+			state_transition_table[i][0]=0;
+			state_transition_table[i][1]=0;
+		}
+
+		string filepath = "../benchmarks/programs/" + program_name + "/fsmdump-" + program_name;
+		//cout << "Reading " << (filepath + "-state-map") << endl;
+		read_state_map_from_file(filepath + "-state-map");
+		//cout << "Reading " << (filepath + "-state-transition-table") << endl;
+		read_state_transition_table_from_file(filepath + "-state-transition-table");
+		cout << "Done initializing" << endl;
+	}
+#endif
+
 
 	return;
 }

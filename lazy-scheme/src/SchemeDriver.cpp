@@ -143,11 +143,9 @@ long Scheme::SchemeDriver::process()
 
     convertLivenessMap(livenessMap, anf_program->progpt_map);
     anf_program->liveness_data = *combined_grammar;
-  
-    //TODO remember to uncomment this line and ensure that the fields combined_grammar & program_grammars are correctly initialized
+    //TODO remember to un-comment this line and ensure that the fields combined_grammar & program_grammars are correctly initialized
     //combined_grammar = Scheme::Demands::solve_functions_and_combine(program_grammars);
-    
-   
+
     combined_grammar->emplace("D/all", Scheme::Demands::rule({{Scheme::Demands::T0, "D/all"},
         {Scheme::Demands::T1, "D/all"},
         {Scheme::Demands::E}

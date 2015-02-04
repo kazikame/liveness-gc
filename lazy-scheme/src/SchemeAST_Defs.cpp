@@ -35,6 +35,7 @@ extern map<int, string> root_var_map;
 
 std::string curr_return_addr;
 
+
 std::string getNextLabel()
 {
 	std::stringstream sstream;
@@ -178,6 +179,8 @@ cons* ReturnExprNode::evaluate()
 	if (!retval->inWHNF)
 	{
 
+		curr_return_addr = this->getLabel();
+		actRecStack.front().return_point = this->getLabel();
 		update_heap_refs.push(retval);
 		cons* temp = retval->val.closure.expr->evaluate();
 		retval = update_heap_refs.top();
@@ -192,9 +195,6 @@ cons* ReturnExprNode::evaluate()
 
 	}
 	
-
-	curr_return_addr = this->getLabel();
-
 	return retval;
 }
 cons* ReturnExprNode::make_closure()
@@ -496,17 +496,16 @@ cons* LetExprNode::evaluate()
 #undef __MYDEBUG
 #endif
 {
+	curr_return_addr = getLabel();
+	//cout << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl;
+	//cout << "Pointing to " << static_cast<cons*>(getfree()) << endl;
 #ifdef __MYDEBUG 
 	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 	cout << "Allocation #" << num_of_allocations << endl;
 	cout << "Current heap = " << current_heap() << endl;
-	if (getVarExpr()->isFunctionCallExpression())
-	cout << "Number of arguments for func " << ((FuncExprNode*)(getVarExpr()))->pListArgs->size() << endl;
-	cout << (gc_status != gc_disable)  << endl;
-	cout << "Is func call? " << getVarExpr()->isFunctionCallExpression() << endl;
-	cout << (!(getVarExpr()->isFunctionCallExpression()) && current_heap() < 1) << endl;
+
 #endif
-	curr_return_addr = getLabel();
+
 	bool isFunctionCall = getVarExpr()->isFunctionCallExpression(); 
 	if ((gc_status != gc_disable) && (
 			(!isFunctionCall && (current_heap() < 1))
@@ -517,18 +516,39 @@ cons* LetExprNode::evaluate()
 
 		if (gc_status != gc_live)
 		{
+			cout << "DOING RGC"<<endl;
+			//TODO : Remove these, they are not needed for RGC. Added only to dump graphviz files
+			//std::string curr_let_pgmpt = return_stack().return_point;
+			//return_stack().return_point = getLabel();
 			reachability_gc();
+			//return_stack().return_point = curr_let_pgmpt;
 		}
 		else
 		{
+			cout << "DOING LGC"<< endl;
+			//cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 			std::string curr_let_pgmpt = return_stack().return_point;
 			return_stack().return_point = getLabel();
 			liveness_gc();
+
+			//We have to check for this condition here for lazy languages
+			int num_cells_reqd = 0;
+			if ((!isFunctionCall && (current_heap() < 1)))
+					num_cells_reqd = 1;
+			else
+				num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
+			cout << "Num of cons cells required is " << num_cells_reqd<<endl;
+			if (check_space(num_cells_reqd * sizeof(cons)) == 0)
+			{
+				fprintf(stderr,"No Sufficient Memory - cons\n");
+				throw bad_alloc();
+			}
+
 			return_stack().return_point = curr_let_pgmpt;
 		}
 	}
-
 	
+
 	//Create an entry for the variable where it will be allocated on the heap
 	make_reference_addr(this->getVar().c_str(), getfree());
 	//ensure that the pointer does not get forwarded unnecessarily.
@@ -1276,6 +1296,7 @@ cons* FuncExprNode::evaluate()
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
 
 	//TODO : WHAT SHOULD BE THE PROGRAM POINT TO BE PASSED? 
+	//cout << "Creating activation record for func " << funcDef->getFuncName() << " with ret address " << curr_return_addr << endl;
 	make_environment(funcDef->getFuncName().c_str(), curr_return_addr);
 
 	auto num_args = pListArgs->size();
@@ -1298,6 +1319,7 @@ cons* FuncExprNode::evaluate()
 	heap_cell->val = temp->val;
 	heap_cell->typecell = temp->typecell;
 	heap_cell->inWHNF = true;
+
 	delete_environment();
 
 	assert(heap_cell->typecell == temp->typecell);

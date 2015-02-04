@@ -407,7 +407,7 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     
     	int index = 0;
     	demand_grammar * arg_demands = new demand_grammar;
-    	cout << "Number of arguments is " << pListArgs->size() << endl;
+
     	for(auto & arg : *pListArgs)
     	{
 
@@ -480,7 +480,7 @@ unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const 
     this->liveness_data = gLivenessData;
 
 
-    cout << "Completed processing all defines " << endl;
+
 
 
     return gLivenessMap;

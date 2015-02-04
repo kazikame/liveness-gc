@@ -473,12 +473,17 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 	for(auto st_tuple:nfa->second)
 	{
 		std::string st;
+
 		if (start_states.find(st_tuple.first) == start_states.end())
 			continue;
 		else
 			st = st_tuple.first;
 
+
+
+
 		auto new_s = epsilonClosure(st, nfa);
+
 		std::vector<std::unordered_set<std::string> > processed;
 		std::string s = st;
 		new_state_map[s] = new_s;
@@ -496,7 +501,6 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 			//Insert the state in the final state list of the dfa and insert a dummy transition
 			if (nfa->first.find(curr_state) != nfa->first.end())
 			{
-				//std::cout << "Inserting state in dfa " << curr_state << std::endl;
 				dfa->first.insert(curr_state);
 				dfa->second[curr_state];
 			}

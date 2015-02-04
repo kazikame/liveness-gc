@@ -125,11 +125,11 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	if (gc_type == gc_live && !filesCached)
 	{
 		
-		//Instead of driver.process returning an integer why cant it return the grammar?
+		//Instead of driver.process returning an integer why can't it return the grammar?
 		int resint = driver.process();
 		//convert LFs into IFs and DFs
 		//Use pgm->liveness_data as the final grammar
-		Scheme::output::dumpGrammar(cout, &gLivenessData);
+		//Scheme::output::dumpGrammar(cout, &gLivenessData);
 		gLivenessData.insert(pgm->liveness_data.begin(), pgm->liveness_data.end()) ;
 		gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
 
@@ -144,7 +144,6 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 //			}
 //			gLivenessData[elem.first] = r;
 //		}
-
 
 		//cout << "program name " << pgmname << endl;
 		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
@@ -165,15 +164,19 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		std::unordered_set<std::string> start_states;
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
-//		Scheme::Demands::simplifyNFA(start_states, nfa);
-//		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
+		Scheme::Demands::simplifyNFA(start_states, nfa);
+		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
 		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
 		Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
 		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);
 		//Scheme::Demands::minimizeDFA(dfa, start_states);
 	}
-	else if (gc_type == gc_live)
+	else if (gc_type == gc_live) //TODO : Make it compile conditionally only when we are dumping graphviz files
 	{
+		std::ofstream file("anf_prog.txt");
+		driver.get_anf_prog()->print(file, 0, true, true, Scheme::output::SCHEME);
+		file.close();
+
 		cout <<"Reading data from cached files "<<endl;
 		const int SZ = 1024 * 1024;
 		std::vector<char> buff(SZ, '\0');
@@ -194,10 +197,15 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	allocate_heap(hsize * 2);
 
 
-	empty_environment("main");
+
+	empty_environment("psuedo-main");
 	init_gc_stats();
 
 	Scheme::AST::cons* r = pgm->evaluate();
+
+	//remove the psuedo-main environment added
+	delete_environment();
+
 	printval(r);
 	cout << endl;
 

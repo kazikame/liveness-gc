@@ -12,6 +12,14 @@
 #include<utility>
 #include<set>
 
+//#define PRNT_DBG
+
+#ifdef PRNT_DBG
+#define DOUT(str) cout << str << endl;
+#else
+#define DOUT(str) void();
+#endif
+
 using namespace std;
 
 namespace Scheme {
