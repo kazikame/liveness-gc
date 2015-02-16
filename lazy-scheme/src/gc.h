@@ -39,6 +39,8 @@ typedef unordered_map<string, state_index>::const_iterator stateMapIter;
 typedef unordered_map<string, state_index> stateMap;
 
 
+extern std::ostream null_stream;
+
 
 
 typedef struct Var_Heap
@@ -126,13 +128,14 @@ typedef struct activationRecord
  char locate_var(const char *var);
  cons* lookup_addr(const char *var);
  void* lookup_value(const char *var);
- void printval(void *ref);
+ void printval(void *ref,ostream& out = cout);
  unsigned int current_heap();
  int getType(void* node, int field);
- cons* copy(cons* node);
- cons* copy_deep(cons* node);
+ cons* copy(cons* node, ostream& out = null_stream);
+ cons* copy_deep(cons* node, ostream& out = null_stream);
  int copy_scan_children(cons* node);
  actRec& return_stack();
+ void print_gc_move(cons* from, cons* to, ostream& out = null_stream);
 
 
  int lt_scan_free();
@@ -154,6 +157,7 @@ typedef struct activationRecord
 
  void* getscan();
  void* getfree();
+ cons* getbufferlive();
  int lt_scan_freept();
  void calculate_garbage();
 
@@ -168,6 +172,7 @@ typedef struct activationRecord
  int is_end_of_non_ref_vector();
  int is_empty_heap_ref_vector();
  int is_empty_non_ref_vector();
+ void print_activation_record_stack(ostream& out = null_stream);
 
 //GC methods
  void reachability_gc();
@@ -175,8 +180,9 @@ typedef struct activationRecord
  void cleanup(state_index);
  void liveness_gc();
  void dump_heap(string label);
- void print_accessible_heap();
+ void print_accessible_heap(const string);
  int is_valid_address(void* addr);
  void create_heap_bft(ostream&);
  string print_cell_type(cell_type t);
+ void update_heap_ref_stack(ostream& out = null_stream, int gc_type = 0);
 #endif

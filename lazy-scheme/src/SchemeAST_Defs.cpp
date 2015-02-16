@@ -20,17 +20,17 @@ extern deque<actRec> actRecStack;
 extern GCStatus gc_status;
 vector<double> gc_times;
 int conscount;
-extern int gcinvoke;
+//extern int gcinvoke;
 int maxcount;
-extern double gctime;
+//extern double gctime;
 ProgramNode* pgm;
 unsigned long lbl_count = 0;
 map< string, vector<ExprNode*>> func_call_points;
 unsigned int closure_count = 0;
 unsigned int reduction_count = 0;
-extern unsigned int num_of_allocations;
-extern map<cons*, int> heap_map;
-extern map<int, string> root_var_map;
+//extern unsigned int num_of_allocations;//
+//extern map<cons*, int> heap_map;
+//extern map<int, string> root_var_map;
 
 
 std::string curr_return_addr;
@@ -51,6 +51,8 @@ cons* reduceParamToWHNF(cons* cell)
 	assert(is_valid_address(heap_cell));
 	if (heap_cell->inWHNF)
 	{
+//		cout << "Heap cell " << heap_cell - getbufferlive() << " is in whnf" << endl;
+//		cout << "Its type is " << heap_cell->typecell << endl;
 		return heap_cell;
 	}
 	else
@@ -58,7 +60,12 @@ cons* reduceParamToWHNF(cons* cell)
 		cons* retval = heap_cell;
 		cons *temp = (retval->val.closure.expr->evaluate());
 		retval=temp;
-
+		//cout << "Type of heap_cell after reduction is " << temp->typecell << endl;
+		assert( temp->typecell == consExprClosure ||
+				temp->typecell == constIntExprClosure ||
+				temp->typecell == constBoolExprClosure ||
+				temp->typecell == constStringExprClosure ||
+				temp->typecell == nilExprClosure);
 		assert(retval->inWHNF);
 		assert(is_valid_address(retval));
 
@@ -231,8 +238,9 @@ cons* NilConstExprNode::make_closure()
 
 cons* NilConstExprNode::evaluate()
 {
-    cons *heap_cell = NULL; assert(false && "TO BE FIXED -- Amey");
-    
+    //cons *heap_cell = NULL;
+	assert(false && "TO BE FIXED -- Amey");
+    cons *heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
@@ -413,6 +421,9 @@ cons* IfExprNode::evaluate()
 	cons* cond_heap_ref = (cons*)lookup_addr(i->getIDStr().c_str());
 
 
+	//cout << "In if setting return address to " << curr_return_addr << endl;
+	actRecStack.front().return_point = curr_return_addr;
+
 	update_heap_refs.push(cond_heap_ref);
 
 	cons* cond_resultValue = this->pCond->evaluate();
@@ -497,12 +508,12 @@ cons* LetExprNode::evaluate()
 #endif
 {
 	curr_return_addr = getLabel();
-	//cout << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl;
-	//cout << "Pointing to " << static_cast<cons*>(getfree()) << endl;
+//	cout << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl;
+//	cout << "Pointing to " << static_cast<cons*>(getfree()) << endl;
 #ifdef __MYDEBUG 
-	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
-	cout << "Allocation #" << num_of_allocations << endl;
-	cout << "Current heap = " << current_heap() << endl;
+//	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
+//	cout << "Allocation #" << num_of_allocations << endl;
+//	cout << "Current heap = " << current_heap() << endl;
 
 #endif
 
@@ -522,29 +533,35 @@ cons* LetExprNode::evaluate()
 			//return_stack().return_point = getLabel();
 			reachability_gc();
 			//return_stack().return_point = curr_let_pgmpt;
+
 		}
 		else
 		{
+			/*
+			 * nperm with size 800 copies invalid memory locations and asserts.
+			 * Also nperm with size 900 gives an invalid memory access error.
+			 * 850 gives a segmentation fault
+			 * Both might be related.
+			 * */
 			cout << "DOING LGC"<< endl;
 			//cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 			std::string curr_let_pgmpt = return_stack().return_point;
 			return_stack().return_point = getLabel();
 			liveness_gc();
 
-			//We have to check for this condition here for lazy languages
-			int num_cells_reqd = 0;
-			if ((!isFunctionCall && (current_heap() < 1)))
-					num_cells_reqd = 1;
-			else
-				num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
-			cout << "Num of cons cells required is " << num_cells_reqd<<endl;
-			if (check_space(num_cells_reqd * sizeof(cons)) == 0)
-			{
-				fprintf(stderr,"No Sufficient Memory - cons\n");
-				throw bad_alloc();
-			}
-
 			return_stack().return_point = curr_let_pgmpt;
+		}
+		//We have to check for this condition here for lazy languages
+		int num_cells_reqd = 0;
+		if (!isFunctionCall )
+			num_cells_reqd = 1;
+		else if (isFunctionCall)
+			num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
+		cout << "Num of cons cells required is " << num_cells_reqd<<endl;
+		if (check_space(num_cells_reqd * sizeof(cons)) == 0)
+		{
+			fprintf(stderr,"No Sufficient Memory - cons\n");
+			throw bad_alloc();
 		}
 	}
 	
@@ -554,6 +571,8 @@ cons* LetExprNode::evaluate()
 	//ensure that the pointer does not get forwarded unnecessarily.
 	cons* temp = static_cast<cons*>(getfree());
 	temp->forward=NULL;
+
+	//cout << "Created " << this->pID->getIDStr() << " at " << (temp - getbufferlive()) << endl;
 
 	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
 	if (getVarExpr()->isFunctionCallExpression())
@@ -671,21 +690,35 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 	else
 	{
 		update_heap_refs.push(heap_cell->val.closure.arg1);
+//		cout << "Processing heap cell with index " << (heap_cell - (cons*)getbufferlive())<< endl;
+//		cout << "Before reduction type of heap cell is " << heap_cell->typecell << endl;
+//
+//		cout << " Processing arg1 of UnOp with index " << ((cons*)update_heap_refs.top() - (cons*)getbufferlive())<< endl;
+//		cout << "Type of arg1 is " << update_heap_refs.top()->typecell << endl;
 		cons* temp = reduceParamToWHNF(heap_cell->val.closure.arg1);
+
+		assert(temp->inWHNF);
 		cons* arg1 = update_heap_refs.top();
+
 		assert(is_valid_address(arg1));
+//		cout << "Updated type of arg1 to " << arg1->typecell << " with index " << ((cons*)arg1 - getbufferlive()) <<endl;
+
 		arg1->typecell = temp->typecell;
 		arg1->inWHNF = temp->inWHNF;
 		arg1->val = temp->val;
 		update_heap_refs.pop();
 
 
-		assert(arg1->typecell = consExprClosure);
+		assert(arg1->typecell == consExprClosure);
 
 		assert(is_valid_address(arg1->val.cell.car));
-		update_heap_refs.push(arg1->val.cell.car);
-		cons* retval = reduceParamToWHNF(arg1->val.cell.car);
 
+
+		update_heap_refs.push(arg1->val.cell.car);
+//		cout << " Processing car part of UnOp with index " << ((cons*)update_heap_refs.top() - (cons*)getbufferlive())<< endl;
+//		cout << "Type of car is " << update_heap_refs.top()->typecell << endl;
+		cons* retval = reduceParamToWHNF(arg1->val.cell.car);
+//		cout << "Updating type to " << retval->typecell << " for index " << ((cons*)update_heap_refs.top() - (cons*)getbufferlive()) << endl;
 		update_heap_refs.pop();
 
 		cons* heap_cell = update_heap_refs.top();
@@ -693,6 +726,8 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 		heap_cell->typecell = retval->typecell;
 		heap_cell->val = retval->val;
 		heap_cell->inWHNF = true;
+
+//		cout << "Updated type of heap_cell " << (heap_cell - (cons*)getbufferlive()) << " to " << heap_cell->typecell << endl;
 
 		heap_cell->reduction_id = ++reduction_count;
 		return heap_cell;
@@ -889,6 +924,8 @@ cons* BinaryPrimExprNode::evaluateCons()
 		return heap_cell;
 
 	assert(is_valid_address(heap_cell->val.closure.arg1) && is_valid_address(heap_cell->val.closure.arg2));
+//	cout << "Creating cons cell with closures " << (heap_cell->val.closure.arg1 - getbufferlive()) <<
+//				" and " << (heap_cell->val.closure.arg2 - getbufferlive()) << " at index " << (heap_cell - getbufferlive()) << endl;
 	heap_cell->inWHNF = true;
 	heap_cell->typecell = consExprClosure;
 	heap_cell->val.cell.car = heap_cell->val.closure.arg1;
@@ -1266,7 +1303,7 @@ void FuncExprNode::doLabel(bool shouldAddLabel)
 }
 
 FuncExprNode::FuncExprNode(IdExprNode * id, std::list<ExprNode *> * args)
-: ExprNode("FUNC"), pID(id), pListArgs(args)
+: ExprNode("FUNC"), pID(id), pListArgs(args), fBody(NULL)
 {
 	for(std::list<ExprNode *>::const_iterator i = pListArgs->begin(); i != pListArgs->end(); ++i)
 		vargs.push_back(*i);
@@ -1295,8 +1332,7 @@ cons* FuncExprNode::evaluate()
 		return heap_cell;
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
 
-	//TODO : WHAT SHOULD BE THE PROGRAM POINT TO BE PASSED? 
-	//cout << "Creating activation record for func " << funcDef->getFuncName() << " with ret address " << curr_return_addr << endl;
+//	cout << "Creating activation record for func " << funcDef->getFuncName() << " with ret address " << curr_return_addr << endl;
 	make_environment(funcDef->getFuncName().c_str(), curr_return_addr);
 
 	auto num_args = pListArgs->size();
@@ -1321,7 +1357,7 @@ cons* FuncExprNode::evaluate()
 	heap_cell->inWHNF = true;
 
 	delete_environment();
-
+//	cout << "Completed processing function " << funcDef->getFuncName() << endl;
 	assert(heap_cell->typecell == temp->typecell);
 	heap_cell->reduction_id = ++reduction_count;
 
@@ -1341,19 +1377,31 @@ cons* FuncExprNode::make_closure()
 	retval->val.closure.expr = this;
 	retval->val.closure.arg1 = NULL;
 	retval->val.closure.arg2 = NULL;
+	retval->inWHNF = false;
 	if (pListArgs->size() > 0)
 	{
 
+//		cout << "Creating closure for " <<
+//				((IdExprNode*)(*rarglistiter))->getIDStr()
+//				<< " at " << (retval - getbufferlive())
+//				<< " pointing to " << (lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str()) - getbufferlive())
+//				<< endl;
 		retval->val.closure.arg2 = lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
-		retval->inWHNF = false;
+
 		auto prev = retval;
 		while(num_args > 0)
 		{
 			++rarglistiter;
 			auto curr = allocate_cons();
 			curr->inWHNF = false;
+//			cout << "Creating closure for " <<
+//							((IdExprNode*)(*rarglistiter))->getIDStr()
+//							<< " at " << (curr - getbufferlive())
+//							<< " pointing to " << (lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str()) - getbufferlive())
+//							<< endl;
 			curr->typecell = funcArgClosure;
 			curr->val.closure.arg2 =  lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
+
 			curr->val.closure.expr = this;
 			curr->val.closure.arg1 = NULL;
 			prev->val.closure.arg1 = curr;
@@ -1451,7 +1499,7 @@ void ProgramNode::doLabel(bool shouldAddLabel)
 }
 
 ProgramNode::ProgramNode(std::list<DefineNode *> * defines, ExprNode * expr)
-: Node("PROGRAM"), pListDefines(defines), pExpr(expr)
+: Node("PROGRAM"), pListDefines(defines), pExpr(expr), progpt_map(new std::unordered_map<std::string, const Node*>())
 {
 	for (std::list<DefineNode*>::iterator fundef = defines->begin(); fundef != defines->end(); ++fundef)
 	{

@@ -7,7 +7,7 @@ using namespace std;
 
 
 demand_grammar function_call_demands;
-demand_grammar gLivenessData; //Global map which stores the liveness at cons points and the next statement after a function call only.
+demand_grammar gLivenessData;
 unordered_map<string, expr_demand_grammars*> gLivenessMap;
 unordered_map<string, const Node*> prog_pt_map;
 
@@ -203,7 +203,6 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
 
 
     //Create a new label and insert it in the map, along with the liveness for the condition variable
-    demand_grammar *cond_grammar = new demand_grammar();
     string cond_variable = ((IdExprNode*)pCond)->getIDStr();
 
     pThen->transformDemand(demand);
@@ -368,23 +367,27 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
 {
     // The demand argument is unnecessary for this function.
 
+
+
 	gfunc_prog_pts.clear();
 	in_function_define = true;
-
-
-
     std::string func_demand_prefix = PREFIX_DEMAND + SEPARATOR + pID->getIDStr();
 
-    expr_demand_grammars * result = new expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
+    expr_demand_grammars * result = new expr_demand_grammars({ new Scheme::Demands::demand_grammar, new Scheme::Demands::demand_grammar});
     unordered_map<string, expr_demand_grammars *> liveness_map;
     
     auto expr_map = pExpr->transformDemand(rule({{ func_demand_prefix }}));
     
+
+    //cout << "Inserting prog pts for function " << pID->getIDStr() << endl;
+    prog_pt_map.insert(gfunc_prog_pts.begin(), gfunc_prog_pts.end());
+    //cout << "Number of prog pts in " << pID->getIDStr() << " = " << gfunc_prog_pts.size() << endl;
+
     //For each function point, get liveness for function variables and store it in a map
     for (auto p : gfunc_prog_pts)
     {
     	auto labels = p.second->label_set;
-    	liveness_map[p.first] = new expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
+    	liveness_map[p.first] = new expr_demand_grammars({ new Scheme::Demands::demand_grammar, new Scheme::Demands::demand_grammar});
     	for(auto l : labels)
     	{
     		liveness_map[p.first] = merge(liveness_map[p.first], expr_map[l]);
@@ -435,13 +438,13 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     	}
     }
     
-    for (auto &var : (*dem_grams))
-    {
-    	string nt = var.first;
-    	gLivenessData[nt].insert(var.second.begin(), var.second.end());
-
-
-    }
+//    for (auto &var : (*dem_grams))
+//    {
+//    	string nt = var.first;
+//    	gLivenessData[nt].insert(var.second.begin(), var.second.end());
+//
+//
+//    }
 
     in_function_define = false;
     return gLivenessMap;
@@ -461,8 +464,8 @@ unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const 
 
 
     expr_demand_grammars * result = new expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
-    pExpr->transformDemand(symbolic_demand);
-
+    auto main_expr_gram = pExpr->transformDemand(symbolic_demand);
+    gLivenessMap.insert(main_expr_gram.begin(), main_expr_gram.end());
 
     for(auto & def : *pListDefines)
     {
@@ -478,10 +481,6 @@ unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const 
     this->label_set.insert(pExpr->label_set.begin(), pExpr->label_set.end());
     this->progpt_map = &prog_pt_map;
     this->liveness_data = gLivenessData;
-
-
-
-
 
     return gLivenessMap;
 }

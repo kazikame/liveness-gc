@@ -22,11 +22,19 @@
 
 using namespace std;
 
+class NullBuffer : public std::streambuf
+{
+public:
+  int overflow(int c);
+};
+
 namespace Scheme {
 
 namespace AST {
 
 class ExprNode;
+
+
 
 typedef int state_index;
 typedef std::set<state_index> stateset;

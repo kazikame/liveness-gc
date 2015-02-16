@@ -11,6 +11,24 @@ using namespace std;
 
 using Scheme::output::global_options;
 
+
+std::string make_key(std::unordered_set<std::string>&);
+
+
+
+std::string make_key(std::unordered_set<std::string>& st)
+{
+	assert(!st.empty());
+	string key(*(st.begin()));
+	auto st_temp = st.begin()++;
+	for(auto s = st_temp; s != st.end(); s++)
+	{
+		key.append("#");
+		key.append(*s);
+	}
+	return key;
+}
+
 Scheme::SchemeDriver::SchemeDriver()
     : parser(NULL), scanner(NULL), program(NULL), anf_program(NULL),program_grammars(NULL), combined_grammar(NULL), approx_grammar(NULL)
 {}
@@ -95,18 +113,29 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 	std::unordered_map<string, Scheme::Demands::expr_demand_grammars*> livenessData;
 	std::unordered_map<std::string, const Scheme::AST::Node*> prog_pts = *prog_pt_map;
 
+	//TODO : Do not assign the merged grammar here
+	//Maybe save it as a separate map with each liveness set acting as key
+	//Merge the liveness paths, create regular grammar, convert to NFA, simplify it, convert to DFA and then assign the same DFA to
+	//all the program points which share the same liveness set.
+
+
+	cout << "Number of program points " << prog_pts.size() << endl;
 	for(auto p : prog_pts)
 	{
-
+//		cout << "Processing program point " << p.first << endl;
 		std::unordered_set<std::string> label_set = p.second->label_set;
-
-		livenessData[p.first] = new Scheme::Demands::expr_demand_grammars({ new Scheme::Demands::demand_grammar({{ }}), new Scheme::Demands::demand_grammar({{ }})});
-		for (auto l : label_set)
+		string key = make_key(label_set);
+		if (livenessData.find(key) == livenessData.end())
 		{
-			assert(livenessMap[l]);
-			if (livenessMap[l])
+//			cout << "Processing liveness key " << key << endl;
+			livenessData[key] = new Scheme::Demands::expr_demand_grammars({ new Scheme::Demands::demand_grammar, new Scheme::Demands::demand_grammar});
+			for (auto l : label_set)
 			{
-				livenessData[p.first] = Scheme::Demands::merge(livenessData[p.first], livenessMap[l]);
+				assert(livenessMap[l]);
+				if (livenessMap[l])
+				{
+					livenessData[key] = Scheme::Demands::merge(livenessData[key], livenessMap[l]);
+				}
 			}
 		}
 	}
@@ -121,7 +150,11 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 			(*combined_grammar)[liveness_label] = g.second;
 		}
 	}
-	
+
+//Create combined_grammar for liveness sets instead of (prop_pt, variables)
+//Assigning (prog_pt, variable) to DFA's can be done at a later stage
+
+
 	return livenessData;
 }
 
@@ -143,6 +176,7 @@ long Scheme::SchemeDriver::process()
 
     convertLivenessMap(livenessMap, anf_program->progpt_map);
     anf_program->liveness_data = *combined_grammar;
+
     //TODO remember to un-comment this line and ensure that the fields combined_grammar & program_grammars are correctly initialized
     //combined_grammar = Scheme::Demands::solve_functions_and_combine(program_grammars);
 

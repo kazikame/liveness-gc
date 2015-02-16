@@ -13,9 +13,12 @@
 
 using namespace Scheme::Demands;
 
+
 extern demand_grammar gLivenessData;
 
 static unsigned long state_counter = 0;
+
+std::map<std::string, bool> nfa_changed;
 
 static std::unordered_set<std::string> marked_states;
 static std::unordered_map<std::string, automaton> nfa_map;
@@ -480,8 +483,6 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 			st = st_tuple.first;
 
 
-
-
 		auto new_s = epsilonClosure(st, nfa);
 
 		std::vector<std::unordered_set<std::string> > processed;
@@ -573,8 +574,33 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 
 	return dfa;
 }
+//TODO : Try to move make_key function to a common file so that it can be used in both Demands.cpp & SchemeDriver.cpp.
+std::string make_key1(std::unordered_set<std::string>& st)
+{
+	assert(!st.empty());
+	std::string key(*(st.begin()));
+	auto st_temp = st.begin()++;
+	for(auto s = st_temp; s != st.end(); s++)
+	{
+		key.append("#");
+		key.append(*s);
+	}
+	return key;
+}
 
-int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa)
+std::vector<std::string> splitLivenessString(std::string ls)
+{
+	std::vector<std::string> v;
+	std::string label_set_str = ls.substr(ls.find_first_of("/") + 1, ls.find_last_of("/") - ls.find_first_of("/") - 1);
+	std::string var_name = ls.substr(ls.find_last_of("/") + 1,  std::string::npos);
+	v.push_back(label_set_str);
+	v.push_back(var_name);
+	//std::cout << "label set is " << label_set_str << std::endl;
+	//std::cout << "var name is "<< var_name << std::endl;
+	return v;
+}
+
+int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::map<std::string, std::unordered_set<std::string>> prog_pt_map)
 {
 	int numkeys = 1;
 	std::ofstream state_map("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map");
@@ -583,6 +609,18 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa)
 	{
 		state_map << st_tuple.first << ":" << std::to_string(numkeys) <<";"<<std::endl;
 		st_map[st_tuple.first] = numkeys;
+		auto v = splitLivenessString(st_tuple.first);
+		for (auto p : prog_pt_map)
+		{
+			if (make_key1(p.second) == v[0] &&
+					v[1].find("(") == std::string::npos)
+			{
+				std::string state_name = "L/" + p.first + "/" + v[1];
+				//std::cout << "Mapped pg_pt to " << state_name << " with id " << numkeys << std::endl;
+				state_map << state_name << ":" << std::to_string(numkeys) <<";"<<std::endl;
+				st_map[state_name] = numkeys;
+			}
+		}
 		++numkeys;
 	}
 	state_map.close();
@@ -605,11 +643,12 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa)
 
 std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa)
 {
+
 	std::unordered_set<std::string> eps_closure;
 	eps_closure.insert(state);
 	std::queue<std::string> state_queue;
 	state_queue.push(state);
-
+	//std::cout << "Finding epsilon closure for " << state << std::endl;
 
 	while(!state_queue.empty())
 	{
@@ -649,6 +688,7 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		nfa->first.insert(state);
 	}
 
+	//std::cout << "Finished epsilon closure for " << state << std::endl;
 	return eps_closure;
 }
 
@@ -727,6 +767,7 @@ bool replaceEdgesWithEpsilonEdge(std::pair<std::string, transitions> ts, state_t
 							//Add only if the edge is not present
 							trans.at(src)[E].insert(d);
 							changed = true;
+							nfa_changed[src] = true;
 						}
 					}
 				}
@@ -741,11 +782,15 @@ bool barEdgeSimplification(automaton *nfa)
 	bool changed = false;
 	state_transitions &trans = nfa->second;
 	std::cout << "Bar edge simplification started"<< std::endl;
-	for(auto ts:trans)
+	for(auto ts : trans)
 	{
-		bool t1 = replaceEdgesWithEpsilonEdge(ts, trans, T0b, T0);
-		bool t2 = replaceEdgesWithEpsilonEdge(ts, trans, T1b, T1);
-		changed = t1 || t2 || changed;
+		if (nfa_changed[ts.first])
+		{
+			std::cout << "Simplifying " << ts.first << std::endl;
+			bool t1 = replaceEdgesWithEpsilonEdge(ts, trans, T0b, T0);
+			bool t2 = replaceEdgesWithEpsilonEdge(ts, trans, T1b, T1);
+			changed = t1 || t2 || changed;
+		}
 	}
 	std::cout << "Bar edge simplification completed"<< std::endl;
 	return changed;
@@ -760,7 +805,7 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 	for(auto non_terminal: start_states)
 	{
 		++i;
-
+		//std::cout << "Processing non terminal " << non_terminal << std::endl;
 		std::stack<std::string> states;
 		std::unordered_set<std::string> processed;
 		states.push(non_terminal);
@@ -801,10 +846,12 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 				}
 			}
 		}
+		//std::cout << "Completed epsilon removal for " << non_terminal << std::endl;
 	}
 	std::cout << "Completed processing all non_terminals" << std::endl;
 	removeUnreachableStates(reachable_states, nfa);
 	std::cout << "Removed unreachable states" << std::endl;
+
 	return changed;
 }
 
@@ -1437,7 +1484,7 @@ void get_minimized_dfa(automaton *dfa, std::deque<partition> minimized_dfa, auto
 }
 
 //This minimization process is very specific to our requirement. It handles only two alphabets 0 & 1.
-//TODO should we write a more general deteminization function?
+//TODO should we write a more general determinization function?
 void Scheme::Demands::minimizeDFA(automaton* dfa, std::unordered_set<std::string> nt)
 {
 	std::unordered_set<std::string> processed_states;

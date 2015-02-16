@@ -25,6 +25,28 @@ int gcinvoke=0;
 extern demand_grammar gLivenessData;
 
 
+demand_grammar filter_grammar(demand_grammar gLivenessData, vector<string> filter_criteria)
+{
+	demand_grammar filtered_grammar;
+	for (auto s : filter_criteria)
+	{
+		filtered_grammar[s] = gLivenessData[s];
+	}
+	return filtered_grammar;
+}
+
+void read_filter_criteria_from_file(string filepath, vector<string> &v)
+{
+	ifstream infile(filepath);
+	while(!infile.eof())
+	{
+		string s;
+		infile >> s;
+		v.push_back(s);
+	}
+	return;
+}
+
 
 unsigned int FileRead( istream & is, vector <char> & buff ) {
     is.read( &buff[0], buff.size() );
@@ -127,23 +149,10 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		
 		//Instead of driver.process returning an integer why can't it return the grammar?
 		int resint = driver.process();
-		//convert LFs into IFs and DFs
 		//Use pgm->liveness_data as the final grammar
 		//Scheme::output::dumpGrammar(cout, &gLivenessData);
 		gLivenessData.insert(pgm->liveness_data.begin(), pgm->liveness_data.end()) ;
 		gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
-
-		//Do we need this splitting as we don't have any independent part (due to Xb).
-//		for (auto elem: gLivenessData)
-//		{
-//			rule r;
-//			for(auto path:elem.second)
-//			{
-//				rule temp = expandProd(path);
-//				r.insert(temp.begin(), temp.end());
-//			}
-//			gLivenessData[elem.first] = r;
-//		}
 
 		//cout << "program name " << pgmname << endl;
 		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
@@ -158,9 +167,33 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-reg.txt");
 		Scheme::Demands::sanitize(&gLivenessData); //Remove empty productions
 		std::cout << "Sanitized the regular grammar"<<std::endl;
+
+
 		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
 		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-nfa.txt");
 
+#ifdef MY_DEBUG
+//		//Add a layer here to filter the liveness Data that needs to be converted.
+//
+		vector<string> filter_criteria;
+		read_filter_criteria_from_file("../benchmarks/programs/" + pgmname + "/filter.txt", filter_criteria);
+		demand_grammar filtered_gram = filter_grammar(gLivenessData, filter_criteria);
+
+		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&filtered_gram, pgmname);
+		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/filtered-nfa.txt");
+
+
+		std::unordered_set<std::string> start_states;
+		for (auto nt:filtered_gram)
+			start_states.insert(nt.first);
+		Scheme::Demands::simplifyNFA(start_states, nfa);
+		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
+		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
+		Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
+		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);
+
+		exit(1);
+#endif
 		std::unordered_set<std::string> start_states;
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
@@ -168,7 +201,15 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
 		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
 		Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
-		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);
+
+		//While converting DFA to 2D array and writing to file, set the associations for the (prog_pt, varname) instead of e-paths
+		std::map<std::string, std::unordered_set<std::string>> label_set_map;
+		for (auto p : *(pgm->progpt_map))
+		{
+			label_set_map[p.first] = p.second->label_set;
+		}
+		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa, label_set_map);
+
 		//Scheme::Demands::minimizeDFA(dfa, start_states);
 	}
 	else if (gc_type == gc_live) //TODO : Make it compile conditionally only when we are dumping graphviz files
