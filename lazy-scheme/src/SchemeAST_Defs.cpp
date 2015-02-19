@@ -48,6 +48,9 @@ cons* reduceParamToWHNF(cons* cell)
 {
 	cons* heap_cell = update_heap_refs.top();
 
+	if (!is_valid_address(heap_cell))
+		cout << "Address invalid for " << heap_cell << endl;
+
 	assert(is_valid_address(heap_cell));
 	if (heap_cell->inWHNF)
 	{

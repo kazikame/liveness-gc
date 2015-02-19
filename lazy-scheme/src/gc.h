@@ -10,10 +10,10 @@ using namespace std;
 using namespace Scheme::AST;
 
 
-#define REACHABILITY_BFS
-//#define REACHABILITY_DFS
-#define LIVENESS_BFS
-//#define LIVENESS_DFS
+//#define REACHABILITY_BFS
+#define REACHABILITY_DFS
+//#define LIVENESS_BFS
+#define LIVENESS_DFS
 //#define K_LIVENESS
 //#defines to be used for meta data generation
 //#define TEST_RUN //determines the min size of memory required (max reachability value achieved during program execution) to execute the program with gc-plain
@@ -69,42 +69,6 @@ typedef struct activationRecord
 }actRec;
 
 
-
-//typedef class HeapCell
-//{
-//public:
-//	cell_type type;
-//	cell_type get_type();
-//	void set_type(cell_type);
-//	void* get_value();
-//	void set_value(void *);
-//	bool isinWHNF();
-//	void* forward;
-//	stateset *setofStates;
-//#ifdef GC_ENABLE_STATS
-//	/*----------------------------------------------------------------------
-//	 * Following fields are added by Amey Karkare to
-//	 * generate gc related statistics
-//	 */
-//	/* size is used only if we support vectors */
-//	clock_tick created;       /* creation time of cell */
-//	clock_tick first_use;     /* first use time of cell */
-//	clock_tick last_use;      /* last use time of cell */
-//	char       is_reachable:1,  /* true if cell is reachable during current gc */
-//	is_used:1;       /* true if cell is dereferenced for use */
-//	/*----------------------------------------------------------------------*/
-//#endif
-//#ifdef ENABLE_SHARING_STATS
-//	int visited;
-//#endif
-//private:
-//	boost::any _value;
-//
-//}cons;
-
-
-
-
  cons* getCar(void* ref, const char fromGC);
  cons* getCdr(void* ref, const char fromGC);
  void init_gc_stats();
@@ -133,8 +97,11 @@ typedef struct activationRecord
  int getType(void* node, int field);
  cons* copy(cons* node, ostream& out = null_stream);
  cons* copy_deep(cons* node, ostream& out = null_stream);
+ cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
  int copy_scan_children(cons* node);
  actRec& return_stack();
+ cons* followpaths_reachability(cons* loc, ostream& out = null_stream);
+ cons* followpaths(cons* loc, state_index index);
  void print_gc_move(cons* from, cons* to, ostream& out = null_stream);
 
 
@@ -184,5 +151,5 @@ typedef struct activationRecord
  int is_valid_address(void* addr);
  void create_heap_bft(ostream&);
  string print_cell_type(cell_type t);
- void update_heap_ref_stack(ostream& out = null_stream, int gc_type = 0);
+ void update_heap_ref_stack(ostream& out = cerr, int gc_type = 0);
 #endif

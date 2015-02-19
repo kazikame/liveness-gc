@@ -247,8 +247,16 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	//remove the psuedo-main environment added
 	delete_environment();
 
-	printval(r);
-	cout << endl;
+	std::string filepath;
+	if (gc_type == gc_live)
+		filepath = "./live.txt";
+	else
+		filepath = "./plain.txt";
+
+	std::ofstream outfile(filepath, ios::out);
+
+	printval(r, outfile);
+	outfile << endl;
 
 
 	cout << "Completed program evaluation" << endl;
