@@ -678,6 +678,8 @@ cons* UnaryPrimExprNode::make_closure()
 	retval->val.closure.arg1 = pArg->make_closure();
 	retval->val.closure.arg2 = NULL;
 	retval->inWHNF = false;
+	retval->val.closure.arg1_name = new string((static_cast<IdExprNode*>(this->pArg))->getIDStr());
+	retval->val.closure.prog_pt = new string(curr_return_addr);
 	retval->closure_id = ++closure_count;
 	return retval;
 }
@@ -913,6 +915,9 @@ cons* BinaryPrimExprNode::make_closure()
 	retval->val.closure.expr = this;
 	retval->typecell = binaryprimopExprClosure;
 	retval->inWHNF = false;
+	retval->val.closure.arg1_name = new string((static_cast<IdExprNode*>(this->pArg1))->getIDStr());
+	retval->val.closure.arg2_name = new string((static_cast<IdExprNode*>(this->pArg2))->getIDStr());
+	retval->val.closure.prog_pt = new string(curr_return_addr);
 	retval->closure_id = ++closure_count;
 
 	return retval;
@@ -1390,7 +1395,6 @@ cons* FuncExprNode::make_closure()
 //				<< " pointing to " << (lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str()) - getbufferlive())
 //				<< endl;
 		retval->val.closure.arg2 = lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
-
 		auto prev = retval;
 		while(num_args > 0)
 		{
@@ -1404,6 +1408,8 @@ cons* FuncExprNode::make_closure()
 //							<< endl;
 			curr->typecell = funcArgClosure;
 			curr->val.closure.arg2 =  lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
+			curr->val.closure.arg2_name = new string(((IdExprNode*)(*rarglistiter))->getIDStr());
+			curr->val.closure.prog_pt = new string(curr_return_addr);
 
 			curr->val.closure.expr = this;
 			curr->val.closure.arg1 = NULL;

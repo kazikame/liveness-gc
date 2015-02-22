@@ -10,6 +10,12 @@ using namespace std;
 using namespace Scheme::AST;
 
 
+
+#ifndef __DEBUG__GC
+#define __DEBUG__GC
+#undef __DEBUG__GC
+#endif
+
 //#define REACHABILITY_BFS
 #define REACHABILITY_DFS
 //#define LIVENESS_BFS
@@ -75,7 +81,8 @@ typedef struct activationRecord
  void finish_gc_stats();
  void dump_garbage_stats();
  int sizeof_cons();
-
+ unsigned int current_heap();
+ int getType(void* node, int field);
  void allocate_heap(unsigned long size);
  void swap_buffer();
  void update_free(unsigned int size);
@@ -93,22 +100,27 @@ typedef struct activationRecord
  cons* lookup_addr(const char *var);
  void* lookup_value(const char *var);
  void printval(void *ref,ostream& out = cout);
- unsigned int current_heap();
- int getType(void* node, int field);
+#ifndef __GC_DEBUG
  cons* copy(cons* node, ostream& out = null_stream);
- cons* copy_deep(cons* node, ostream& out = null_stream);
  cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
- int copy_scan_children(cons* node);
- actRec& return_stack();
  cons* followpaths_reachability(cons* loc, ostream& out = null_stream);
  cons* followpaths(cons* loc, state_index index);
  void print_gc_move(cons* from, cons* to, ostream& out = null_stream);
+#else
+ cons* copy(cons* node);
+ cons* deep_copy(cons* node, int gc_type = 0);
+ cons* followpaths_reachability(cons* loc);
+ cons* followpaths(cons* loc, state_index index);
+ void print_gc_move(cons* from, cons* to);
+#endif
 
-
+ int copy_scan_children(cons* node);
+ actRec& return_stack();
  int lt_scan_free();
  unsigned long diff_scan_free();
  void set_car(void* loc, void* ref);
  void set_cdr(void* loc, void* ref);
+ void* dup_cons(cons* cell);
 
  void detail_gc();
  int is_null_stack(actRec st);

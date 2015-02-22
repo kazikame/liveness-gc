@@ -72,6 +72,9 @@ struct cons
 			ExprNode* expr;
 			cons* arg1;
 			cons* arg2;
+			string* arg1_name;
+			string* arg2_name;
+			string* prog_pt;
 		}closure;
 	}val;
 	void *forward;
@@ -79,6 +82,7 @@ struct cons
 	int depth;
 	bool inWHNF;
 	bool isLive;
+	bool copied_using_rgc;
 	unsigned int closure_id;
 	unsigned int reduction_id;
 #ifdef GC_ENABLE_STATS

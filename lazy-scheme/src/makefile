@@ -1,9 +1,9 @@
 CC = g++
 EXTRA_FLAGS= -Wno-reorder -Wno-unused -Werror
-CFLAGS = -g -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive
+CFLAGS = -g -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive 
 OBJ_FLAGS=-c
-DBG_FLAGS=-pg -O0
-PROD_FLAGS=-O0
+DBG_FLAGS=-g
+PROD_FLAGS= -g
 
 TARGET = Simulator
 
@@ -58,3 +58,4 @@ remove:
 	rm -rf *.o scheme_lexer.cc
 	rm -rf location.hh position.hh stack.hh
 	rm -rf scheme.tab.h scheme.tab.c scheme.output
+	rm -rf PostGC*.txt GC*.txt PreGC*.txt gc_messages.txt pre_gc_addr.txt
