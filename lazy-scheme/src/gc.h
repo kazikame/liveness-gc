@@ -10,6 +10,15 @@ using namespace std;
 using namespace Scheme::AST;
 
 
+#define _OPT_TIME
+//#undef _OPT_TIME
+
+#ifdef _OPT_TIME
+#undef _OPT_FULL_LGC
+#else
+#define _OPT_FULL_LGC
+#endif
+
 
 #ifndef __DEBUG__GC
 #define __DEBUG__GC
@@ -100,12 +109,13 @@ typedef struct activationRecord
  cons* lookup_addr(const char *var);
  void* lookup_value(const char *var);
  void printval(void *ref,ostream& out = cout);
-#ifndef __GC_DEBUG
+#ifdef _OPT_TIME
  cons* copy(cons* node, ostream& out = null_stream);
  cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
  cons* followpaths_reachability(cons* loc, ostream& out = null_stream);
- cons* followpaths(cons* loc, state_index index);
+ cons* followpaths(cons* loc, state_index index, ostream& out = null_stream);
  void print_gc_move(cons* from, cons* to, ostream& out = null_stream);
+ void clear_live_buffer(ostream& out = null_stream);
 #else
  cons* copy(cons* node);
  cons* deep_copy(cons* node, int gc_type = 0);

@@ -17,10 +17,10 @@
 //#include "dumptographviz.h"
 using namespace std;
 
-#ifndef __DEBUG__GC
-#define __DEBUG__GC
-#undef __DEBUG__GC
-#endif
+//#ifndef __DEBUG__GC
+//#define __DEBUG__GC
+//#undef __DEBUG__GC
+//#endif
 
 
 #define DUMP_HEAP_AS_GRAPHVIZ
@@ -141,7 +141,7 @@ void depthfirstpaths(Scheme::AST::cons* loc, Scheme::AST::state_index index);
 
 
 
-#ifndef __DEBUG__GC
+#ifdef _OPT_TIME
 void print_gc_move(cons* from, cons* to, ostream& out)
 {
 	if (from != NULL && to != NULL)
@@ -164,6 +164,7 @@ void print_gc_move(cons* from, cons* to, ostream& out)
 
 cons* deep_copy(cons* node, int gc_type, ostream& out)
 {
+	assert(!is_valid_address(node));
 	if (gc_type == 0)
 		return followpaths_reachability(node);
 	else
@@ -179,9 +180,8 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				{
 					cons* new_loc = copy(node, out);
 					node->copied_using_rgc = true;
-					new_loc->copied_using_rgc = true;
-					new_loc->val.cell.car = deep_copy(new_loc->val.cell.car, 1, out);
-					new_loc->val.cell.cdr = deep_copy(new_loc->val.cell.cdr, 1, out);
+					new_loc->val.cell.car = deep_copy(node->val.cell.car, 1, out);
+					new_loc->val.cell.cdr = deep_copy(node->val.cell.cdr, 1, out);
 					return new_loc;
 				}
 				else
@@ -201,8 +201,8 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				    (node->typecell == funcApplicationExprClosure) ||
 				    (node->typecell == funcArgClosure))
 				{
-					new_loc->val.closure.arg1 = deep_copy(new_loc->val.closure.arg1, 1, out);
-					new_loc->val.closure.arg2 = deep_copy(new_loc->val.closure.arg2, 1, out);
+					new_loc->val.closure.arg1 = deep_copy(node->val.closure.arg1, 1, out);
+					new_loc->val.closure.arg2 = deep_copy(node->val.closure.arg2, 1, out);
 				}
 				return new_loc;
 			}
@@ -511,7 +511,7 @@ cons* followpaths_reachability(cons* loc)
 #endif
 
 
-void clear_live_buffer()
+void clear_live_buffer(ostream& out)
 {
 	cons* start_ptr = static_cast<cons*>(buffer_live);
 	cons* end_ptr = static_cast<cons*>(freept);
@@ -522,7 +522,10 @@ void clear_live_buffer()
 		{
 		case consExprClosure:
 			if (!is_valid_address(start_ptr->val.cell.car))
+			{
+				out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl;
 				start_ptr->val.cell.car = NULL;
+			}
 			if (!is_valid_address(start_ptr->val.cell.cdr))
 				start_ptr->val.cell.cdr = NULL;
 			break;
@@ -1588,11 +1591,9 @@ void liveness_gc()
 
 //    		  if (((cons*)vhit->ref)->forward == NULL)//If pointer already not copied then clear its contents
 //    			  c->s->clear();
-    		  if (gccount >= 21 && vhit->ref) {
-    			  //cerr << "Processing var " << vhit->varname << endl;
-    			  //cerr << (static_cast<cons*>(vhit->ref))->copied_using_rgc << endl;
-    		  }
-    		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second);
+
+    		  pre << "Processing var " << vhit->varname << endl;
+    		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second, pre);
     		  //cons* c = (cons*) addr;
     		  //c->s->insert(got->second);
     		  vhit->ref = addr;
@@ -1607,7 +1608,7 @@ void liveness_gc()
     }
   //cerr << "Completed liveness GC" << endl;
   update_heap_ref_stack(pre, 1);
-  clear_live_buffer();
+  clear_live_buffer(pre);
 #ifdef __DEBUG__GC
 	pre.close();
 	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
@@ -1624,18 +1625,15 @@ void liveness_gc()
   return;
 }
 
-cons* followpaths(cons* loc, state_index index)
+cons* followpaths(cons* loc, state_index index, ostream& out)
 {
 
-	if (!((loc >= buffer_dead && loc < boundary_dead) || (loc >= buffer_live && loc < boundary_live) || (loc == NULL)))
-	{
-		//cerr << "ERROR copying " << loc << endl;
-	}
-  assert((loc == NULL) || (loc >= buffer_dead && loc < boundary_dead) || (loc >= buffer_live && loc < boundary_live));
-  cons* loccopy = copy(loc);
+	if (NULL == loc)
+		return loc;
 
-//  if (gccount >= 21)
-//	  cerr << "Copying cons cell from " << loc << " with type " << loc->typecell << " == " << consExprClosure << endl;
+	cons* loccopy = copy(loc, out);
+
+    out << "Copying cons cell from " << loc << " with type " << loc->typecell << " == " << consExprClosure << endl;
 
 #ifdef ENABLE_SHARING_STATS
   if (loccopy)
@@ -1656,13 +1654,13 @@ cons* followpaths(cons* loc, state_index index)
 			  set_car(loccopy, addr);
 		  }
 	  }
-//	  else if (gccount >= 21)
-//	  {
-//		  cons* carloc = getCar(loc, 1);
-//		  cerr << carloc << endl;
-//		  if (carloc)
-//			  cerr << "Not chasing reachable cell during LGC as car is not live"<<endl;
-//	  }
+	  else
+	  {
+		  cons* carloc = getCar(loc, 1);
+		  out << carloc << endl;
+		  if (carloc)
+			  out << "Not chasing reachable cell during LGC as car is not live for "<< loc << " with index "<< (carloc - (cons*)buffer_dead) << endl;
+	  }
 
 	  state_index a1 = state_transition_table[index][1];//get_target_dfastate(index, 1);
 	  if (a1 > 0)
@@ -1690,7 +1688,7 @@ cons* followpaths(cons* loc, state_index index)
   {
 	  if (loc == loccopy)
 	  {
-//		  cerr << "returning already copied pointer"<<endl;
+		  out << "returning already copied pointer"<<endl;
 		  return static_cast<cons*>(loc->forward);
 	  }
 	  else
@@ -1710,156 +1708,159 @@ cons* followpaths(cons* loc, state_index index)
 }
 
 
-//
-////Liveness GC with liveness for closures
-//void liveness_gc()
-//{
-//	clock_t pstart = clock();
-//	 ++gccount;
-//	 cerr << "Starting LGC#"<<gccount<<endl;
-//#ifdef ENABLE_SHARING_STATS
-//	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
-//			  ((cons*)i)->visited = 0;
-//#endif
-//
-//
-//
-//
-//#ifndef __DEBUG__GC
-//	  ofstream pre("GC" + to_string(gccount) + ".txt", ios_base::out);
-//	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
-//	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
-//	  create_heap_bft(pregc);
-//	  pregc.close();
-//	  print_activation_record_stack(pre);
-//#else
-//	  ostream &pre = null_stream;
-//#endif
-//	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
-//	  swap_buffer();
-//
-//  for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
-//    {
-//	  cerr << "Processing function " << stackit->funcname << endl;
-//	  for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
-//      {
-//    	  pre << "Doing gc at return point " << stackit->return_point << endl;
-//		  string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
-//    	  stateMapIter got = statemap.find(nodeName);
-//
-//    	  if (got != statemap.end())
-//    	  {
-//
-//    		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second);
-//    		  vhit->ref = addr;
-//
-//#ifdef ENABLE_SHARING_STATS
-//    		  if (vhit->ref)
-//    			  ++(((cons*)vhit->ref)->visited);
-//#endif
-//    	  }
-//      }
-//    }
-//  cerr << "Completed liveness GC" << endl;
-//  update_heap_ref_stack(pre, 1);
-//  clear_live_buffer();
-//#ifndef __DEBUG__GC
-//	pre.close();
-//	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
-//	create_heap_bft(postgc);
-//	postgc.close();
-//#endif
-//#ifdef ENABLE_SHARING_STATS
-//  print_sharing_stats();
-//#endif
-//  clock_t pend = clock();
-//  double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
-//  cout << "GC Time for " << gccount << " = " << gc_time << endl;
-//  gctime += gc_time;
-//  return;
-//}
-//
-//cons* followpaths(cons* loc, state_index index)
-//{
-//  cons* loccopy = copy(loc);
-//#ifdef ENABLE_SHARING_STATS
-//  if (loccopy)
-//	  ++(((cons*)loccopy)->visited);
-//#endif
-//  switch(loc->typecell)
-//  {
-//  case consExprClosure :
-//  {
-//	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
-//	  if (a0 > 0)
-//	  {
-//		  cons* newloc = getCar(loc, 1);
-//		  cons* addr = followpaths(newloc, a0);
-//		  set_car(loccopy, addr);
-//	  }
-//
-//
-//	  state_index a1 = state_transition_table[index][1];//get_target_dfastate(index, 1);
-//	  if (a1 > 0)
-//	  {
-//		  cons* newloc = getCdr(loc, 1);
-//		  cons* addr = followpaths(newloc, a1);
-//		  set_cdr(loccopy, addr);
-//	  }
-//  }
-//
-//  break;
-//  case nilExprClosure:
-//  case constIntExprClosure:
-//  case constBoolExprClosure:
-//  case constStringExprClosure: return loccopy;
-//  break;
-//  case unaryprimopExprClosure :
-//  {
-//	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
-//	  auto liveness_state = statemap.find(liveness_string);
-//	  if (liveness_state != statemap.end())
-//	  {
-//	  	  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
-//	  	  loccopy->val.closure.arg1 = new_arg1;
-//	  }
-//  }
-//  break;
-//  case binaryprimopExprClosure:
-//  {
-//	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
-//	  auto liveness_state = statemap.find(liveness_string);
-//	  if (liveness_state != statemap.end())
-//	  {
-//		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
-//		  loccopy->val.closure.arg1 = new_arg1;
-//	  }
-//	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
-//	  liveness_state = statemap.find(liveness_string);
-//	  if (liveness_state != statemap.end())
-//	  {
-//		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
-//		  loccopy->val.closure.arg2 = new_arg2;
-//	  }
-//  }
-//  break;
-//  case funcApplicationExprClosure:
-//  case funcArgClosure:
-//  {
-//	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
-//	  auto liveness_state = statemap.find(liveness_string);
-//	  if (liveness_state != statemap.end())
-//	  {
-//		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
-//		  loccopy->val.closure.arg2 = new_arg2;
-//	  }
-//  }
-//  break;
-//  default : cerr << "Should have never come here " << loc << endl;
-//  }
-//
-//  return loccopy;
-//}
+#ifdef _OPT_FULL_LGC
+//Liveness GC with liveness for closures
+void liveness_gc()
+{
+	clock_t pstart = clock();
+	 ++gccount;
+	 cerr << "Starting LGC#"<<gccount<<endl;
+#ifdef ENABLE_SHARING_STATS
+	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
+			  ((cons*)i)->visited = 0;
+#endif
+
+
+
+
+#ifndef __DEBUG__GC
+	  ofstream pre("GC" + to_string(gccount) + ".txt", ios_base::out);
+	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
+	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
+	  create_heap_bft(pregc);
+	  pregc.close();
+	  print_activation_record_stack(pre);
+#else
+	  ostream &pre = null_stream;
+#endif
+	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
+	  swap_buffer();
+
+  for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
+    {
+	  cerr << "Processing function " << stackit->funcname << endl;
+	  for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
+      {
+    	  pre << "Doing gc at return point " << stackit->return_point << endl;
+		  string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
+    	  stateMapIter got = statemap.find(nodeName);
+
+    	  if (got != statemap.end())
+    	  {
+
+    		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second);
+    		  vhit->ref = addr;
+
+#ifdef ENABLE_SHARING_STATS
+    		  if (vhit->ref)
+    			  ++(((cons*)vhit->ref)->visited);
+#endif
+    	  }
+      }
+    }
+  cerr << "Completed liveness GC" << endl;
+  update_heap_ref_stack(pre, 1);
+  clear_live_buffer();
+#ifndef __DEBUG__GC
+	pre.close();
+	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
+	create_heap_bft(postgc);
+	postgc.close();
+#endif
+#ifdef ENABLE_SHARING_STATS
+  print_sharing_stats();
+#endif
+  clock_t pend = clock();
+  double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
+  cout << "GC Time for " << gccount << " = " << gc_time << endl;
+  gctime += gc_time;
+  return;
+}
+
+cons* followpaths(cons* loc, state_index index)
+{
+  cons* loccopy = copy(loc);
+#ifdef ENABLE_SHARING_STATS
+  if (loccopy)
+	  ++(((cons*)loccopy)->visited);
+#endif
+  switch(loc->typecell)
+  {
+  case consExprClosure :
+  {
+	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
+	  if (a0 > 0)
+	  {
+		  cons* newloc = getCar(loc, 1);
+		  cons* addr = followpaths(newloc, a0);
+		  set_car(loccopy, addr);
+	  }
+
+
+	  state_index a1 = state_transition_table[index][1];//get_target_dfastate(index, 1);
+	  if (a1 > 0)
+	  {
+		  cons* newloc = getCdr(loc, 1);
+		  cons* addr = followpaths(newloc, a1);
+		  set_cdr(loccopy, addr);
+	  }
+  }
+
+  break;
+  case nilExprClosure:
+  case constIntExprClosure:
+  case constBoolExprClosure:
+  case constStringExprClosure: return loccopy;
+  break;
+  case unaryprimopExprClosure :
+  {
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+	  auto liveness_state = statemap.find(liveness_string);
+	  if (liveness_state != statemap.end())
+	  {
+	  	  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
+	  	  loccopy->val.closure.arg1 = new_arg1;
+	  }
+  }
+  break;
+  case binaryprimopExprClosure:
+  {
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  auto liveness_state = statemap.find(liveness_string);
+	  if (liveness_state != statemap.end())
+	  {
+		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
+		  loccopy->val.closure.arg1 = new_arg1;
+	  }
+	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  liveness_state = statemap.find(liveness_string);
+	  if (liveness_state != statemap.end())
+	  {
+		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
+		  loccopy->val.closure.arg2 = new_arg2;
+	  }
+  }
+  break;
+  case funcApplicationExprClosure:
+  case funcArgClosure:
+  {
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  auto liveness_state = statemap.find(liveness_string);
+	  if (liveness_state != statemap.end())
+	  {
+		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
+		  loccopy->val.closure.arg2 = new_arg2;
+	  }
+  }
+  break;
+  default : cerr << "Should have never come here " << loc << endl;
+  }
+
+  return loccopy;
+}
+#endif
+
+
 #endif
 
 
@@ -2394,7 +2395,11 @@ struct heap_data
 
 string print_cell_type(cons* cell)
 {
+	if (!cell)
+		return "";
+
 	auto t = cell->typecell;
+
 //	cout << "Printing cell " << cell << " with index " << (cell - getbufferlive()) << endl;
 	switch(t)
 	{
@@ -2453,6 +2458,9 @@ void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map
 			out << (elem - (cons*)buffer_live) << "(" << elem << ")" << "\t" << print_cell_type(elem)<<"\t\t";
 			index++;
 		}
+
+		if (!elem)
+			continue;
 
 		switch(elem->typecell)
 		{
@@ -2548,7 +2556,14 @@ void create_heap_bft(ostream& out)
 	while (curr_index < heap_cell_list.size())
 	{
 		cons* curr_cell = heap_cell_list[curr_index];
-//		out << "index for " << curr_cell << " is " << curr_index << endl;
+//		cerr << "index for " << curr_cell << " is " << curr_index << endl;
+
+		if (!curr_cell)
+		{
+			++curr_index;
+			continue;
+		}
+
 		switch(curr_cell->typecell)
 		{
 		case consExprClosure: {
