@@ -595,8 +595,6 @@ std::vector<std::string> splitLivenessString(std::string ls)
 	std::string var_name = ls.substr(ls.find_last_of("/") + 1,  std::string::npos);
 	v.push_back(label_set_str);
 	v.push_back(var_name);
-	//std::cout << "label set is " << label_set_str << std::endl;
-	//std::cout << "var name is "<< var_name << std::endl;
 	return v;
 }
 

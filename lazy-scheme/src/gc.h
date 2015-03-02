@@ -22,7 +22,7 @@ using namespace Scheme::AST;
 
 #ifndef __DEBUG__GC
 #define __DEBUG__GC
-#undef __DEBUG__GC
+//#undef __DEBUG__GC
 #endif
 
 //#define REACHABILITY_BFS

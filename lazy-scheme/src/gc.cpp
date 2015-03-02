@@ -27,6 +27,8 @@ using namespace std;
 #undef DUMP_HEAP_AS_GRAPHVIZ
 
 
+cons* memory_loc = NULL;
+
 int numcopied = 0; //TODO:Delete after debugging
 
 
@@ -165,10 +167,20 @@ void print_gc_move(cons* from, cons* to, ostream& out)
 cons* deep_copy(cons* node, int gc_type, ostream& out)
 {
 	assert(!is_valid_address(node));
+
 	if (gc_type == 0)
 		return followpaths_reachability(node);
 	else
 	{
+		out << "Processing node " << node << endl;
+		//if ((node - (cons*)buffer_dead) > 30000)
+		{
+			out << "Buffer live " << buffer_live << " && " << boundary_live << endl;
+			out << "Buffer dead "<< buffer_dead << " && " << boundary_dead << endl;
+			out << "Index is " << (node - (cons*)buffer_dead) << endl;
+			out << "Index is " << (node - (cons*)buffer_live) << endl;
+			out << sizeof(cons) << endl;
+		}
 		if (node != NULL)
 		{
 			if (node->typecell != consExprClosure && node->forward != NULL)
@@ -192,16 +204,22 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 			else
 			{
 				cons* new_loc = copy(node, out);
-				if (new_loc == node)
-				{
-					return node;
-				}
+				assert(new_loc != node);
+//				if (new_loc == node)
+//				{
+//					return node;
+//				}
 				if ((node->typecell == unaryprimopExprClosure) ||
 				    (node->typecell == binaryprimopExprClosure) ||
 				    (node->typecell == funcApplicationExprClosure) ||
 				    (node->typecell == funcArgClosure))
 				{
+					out << "Is valid address for arg1? " << is_valid_address(node->val.closure.arg1) << endl;
 					new_loc->val.closure.arg1 = deep_copy(node->val.closure.arg1, 1, out);
+
+					out << "Is valid address for arg2? " << is_valid_address(node->val.closure.arg2) << endl;
+					if (node->val.closure.arg2)
+						out << "Type of arg2 is " << node->val.closure.arg2->typecell << endl;
 					new_loc->val.closure.arg2 = deep_copy(node->val.closure.arg2, 1, out);
 				}
 				return new_loc;
@@ -323,99 +341,22 @@ void print_gc_move(cons* from, cons* to)
 	return;
 }
 
+
 cons* deep_copy(cons* node, int gc_type)
 {
-//	if (gccount > 5)
-//	{
-//		cerr << "Processing node " << node <<endl;
-//		if (node)
-//		{
-//			cerr << " with type "<< node->typecell<<endl;
-//			cerr << node->copied_using_rgc << endl;
-//		}
-//	}
 	if (gc_type == 0)
 		return followpaths_reachability(node);
 	else
 	{
-		//What do we do here? What should be the state that we pass?
-		return followpaths_reachability(node);
-//		if (node != NULL)
-//		{
-//			if (node->typecell != consExprClosure && node->forward != NULL)
-//				return static_cast<cons*>(node->forward);
-//			else if (node->typecell == consExprClosure)
-//			{
-////				cerr << "Copying cons cell " << node << endl;
-//
-//				if ( (!is_valid_address(node) && node->forward == NULL) ||
-//						(is_valid_address(node) && node->copied_using_rgc == false))
-//				{
-////					if (!(node->forward == NULL || is_valid_address(node)))
-////					{
-////						cerr << "Node address is "<<node<<endl;
-////						cerr << "Node forward address is "<<node->forward<<endl;
-////						cerr << "Is the node valid?" << is_valid_address(node) << endl;
-////						cerr << "Copied using RGC?"<<node->copied_using_rgc<<endl;
-////						if (node->forward == NULL)
-////							cerr << "Node is not forwarded " << endl;
-////
-////						//assert(node->forward == NULL || is_valid_address(node));
-////					}
-//
-//					cons* new_loc;
-//					if (node->forward == NULL)
-//						new_loc = copy(node);
-//					else
-//						new_loc = static_cast<cons*>(node->forward);
-//
-////					if (node == new_loc)
-////					{
-////						cerr << "Copied using RGC? " << node->copied_using_rgc<<endl;
-////						cerr << "returning " << new_loc << endl;
-////						cerr << "Copying car and cdr part"<<endl;
-////					}
-//
-//					node->copied_using_rgc = true;
-//					new_loc->copied_using_rgc = true;
-//					new_loc->val.cell.car = deep_copy(new_loc->val.cell.car, 1);
-//					new_loc->val.cell.cdr = deep_copy(new_loc->val.cell.cdr, 1);
-//
-//					return new_loc;
-//				}
-//				else
-//				{
-////					cerr << "returning already copied cons cell"<<endl;
-//					return static_cast<cons*>(node->forward);
-//				}
-//			}
-//			else
-//			{
-//				cons* new_loc = copy(node);
-//				if (new_loc == node)
-//				{
-//
-////					cerr << "returning the same cell " << endl;
-////					cerr << new_loc->forward << " = " << node->forward << endl;
-//					return node;
-//				}
-//				if ((node->typecell == unaryprimopExprClosure) ||
-//				    (node->typecell == binaryprimopExprClosure) ||
-//				    (node->typecell == funcApplicationExprClosure) ||
-//				    (node->typecell == funcArgClosure))
-//				{
-////					cerr << "Processing arg1 " << new_loc->val.closure.arg1 << endl;
-//					new_loc->val.closure.arg1 = deep_copy(new_loc->val.closure.arg1, 1);
-////					cerr << "Processing arg2 " << new_loc->val.closure.arg2 << endl;
-//					new_loc->val.closure.arg2 = deep_copy(new_loc->val.closure.arg2, 1);
-//				}
-//				return new_loc;
-//			}
-//		}
-
+		stateMapIter got = statemap.find("L/-1/c");
+		//This should always return D/all
+		assert(got != statemap.end());
+		return followpaths(node, got->second);
 	}
 	return NULL;
 }
+
+
 cons* copy(cons* node)
 {
 	void *addr;
@@ -439,7 +380,7 @@ cons* copy(cons* node)
 			return (static_cast<cons*>(conscell->forward));
 		}
 
-
+		break execution whenever a memory location is written to in eclipse
 		addr = dup_cons(conscell);
 		conscell->forward=addr;
 		copycells=copycells+1;
@@ -1174,7 +1115,11 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 	while(!print_stack.empty())
 	{
 		cons* heap_ref = print_stack.top();
-
+		if (gc_type == 0)
+		{
+			followpaths_reachability(heap_ref);
+		}
+		else
 //		out << "Processing heap reference in print " << heap_ref << " with index " << (heap_ref - (cons*)buffer_dead)<<endl;
 //		out << heap_ref->forward << endl;
 		if (heap_ref->forward == NULL)
@@ -1187,6 +1132,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 				//If it is liveness based GC and we are copying a cons cell then check for can_delete_car flag
 				//whether to copy the cdr part or not
 				new_ref = copy(heap_ref);
+				out << "Copying " << heap_ref << " with index " << (heap_ref - (cons*)buffer_dead) << endl;
 				if (heap_ref->val.cell.can_delete_car == false)
 				{
 					//How can we assert that the memory pointed to by the car pointer will be on print stack and will
@@ -1194,21 +1140,29 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 					//If this assertion is true then we do not need to copy the car part.
 					//assert(heap_ref->val.cell.car->forward != NULL);
 					//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
-					cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type);
+					out << "Not copying the car part for cell " << (heap_ref - (cons*)buffer_dead) << endl;
+					cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type, out);
 					new_ref->val.cell.cdr = static_cast<cons*>(cdr_ref);
-
 				}
-				assert(heap_ref->val.cell.cdr->forward != NULL);
 				//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
 				//TODO  Since this will never be accessed can we set it to NULL here?????
-
+				if (new_ref->val.cell.car->forward != NULL)
+				{
+					new_ref->val.cell.car = static_cast<cons*>(new_ref->val.cell.car->forward);
+				}
+				else
+				{
+					new_ref->val.cell.car = NULL;
+				}
 				//new_ref->val.cell.car = static_cast<cons*>(static_cast<void*>(0x1)); //Set it to an invalid address,
+				assert(heap_ref->val.cell.cdr->forward != NULL);
+				out << "Setting the cdr ptr to " << ((cons*)(heap_ref->val.cell.cdr->forward) - getbufferlive()) << endl;
 				new_ref->val.cell.cdr = static_cast<cons*>(heap_ref->val.cell.cdr->forward);
 			}
 			else
 			{
-//				out << "Copying reference from print buffer " << (heap_ref - (cons*)buffer_dead) << endl;
-				new_ref = deep_copy(heap_ref, gc_type);
+				out << "Copying reference from print buffer " << (heap_ref - (cons*)buffer_dead) << endl;
+				new_ref = deep_copy(heap_ref, gc_type, out);
 			}
 			//out << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
 		}
@@ -1416,7 +1370,7 @@ void reachability_gc()
 #endif
 	clock_t pend = clock();
 	double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
-	cout << "GC Time for " << gccount << " = " << gc_time << endl;
+	cerr << "GC Time for " << gccount << " = " << gc_time << endl;
 	gctime += gc_time;
 	return;
 }
@@ -1550,7 +1504,7 @@ void print_sharing_stats()
 #endif
 
 #ifdef LIVENESS_DFS
-
+#ifdef _OPT_TIME
 void liveness_gc()
 {
 	clock_t pstart = clock();
@@ -1589,13 +1543,9 @@ void liveness_gc()
     	  if (got != statemap.end())
     	  {
 
-//    		  if (((cons*)vhit->ref)->forward == NULL)//If pointer already not copied then clear its contents
-//    			  c->s->clear();
-
     		  pre << "Processing var " << vhit->varname << endl;
+    		  pre << "Index is " << ((cons*)vhit->ref - (cons*)buffer_dead) << endl;
     		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second, pre);
-    		  //cons* c = (cons*) addr;
-    		  //c->s->insert(got->second);
     		  vhit->ref = addr;
 
 
@@ -1606,8 +1556,9 @@ void liveness_gc()
     	  }
       }
     }
-  //cerr << "Completed liveness GC" << endl;
+  pre << "Completed liveness GC" << endl;
   update_heap_ref_stack(pre, 1);
+  pre << "Number of cells copied " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl;
   clear_live_buffer(pre);
 #ifdef __DEBUG__GC
 	pre.close();
@@ -1620,7 +1571,7 @@ void liveness_gc()
 #endif
   clock_t pend = clock();
   double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
-  cout << "GC Time for " << gccount << " = " << gc_time << endl;
+  cerr << "GC Time for " << gccount << " = " << gc_time << endl;
   gctime += gc_time;
   return;
 }
@@ -1633,7 +1584,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 
 	cons* loccopy = copy(loc, out);
 
-    out << "Copying cons cell from " << loc << " with type " << loc->typecell << " == " << consExprClosure << endl;
+    out << "Copying cell from " << loc << " with type " << loc->typecell << endl;
 
 #ifdef ENABLE_SHARING_STATS
   if (loccopy)
@@ -1686,6 +1637,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  loc->typecell == binaryprimopExprClosure ||
 		  loc->typecell == funcArgClosure)
   {
+	  out << "Copying cell with index " << (loc - getbufferlive()) << endl;
 	  if (loc == loccopy)
 	  {
 		  out << "returning already copied pointer"<<endl;
@@ -1693,22 +1645,25 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 	  }
 	  else
 	  {
-		  cons* oldarg1 = loc->val.closure.arg1;
-		  cons* addr = deep_copy(loc->val.closure.arg1, 1);
-		  loccopy->val.closure.arg1 = addr;
 
+		  out << "arg1 --> " << loc->val.closure.arg1 << " with index = " <<(loc->val.closure.arg1 - (cons*)buffer_dead) << endl;
+		  cons* oldarg1 = loc->val.closure.arg1;
+		  cons* addr = deep_copy(loc->val.closure.arg1, 1, out);
+		  loccopy->val.closure.arg1 = addr;
+		  out << "Copied arg1 from " << oldarg1 << " to " << addr <<endl;
+
+		  out << "arg2 --> " << loc->val.closure.arg2 << " with index = " <<(loc->val.closure.arg2 - (cons*)buffer_dead) << endl;
 		  cons* oldarg2 = loc->val.closure.arg2;
-		  addr = deep_copy(loc->val.closure.arg2, 1);
+		  addr = deep_copy(loc->val.closure.arg2, 1, out);
 		  loccopy->val.closure.arg2 = addr;
+		  out << "Copied arg2 from " << oldarg2 << " to " << addr << endl;
 	  }
 
   }
 
   return loccopy;
 }
-
-
-#ifdef _OPT_FULL_LGC
+#else
 //Liveness GC with liveness for closures
 void liveness_gc()
 {
@@ -1760,7 +1715,7 @@ void liveness_gc()
     }
   cerr << "Completed liveness GC" << endl;
   update_heap_ref_stack(pre, 1);
-  clear_live_buffer();
+  clear_live_buffer(pre);
 #ifndef __DEBUG__GC
 	pre.close();
 	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
@@ -1784,6 +1739,10 @@ cons* followpaths(cons* loc, state_index index)
   if (loccopy)
 	  ++(((cons*)loccopy)->visited);
 #endif
+
+  if (NULL == loc)
+	  return loc;
+
   switch(loc->typecell)
   {
   case consExprClosure :
@@ -2448,6 +2407,8 @@ void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map
 	out << "Starting GC " << endl;
 	for(auto elem : heap_cell_list)
 	{
+		assert(elem);
+
 		if (index < num_root_vars)
 		{
 			out << (elem - (cons*)buffer_live) << "(" << elem << ")" << "("<< root_var_map[index]<< ")\t" << print_cell_type(elem)<<"\t\t";
@@ -2459,8 +2420,8 @@ void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map
 			index++;
 		}
 
-		if (!elem)
-			continue;
+//		if (!elem)
+//			continue;
 
 		switch(elem->typecell)
 		{
@@ -2490,18 +2451,18 @@ void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map
 		}
 		out  << endl;
 		break;
-		default : out << endl;
+		default : out << "Unknown type. Should not have come here " << elem << " with index(heap_list) " << (index - 1) << endl;
 				break;
 		}
 
 	}
 
-	ofstream pre_gc_addr_list("pre_gc_addr.txt", ios::out);
-	for(auto ele: heap_cell_list)
-	{
-		pre_gc_addr_list << ele << " with type "<< print_cell_type(ele) << endl;
-	}
-	pre_gc_addr_list.close();
+//	ofstream pre_gc_addr_list("pre_gc_addr.txt", ios::out);
+//	for(auto ele: heap_cell_list)
+//	{
+//		pre_gc_addr_list << ele << " with type "<< print_cell_type(ele) << endl;
+//	}
+//	pre_gc_addr_list.close();
 
 	//out << "Completed writing GC " << gccount << endl;
 	out << "Completed writing GC " <<  endl;
@@ -2510,7 +2471,6 @@ void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map
 
 void create_heap_bft(ostream& out)
 {
-
 	vector<cons*> heap_cell_list;
 
 	heap_map.clear();
@@ -2553,16 +2513,28 @@ void create_heap_bft(ostream& out)
 
 
 	unsigned int curr_index = 0;
+	size_t dummy = heap_cell_list.size();
 	while (curr_index < heap_cell_list.size())
 	{
+
 		cons* curr_cell = heap_cell_list[curr_index];
 //		cerr << "index for " << curr_cell << " is " << curr_index << endl;
-
-		if (!curr_cell)
+		dummy = heap_cell_list.size();
+		//if ( (dummy == 29912) && (gccount >= 253))
+		if ( (dummy >= 29644) && (gccount >= 238))
 		{
-			++curr_index;
-			continue;
+			memory_loc = curr_cell->val.closure.arg2 ;
+			cerr << "Processing cell " << curr_cell << endl;
+			cerr << "cell type is " << curr_cell->typecell << endl;
 		}
+
+		assert(curr_cell);
+
+//		if (!curr_cell)
+//		{
+//			++curr_index;
+//			continue;
+//		}
 
 		switch(curr_cell->typecell)
 		{
@@ -2579,6 +2551,14 @@ void create_heap_bft(ostream& out)
 			if (heap_map.find(cdr_part) == heap_map.end())
 			{
 				heap_map[cdr_part] = index;
+				if (gccount == 254 && index == 29810)
+				{
+					cerr << "Processing cdr part of cell " << curr_cell << endl;
+					cerr << "cdr part address is " << cdr_part << endl;
+					cerr << "Index of cdr part is " << (cdr_part - getbufferlive()) << endl;
+					cerr << "Type of cdr part is " << cdr_part->typecell << endl;
+					cerr << "Current index is " << curr_index << endl;
+				}
 				++index;
 				heap_cell_list.push_back(cdr_part);
 			}

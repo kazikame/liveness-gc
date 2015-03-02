@@ -530,7 +530,7 @@ cons* LetExprNode::evaluate()
 
 		if (gc_status != gc_live)
 		{
-			cout << "DOING RGC"<<endl;
+			cerr << "DOING RGC"<<endl;
 			//TODO : Remove these, they are not needed for RGC. Added only to dump graphviz files
 			//std::string curr_let_pgmpt = return_stack().return_point;
 			//return_stack().return_point = getLabel();
@@ -540,13 +540,7 @@ cons* LetExprNode::evaluate()
 		}
 		else
 		{
-			/*
-			 * nperm with size 800 copies invalid memory locations and asserts.
-			 * Also nperm with size 900 gives an invalid memory access error.
-			 * 850 gives a segmentation fault
-			 * Both might be related.
-			 * */
-			cout << "DOING LGC"<< endl;
+			cerr << "DOING LGC"<< endl;
 			//cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 			std::string curr_let_pgmpt = return_stack().return_point;
 			return_stack().return_point = getLabel();
@@ -1003,7 +997,7 @@ cons* BinaryPrimExprNode::evaluateSub()
 	if (heap_cell->inWHNF)
 			return heap_cell;
 
-
+//	cerr << "Evaluating sub operation for node " << heap_cell << endl;
 	update_heap_refs.push(heap_cell->val.closure.arg1);
 	cons* arg1 = reduceParamToWHNF(heap_cell->val.closure.arg1);
 
@@ -1032,6 +1026,7 @@ cons* BinaryPrimExprNode::evaluateSub()
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal - arg2->val.intVal;
 
+//	cerr << "Updated sub operation for node " << heap_cell << endl;
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
 }

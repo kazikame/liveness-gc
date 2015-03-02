@@ -154,6 +154,11 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		gLivenessData.insert(pgm->liveness_data.begin(), pgm->liveness_data.end()) ;
 		gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
 
+		//Add a dummy pgmpt with D/all liveness to handle liveness for cons cells on the print stack
+		rule symbolic_demand = rule({{ PREFIX_DEMAND + SEPARATOR + "all" }});
+		gLivenessData["L/-1/c"] = symbolic_demand;
+
+
 		//cout << "program name " << pgmname << endl;
 		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
 		//Simplify grammar
@@ -172,28 +177,6 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
 		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-nfa.txt");
 
-#ifdef MY_DEBUG
-//		//Add a layer here to filter the liveness Data that needs to be converted.
-//
-		vector<string> filter_criteria;
-		read_filter_criteria_from_file("../benchmarks/programs/" + pgmname + "/filter.txt", filter_criteria);
-		demand_grammar filtered_gram = filter_grammar(gLivenessData, filter_criteria);
-
-		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&filtered_gram, pgmname);
-		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/filtered-nfa.txt");
-
-
-		std::unordered_set<std::string> start_states;
-		for (auto nt:filtered_gram)
-			start_states.insert(nt.first);
-		Scheme::Demands::simplifyNFA(start_states, nfa);
-		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
-		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
-		Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
-		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);
-
-		exit(1);
-#endif
 		std::unordered_set<std::string> start_states;
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);

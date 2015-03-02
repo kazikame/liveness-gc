@@ -478,6 +478,8 @@ unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const 
         gLivenessData[PREFIX_DEMAND + SEPARATOR + func.first].insert(func.second.begin(), func.second.end());
     }
 
+
+
     this->label_set.insert(pExpr->label_set.begin(), pExpr->label_set.end());
     this->progpt_map = &prog_pt_map;
     this->liveness_data = gLivenessData;
