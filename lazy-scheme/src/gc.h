@@ -11,7 +11,7 @@ using namespace Scheme::AST;
 
 
 #define _OPT_TIME
-//#undef _OPT_TIME
+#undef _OPT_TIME
 
 #ifdef _OPT_TIME
 #undef _OPT_FULL_LGC
@@ -118,7 +118,7 @@ typedef struct activationRecord
  void clear_live_buffer(ostream& out = null_stream);
 #else
  cons* copy(cons* node);
- cons* deep_copy(cons* node, int gc_type = 0);
+ cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
  cons* followpaths_reachability(cons* loc);
  cons* followpaths(cons* loc, state_index index);
  void print_gc_move(cons* from, cons* to);

@@ -503,12 +503,12 @@ LetExprNode * LetExprNode::clone() const
 	return new LetExprNode(pID->clone(), pExpr->clone(), pBody->clone());
 }
 
-cons* LetExprNode::evaluate()
-
 #ifndef __MYDEBUG
 #define __MYDEBUG
 #undef __MYDEBUG
 #endif
+
+cons* LetExprNode::evaluate()
 {
 	curr_return_addr = getLabel();
 //	cout << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl;
@@ -531,7 +531,7 @@ cons* LetExprNode::evaluate()
 		if (gc_status != gc_live)
 		{
 			cerr << "DOING RGC"<<endl;
-			//TODO : Remove these, they are not needed for RGC. Added only to dump graphviz files
+			//TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
 			//std::string curr_let_pgmpt = return_stack().return_point;
 			//return_stack().return_point = getLabel();
 			reachability_gc();
@@ -541,7 +541,6 @@ cons* LetExprNode::evaluate()
 		else
 		{
 			cerr << "DOING LGC"<< endl;
-			//cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
 			std::string curr_let_pgmpt = return_stack().return_point;
 			return_stack().return_point = getLabel();
 			liveness_gc();
@@ -554,7 +553,7 @@ cons* LetExprNode::evaluate()
 			num_cells_reqd = 1;
 		else if (isFunctionCall)
 			num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
-		cout << "Num of cons cells required is " << num_cells_reqd<<endl;
+//		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
 		if (check_space(num_cells_reqd * sizeof(cons)) == 0)
 		{
 			fprintf(stderr,"No Sufficient Memory - cons\n");
@@ -580,7 +579,6 @@ cons* LetExprNode::evaluate()
 	
 
 	cons* var_res = this->getVarExpr()->make_closure();
-	//cout << "Address of " << this->getVar() << " = " << var_res << endl;
 	cons* retval = this->getBody()->evaluate();
 	assert(retval->inWHNF && is_valid_address(retval));
 
@@ -689,18 +687,12 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 	else
 	{
 		update_heap_refs.push(heap_cell->val.closure.arg1);
-//		cout << "Processing heap cell with index " << (heap_cell - (cons*)getbufferlive())<< endl;
-//		cout << "Before reduction type of heap cell is " << heap_cell->typecell << endl;
-//
-//		cout << " Processing arg1 of UnOp with index " << ((cons*)update_heap_refs.top() - (cons*)getbufferlive())<< endl;
-//		cout << "Type of arg1 is " << update_heap_refs.top()->typecell << endl;
 		cons* temp = reduceParamToWHNF(heap_cell->val.closure.arg1);
 
 		assert(temp->inWHNF);
 		cons* arg1 = update_heap_refs.top();
 
 		assert(is_valid_address(arg1));
-//		cout << "Updated type of arg1 to " << arg1->typecell << " with index " << ((cons*)arg1 - getbufferlive()) <<endl;
 
 		arg1->typecell = temp->typecell;
 		arg1->inWHNF = temp->inWHNF;
@@ -714,19 +706,17 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 
 
 		update_heap_refs.push(arg1->val.cell.car);
-//		cout << " Processing car part of UnOp with index " << ((cons*)update_heap_refs.top() - (cons*)getbufferlive())<< endl;
-//		cout << "Type of car is " << update_heap_refs.top()->typecell << endl;
 		cons* retval = reduceParamToWHNF(arg1->val.cell.car);
-//		cout << "Updating type to " << retval->typecell << " for index " << ((cons*)update_heap_refs.top() - (cons*)getbufferlive()) << endl;
 		update_heap_refs.pop();
 
 		cons* heap_cell = update_heap_refs.top();
 		assert(retval->inWHNF);
+
+
+
 		heap_cell->typecell = retval->typecell;
 		heap_cell->val = retval->val;
 		heap_cell->inWHNF = true;
-
-//		cout << "Updated type of heap_cell " << (heap_cell - (cons*)getbufferlive()) << " to " << heap_cell->typecell << endl;
 
 		heap_cell->reduction_id = ++reduction_count;
 		return heap_cell;
@@ -926,8 +916,6 @@ cons* BinaryPrimExprNode::evaluateCons()
 		return heap_cell;
 
 	assert(is_valid_address(heap_cell->val.closure.arg1) && is_valid_address(heap_cell->val.closure.arg2));
-//	cout << "Creating cons cell with closures " << (heap_cell->val.closure.arg1 - getbufferlive()) <<
-//				" and " << (heap_cell->val.closure.arg2 - getbufferlive()) << " at index " << (heap_cell - getbufferlive()) << endl;
 	heap_cell->inWHNF = true;
 	heap_cell->typecell = consExprClosure;
 	heap_cell->val.cell.car = heap_cell->val.closure.arg1;
@@ -1385,23 +1373,15 @@ cons* FuncExprNode::make_closure()
 	if (pListArgs->size() > 0)
 	{
 
-//		cout << "Creating closure for " <<
-//				((IdExprNode*)(*rarglistiter))->getIDStr()
-//				<< " at " << (retval - getbufferlive())
-//				<< " pointing to " << (lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str()) - getbufferlive())
-//				<< endl;
 		retval->val.closure.arg2 = lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
+		retval->val.closure.arg2_name = new string(((IdExprNode*)(*rarglistiter))->getIDStr());
+		retval->val.closure.prog_pt = new string(curr_return_addr);
 		auto prev = retval;
 		while(num_args > 0)
 		{
 			++rarglistiter;
 			auto curr = allocate_cons();
 			curr->inWHNF = false;
-//			cout << "Creating closure for " <<
-//							((IdExprNode*)(*rarglistiter))->getIDStr()
-//							<< " at " << (curr - getbufferlive())
-//							<< " pointing to " << (lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str()) - getbufferlive())
-//							<< endl;
 			curr->typecell = funcArgClosure;
 			curr->val.closure.arg2 =  lookup_addr(((IdExprNode*)(*rarglistiter))->getIDStr().c_str());
 			curr->val.closure.arg2_name = new string(((IdExprNode*)(*rarglistiter))->getIDStr());

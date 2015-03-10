@@ -299,67 +299,14 @@ cons* followpaths_reachability(cons* loc, ostream& out)
 		case funcApplicationExprClosure:
 		case funcArgClosure:
 		{
-			if (loccopy->typecell == funcApplicationExprClosure)
-			{
-				FuncExprNode* funcall = static_cast<FuncExprNode*>(loccopy->val.closure.expr);
-				string func_name = funcall->getFunction();
-				if (func_name == "fill-queue")
-				{
-					cerr << "Processing function call " << funcall->getFunction() << endl;
-					cerr << "loc = " << loccopy << endl;
-					cerr << "Before copying " << endl;
-					cerr << "Arg1 = " << loccopy->val.closure.arg1<< endl;
-					cerr << "Type of arg1 = " << loccopy->val.closure.arg1->typecell << endl;
-					cerr << "Arg2 = " << loccopy->val.closure.arg2<< endl;
-					cerr << "Arg2 forward " << loccopy->val.closure.arg2->forward << endl;
-					cerr << "Type of arg2 = " << loccopy->val.closure.arg2->typecell << endl;
-				}
-			}
-
-
 			cons* oldarg1 = loccopy->val.closure.arg1;
 			cons *addr=followpaths_reachability(loccopy->val.closure.arg1, out);
 			loccopy->val.closure.arg1=addr;
-			print_gc_move(oldarg1, addr, null_stream);
-
-			if (loccopy->typecell == funcApplicationExprClosure)
-			{
-				FuncExprNode* funcall = static_cast<FuncExprNode*>(loccopy->val.closure.expr);
-				string func_name = funcall->getFunction();
-				if (func_name == "fill-queue")
-				{
-					cerr << "Processing function call " << funcall->getFunction() << endl;
-					cerr << "loc = " << loccopy << endl;
-					cerr << "After copying arg1" << endl;
-					cerr << "Arg1 = " << loccopy->val.closure.arg1<< endl;
-					cerr << "Type of arg1 = " << loccopy->val.closure.arg1->typecell << endl;
-					cerr << "Arg2 = " << loccopy->val.closure.arg2<< endl;
-					cerr << "Arg2 forward " << loccopy->val.closure.arg2->forward << endl;
-					cerr << "Type of arg2 = " << loccopy->val.closure.arg2->typecell << endl;
-				}
-			}
 
 			cons* oldarg2 = loccopy->val.closure.arg2;
 			addr=followpaths_reachability(loccopy->val.closure.arg2, out);
 			loccopy->val.closure.arg2=addr;
-//			if (loccopy->typecell == funcApplicationExprClosure)
-				print_gc_move(oldarg2, addr, null_stream);
-			if (loccopy->typecell == funcApplicationExprClosure)
-			{
-				FuncExprNode* funcall = static_cast<FuncExprNode*>(loccopy->val.closure.expr);
-				string func_name = funcall->getFunction();
-				if (func_name == "fill-queue")
-				{
-					cerr << "Processing function call " << funcall->getFunction() << endl;
-					cerr << "loc = " << loccopy << endl;
-					cerr << "After copying arg2" << endl;
-					cerr << "Arg1 = " << loccopy->val.closure.arg1<< endl;
-					cerr << "Type of arg1 = " << loccopy->val.closure.arg1->typecell << endl;
-					cerr << "Arg2 = " << loccopy->val.closure.arg2<< endl;
-					cerr << "Arg2 forward " << loccopy->val.closure.arg2->forward << endl;
-					cerr << "Type of arg2 = " << loccopy->val.closure.arg2->typecell << endl;
-				}
-			}
+
 		}
 
 		break;
@@ -393,7 +340,7 @@ void print_gc_move(cons* from, cons* to)
 }
 
 
-cons* deep_copy(cons* node, int gc_type)
+cons* deep_copy(cons* node, int gc_type, ostream& out)
 {
 	if (gc_type == 0)
 		return followpaths_reachability(node);
@@ -402,6 +349,7 @@ cons* deep_copy(cons* node, int gc_type)
 		stateMapIter got = statemap.find("L/-1/c");
 		//This should always return D/all
 		assert(got != statemap.end());
+		cerr << "Doing LGC with state D/all for node " << node << " state = " << got->second << endl;
 		return followpaths(node, got->second);
 	}
 	return NULL;
@@ -431,7 +379,6 @@ cons* copy(cons* node)
 			return (static_cast<cons*>(conscell->forward));
 		}
 
-		break execution whenever a memory location is written to in eclipse
 		addr = dup_cons(conscell);
 		conscell->forward=addr;
 		copycells=copycells+1;
@@ -1165,12 +1112,9 @@ void end_GC_dump()
 void update_heap_ref_stack(ostream& out, int gc_type)
 {
 	stack<cons*> temp;
-//	cerr << "Updating print & heap ref stack" << endl;
-	cout << "Updating print stack with size " << print_stack.size() << endl;
-	int ii = 0;
+
 	while(!print_stack.empty())
 	{
-		++ii;
 		cons* heap_ref = print_stack.top();
 		if (gc_type == 0)
 		{
@@ -1427,7 +1371,7 @@ void reachability_gc()
 #endif
 	clock_t pend = clock();
 	double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
-	cerr << "GC Time for " << gccount << " = " << gc_time << endl;
+//	cerr << "GC Time for " << gccount << " = " << gc_time << endl;
 	gctime += gc_time;
 	return;
 }
@@ -1566,7 +1510,7 @@ void liveness_gc()
 {
 	clock_t pstart = clock();
 	 ++gccount;
-	 cerr << "Starting LGC#"<<gccount<<endl;
+//	 cerr << "Starting LGC#"<<gccount<<endl;
 #ifdef ENABLE_SHARING_STATS
 	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
 			  ((cons*)i)->visited = 0;
@@ -1628,7 +1572,7 @@ void liveness_gc()
 #endif
   clock_t pend = clock();
   double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
-  cerr << "GC Time for " << gccount << " = " << gc_time << endl;
+//  cerr << "GC Time for " << gccount << " = " << gc_time << endl;
   gctime += gc_time;
   return;
 }
@@ -1649,7 +1593,6 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 #endif
   if (loc->typecell == consExprClosure)
   {
-//	  if (gccount >= 21) cerr << "Copied cons cell from " << loc << " to " << loccopy << endl;
 	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
 	  if (a0 > 0)
 	  {
@@ -1773,7 +1716,7 @@ void liveness_gc()
   cerr << "Completed liveness GC" << endl;
   update_heap_ref_stack(pre, 1);
   clear_live_buffer(pre);
-#ifndef __DEBUG__GC
+#ifdef __DEBUG__GC
 	pre.close();
 	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
 	create_heap_bft(postgc);
@@ -1786,6 +1729,7 @@ void liveness_gc()
   double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
   cout << "GC Time for " << gccount << " = " << gc_time << endl;
   gctime += gc_time;
+  cerr << "Number of cells copied = " << numcopied << endl;
   return;
 }
 
@@ -1831,9 +1775,11 @@ cons* followpaths(cons* loc, state_index index)
   case unaryprimopExprClosure :
   {
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
+		  cerr << "Doing GC corresponding to " << liveness_string << endl;
 	  	  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
 	  	  loccopy->val.closure.arg1 = new_arg1;
 	  }
@@ -1842,16 +1788,20 @@ cons* followpaths(cons* loc, state_index index)
   case binaryprimopExprClosure:
   {
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
+		  cerr << "Doing GC corresponding to " << liveness_string << endl;
 		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
 		  loccopy->val.closure.arg1 = new_arg1;
 	  }
 	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+
 	  liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
+		  cerr << "Doing GC corresponding to " << liveness_string << endl;
 		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
 		  loccopy->val.closure.arg2 = new_arg2;
 	  }
@@ -1861,9 +1811,11 @@ cons* followpaths(cons* loc, state_index index)
   case funcArgClosure:
   {
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
+		  cerr << "Doing GC corresponding to " << liveness_string << endl;
 		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
 		  loccopy->val.closure.arg2 = new_arg2;
 	  }
@@ -2575,23 +2527,6 @@ void create_heap_bft(ostream& out)
 	{
 
 		cons* curr_cell = heap_cell_list[curr_index];
-//		cerr << "index for " << curr_cell << " is " << curr_index << endl;
-		dummy = heap_cell_list.size();
-		//if ( (dummy == 29912) && (gccount >= 253))
-		if ( (dummy >= 29644) && (gccount >= 238))
-		{
-			memory_loc = curr_cell->val.closure.arg2 ;
-			cerr << "Processing cell " << curr_cell << endl;
-			cerr << "cell type is " << curr_cell->typecell << endl;
-		}
-
-		assert(curr_cell);
-
-//		if (!curr_cell)
-//		{
-//			++curr_index;
-//			continue;
-//		}
 
 		switch(curr_cell->typecell)
 		{
@@ -2608,14 +2543,6 @@ void create_heap_bft(ostream& out)
 			if (heap_map.find(cdr_part) == heap_map.end())
 			{
 				heap_map[cdr_part] = index;
-				if (gccount == 254 && index == 29810)
-				{
-					cerr << "Processing cdr part of cell " << curr_cell << endl;
-					cerr << "cdr part address is " << cdr_part << endl;
-					cerr << "Index of cdr part is " << (cdr_part - getbufferlive()) << endl;
-					cerr << "Type of cdr part is " << cdr_part->typecell << endl;
-					cerr << "Current index is " << curr_index << endl;
-				}
 				++index;
 				heap_cell_list.push_back(cdr_part);
 			}
