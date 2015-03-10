@@ -1342,6 +1342,7 @@ cons* FuncExprNode::evaluate()
 	auto curr = heap_cell;
 	while(num_args > 0)
 	{
+		//cerr << "Creating ref for argument " << (funcDef->getArgs()[num_args-1]).c_str() << " with type " << curr->val.closure.arg2->typecell << endl;
 		make_reference_addr((funcDef->getArgs()[num_args-1]).c_str(), curr->val.closure.arg2);
 		--num_args;
 		if (curr->val.closure.arg1 != NULL)

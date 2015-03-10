@@ -299,16 +299,67 @@ cons* followpaths_reachability(cons* loc, ostream& out)
 		case funcApplicationExprClosure:
 		case funcArgClosure:
 		{
+			if (loccopy->typecell == funcApplicationExprClosure)
+			{
+				FuncExprNode* funcall = static_cast<FuncExprNode*>(loccopy->val.closure.expr);
+				string func_name = funcall->getFunction();
+				if (func_name == "fill-queue")
+				{
+					cerr << "Processing function call " << funcall->getFunction() << endl;
+					cerr << "loc = " << loccopy << endl;
+					cerr << "Before copying " << endl;
+					cerr << "Arg1 = " << loccopy->val.closure.arg1<< endl;
+					cerr << "Type of arg1 = " << loccopy->val.closure.arg1->typecell << endl;
+					cerr << "Arg2 = " << loccopy->val.closure.arg2<< endl;
+					cerr << "Arg2 forward " << loccopy->val.closure.arg2->forward << endl;
+					cerr << "Type of arg2 = " << loccopy->val.closure.arg2->typecell << endl;
+				}
+			}
+
+
 			cons* oldarg1 = loccopy->val.closure.arg1;
 			cons *addr=followpaths_reachability(loccopy->val.closure.arg1, out);
 			loccopy->val.closure.arg1=addr;
 			print_gc_move(oldarg1, addr, null_stream);
 
+			if (loccopy->typecell == funcApplicationExprClosure)
+			{
+				FuncExprNode* funcall = static_cast<FuncExprNode*>(loccopy->val.closure.expr);
+				string func_name = funcall->getFunction();
+				if (func_name == "fill-queue")
+				{
+					cerr << "Processing function call " << funcall->getFunction() << endl;
+					cerr << "loc = " << loccopy << endl;
+					cerr << "After copying arg1" << endl;
+					cerr << "Arg1 = " << loccopy->val.closure.arg1<< endl;
+					cerr << "Type of arg1 = " << loccopy->val.closure.arg1->typecell << endl;
+					cerr << "Arg2 = " << loccopy->val.closure.arg2<< endl;
+					cerr << "Arg2 forward " << loccopy->val.closure.arg2->forward << endl;
+					cerr << "Type of arg2 = " << loccopy->val.closure.arg2->typecell << endl;
+				}
+			}
 
 			cons* oldarg2 = loccopy->val.closure.arg2;
 			addr=followpaths_reachability(loccopy->val.closure.arg2, out);
 			loccopy->val.closure.arg2=addr;
-			print_gc_move(oldarg2, addr, null_stream);
+//			if (loccopy->typecell == funcApplicationExprClosure)
+				print_gc_move(oldarg2, addr, null_stream);
+			if (loccopy->typecell == funcApplicationExprClosure)
+			{
+				FuncExprNode* funcall = static_cast<FuncExprNode*>(loccopy->val.closure.expr);
+				string func_name = funcall->getFunction();
+				if (func_name == "fill-queue")
+				{
+					cerr << "Processing function call " << funcall->getFunction() << endl;
+					cerr << "loc = " << loccopy << endl;
+					cerr << "After copying arg2" << endl;
+					cerr << "Arg1 = " << loccopy->val.closure.arg1<< endl;
+					cerr << "Type of arg1 = " << loccopy->val.closure.arg1->typecell << endl;
+					cerr << "Arg2 = " << loccopy->val.closure.arg2<< endl;
+					cerr << "Arg2 forward " << loccopy->val.closure.arg2->forward << endl;
+					cerr << "Type of arg2 = " << loccopy->val.closure.arg2->typecell << endl;
+				}
+			}
 		}
 
 		break;
@@ -979,9 +1030,13 @@ void printval(void *ref, ostream& out)
 
 		print_stack.push(cref->val.cell.cdr);
 		cref->val.cell.can_delete_car = false;
+		print_stack.push(cref);
+
 		out<<"(";
 		printval(cref->val.cell.car, out);
 
+		cref = print_stack.top();
+		print_stack.pop();
 
 		cons* cdr = print_stack.top();
 //		out << "post gc cdr part = " << (cdr - (cons*)buffer_live) << endl;
@@ -1111,9 +1166,11 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 {
 	stack<cons*> temp;
 //	cerr << "Updating print & heap ref stack" << endl;
-	//out << "Updating print stack with size " << print_stack.size() << endl;
+	cout << "Updating print stack with size " << print_stack.size() << endl;
+	int ii = 0;
 	while(!print_stack.empty())
 	{
+		++ii;
 		cons* heap_ref = print_stack.top();
 		if (gc_type == 0)
 		{
@@ -1146,7 +1203,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 				}
 				//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
 				//TODO  Since this will never be accessed can we set it to NULL here?????
-				if (new_ref->val.cell.car->forward != NULL)
+				if (new_ref->val.cell.car && new_ref->val.cell.car->forward != NULL)
 				{
 					new_ref->val.cell.car = static_cast<cons*>(new_ref->val.cell.car->forward);
 				}
