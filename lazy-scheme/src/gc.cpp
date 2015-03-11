@@ -166,21 +166,13 @@ void print_gc_move(cons* from, cons* to, ostream& out)
 
 cons* deep_copy(cons* node, int gc_type, ostream& out)
 {
-	assert(!is_valid_address(node));
+	//assert(!is_valid_address(node));
 
 	if (gc_type == 0)
 		return followpaths_reachability(node);
 	else
 	{
 		out << "Processing node " << node << endl;
-		//if ((node - (cons*)buffer_dead) > 30000)
-		{
-			out << "Buffer live " << buffer_live << " && " << boundary_live << endl;
-			out << "Buffer dead "<< buffer_dead << " && " << boundary_dead << endl;
-			out << "Index is " << (node - (cons*)buffer_dead) << endl;
-			out << "Index is " << (node - (cons*)buffer_live) << endl;
-			out << sizeof(cons) << endl;
-		}
 		if (node != NULL)
 		{
 			if (node->typecell != consExprClosure && node->forward != NULL)
@@ -204,22 +196,18 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 			else
 			{
 				cons* new_loc = copy(node, out);
-				assert(new_loc != node);
-//				if (new_loc == node)
-//				{
-//					return node;
-//				}
+//				assert(new_loc != node);
 				if ((node->typecell == unaryprimopExprClosure) ||
 				    (node->typecell == binaryprimopExprClosure) ||
 				    (node->typecell == funcApplicationExprClosure) ||
 				    (node->typecell == funcArgClosure))
 				{
-					out << "Is valid address for arg1? " << is_valid_address(node->val.closure.arg1) << endl;
+//					out << "Is valid address for arg1? " << is_valid_address(node->val.closure.arg1) << endl;
 					new_loc->val.closure.arg1 = deep_copy(node->val.closure.arg1, 1, out);
 
-					out << "Is valid address for arg2? " << is_valid_address(node->val.closure.arg2) << endl;
-					if (node->val.closure.arg2)
-						out << "Type of arg2 is " << node->val.closure.arg2->typecell << endl;
+//					out << "Is valid address for arg2? " << is_valid_address(node->val.closure.arg2) << endl;
+//					if (node->val.closure.arg2)
+//						out << "Type of arg2 is " << node->val.closure.arg2->typecell << endl;
 					new_loc->val.closure.arg2 = deep_copy(node->val.closure.arg2, 1, out);
 				}
 				return new_loc;
@@ -951,9 +939,9 @@ void printval(void *ref, ostream& out)
 		print_stack.push(cref);
 		cons *temp = cref->val.closure.expr->evaluate();
 
-		assert(is_valid_address(temp));
+		//assert(is_valid_address(temp));
 		cref = update_heap_refs.top();
-		assert(is_valid_address(cref));
+		//assert(is_valid_address(cref));
 
 		cref->typecell = temp->typecell;
 		cref->inWHNF = temp->inWHNF;
@@ -1133,7 +1121,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 				//If it is liveness based GC and we are copying a cons cell then check for can_delete_car flag
 				//whether to copy the cdr part or not
 				new_ref = copy(heap_ref);
-				out << "Copying " << heap_ref << " with index " << (heap_ref - (cons*)buffer_dead) << endl;
+//				out << "Copying " << heap_ref << " with index " << (heap_ref - (cons*)buffer_dead) << endl;
 				if (heap_ref->val.cell.can_delete_car == false)
 				{
 					//How can we assert that the memory pointed to by the car pointer will be on print stack and will
@@ -1141,7 +1129,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 					//If this assertion is true then we do not need to copy the car part.
 					//assert(heap_ref->val.cell.car->forward != NULL);
 					//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
-					out << "Not copying the car part for cell " << (heap_ref - (cons*)buffer_dead) << endl;
+//					out << "Not copying the car part for cell " << (heap_ref - (cons*)buffer_dead) << endl;
 					cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type, out);
 					new_ref->val.cell.cdr = static_cast<cons*>(cdr_ref);
 				}
@@ -1156,21 +1144,21 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 					new_ref->val.cell.car = NULL;
 				}
 				//new_ref->val.cell.car = static_cast<cons*>(static_cast<void*>(0x1)); //Set it to an invalid address,
-				assert(heap_ref->val.cell.cdr->forward != NULL);
-				out << "Setting the cdr ptr to " << ((cons*)(heap_ref->val.cell.cdr->forward) - getbufferlive()) << endl;
+//				assert(heap_ref->val.cell.cdr->forward != NULL);
+//				out << "Setting the cdr ptr to " << ((cons*)(heap_ref->val.cell.cdr->forward) - getbufferlive()) << endl;
 				new_ref->val.cell.cdr = static_cast<cons*>(heap_ref->val.cell.cdr->forward);
 			}
 			else
 			{
-				out << "Copying reference from print buffer " << (heap_ref - (cons*)buffer_dead) << endl;
+//				out << "Copying reference from print buffer " << (heap_ref - (cons*)buffer_dead) << endl;
 				new_ref = deep_copy(heap_ref, gc_type, out);
 			}
 			//out << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
 		}
-		assert(heap_ref->forward != NULL);
+//		assert(heap_ref->forward != NULL);
 
 		heap_ref = static_cast<cons*>(heap_ref->forward);
-		assert(is_valid_address(heap_ref));
+//		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
 		print_stack.pop();
 	}
@@ -1192,10 +1180,10 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 			cout << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
 			assert(false);
 		}
-		assert(!is_valid_address(heap_ref) && heap_ref->forward != NULL);
+//		assert(!is_valid_address(heap_ref) && heap_ref->forward != NULL);
 
 		heap_ref = static_cast<cons*>(heap_ref->forward);
-		assert(is_valid_address(heap_ref));
+//		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
 		update_heap_refs.pop();
 		++i;
@@ -1206,7 +1194,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		temp.pop();
 	}
 //cerr<<"Completed updated print & heap ref stacks"<<endl;
-	assert(temp.empty());
+//	assert(temp.empty());
 }
 
 //garbage collector functions

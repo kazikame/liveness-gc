@@ -530,7 +530,7 @@ cons* LetExprNode::evaluate()
 
 		if (gc_status != gc_live)
 		{
-			cerr << "DOING RGC"<<endl;
+//			cerr << "DOING RGC"<<endl;
 			//TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
 			//std::string curr_let_pgmpt = return_stack().return_point;
 			//return_stack().return_point = getLabel();
@@ -540,11 +540,10 @@ cons* LetExprNode::evaluate()
 		}
 		else
 		{
-			cerr << "DOING LGC"<< endl;
+//			cerr << "DOING LGC"<< endl;
 			std::string curr_let_pgmpt = return_stack().return_point;
 			return_stack().return_point = getLabel();
 			liveness_gc();
-
 			return_stack().return_point = curr_let_pgmpt;
 		}
 		//We have to check for this condition here for lazy languages

@@ -119,6 +119,7 @@ ExprNode * IfExprNode::getANF() const {
 //                                   pThen->getANF(),
 //                                   pElse->getANF()),
 //                    pCond->getANF());
+    return NULL;
 }
 
 IfExprNode * IfExprNode::fillHoleWith(IdExprNode * pSubExpr) {
@@ -172,6 +173,7 @@ ExprNode * UnaryPrimExprNode::getANF() const {
     assert(false);
 //    else
 //        return pushDown(new UnaryPrimExprNode(node_name, new HoleConstExprNode()), pArg->getANF());
+    return NULL;
 }
 
 UnaryPrimExprNode * UnaryPrimExprNode::fillHoleWith(IdExprNode * id) {
@@ -201,6 +203,7 @@ ExprNode * BinaryPrimExprNode::getANF() const {
 //        delete intermediateNode;
 //        return resNode;
 //    }
+    return NULL;
 }
 
 BinaryPrimExprNode * BinaryPrimExprNode::fillHoleWith(IdExprNode * id) {
