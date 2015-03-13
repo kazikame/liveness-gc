@@ -229,8 +229,8 @@ void print_gc_move(cons* from, cons* to, ostream& out)
 		if (to)
 			to_index = (to - (cons*)buffer_live);
 
-		out << from_index << "-->" << to_index << "(" << to << ")" << endl;
-		out << "Type of cell " << from->typecell << endl;
+		DBG(out << from_index << "-->" << to_index << "(" << to << ")" << endl);
+		DBG(out << "Type of cell " << from->typecell << endl);
 	}
 	return;
 }
@@ -1575,9 +1575,9 @@ void liveness_gc()
 	  ostream &pre = null_stream;
 #endif
 	  DBG(pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl);
-#ifdef FIND_REACHABLE
-	  size_t num_reachable_cells = find_num_reachable_cells();
-#endif
+//#ifdef FIND_REACHABLE
+//	  size_t num_reachable_cells = find_num_reachable_cells();
+//#endif
 
 	  swap_buffer();
 
@@ -1623,10 +1623,10 @@ void liveness_gc()
   double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
 //  cerr << "GC Time for " << gccount << " = " << gc_time << endl;
   gctime += gc_time;
-#ifdef FIND_REACHABLE
-  cout << "Num of reachable cells = " << num_reachable_cells << endl;
-  cout << "Num of live cells = " << numcopied << endl;
-#endif
+//#ifdef FIND_REACHABLE
+//  cout << "Num of reachable cells = " << num_reachable_cells << endl;
+//  cout << "Num of live cells = " << numcopied << endl;
+//#endif
   return;
 }
 
@@ -1646,7 +1646,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 #endif
   //Can we add a check here too to find out if a cons cell has been copied using reachability?
   //That might improve the efficiency
-  if (loc->typecell == consExprClosure)
+  if (loc->typecell == consExprClosure && loc->copied_using_rgc == false)
   {
 	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
 	  if (a0 > 0)
