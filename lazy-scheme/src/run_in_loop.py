@@ -29,6 +29,7 @@ def collect_gc_results(filename, prog_dir_path, gc_type):
     heap_total_cmd = grep_cmd + " \"Heap total=[0-9]* \"  " + result_file_name  + int_grep
     heap_left_cmd = grep_cmd + " \"Heap left=[0-9]*\"  " +  result_file_name  + int_grep
     heap_used_cmd = grep_cmd + " \"Heap used=[0-9]*\"   " +  result_file_name  + int_grep
+A
     gc_invocations_cmd = grep_cmd + " \"GC Invocations=[0-9]*\"   " +  result_file_name  + int_grep
     gc_time_cmd = grep_cmd + " \"GC Time=[0-9]*(\.[0-9]*)?\"   " +  result_file_name  + float_grep
     prog_execution_time_cmd = grep_cmd + " \"Program Execution Time=[0-9]*(\.[0-9]*)?\"   " +  result_file_name  + float_grep
@@ -82,11 +83,17 @@ def main():
         f.write('\\begin{document}\n')
         f.write('\\begin{center}\n')
         f.write('\\begin{tabular}\n')
-        f.write('{| l | l | l | l | l |}\n')
+        f.write('{| l | r | r | r | r | r |}\n')
         f.write('\\hline\n')
-        f.write('Prog Name & Num RGC & Num LGC & Avg. RGC Time & Avg. LGC Time \\\\ \\hline\n')
+        f.write('Prog Name & Num RGC & Num LGC & Avg. RGC Time & Avg. LGC Time & RGC/LGC \\\\ \\hline\n')
         for g in gc_stat_list:
-            f.write('\\verb@' + g.prog_name + '@'  + '&' + str(g.reachability.gc_invocations/float(numTimes)) + '&' + str(g.liveness.gc_invocations/float(numTimes)) + '&' + str(g.reachability.gc_time/float(numTimes)) + '&' + str(g.liveness.gc_time/float(numTimes)) + '\\\\ \\hline\n') 
+            f.write('\\verb@' + g.prog_name + '@'  + 
+                    '&' + str(g.reachability.gc_invocations/float(numTimes)) +
+                    '&' + str(g.liveness.gc_invocations/float(numTimes)) +
+                    '&' + str(g.reachability.gc_time/float(numTimes)) +
+                    '&' + str(g.liveness.gc_time/float(numTimes)) +
+                    '&' + str(g.liveness.gc_time/g.reachability.gc_time) +
+                    '\\\\ \\hline\n') 
         f.write('\\end{tabular}\n')
         f.write('\\end{center}\n')
         f.write('\\end{document}\n')
