@@ -1,8 +1,9 @@
 CC = g++
-CFLAGS = -g -Wall -fPIC -std=c++11 -fpermissive
+EXTRA_FLAGS= -Wno-reorder -Wno-unused -Werror
+CFLAGS = -g -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive 
 OBJ_FLAGS=-c
-DBG_FLAGS=-pg -O0
-PROD_FLAGS=-O0
+DBG_FLAGS=-g
+PROD_FLAGS= -g
 
 TARGET = Simulator
 
@@ -31,7 +32,7 @@ output.o: Output.h Output.cpp
 demands.o: Demands.h Demands.cpp
 	$(CC) -o demands.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) Demands.cpp
 
-SchemeAST_Defs.o: Utils.hpp SchemeAST.h SchemeAST_Defs.cpp gc.cpp
+SchemeAST_Defs.o: Utils.hpp SchemeAST.h SchemeAST_Defs.cpp gc.cpp 
 	$(CC) -o SchemeAST_Defs.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeAST_Defs.cpp 
 
 SchemeAST_ANFs.o: SchemeAST.h SchemeAST_ANFs.cpp
@@ -45,6 +46,7 @@ SchemeAST_Demands.o: Demands.h SchemeAST.h SchemeAST_Demands.cpp
 
 SchemeDriver.o: parser.o Output.h SchemeScanner.hpp SchemeDriver.h SchemeDriver.cpp
 	$(CC) -o SchemeDriver.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeDriver.cpp
+	
 
 format:
 	astyle -A14Ck2M56nNSQW2xC96 *.cpp *.h *.hpp
@@ -56,3 +58,4 @@ remove:
 	rm -rf *.o scheme_lexer.cc
 	rm -rf location.hh position.hh stack.hh
 	rm -rf scheme.tab.h scheme.tab.c scheme.output
+	rm -rf PostGC*.txt GC*.txt PreGC*.txt gc_messages.txt pre_gc_addr.txt

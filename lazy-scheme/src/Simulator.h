@@ -20,5 +20,7 @@ public:
 	Simulator& run(std::string pgmFilePath, int hsize, int numkeys); //This method or the constructor should take other parameters like gctype, heap size etc...
 	~Simulator();
 };
+extern double gctime;
+extern int gcinvoke;
 
 #endif

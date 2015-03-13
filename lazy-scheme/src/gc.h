@@ -10,10 +10,25 @@ using namespace std;
 using namespace Scheme::AST;
 
 
-#define REACHABILITY_BFS
-//#define REACHABILITY_DFS
-#define LIVENESS_BFS
-//#define LIVENESS_DFS
+#define _OPT_TIME
+//#undef _OPT_TIME
+
+#ifdef _OPT_TIME
+#undef _OPT_FULL_LGC
+#else
+#define _OPT_FULL_LGC
+#endif
+
+
+#ifndef __DEBUG__GC
+#define __DEBUG__GC
+#undef __DEBUG__GC
+#endif
+
+//#define REACHABILITY_BFS
+#define REACHABILITY_DFS
+//#define LIVENESS_BFS
+#define LIVENESS_DFS
 //#define K_LIVENESS
 //#defines to be used for meta data generation
 //#define TEST_RUN //determines the min size of memory required (max reachability value achieved during program execution) to execute the program with gc-plain
@@ -38,6 +53,8 @@ typedef stateset::iterator setiter;
 typedef unordered_map<string, state_index>::const_iterator stateMapIter;
 typedef unordered_map<string, state_index> stateMap;
 
+
+extern std::ostream null_stream;
 
 
 
@@ -67,49 +84,14 @@ typedef struct activationRecord
 }actRec;
 
 
-
-//typedef class HeapCell
-//{
-//public:
-//	cell_type type;
-//	cell_type get_type();
-//	void set_type(cell_type);
-//	void* get_value();
-//	void set_value(void *);
-//	bool isinWHNF();
-//	void* forward;
-//	stateset *setofStates;
-//#ifdef GC_ENABLE_STATS
-//	/*----------------------------------------------------------------------
-//	 * Following fields are added by Amey Karkare to
-//	 * generate gc related statistics
-//	 */
-//	/* size is used only if we support vectors */
-//	clock_tick created;       /* creation time of cell */
-//	clock_tick first_use;     /* first use time of cell */
-//	clock_tick last_use;      /* last use time of cell */
-//	char       is_reachable:1,  /* true if cell is reachable during current gc */
-//	is_used:1;       /* true if cell is dereferenced for use */
-//	/*----------------------------------------------------------------------*/
-//#endif
-//#ifdef ENABLE_SHARING_STATS
-//	int visited;
-//#endif
-//private:
-//	boost::any _value;
-//
-//}cons;
-
-
-
-
  cons* getCar(void* ref, const char fromGC);
  cons* getCdr(void* ref, const char fromGC);
  void init_gc_stats();
  void finish_gc_stats();
  void dump_garbage_stats();
  int sizeof_cons();
-
+ unsigned int current_heap();
+ int getType(void* node, int field);
  void allocate_heap(unsigned long size);
  void swap_buffer();
  void update_free(unsigned int size);
@@ -126,18 +108,29 @@ typedef struct activationRecord
  char locate_var(const char *var);
  cons* lookup_addr(const char *var);
  void* lookup_value(const char *var);
- void printval(void *ref);
- int current_heap();
- int getType(void* node, int field);
+ void printval(void *ref,ostream& out = cout);
+#ifdef _OPT_TIME
+ cons* copy(cons* node, ostream& out = null_stream);
+ cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
+ cons* followpaths_reachability(cons* loc, ostream& out = null_stream);
+ cons* followpaths(cons* loc, state_index index, ostream& out = null_stream);
+ void print_gc_move(cons* from, cons* to, ostream& out = null_stream);
+ void clear_live_buffer(ostream& out = null_stream);
+#else
  cons* copy(cons* node);
+ cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
+ cons* followpaths_reachability(cons* loc);
+ cons* followpaths(cons* loc, state_index index);
+ void print_gc_move(cons* from, cons* to);
+#endif
+
  int copy_scan_children(cons* node);
  actRec& return_stack();
-
-
  int lt_scan_free();
  unsigned long diff_scan_free();
  void set_car(void* loc, void* ref);
  void set_cdr(void* loc, void* ref);
+ void* dup_cons(cons* cell);
 
  void detail_gc();
  int is_null_stack(actRec st);
@@ -153,6 +146,7 @@ typedef struct activationRecord
 
  void* getscan();
  void* getfree();
+ cons* getbufferlive();
  int lt_scan_freept();
  void calculate_garbage();
 
@@ -167,6 +161,7 @@ typedef struct activationRecord
  int is_end_of_non_ref_vector();
  int is_empty_heap_ref_vector();
  int is_empty_non_ref_vector();
+ void print_activation_record_stack(ostream& out = null_stream);
 
 //GC methods
  void reachability_gc();
@@ -174,8 +169,9 @@ typedef struct activationRecord
  void cleanup(state_index);
  void liveness_gc();
  void dump_heap(string label);
- void print_accessible_heap();
+ void print_accessible_heap(const string);
  int is_valid_address(void* addr);
  void create_heap_bft(ostream&);
  string print_cell_type(cell_type t);
+ void update_heap_ref_stack(ostream& out = cerr, int gc_type = 0);
 #endif

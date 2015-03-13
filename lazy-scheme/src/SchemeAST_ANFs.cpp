@@ -7,14 +7,16 @@
 using namespace Scheme::AST;
 
 
-bool isStatement(const ExprNode * pExpr) {
+bool isStatement(const ExprNode * pExpr)
+{
     return  isOfClass<Node, ConstExprNode>(pExpr)   ||
             isOfClass<Node, PrimExprNode>(pExpr)        ||
             isOfClass<Node, FuncExprNode>(pExpr);
 }
 
 
-bool isExpression(const ExprNode * pExpr) {
+bool isExpression(const ExprNode * pExpr)
+{
     return isOfClass<Node, ReturnExprNode>(pExpr)   ||
            isOfClass<Node, LetExprNode>(pExpr)         ||
            isOfClass<Node, IfExprNode>(pExpr);
@@ -84,6 +86,8 @@ ExprNode * Scheme::AST::pushDown(ExprNode * pHoleExpr, ExprNode * pANFExpr) {
         pIfANFExpr->pElse = pushDown(pHoleExpr, pIfANFExpr->pElse);
         return pIfANFExpr;
     }
+    assert(false); // not expected to reach here!
+    return NULL;
 }
 
 
@@ -109,10 +113,13 @@ ExprNode * IfExprNode::getANF() const {
     if(isOfClass<Node, IdExprNode>(pCond))
         return new IfExprNode(pCond->clone(), pThen->getANF(), pElse->getANF());
 
+    cout << "The type of condition is " << pCond->type << " at " << pCond->getLabel() << endl;
+    assert(false);
 //    return pushDown(new IfExprNode(new HoleConstExprNode(),
 //                                   pThen->getANF(),
 //                                   pElse->getANF()),
 //                    pCond->getANF());
+    return NULL;
 }
 
 IfExprNode * IfExprNode::fillHoleWith(IdExprNode * pSubExpr) {
@@ -146,6 +153,8 @@ ExprNode * LetExprNode::getANF() const {
         return new LetExprNode(pID->clone(), pExpr->clone(), pBody->getANF());
 //    return pushDown(new LetExprNode(pID->clone(), new HoleConstExprNode(), pBody->getANF()),
 //                    pExpr->getANF());
+    else //TODO:Added it to get infinte lazy list programs to work. Need to check if this is the correct thing to do
+    	return new LetExprNode(pID->clone(), pExpr->clone(), pBody->getANF());
 }
 
 LetExprNode * LetExprNode::fillHoleWith(ExprNode * pSubExpr) {
@@ -161,8 +170,10 @@ ExprNode * UnaryPrimExprNode::getANF() const {
         return new LetExprNode(new IdExprNode(new std::string(newVar)), this->clone(),
                                new ReturnExprNode(new IdExprNode(new std::string(newVar))));
     }
+    assert(false);
 //    else
 //        return pushDown(new UnaryPrimExprNode(node_name, new HoleConstExprNode()), pArg->getANF());
+    return NULL;
 }
 
 UnaryPrimExprNode * UnaryPrimExprNode::fillHoleWith(IdExprNode * id) {
@@ -179,10 +190,12 @@ ExprNode * BinaryPrimExprNode::getANF() const {
             return new LetExprNode(new IdExprNode(new std::string(newVar)), this->clone(),
                                    new ReturnExprNode(new IdExprNode(new std::string(newVar))));
         } else {
+        	assert(false);
 //            return pushDown(new BinaryPrimExprNode(node_name, pArg1->clone(), new HoleConstExprNode()),
 //                            pArg2->getANF());
         }
     }
+    assert(false);
 //    else {
 //        ExprNode * intermediateNode = pushDown(new BinaryPrimExprNode(node_name,
 //                                               new HoleConstExprNode(), pArg2->clone()), pArg1->getANF());
@@ -190,6 +203,7 @@ ExprNode * BinaryPrimExprNode::getANF() const {
 //        delete intermediateNode;
 //        return resNode;
 //    }
+    return NULL;
 }
 
 BinaryPrimExprNode * BinaryPrimExprNode::fillHoleWith(IdExprNode * id) {
@@ -212,10 +226,11 @@ ExprNode * FuncExprNode::getANF() const {
     for(std::list<ExprNode *>::const_iterator i = pListArgs->begin(); i != pListArgs->end(); ++i) {
         if(foundExpr || isOfClass<Node, IdExprNode>(* i))
             newArgs->push_back((* i)->clone());
-//        else {
+        else {
+        	assert(false);
 //            foundExpr = * i;
 //            newArgs->push_back(new HoleConstExprNode());
-//        }
+        }
     }
     if(foundExpr) {
         ExprNode * intermediateNode = pushDown(new FuncExprNode(pID->clone(), newArgs),
@@ -241,6 +256,8 @@ FuncExprNode * FuncExprNode::fillHoleWith(IdExprNode * pSubExpr) {
             return this;
         }
     }
+    assert(false); // not expected to reach here!
+    return NULL;
 }
 
 

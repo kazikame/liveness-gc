@@ -1,5 +1,27 @@
-(define (f l)
- (if (null? l) l
-     (cons (f (car l)) 2)))
+(define (mapsq l)
+  (let ((c (null? l)))
+   (if  c
+	l
+	(let ((x (car l)))
+	  (let ((xs (cdr l)))
+	    (let ((y (* x x)))
+	      (let ((ys (mapsq xs)))
+		(let ((res (cons y ys)))
+		  res))))))))
 
-(f ())
+(let ((a ()))
+  (let ((a1 1))
+    (let ((b2 2))
+      (let ((c3 3))
+	(let ((a0 0))
+	  (let ((b (cons a1 a)))
+	    (let ((c (cons b2 b)))
+	      (let ((d (cons c3 c)))
+		(let ((e (mapsq d)))
+		  (let ((f (null? b)))
+		    (let ((j (pair? e)))
+		      (if j
+			  (let ((g (mapsq d)))
+			    g)
+			  (let ((h (cons a0 a)))
+			    h)))))))))))))

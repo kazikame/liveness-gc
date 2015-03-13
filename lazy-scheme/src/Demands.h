@@ -66,7 +66,7 @@ void printNFAToFile(automaton *nfa, std::string filename);
 automaton* simplifyNFA(std::unordered_set<std::string> start_states, automaton *nfa);
 void printSetofStates(std::unordered_set<std::string> states);
 automaton* convertNFAtoDFA(std::unordered_set<std::string> start_states, automaton* nfa, const std::string);
-int writeDFAToFile(std::string pgmname, automaton* dfa);
+int writeDFAToFile(std::string pgmname, automaton* dfa, std::map<std::string, std::unordered_set<std::string>>);
 
 void simplifyCFG(demand_grammar* gram);
 

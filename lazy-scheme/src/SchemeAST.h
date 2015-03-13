@@ -12,13 +12,29 @@
 #include<utility>
 #include<set>
 
+//#define PRNT_DBG
+
+#ifdef PRNT_DBG
+#define DOUT(str) cout << str << endl;
+#else
+#define DOUT(str) void();
+#endif
+
 using namespace std;
+
+class NullBuffer : public std::streambuf
+{
+public:
+  int overflow(int c);
+};
 
 namespace Scheme {
 
 namespace AST {
 
 class ExprNode;
+
+
 
 typedef int state_index;
 typedef std::set<state_index> stateset;
@@ -40,44 +56,50 @@ typedef unsigned long clock_tick;
 
 struct cons
 {
-  cell_type typecell;
-  union
-  {
-	  struct
-	  {
-		 cons *car, *cdr;
-	  }cell;
-	  int intVal;
-	  bool boolval;
-	  std::string* stringVal;
-	  struct
-	  {
-		  ExprNode* expr;
-		  cons* arg1;
-		  cons* arg2;
-	  }closure;
-  }val;
-  void *forward;
-  stateset *setofStates;
-  int depth;
-  bool inWHNF;
-  unsigned int closure_id;
-  unsigned int reduction_id;
+	cell_type typecell;
+	union
+	{
+		struct
+		{
+			cons *car, *cdr;
+			bool can_delete_car;
+		}cell;
+		int intVal;
+		bool boolval;
+		std::string* stringVal;
+		struct
+		{
+			ExprNode* expr;
+			cons* arg1;
+			cons* arg2;
+			string* arg1_name;
+			string* arg2_name;
+			string* prog_pt;
+		}closure;
+	}val;
+	void *forward;
+	stateset *setofStates;
+	int depth;
+	bool inWHNF;
+	bool isLive;
+	bool copied_using_rgc;
+	unsigned int closure_id;
+	unsigned int reduction_id;
 #ifdef GC_ENABLE_STATS
-    /*----------------------------------------------------------------------
-     * Following fields are added by Amey Karkare to
-     * generate gc related statistics
-     */
-    /* size is used only if we support vectors */
-    clock_tick created;       /* creation time of cell */
-    clock_tick first_use;     /* first use time of cell */
-    clock_tick last_use;      /* last use time of cell */
-    char       is_reachable:1,  /* true if cell is reachable during current gc */
-               is_used:1;       /* true if cell is dereferenced for use */
-    /*----------------------------------------------------------------------*/
+	/*----------------------------------------------------------------------
+	 * Following fields are added by Amey Karkare to
+	 * generate gc related statistics
+	 */
+	/* size is used only if we support vectors */
+	clock_tick created;       /* creation time of cell */
+	clock_tick first_use;     /* first use time of cell */
+	clock_tick last_use;      /* last use time of cell */
+	char       is_reachable:1,  /* true if cell is reachable during current gc */
+	is_used:1;       /* true if cell is dereferenced for use */
+	/*----------------------------------------------------------------------*/
 #endif
 #ifdef ENABLE_SHARING_STATS
-    int visited;
+	int visited;
 #endif
 
 
@@ -124,14 +146,27 @@ public:
 
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const = 0;
+	transformDemandRef(const Scheme::Demands::rule&)
+	{
+		std::cerr << "Error : should not be called" << std::endl;
+		return NULL;
+	}
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+        transformDemand(const Scheme::Demands::rule&)
+	{
+		std::unordered_map<string, Scheme::Demands::expr_demand_grammars*> r;
+		std::cerr << "Error : should not be called" << std::endl;
+		return r;
+	}
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const = 0;
 	enum exprType type;
 	const std::string node_name;
+	std::unordered_set<std::string> label_set;
 protected:
 	std::string label;
+
 
 
 	Node(const std::string);
@@ -150,10 +185,11 @@ public:
 	 * ExprNode, is Exprnode * and not Node *.                */
 	virtual ExprNode * clone() const = 0;
 	virtual ExprNode * getANF() const = 0;
-	virtual cons* evaluate(struct cons* heap_cell = NULL) = 0;
+	virtual cons* evaluate(void) = 0;
 	virtual bool isFunctionCallExpression()	{return false;}
 	virtual bool isConsExpression() {return false;}
 	virtual cons* make_closure() = 0;
+	virtual bool isExpressionRecursive(const std::string) const {return false;}
 	//cons* heap_ptr;
 protected:
 	ExprNode(const std::string name);
@@ -173,14 +209,16 @@ public:
 	virtual ReturnExprNode * clone() const;
 	virtual ReturnExprNode * getANF() const;
 
-	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+        transformDemand(const Scheme::Demands::rule&);
+	virtual cons* evaluate(void);
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 
 	virtual std::string getLabel() const;
 	virtual cons* make_closure();
+
+	std::string idVarLabel;
 
 protected:
 	IdExprNode * pID;
@@ -200,13 +238,13 @@ public:
 
 	std::string getIDStr() const;
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::expr_demand_grammars *
+        transformDemandRef(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getName() {return *pID;}
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
 	virtual std::string getLabel() const;
 	//cons *closure;
@@ -229,21 +267,21 @@ public:
 
 	virtual LetExprNode * fillHoleWith(ExprNode * pSubExpr);
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+        transformDemand(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getVar();
 	ExprNode* getVarExpr();
 	ExprNode* getBody();
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
+
 
 protected:
 	IdExprNode * pID;
 	ExprNode * pExpr, * pBody;
-	//cons *varExprClosure, *bodyExprClosure;
 	friend ExprNode * pushDown(ExprNode *, ExprNode *);
 };
 
@@ -260,15 +298,15 @@ public:
 
 	virtual IfExprNode * fillHoleWith(IdExprNode * pSubExpr);
 	//
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+        transformDemand(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	ExprNode* getCond();
 	ExprNode* getThenPart();
 	ExprNode* getElsePart();
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
 
 
@@ -289,7 +327,7 @@ public:
 	virtual void doLabel(bool = true);
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+        transformDemandRef(const Scheme::Demands::rule&);
 protected:
 	ConstExprNode(const std::string);
 };
@@ -303,7 +341,7 @@ public:
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
 };
 
@@ -318,7 +356,7 @@ public:
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	int getVal();
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
 
 
@@ -338,7 +376,7 @@ public:
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	string* getVal();
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
 
 
@@ -358,7 +396,7 @@ public:
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	bool getVal();
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
 
 
@@ -390,22 +428,22 @@ public:
 	virtual UnaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+        transformDemandRef(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
+	virtual bool isExpressionRecursive(const std::string) const;
 	//cons *argClosure;
-
-
+    
 protected:
 	ExprNode * pArg;
 
-	cons* evaluateCarExpr(cons* heap_cell = NULL);
-	cons* evaluateCdrExpr(cons* heap_cell = NULL);
-	cons* evaluateNullqExpr(cons* heap_cell = NULL);
-	cons* evaluatePairqExpr(cons* heap_cell = NULL);
+	cons* evaluateCarExpr();
+	cons* evaluateCdrExpr();
+	cons* evaluateNullqExpr();
+	cons* evaluatePairqExpr();
 	friend class LetExprNode;
 	friend ExprNode * pushDown(ExprNode *, ExprNode *);
 };
@@ -424,27 +462,28 @@ public:
 	virtual BinaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
 	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+        transformDemandRef(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual cons* make_closure();
 
 	virtual bool isConsExpression() {return (node_name == "cons");}
+	virtual bool isExpressionRecursive(const std::string) const;
 	//cons *arg1Closure, *arg2Closure;
 protected:
 	ExprNode * pArg1, * pArg2;
 
-	cons* evaluateCons(cons* heap_cell = NULL);
-	cons* evaluateAdd(cons* heap_cell = NULL);
-	cons* evaluateSub(cons* heap_cell = NULL);
-	cons* evaluateMul(cons* heap_cell = NULL);
-	cons* evaluateDiv(cons* heap_cell = NULL);
-	cons* evaluateMod(cons* heap_cell = NULL);
-	cons* evaluateLT(cons* heap_cell = NULL);
-	cons* evaluateGT(cons* heap_cell = NULL);
-	cons* evaluateEQ(cons* heap_cell = NULL);
+	cons* evaluateCons();
+	cons* evaluateAdd();
+	cons* evaluateSub();
+	cons* evaluateMul();
+	cons* evaluateDiv();
+	cons* evaluateMod();
+	cons* evaluateLT();
+	cons* evaluateGT();
+	cons* evaluateEQ();
 
 	friend class LetExprNode;
 	friend ExprNode * pushDown(ExprNode *, ExprNode *);
@@ -463,18 +502,20 @@ public:
 
 	virtual FuncExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::expr_demand_grammars *
+        transformDemandRef(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getFunction();
 	std::vector<ExprNode*> getArgs();
-	virtual cons* evaluate(struct cons* heap_cell = NULL);
+	virtual cons* evaluate(void);
 	virtual bool isFunctionCallExpression()	{return true;}
 	void setNextExpr(std::string);
 	std::string getNextExpr();
 	virtual cons* make_closure();
+	std::string parent_let_pgmpt;
+	virtual bool isExpressionRecursive(const std::string) const;
 	//std::list<cons*> argsClosureList;
 protected:
 	IdExprNode * pID;
@@ -499,8 +540,8 @@ public:
 	virtual DefineNode * getANF() const;
 
 	virtual std::string getFuncName() const;
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+        transformDemand(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
@@ -525,16 +566,19 @@ public:
 	virtual ProgramNode * clone() const;
 	virtual ProgramNode * getANF() const;
 
-	virtual Scheme::Demands::expr_demand_grammars *
-            transformDemand(const Scheme::Demands::rule&) const;
+	virtual std::unordered_map<string, Scheme::Demands::expr_demand_grammars*>
+        transformDemand(const Scheme::Demands::rule&);
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
-	cons* evaluate(cons* heap_cell = NULL);
+	cons* evaluate();
 
 	Node* getFunction(std::string);
 
 	void doLivenessAnalysis();
+
+	std::unordered_map<string, const Node*> *progpt_map;
+	Scheme::Demands::demand_grammar liveness_data;
 
 	//TODO : Add a function to process function definitions (Similar to the LE function in python)
 protected:

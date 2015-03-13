@@ -5,7 +5,7 @@ import time
 import datetime
 from collections import namedtuple
 
-prog_size = {'testgc':143370}
+prog_size = {'nqueens':10000, 'nperm':40000, 'fibheap':500, 'treejoin':1800000, 'sudoku':4075, 'lcss':550, 'lambda':2790}
 
 gc_info = namedtuple("gc_info", "heap_total heap_left heap_used gc_invocations gc_time exec_time")
 gc_stat = namedtuple("gc_stat", "prog_name reachability liveness")
@@ -43,7 +43,7 @@ def collect_gc_results(filename, prog_dir_path, gc_type):
 
 
 def main():
-    numTimes = 25
+    numTimes = 1
     i = 0
     folder = '../benchmarks/programs'
     prog_folder_path = os.path.join(path, folder)
