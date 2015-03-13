@@ -201,6 +201,7 @@ size_t find_num_reachable_cells()
 	while(!print_stack.empty())
 	{
 		cons* heap_ref = print_stack.top();
+		print_stack.pop();
 		temp.push(heap_ref);
 		reach_dfs(heap_ref, reachable_cells);
 	}
@@ -1575,9 +1576,10 @@ void liveness_gc()
 	  ostream &pre = null_stream;
 #endif
 	  DBG(pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl);
-//#ifdef FIND_REACHABLE
-//	  size_t num_reachable_cells = find_num_reachable_cells();
-//#endif
+#ifdef FIND_REACHABLE
+	  numcopied = 0;
+	  size_t num_reachable_cells = find_num_reachable_cells();
+#endif
 
 	  swap_buffer();
 
@@ -1623,10 +1625,10 @@ void liveness_gc()
   double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
 //  cerr << "GC Time for " << gccount << " = " << gc_time << endl;
   gctime += gc_time;
-//#ifdef FIND_REACHABLE
-//  cout << "Num of reachable cells = " << num_reachable_cells << endl;
-//  cout << "Num of live cells = " << numcopied << endl;
-//#endif
+#ifdef FIND_REACHABLE
+  cout << "Num of reachable cells = " << num_reachable_cells << endl;
+  cout << "Num of live cells = " << numcopied << endl;
+#endif
   return;
 }
 
