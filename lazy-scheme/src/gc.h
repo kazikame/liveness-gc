@@ -40,7 +40,7 @@ using namespace Scheme::AST;
  * Author : Amey Karkare
  * */
 //#define GC_ENABLE_STATS
-#if 0
+#if __DEBUG__GC
 #define DBG(stmt) stmt
 #else
 #define DBG(stmt) (void)0

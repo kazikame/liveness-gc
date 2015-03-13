@@ -667,9 +667,32 @@ consider the function definition shown::
 	\end{uprogram}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Consider a call to $\pf$  with a demand $\sigma$. For obvious reasons,
-this is also the demand on the return values $u$ and $y$, and thus the
-liveness  at  the  program  points  $\pi_7$ and  $\pi_8$  re  $\lbrace
+The concept of demand and liveness for lazy languages are almost similar to their 
+counterparts in the eager language. The important distinction comes from the fact 
+that in eager languages, variables can point only to data values (either atomic values or cons cells). 
+Hence any demand on the variable can easily be transferred onto the data being pointed. 
+In lazy languages, a variable can either point to a fully evaluated data value or it 
+could point to a closure which on evaluation generates the required data value. For example, 
+consider the statement {\tt let \py~ $\leftarrow $ (\CDR~\px)}. In case of an eager language 
+the variable \py~ points to  the \CDR~ part of \px~ which is guaranteed to be a cons cell. 
+Hence any demand on \py~ can be immediately transferred to the \CDR~ part of \px. In case of 
+a lazy language, \px~ might not be evaluated and  hence pointing to a closure. In our 
+example, it points to the closure corresponding to (\CONS~1~\px). It does not make any sense 
+to transfer the demand onto the \CDR~ part of \px~ as it still does not exist. In such a case 
+we treat the closure as a demand transformer and tranform the demand on \py~ to the arguments 
+of the closure pointed by \px. This procedure is similar to the process of transferring the demand 
+from the return value of a function to the arguments of the function call in an eager language. In case 
+of lazy languages this process cannot be done statically as we cannot statically determine whether a variable points to 
+a data value or a closure. Our method approximates the liveness of closure arguments at runtime 
+by tagging extra information with each closure. Since the arguments of the closures could themselves be closures in turn, 
+we keep recursively applying the same procedure until we hit a data value. The only case where we do not 
+follow this procedure is if the demand on a particular closure is null. In such a case we safely collect 
+the entire closure as garbage. 
+
+We now describe the process of finding out the liveness 
+of each variable defined in the function $\pf$ assuming a symbolic demand $\sigma$ on it. 
+For obvious reasons, this is also the demand on the return values $u$ and $y$, and thus the
+liveness  at  the  program  points  $\pi_7$ and  $\pi_8$  are  $\lbrace
 \pu.\sigma \rbrace$ and $\{\py.\sigma\}$.  The liveness at $\pi_7$ and
 $\pi_8$ are propagated backwards as in traditional liveness analysis.
 
@@ -753,7 +776,7 @@ collector at $\pi_6$.
 The liveness of lazy and eager evaluation differ in two respects:
 \begin{enumerate}
 \item  In an  eager  language, \pw\  would  not have  been live  after
-  $\pi_6$, the point of its last use. In a lazy language, however, the
+  $\pi_7$, the point of its last use. In a lazy language, however, the
   definition  $\pu  \leftarrow  (\CDR~\pw)$,  does not  result  in  an
   evaluation  of  $(\CDR~\pw)$; instead  a  closure  is created.   The
   evaluation actually takes place while evaluating $(\RETURN~u)$. Thus
@@ -770,8 +793,8 @@ The liveness of lazy and eager evaluation differ in two respects:
   which     trigger     a     evaluation---\SIF\    conditions     and
   \RETURN\  expressions. We call  such paths  {\em E-paths}.   For the
   program  shown, there  are three  such paths  $EP_1 =  \pi_1, \pi_2,
-  \pi_3,  \pi_4, \pi_5$, $EP_1  = \pi_1,  \pi_2, \pi_3,  \pi_4, \pi_6,
-  \pi_7, \pi_8$, and $EP_2 =  \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.  The
+  \pi_3,  \pi_4, \pi_5$, $EP_2  = \pi_1,  \pi_2, \pi_3,  \pi_4, \pi_6,
+  \pi_7, \pi_8$, and $EP_3 =  \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.  The
   analysis consists of two maps:  The map $\cal{M}$ maps a return path
   to a liveness  environment that is common to  all the program points
   in the path. And a second  map $\cal{P}$ maps a program point to the
