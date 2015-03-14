@@ -667,25 +667,26 @@ consider the function definition shown::
 	\end{uprogram}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-The concept of demand and liveness for lazy languages are almost similar to their 
-counterparts in the eager language. The important distinction comes from the fact 
-that in eager languages, variables can point only to data values (either atomic values or cons cells). 
-Hence any demand on the variable can easily be transferred onto the data being pointed. 
-In lazy languages, a variable can either point to a fully evaluated data value or it 
+The main challenges in doing liveness analysis for lazy languages are, 
+1) a variable can either point to a fully evaluated data value or it 
 could point to a closure which on evaluation generates the required data value. For example, 
 consider the statement {\tt let \py~ $\leftarrow $ (\CDR~\px)}. In case of an eager language 
 the variable \py~ points to  the \CDR~ part of \px~ which is guaranteed to be a cons cell. 
 Hence any demand on \py~ can be immediately transferred to the \CDR~ part of \px. In case of 
 a lazy language, \px~ might not be evaluated and  hence pointing to a closure. In our 
 example, it points to the closure corresponding to (\CONS~1~\px). It does not make any sense 
-to transfer the demand onto the \CDR~ part of \px~ as it still does not exist. In such a case 
-we treat the closure as a demand transformer and tranform the demand on \py~ to the arguments 
-of the closure pointed by \px. This procedure is similar to the process of transferring the demand 
-from the return value of a function to the arguments of the function call in an eager language. In case 
-of lazy languages this process cannot be done statically as we cannot statically determine whether a variable points to 
-a data value or a closure. Our method approximates the liveness of closure arguments at runtime 
+to transfer the demand onto the \CDR~ part of \px~ as it still does not exist.
+, 2) it is not possible to statically determine when a closure gets evaluated.  Therefore 
+during GC we treat a closure as a demand transformer and tranform the demand on to the arguments 
+of the closure pointed. This is similar to the process of transferring the demand 
+from the return value of a function to the arguments of the function call in an eager language. 
+
+In our example, during GC if we find that \px~ points to a closure instead of a cons cell we 
+find out the demand/liveness on the arguments of the closure, namely \py.
+Statically it cannot be determined what values a closure points to or when it gets evaluated,
+hence our method approximates the liveness of closure arguments at runtime 
 by tagging extra information with each closure. Since the arguments of the closures could themselves be closures in turn, 
-we keep recursively applying the same procedure until we hit a data value. The only case where we do not 
+we recursively apply the same procedure until we hit a data value. The only case where we do not 
 follow this procedure is if the demand on a particular closure is null. In such a case we safely collect 
 the entire closure as garbage. 
 
@@ -809,6 +810,33 @@ The liveness of lazy and eager evaluation differ in two respects:
   In  the  sequel we  shall  describe  how  to obtain  $\cal{M}$.  The
   formulation  of $\cal{P}$  is easy  and we  do not  describe  it any
   further.
+  We observe that the ${ref}$ rules neither use ${\cal M}$ directly nor 
+  create new labels. We only need to consider the rules for {\LET}, {\SIF}, and
+  {\RETURN}.
+
+ 
+  A {\RETURN~\px}\  statement always forces an evaluation and hence a new 
+  label {\em l} needs to be created and added to $\cal{M}$. A new liveness
+  environment is associated with {\em l}. The demand $\sigma$ that is placed 
+  on this expression is now transferred to the variable \px. {\em l} will now
+  contain an entry for \px~ with liveness $\sigma$.
+
+  An \SIF~ statement will modify  $\cal{M}$ by doing a union of 
+  the maps from the {\em then} and the {\em else} part. Note that each part can contain 
+  more than one label. Since the variable corresponding to the condition may not
+  be part of either the {\em then} or the {\em else} part, a new label {\em l} is created 
+  and added to $\cal{M}$. The only liveness associated with {\em l} is the liveness 
+  of the condition variable.
+  
+  The processing rule for {\LET} is the most complex among all the rules. A {\LET} does
+  not add any new label but might modify the liveness values of some variables or might add 
+  liveness values for the let bound variable. Since there might be more than one {\RETURN} 
+  statement following a {\LET}, there might be multiple {\em E-paths} reaching the {\LET}.
+  The demand on the let variable might be different along different {\em E-paths}. Therefore,
+  for each label {\em l} in $\cal{M}$, the liveness of the let-expression is calculated using 
+  the liveness environment $\Lv$ corresponding to {\em l}. Since the {\LET} is lazy, 
+  calculating its livness might require a fixed-point processing. 
+  
 
 \bigskip
 \hrule 
