@@ -583,29 +583,31 @@ $\rho'\oplus\rho,~ (\rho, x, (\RETURN~x))\!:\!S, H,  e$} & \sc{return-coo} \\
 A variable is {\em live} it  there is a possibility of its value being
 used  in future computation  and dead  if it  is definitely  not used.
 Heap-allocated data needs a richer model of liveness which talks about
-the liveness  of pointers including  fields of $\CONS$ cells.   We use
-$\acar$, $\acdr$ to represent  access using $\CAR$, $\CDR$ fields. The
-liveness of the structure reachable  from a variable is represented by
-a  set  of  {\em   access  paths}  i.e.   prefix-closed  strings  from
-$\{\acar,\acdr\}^\ast$.  As an example, if $x$ is a list with liveness
-$\{\epsilon,  \acdr, \acdr\acar, \acdr\acdr,  \acdr\acdr\acar\}$, then
-future computations can  only refer up to the  second and third members
-of $x$.  The classical notions of a scalar variable being live or dead
-correspond to $\{\epsilon\}$ and $\{\}$.
+the  liveness of pointers  including fields  of $\CONS$  cells.  Using
+$\acar$, $\acdr$  to represent access using $\CAR$  and $\CDR$ fields,
+the  liveness  of the  structure  reachable  from  a variable  can  be
+represented by a set of {\em access paths} i.e.  prefix-closed strings
+from $\{\acar,\acdr\}^\ast$.   As an  example, if $x$  is a  list with
+liveness      $\{\epsilon,     \acdr,      \acdr\acar,     \acdr\acdr,
+\acdr\acdr\acar\}$, then future computations  can only refer up to the
+second and third  members of $x$. In this  notation, a scalar variable
+being live or dead are represented as $\{\epsilon\}$ and $\{\}$ respectively.
 
 A {\em liveness environment} is a mapping from variables to subsets of
-$\{\acar,\acdr\}^\ast$. But  we often express it as a  set, for
-example writing $\{x.\acar\acdr, x.\acdr, y.\epsilon\}$ instead of $[x
+$\{\acar,\acdr\}^\ast$, but  often expressed as a set,  for example by
+writing  $\{x.\acar\acdr,   x.\acdr,  y.\epsilon\}$  instead   of  $[x
   \mapsto\{\epsilon,\acar,\acar\acdr,\acdr\},     y\mapsto\{\epsilon\},
-  z\mapsto\{\}]$.   For  eager  languages,  we  associate  a  liveness
-environment  with each program  point; the  liveness at  program point
-$\pi$ in $\pi:e$ is the liveness just before executing $e$. Due to the
-inherent uncertainty  in determining the  point of evaluation  in lazy
-languages, we  associate liveness  environments with certain  kinds of
-paths in the program. All programs  points lying on the path share the
-same liveness environment.  We explain this point later.
- 
-A complementary  notion to liveness  is {\em demand}.  The  demand for
+  z\mapsto\{\}]$.   We  associate  a  liveness environment  with  each
+program  point $\pi$:  the liveness  at $\pi:e$  is the  liveness just
+before executing $e$.
+%%
+%% Due to the inherent uncertainty in
+%% determining the  point of evaluation  in lazy languages,  we associate
+%% liveness environments with certain kinds  of paths in the program. All
+%% programs points lying on the path share the same liveness environment.
+%% We explain this point later.
+%% 
+A  notion  related  to  liveness  is {\em  demand}.   The  demand on
 expression  $e$   is  again  an   access  path---that  subset   of  of
 $\{\acar,\acdr\}^\ast$ which  the context of $e$ may  explore of $e$'s
 result.  So,  for example given  a demand $\sigma$ and  the expression
@@ -613,7 +615,7 @@ $\pi: (\RETURN\ x)$, the liveness at $\pi$ is exactly $x.\sigma$.  The
 classical  analogy of  this  is  in {\em  strong  liveness}, where  an
 assignment node $n: x:=y+z$ causes $y$  and $z$ to be live on entry to
 $n$ if (and only if) $x$ is  live at exit of $n$---the liveness of $x$
-at  exit from  $n$ becomes  the demand  on $y+z$.   
+at exit from $n$ becomes the demand on $y+z$.
 
 %% Note  that, for  an  operation  like division  which  may raise  an
 %% exception,  the  assignment $n:  x:=y/z$  makes  $y$  and $z$  live
