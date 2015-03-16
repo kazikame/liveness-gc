@@ -4,6 +4,8 @@ paper/paper.aux
 paper/paper.bbl
 paper/paper.blg
 paper/paper.synctex.gz
+paper/paper.dvi
+paper/paper.ps
 lazy-scheme/benchmarks/anf_prog.txt
 lazy-scheme/benchmarks/gc_addr.txt
 lazy-scheme/benchmarks/output/
