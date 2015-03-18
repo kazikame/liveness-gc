@@ -136,6 +136,7 @@ void depthfirstpaths(Scheme::AST::cons* loc, Scheme::AST::state_index index);
 
 
 #define FIND_REACHABLE
+#undef FIND_REACHABLE
 #ifdef FIND_REACHABLE
 void reach_dfs(cons* loc, vector<cons*>& v)
 {
