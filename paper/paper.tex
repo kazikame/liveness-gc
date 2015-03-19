@@ -36,6 +36,11 @@
 \definecolor{Myblue}{rgb}{0.0,0.0,0.5}
 \newcommand{\comment}[1]{{\color{Myblue}{\medskip \hrule\medskip
     #1 \medskip \hrule \medskip}}}
+\newcommand{\alan}[1]{{\color{red}{\medskip \hrule\medskip
+    #1 \medskip \hrule \medskip}}}
+
+
+
 \newcommand{\scmin} {\mbox{\sf\em in}}
 \newcommand{\scmnull}{\mbox{\sf\em null?}}
 \newcommand{\scmpair}{\mbox{\sf\em pair?}}
@@ -663,13 +668,51 @@ $\sigma$, then $\Lf{f}{i}{\sigma}$ is the liveness of $x_i$ at $e_f$.
 \bigskip
 
 \subsection{Liveness Analysis for lazy languages}
+\comment{analysis for liveness has two components - transfering
+  demands on expressions to liveness of results
+and propagating liveness. first discuss demand --> liveness}
 
+
+%% First recall the classical formulation  of liveness (as sets of simple
+%% variables)        on        three-address       instructions,        $
+%% \mathit{live}_\mathit{in}(I) = \mathit{live}_\mathit{out}(I) \setminus
+%% \mathit{def\/}(I) \cup  \mathit{ref\/}(I) $,  and then note  that {\em
+%%   strong liveness}  needs, when $I$ is the  instruction $z:=x+y$, that
+%% $\mathit{ref}(I)$     be     refined     to    $\{x,y\}$     if     $z
+%% \in\mathit{live}_\mathit{out}(I)$ and $\{\}$ otherwise.
+
+%%Our  liveness analysis  formulated  in Figure~\ref{fig:live-judge}  is
+%%analogous.
+% has three analogous aspects.
+% \begin{itemize}
+% \item
+\alan{Firstly,  the function  $\mathit{ref}$,  when given  a statement  $s$,
+returns the  incremental liveness {\em generated} by  $s$.  Because we
+generalize  {\em  strong}  liveness,  $\mathit{ref}$  needs  a  second
+parameter, specifying  the demand  $\sigma$ on the  result of  $s$, to
+determine which access paths of its free variables are made live.  The
+cases for $(\ID\ x)$ and $(\PRIM\ x\ y)$ exemplify this.
+% The cases for
+% $(\CAR\ x)$, $(\CAR\ x)$ and $(\CONS\ x\ y)$ show how demand for path $\alpha \in \sigma$
+% is transformed into a deeper or shallower path in the demand for (or liveness of) $x$ or $y$.
+% The   operator \PRIM\ dereferences its arguments  resulting in the liveness shown.
+A  demand of  $\sigma$  on  (\CAR~$x$) is  transformed  to the  demand
+$\acar\sigma$  on $x$.   In  addition, \CAR\  always dereferences  its
+argument  (even if  its result  is  never used).   This generates  the
+liveness  $\{x.\epsilon\} \cup  x.\acar\sigma$ (note  $\sigma$  may be
+$\{\}$).   In  the opposite  sense,  the  demand  of $\acar\sigma$  on
+(\CONS~$x$~$y$) is  transformed to the  demand $\sigma$ on  $x$.  Note
+that \CONS\ does not,  by itself, dereference its arguments.  Thirdly,
+for the case  of a user-function call, a  third parameter $\Lfonly$ to
+$\mathit{ref}$  expresses how  the demand  $\sigma$ on  the  result is
+transformed  into demands  on its  parameters.  Constants  generate no
+liveness.}
 
 Liveness analysis for lazy languages differ from eager languages in
 two respects:
 \begin{enumerate}
-\item Unlike eager languages, a variable may be  bound to an
-  expression that is not fully evaluated. i.e. a closure.
+\item Unlike eager languages, a variable may be bound to an expression
+  that is not fully evaluated. i.e. a closure.
 \item The point where an expression gets evaluated cannot be statically
   determined.
 \end{enumerate}
@@ -793,7 +836,7 @@ collector at this point.
                     \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
         \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
         \{l \mapsto  \{x.\epsilon\}\},  & \mbox{if}~\sigma \ne \emptyset\\
-        \emptyset  & \mbox{otherwise}
+        \emptyset_{\cal{M}?}  & \mbox{otherwise}
                  \end{array} \\
  \makebox[0mm]{\hspace*{3.8cm} where $l$ is a new label}\\
 \mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
@@ -841,83 +884,95 @@ In an  eager  language, \pw\  would  not have  been live  after
   \pi_7, \pi_8$, and $EP_3 =  \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.  
 
 The analysis  consists of  two maps: The  map $\cal{M}$ maps  a return
-path  to a  liveness environment  that is  common to  all  the program
-points in the path. And a second map $\cal{P}$ maps a program point to
-the set of  return paths on which the point lies.   If a program point
-happens  to  fall  on more  than  one  such  path, then  the  liveness
-environment of  the program  point is the  variable-wise union  of the
-liveness  environments  of  the  individual  paths.   In  the  example
-program, ${\cal M}(EP_1)=  \ldots$, ${\cal M}(EP_2)=\ldots$ and ${\cal
-  M}(EP_3)= \ldots$.   Since ${\cal P}(pi_4)$ is  $\lbrace EP_1, EP_2,
-EP_3 \rbrace$,  the liveness  of $pi_4$ is  \ldots.  In the  sequel we
-shall describe how to  obtain $\cal{M}$.  The formulation of $\cal{P}$
-is obvious  and we do  not describe it.   We observe that  the ${ref}$
-rules neither use  ${\cal M}$ directly nor create  new labels. We only
-need to consider the rules for {\LET}, {\SIF}, and {\RETURN}.
+path to a common liveness environment, and a second map $\cal{P}$ maps
+a program  point to the set of  return paths on which  the point lies.
+If a  program point happens to fall  on more than one  such path, then
+the  liveness environment of  the program  point is  the variable-wise
+union of  the liveness environments  of the individual paths.   In the
+example program, ${\cal M}(EP_1)= \ldots$, ${\cal M}(EP_2)=\ldots$ and
+${\cal M}(EP_3)=  \ldots$.  Since  ${\cal P}(pi_4)$ is  $\lbrace EP_1,
+EP_2, EP_3 \rbrace$, the liveness  of $pi_4$ is \ldots.  In the sequel
+we  shall  describe  how  to  obtain $\cal{M}$.   The  formulation  of
+$\cal{P}$ is obvious  and we do not describe it.   We observe that the
+${ref}$  rules  neither  use   ${\cal  M}$  directly  nor  create  new
+labels. We  only need  to consider the  rules for {\LET},  {\SIF}, and
+{\RETURN}.
 
  
-  A {\RETURN~\px}\  statement always forces an evaluation and hence a new 
-  label {\em l} needs to be created and added to $\cal{M}$. A new liveness
-  environment is associated with {\em l}. The demand $\sigma$ that is placed 
-  on this expression is now transferred to the variable \px. {\em l} will now
-  contain an entry for \px~ with liveness $\sigma$.
-
-  An \SIF~ statement will modify  $\cal{M}$ by doing a union of 
-  the maps from the {\em then} and the {\em else} part. Note that each part can contain 
-  more than one label. Since the variable corresponding to the condition may not
-  be part of either the {\em then} or the {\em else} part, a new label {\em l} is created 
-  and added to $\cal{M}$. The only liveness associated with {\em l} is the liveness 
-  of the condition variable.
+  A  {\RETURN~\px}\ with a  demand $\sigma$  forces an  evaluation and
+  hence a  new ${\cal M}$ needs to  be created with {\em  l} mapped to
+  $\lbrace \px.\sigma \rbrace$.  An \SIF~ statement is an union of the
+  ${\cal M}$-maps  from the {\em then}  and the {\em  else} part. Note
+  that each part  can contain more than one  label. Since the variable
+  corresponding to  the condition may not  be part of  either the {\em
+    then} or the  {\em else} part, a new label {\em  l} is created and
+  added to $\cal{M}$. The only liveness associated with {\em l} is the
+  liveness of the condition variable. Also notice that the
+  consequences of laziness---the entire statement including the
+  condition is not evaluated if the demand on it is
+  $\emptyset$. This results in the empty map denoted by
+  $\emptyset_{\cal{M}}$. 
   
-  The processing rule for {\LET} is the most complex among all the rules. A {\LET} does
-  not add any new label but might modify the liveness values of some variables or might add 
-  liveness values for the let bound variable. Since there might be more than one {\RETURN} 
-  statement following a {\LET}, there might be multiple {\em E-paths} reaching the {\LET}.
-  The demand on the let variable might be different along different {\em E-paths}. Therefore,
-  for each label {\em l} in $\cal{M}$, the liveness of the let-expression is calculated using 
-  the liveness environment $\Lv$ corresponding to {\em l}. Since the {\LET} is lazy, 
-  calculating its livness might require a fixed-point processing. 
+  The processing  {\LET} rule has an elegant formulation. Recollect
+  that our language permits lazy \LET s whose definitions can be
+  recursive   Thus, in the expression
+  $\LET~x \leftarrow~s~\IN~e$, $x$ can occur in $s$.  We model a let statement as a recursive function which captures an
+  arbitrary  number
+  of unrollings. We pass to this function the demand arising out of
+  the liveness of $x$  at the
+  beginning of $e$, and let the $the  
+  that is the  most complex among  all the
+  rules. A  {\LET} does  not add  any new label  but might  modify the
+  liveness values of  some variables or might add  liveness values for
+  the let bound variable. Since there might be more than one {\RETURN}
+  statement following a {\LET},  there might be multiple {\em E-paths}
+  reaching  the {\LET}.   The  demand  on the  let  variable might  be
+  different along  different {\em E-paths}. Therefore,  for each label
+  {\em  l}  in  $\cal{M}$,  the  liveness  of  the  let-expression  is
+  calculated  using the  liveness environment  $\Lv$  corresponding to
+  {\em l}.  Since the  {\LET} is lazy,  calculating its  livness might
+  require a fixed-point processing.
   
 
 \bigskip
 \hrule 
 \bigskip
 
-First recall the classical formulation  of liveness (as sets of simple
-variables)        on        three-address       instructions,        $
-\mathit{live}_\mathit{in}(I) = \mathit{live}_\mathit{out}(I) \setminus
-\mathit{def\/}(I) \cup  \mathit{ref\/}(I) $,  and then note  that {\em
-  strong liveness}  needs, when $I$ is the  instruction $z:=x+y$, that
-$\mathit{ref}(I)$     be     refined     to    $\{x,y\}$     if     $z
-\in\mathit{live}_\mathit{out}(I)$ and $\{\}$ otherwise.
+%% First recall the classical formulation  of liveness (as sets of simple
+%% variables)        on        three-address       instructions,        $
+%% \mathit{live}_\mathit{in}(I) = \mathit{live}_\mathit{out}(I) \setminus
+%% \mathit{def\/}(I) \cup  \mathit{ref\/}(I) $,  and then note  that {\em
+%%   strong liveness}  needs, when $I$ is the  instruction $z:=x+y$, that
+%% $\mathit{ref}(I)$     be     refined     to    $\{x,y\}$     if     $z
+%% \in\mathit{live}_\mathit{out}(I)$ and $\{\}$ otherwise.
 
-Our  liveness analysis  formulated  in Figure~\ref{fig:live-judge}  is
-analogous.
-% has three analogous aspects.
-% \begin{itemize}
-% \item
-Firstly,  the function  $\mathit{ref}$,  when given  a statement  $s$,
-returns the  incremental liveness {\em generated} by  $s$.  Because we
-generalize  {\em  strong}  liveness,  $\mathit{ref}$  needs  a  second
-parameter, specifying  the demand  $\sigma$ on the  result of  $s$, to
-determine which access paths of its free variables are made live.  The
-cases for $(\ID\ x)$ and $(\PRIM\ x\ y)$ exemplify this.
-% The cases for
-% $(\CAR\ x)$, $(\CAR\ x)$ and $(\CONS\ x\ y)$ show how demand for path $\alpha \in \sigma$
-% is transformed into a deeper or shallower path in the demand for (or liveness of) $x$ or $y$.
-% The   operator \PRIM\ dereferences its arguments  resulting in the liveness shown.
-A demand  of  $\sigma$  on  (\CAR~$x$)  is  transformed  to  the  demand
-$\acar\sigma$  on  $x$.   In  addition, \CAR\  always  dereferences  its
-argument (even if its result is never used).
-This generates the liveness  $\{x.\epsilon\} \cup  x.\acar\sigma$
-(note $\sigma$ may be $\{\}$).
-In the opposite  sense, the  demand  of $\acar\sigma$  on
-(\CONS~$x$~$y$) is  transformed to the  demand $\sigma$ on  $x$.  Note
-that \CONS\ does not, by itself, dereference its arguments.
-Thirdly, for the case of a user-function call, a third parameter $\Lfonly$ to 
-$\mathit{ref}$
-expresses how the demand $\sigma$ on the result is transformed into demands on its parameters.
-Constants generate no liveness.
+%% Our  liveness analysis  formulated  in Figure~\ref{fig:live-judge}  is
+%% analogous.
+%% % has three analogous aspects.
+%% % \begin{itemize}
+%% % \item
+%% Firstly,  the function  $\mathit{ref}$,  when given  a statement  $s$,
+%% returns the  incremental liveness {\em generated} by  $s$.  Because we
+%% generalize  {\em  strong}  liveness,  $\mathit{ref}$  needs  a  second
+%% parameter, specifying  the demand  $\sigma$ on the  result of  $s$, to
+%% determine which access paths of its free variables are made live.  The
+%% cases for $(\ID\ x)$ and $(\PRIM\ x\ y)$ exemplify this.
+%% % The cases for
+%% % $(\CAR\ x)$, $(\CAR\ x)$ and $(\CONS\ x\ y)$ show how demand for path $\alpha \in \sigma$
+%% % is transformed into a deeper or shallower path in the demand for (or liveness of) $x$ or $y$.
+%% % The   operator \PRIM\ dereferences its arguments  resulting in the liveness shown.
+%% A demand  of  $\sigma$  on  (\CAR~$x$)  is  transformed  to  the  demand
+%% $\acar\sigma$  on  $x$.   In  addition, \CAR\  always  dereferences  its
+%% argument (even if its result is never used).
+%% This generates the liveness  $\{x.\epsilon\} \cup  x.\acar\sigma$
+%% (note $\sigma$ may be $\{\}$).
+%% In the opposite  sense, the  demand  of $\acar\sigma$  on
+%% (\CONS~$x$~$y$) is  transformed to the  demand $\sigma$ on  $x$.  Note
+%% that \CONS\ does not, by itself, dereference its arguments.
+%% Thirdly, for the case of a user-function call, a third parameter $\Lfonly$ to 
+%% $\mathit{ref}$
+%% expresses how the demand $\sigma$ on the result is transformed into demands on its parameters.
+%% Constants generate no liveness.
 
 The  function  $\mathcal{L}$ now  gives  the  (total)  liveness of  an
 expression $e$.   The cases $\RETURN$ and  $\SIF$ are straightforward,
