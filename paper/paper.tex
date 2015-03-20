@@ -38,7 +38,7 @@
     #1 \medskip \hrule \medskip}}}
 \newcommand{\alan}[1]{{\color{red}{\medskip \hrule\medskip
     #1 \medskip \hrule \medskip}}}
-
+\newcommand{\blankout}[1]{}
 
 
 \newcommand{\scmin} {\mbox{\sf\em in}}
@@ -109,6 +109,9 @@
 }}
 \authorinfo{Double Blind Review}{}{}
 \maketitle
+
+
+
 \begin{abstract}
 We  consider  two  ways  to  reduce the  memory  requirement  of  lazy
 functional  programming  languages. The  first  is  to modify  garbage
@@ -584,6 +587,7 @@ $\rho'\oplus\rho,~ (\rho, x, (\RETURN~x))\!:\!S, H,  e$} & \sc{return-coo} \\
 %==============================================================
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 
+\pagebreak
 
 \section{Liveness}\label{sec:liveness}
 
@@ -597,183 +601,141 @@ represented by a set of {\em access paths} i.e.  prefix-closed strings
 from $\{\acar,\acdr\}^\ast$.   As an  example, if $x$  is a  list with
 liveness      $\{\epsilon,     \acdr,      \acdr\acar,     \acdr\acdr,
 \acdr\acdr\acar\}$, then future computations  can only refer up to the
-second and third  members of $x$. In this  notation, a scalar variable
-being live or dead are represented as $\{\epsilon\}$ and $\{\}$ respectively.
-
-A {\em liveness environment} is a mapping from variables to subsets of
-$\{\acar,\acdr\}^\ast$, but  often expressed as a set,  for example by
-writing  $\{x.\acar\acdr,   x.\acdr,  y.\epsilon\}$  instead   of  $[x
+second  and  third  members  of  $x$. In  this  notation,  $x  \mapsto
+\{\epsilon\}$ represents access using  $x$ itself and $x \mapsto \{\}$
+indicates that $x$ is dead.  A {\em liveness environment} is a mapping
+from  variables  to   subsets  of  $\{\acar,\acdr\}^\ast$,  but  often
+expressed as  a set, for example by  writing $\{x.\acar\acdr, x.\acdr,
+y.\epsilon\}$               instead               of               $[x
   \mapsto\{\epsilon,\acar,\acar\acdr,\acdr\},     y\mapsto\{\epsilon\},
-  z\mapsto\{\}]$.   We  associate  a  liveness environment  with  each
-program  point $\pi$:  the liveness  at $\pi:e$  is the  liveness just
+  z\mapsto\{\}]$.   We  associate  a  liveness environment  with  
+program  points $\pi$.  The liveness  at $\pi:e$  is the  liveness just
 before executing $e$.
-%%
-%% Due to the inherent uncertainty in
-%% determining the  point of evaluation  in lazy languages,  we associate
-%% liveness environments with certain kinds  of paths in the program. All
-%% programs points lying on the path share the same liveness environment.
-%% We explain this point later.
-%% 
-A  notion  related  to  liveness  is  {\em  demand}.   The  demand  on
-expression  $e$   is  again  an   access  path---that  subset   of  of
+
+
+A  notion related  to  liveness is  {\em  demand}.  The  demand on  an
+expression  $e$  is again  a  set  of  access paths---that  subset  of
 $\{\acar,\acdr\}^\ast$ which  the context of $e$ may  explore of $e$'s
-result.   The  demand on  an  expression  generates  liveness for  its
-constituent  variables.  So  for  example, given  a (non-null)  demand
-$\sigma =  \lbrace \epsilon, \acar  \rbrace$ and the  expression $\pi:
-(\CDR\  x)$, the liveness  at $\pi$  is $\lbrace  x.\epsilon, x.\acdr,
-x.\acdr\acar \rbrace$.  This indicates  that to explore $\sigma$ parts
-of the  result of $(\CDR\  x)$, one has  to first dereference  $x$ and
-\CDR\  field of  the cons  cell referred  by $x$.  Note  that liveness
-refers to  variables and  fields, and not  to $\CONS$ cells  (i.e.\ to
-edges  in  the memory  graph,  not  to  locations themselves).   Hence
-liveness of $\{x.\epsilon,x.\acar\}$ means that future computation may
-refer to  the value  $\ell$ of  variable $x$, and  also to  the $\CAR$
-field of location $\ell$.
-
-%% The classical  analogy of this  is in
-%% {\em strong liveness},  which can be expressed in  our terminology as:
-%% $y$ and $z$  have a liveness of $\lbrace\epsilon\rbrace$  at the entry
-%% to $n: x:=y+z$,  c$y$ and $z$ if  (and only if) $x$ has  a liveness of
-%% $\lbrace\epsilon\rbrace$ at exit of  $n$---the liveness of $x$ at exit
-%% from $n$ becomes the demand on $y+z$.
-
-%% Note  that, for  an  operation  like division  which  may raise  an
-%% exception,  the  assignment $n:  x:=y/z$  makes  $y$  and $z$  live
-%% regardless of the liveness of $x$.
+result.   To see  the need  for demands,  consider the  let expression
+$\pi:(\LET~x\leftarrow (\CDR~y)~\IN~ \pi':\RETURN~x)$. Assume that the
+context of  this expression produces the liveness  $[x \mapsto \lbrace
+  \epsilon, \acar  \rbrace]$ at $\pi'$.   Due to the  \LET\ definition
+which  binds $x$  to $(\CDR~y)$,  the liveness  of $x$  at  $\pi'$ now
+becomes  the  demand on  $(\CDR~y)$.   This,  in  turn, generates  the
+liveness $\lbrace y.\epsilon,  y.\acdr, y.\acdr\acar \rbrace$ at $\pi$
+(the set of $y$-rooted accesses required to explore $\lbrace \epsilon,
+\acar  \rbrace$  paths  of  the  result  of  $(\CDR~y)$)\footnote{The
+  classical analogue  is strong liveness  analysis, where $y$  and $z$
+  have  a  liveness  of  $\lbrace\epsilon\rbrace$  at  the  entry  $n:
+  x:=y+z$,    if   and    only   if    $x$   has    a    liveness   of
+  $\lbrace\epsilon\rbrace$ at  exit of  $n$.  In our  terminology, the
+  liveness of $x$  at exit from $n$ becomes the  demand on $y+z$. This
+  generates the  liveness $\lbrace y.\epsilon,  z.\epsilon \rbrace$ at
+  the entry of $n$.}.
+%% Exploring $\lbrace \epsilon, \acar \rbrace$ of the
+%% result of $(\CDR~y)$ first requires access using $y$ ( and the \CDR\ field of the cons cell pointed by
+%% $y$.
+Note that  liveness refers to  access using variables and  fields, and
+not  to $\CONS$  cells (i.e.\  to edges  in the  memory graph,  not to
+locations themselves).
 
 We use $\sigma$  to range over demands, $\alpha$  to range over access
-paths  and $\Lv$  to range  over liveness  environments.  The notation
+paths  and $\Lv$ to  range over  liveness environments.   The notation
 $\sigma_1\sigma_2$  denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
-\alpha_1 \in  \sigma_1, \alpha_2 \in \sigma_2\rbrace$.  Often we shall
+\alpha_1 \in \sigma_1, \alpha_2  \in \sigma_2\rbrace$.  Often we shall
 abuse notation to  juxtapose an edge label and a  set of access paths:
-$\acar\sigma$   is   a   shorthand  for   $\lbrace\acar\rbrace\sigma$.
-Finally,  we use $\Lfonly$  to range  over {\em  demand transformers}.
-These transform demands on a function call into demands for its formal
-parameters:    given    a    user    function    $f$,    defined    by
-$(\DEFINE\  (f\ x_1\  \ldots\ x_n)\  \  e_f)$ and  called with  demand
-$\sigma$, then $\Lf{f}{i}{\sigma}$ is the liveness of $x_i$ at $e_f$.
-
-%% Note that liveness refers to  variables and fields, and not to $\CONS$
-%% cells  (i.e.\  to  edges  in   the  memory  graph,  not  to  locations
-%% themselves).   Hence liveness  of $\{x.\epsilon,x.\acar\}$  means that
-%% future computation may refer to  the value $\ell$ of variable $x$, and
-%% also to the $\CAR$ field of  location $\ell$.  In the absence of other
-%% pointers to heap location $\ell$, we are certain that the $\CDR$ field
-%% of  $\ell$  will  not  be   referenced  and  may  hence  be  corrupted
-%% arbitrarily.   Note therefore,  that  while $\ell$  cannot be  garbage
-%% collected, any location  $\ell'$ stored in the $\CDR$  field of $\ell$
-%% would  be  garbage (again  provided  there  are  no other  aliases  to
-%% $\ell$).
-
-\bigskip
-\hrule 
-\bigskip
+$\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
+%% Finally,  we use $\Lfonly$  to range  over {\em  demand transformers}.
+%% These transform demands on a function call into demands for its formal
+%% parameters:    given    a    user    function    $f$,    defined    by
+%% $(\DEFINE\  (f\ x_1\  \ldots\ x_n)\  \  e_f)$ and  called with  demand
+%% $\sigma$, then $\Lf{f}{i}{\sigma}$ is the liveness of $x_i$ at $e_f$.
 
 \subsection{Liveness Analysis for lazy languages}
-\comment{analysis for liveness has two components - transfering
-  demands on expressions to liveness of results
-and propagating liveness. first discuss demand --> liveness}
+
+Figure~\ref{fig:live-judge}  describes  our  analysis.   Firstly,  the
+function $\mathit{ref}$,  when given an  application $s$ and  a demand
+$\sigma$,  returns the liveness  generated for  the free  variables of
+$s$.   In  each  case,  the  null demand  ($\emptyset$)  generates  no
+liveness.   Notice  that this  is  different  from  liveness of  eager
+languages, where, for instance,  (\CDR~$x$) would be evaluated even if
+the   demand   on   it   is  $\emptyset$   generating   the   liveness
+$\{x.\epsilon\}$.  The  cases (\PRIM~x~y)  and (\NULLQ~x) are  easy. A
+non-null  demand of  $\sigma$  on (\CDR~$x$),  is  transformed to  the
+liveness  $x.\epsilon,  x.\acdr\sigma$.   In  an opposite  sense,  the
+demand  of  $\acar\sigma$ on  (\CONS~$x$~$y$)  is  transformed to  the
+demand  $\sigma$  on $x$.   Note  that  \CONS\  does not,  by  itself,
+dereference its arguments. Constants generate no liveness.
 
 
-%% First recall the classical formulation  of liveness (as sets of simple
-%% variables)        on        three-address       instructions,        $
-%% \mathit{live}_\mathit{in}(I) = \mathit{live}_\mathit{out}(I) \setminus
-%% \mathit{def\/}(I) \cup  \mathit{ref\/}(I) $,  and then note  that {\em
-%%   strong liveness}  needs, when $I$ is the  instruction $z:=x+y$, that
-%% $\mathit{ref}(I)$     be     refined     to    $\{x,y\}$     if     $z
-%% \in\mathit{live}_\mathit{out}(I)$ and $\{\}$ otherwise.
+For  the  case  of a  user-function  call  we  use a  third  parameter
+$\Lfonly$  that  represents the  summaries  of  all  functions in  the
+program. $\Lfonly$ expresses how the  demand $\sigma$ on the result of
+a function call is transformed  into liveness on its parameters at the
+beginning of the call.  $\Lfonly$  is determined by the judgement form
+$\mathit{Prog}    \len   \Lfonly$    using   inference    rule   ({\sc
+  live-define}). This states the  fixpoint property to be satisfied by
+$\Lfonly$, namely, the demand transformation assumed for each function
+in  the  program should  be  the  same  as the  demand  transformation
+calculated from their bodies. The algorithmic formulation of this rule
+through  a  grammar will  be  described  in [???].   This yields  the  least
+solution  satisfying  the  fixpoint  property  and  thus  ensures  the
+greatest amount of garbage collected.
+  
 
-%%Our  liveness analysis  formulated  in Figure~\ref{fig:live-judge}  is
-%%analogous.
-% has three analogous aspects.
-% \begin{itemize}
-% \item
-\alan{Firstly,  the function  $\mathit{ref}$,  when given  a statement  $s$,
-returns the  incremental liveness {\em generated} by  $s$.  Because we
-generalize  {\em  strong}  liveness,  $\mathit{ref}$  needs  a  second
-parameter, specifying  the demand  $\sigma$ on the  result of  $s$, to
-determine which access paths of its free variables are made live.  The
-cases for $(\ID\ x)$ and $(\PRIM\ x\ y)$ exemplify this.
-% The cases for
-% $(\CAR\ x)$, $(\CAR\ x)$ and $(\CONS\ x\ y)$ show how demand for path $\alpha \in \sigma$
-% is transformed into a deeper or shallower path in the demand for (or liveness of) $x$ or $y$.
-% The   operator \PRIM\ dereferences its arguments  resulting in the liveness shown.
-A  demand of  $\sigma$  on  (\CAR~$x$) is  transformed  to the  demand
-$\acar\sigma$  on $x$.   In  addition, \CAR\  always dereferences  its
-argument  (even if  its result  is  never used).   This generates  the
-liveness  $\{x.\epsilon\} \cup  x.\acar\sigma$ (note  $\sigma$  may be
-$\{\}$).   In  the opposite  sense,  the  demand  of $\acar\sigma$  on
-(\CONS~$x$~$y$) is  transformed to the  demand $\sigma$ on  $x$.  Note
-that \CONS\ does not,  by itself, dereference its arguments.  Thirdly,
-for the case  of a user-function call, a  third parameter $\Lfonly$ to
-$\mathit{ref}$  expresses how  the demand  $\sigma$ on  the  result is
-transformed  into demands  on its  parameters.  Constants  generate no
-liveness.}
 
-Liveness analysis for lazy languages differ from eager languages in
-two respects:
-\begin{enumerate}
-\item Unlike eager languages, a variable may be bound to an expression
-  that is not fully evaluated. i.e. a closure.
-\item The point where an expression gets evaluated cannot be statically
-  determined.
-\end{enumerate}
+%%   Analogously   to  classical  liveness  being
+%% computed  as  a  solution  of  dataflow  equations,  we  require,  via
+%% inference   rule  ({\sc  live-define}),   $\Lfonly$  to   satisfy  the
+%% fixed-point property that:  when we assume $\Lfonly$ to  be the family
+%% of demand transformers for the program then the calculated liveness of
+%% each function  body $\mathcal{L}(e_f,\sigma,\Lfonly)$ agrees  with the
+%% assumed $\Lfonly$.   As usual, there  are often multiple  solutions to
+%% $\Lfonly$;  all are  safe (see  Section~\ref{sec:correctness})  but we
+%% prefer  the  least  one  as  giving  the  least  liveness  subject  to
+%% safety---and hence greatest amount of garbage collected.
 
-To  deal  with the  first  issue, we  apply  the  results of  liveness
-analysis only  to fully evaluated  data.  If the marking  phase during
-garbage collection leads to a closure, and the closure is not dead, we
-mark the entire reachable memory  under the closure for collection.  A
-better scheme  would be  to garbage collect  the closure based  on the
-liveness  at the point  of its  creation.  This  is sound  because our
-language is statically scoped.  However, this is work in progress, and
-the method described in this paper switches over to reachability while
-collecting closures.
 
-%% However, we GC,  if we find a variable can either  point to a fully
-%% evaluated  data value  or  it could  point  to a  closure which  on
-%% evaluation  generates  the   required  data  value.   For  example,
-%% consider the statement {\tt  let \py~ $\leftarrow $ (\CDR~\px)}. In
-%% case of  an eager  language the variable  \py~ points to  the \CDR~
-%% part of  \px~ which  is guaranteed  to be a  cons cell.   Hence any
-%% demand on \py~ can be  immediately transferred to the \CDR~ part of
-%% \px.  In case  of a lazy language, \px~ might  not be evaluated and
-%% hence  pointing to  a closure.  In our  example, it  points  to the
-%% closure corresponding to (\CONS~1~\px).  It does not make any sense
-%% to transfer the demand onto the \CDR~ part of \px~ as it still does
-%% not exist.  , 2) it is  not possible to statically determine when a
-%% closure gets evaluated.  Therefore during  GC we treat a closure as
-%% a demand transformer and tranform the demand on to the arguments of
-%% the  closure   pointed.   This  is   similar  to  the   process  of
-%% transferring the demand from the  return value of a function to the
-%% arguments of the function call in an eager language.
+We now describe the  propagation of liveness through expressions. This
+brings  us to  the  second way  in  which liveness  analysis for  lazy
+languages  differ from  eager languages---the point where  an
+expression gets evaluated cannot be statically determined.  To see how
+this  is handled,  consider  the liveness  analysis  of the  following
+function:
+%%%%%%%%%%%%%%%%%%%%%%
 
-%% In our example, during GC if  we find that \px~ points to a closure
-%% instead  of a  cons cell  we find  out the  demand/liveness  on the
-%% arguments  of the  closure, namely  \py.  Statically  it  cannot be
-%% determined  what  values  a  closure  points to  or  when  it  gets
-%% evaluated, hence  our method  approximates the liveness  of closure
-%% arguments  at  runtime  by  tagging  extra  information  with  each
-%% closure.  Since  the arguments of the closures  could themselves be
-%% closures in turn, we recursively  apply the same procedure until we
-%% hit  a data  value.  The only  case  where we  do  not follow  this
-%% procedure is if the demand on a particular closure is null. In such
-%% a case we safely collect the entire closure as garbage.
+% Push this to a later point
 
-To see  our way of  handling the second  issue, consider the liveness
-analysis of the following function:
+
+%% Unlike eager languages, a variable may be bound to an expression
+%%   that is not fully evaluated. i.e. a closure.
+
+
+%% To  deal  with the  first  issue, we  apply  the  results of  liveness
+%% analysis only  to fully evaluated  data.  If the marking  phase during
+%% garbage collection leads to a closure, and the closure is not dead, we
+%% mark the entire reachable memory  under the closure for collection.  A
+%% better scheme  would be  to garbage collect  the closure based  on the
+%% liveness  at the point  of its  creation.  This  is sound  because our
+%% language is statically scoped.  However, this is work in progress, and
+%% the method described in this paper switches over to reachability while
+%% collecting closures.
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+
 
 \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
-	  \UNL{1} (\DEFINE\ (\pf~\pa)
-	  \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\CONS~1~\px) \IN
-	  \UNL{3}      $\pi_2\!\!:\, $(\LET~\py\ $\leftarrow $\ (\CDR~\px) \IN  
-          \UNL{4} \hspace*{.05cm}     $\pi_3\!\!:\,
+	  \UNL{0}\hspace*{-.5cm} (\DEFINE\ (\pf~\pa)
+	  \UNL{1}\hspace*{-.5cm}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\CONS~1~\px) \IN
+	  \UNL{2}\hspace*{-.5cm}      $\pi_2\!\!:\, $(\LET~\py\ $\leftarrow $\ (\CDR~\px) \IN  
+          \UNL{3}\hspace*{-.5cm} \hspace*{.05cm}     $\pi_3\!\!:\,
           $(\LET\ \pz\  $\leftarrow$\   (\NULLQ~\pa) \IN
-	  \UNL{5}  \hspace*{.05cm}    $\pi_4\!\!:\,
+	  \UNL{4}\hspace*{-.45cm}      $\pi_4\!\!:\,
           $(\SIF\ $\pi_5\!\!:\,$ \pz\ ~$\pi_6\!\!:\,$ (\LET~\ww\  $\leftarrow$  (\take~5~\px) \IN
-	  \UNL{6} \hspace*{1.15cm}    $\pi_7\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\pw)  \IN
-	  \UNL{7}  \hspace*{1.15cm}   $\pi_8\!\!:\,(\RETURN_1~\pu)$))
-          \UNL{5} \hspace*{.05cm} $\pi_9\!\!:\, (\RETURN_2~\py)$)))))
+	  \UNL{5}\hspace*{.45cm}     $\pi_7\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\pw)  \IN
+	  \UNL{6}\hspace*{.45cm}  $\pi_8\!\!:\,(\RETURN_1~\pu)$))
+          \UNL{5}\hspace*{-.45cm}  $\pi_9\!\!:\, (\RETURN_2~\py)$)))))
 	\end{uprogram}}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \medskip
@@ -789,13 +751,13 @@ backwards as in traditional liveness analysis.
 
 Since   \pu\  is  $(\CDR~   \pw)$,  the   liveness  of   $\sigma$  for
 \pu\ translates  into a demand  of $\sigma$ on $(\CDR~\pw)$,  which in
-turn generates  a liveness  of $\{\pw,~\pw.1\sigma\}$ at  $\pi_6$. The
+turn generates  a liveness of $\{\pw,~\pw.1\sigma\}$  at $\pi_6$.  The
 liveness of  \pu\ is  also killed at  $\pi_6$ since  it is not  in the
-scope of  \pu. However, for simplicity  of exposition, we  do not kill
-  livenesses  of  variables  in  our formulation.   This  does  not
-introduce any imprecision since \pu\  is yet to come into existence at
-$\pi_6$  and  its  liveness  will  not be  consulted  by  the  garbage
-collector at this point.
+scope of \pu.   However, for simplicity of exposition,  we do not kill
+livenesses of  variables in our formulation.  This  does not introduce
+any imprecision  since \pu\ is yet  to come into  existence at $\pi_6$
+and its  liveness will  not be consulted  by the garbage  collector at
+this point.
 %==============================================================
 \begin{figure*}[t]  
 \begin{eqnarray*}
@@ -866,24 +828,23 @@ collector at this point.
 \end{figure*}
 %======================================================================================
 
-In an  eager  language, \pw\  would  not have  been live  after
- $\pi_7$, the point of its last use. In a lazy language, however, the
-  definition  $\pu  \leftarrow  (\CDR~\pw)$,  does not  result  in  an
-  evaluation  of  $(\CDR~\pw)$; instead  a  closure  is created.   The
-  evaluation actually takes place while evaluating $(\RETURN~\pu)$. Thus
-  it is necessary to record the liveness of $\pw$ at the program point
-  $\pi_8$, indeed at every program point  from $\pi_8$ up to the
-  beginning of the program.
+In an eager language, \pw\ would not have been live after $\pi_7$, the
+point of  its last  use. In a  lazy language, however,  the definition
+$\pu  \leftarrow (\CDR~\pw)$,  does  not result  in  an evaluation  of
+$(\CDR~\pw)$; instead  a closure is created.   The evaluation actually
+takes place while evaluating  $(\RETURN~\pu)$. Thus it is necessary to
+record the liveness  of $\pw$ at the program  point $\pi_8$, indeed at
+every program point from $\pi_8$ up to the beginning of the program.
 %% The second  difference is that  our \LET s  can be recursive  as in
 %%   program point $\pi_1$.  In such a case, the liveness of a let has
 %%   to be formulated as a fix-point computation.
-  We thus  regard the body of the function as a
-  tree and consider paths from the root of this tree to program points
-  which     trigger     a     evaluation---\SIF\    conditions     and
-  \RETURN\  expressions. We call  such paths  {\em e-paths}.   For the
-  program  shown, there  are three  such paths  $EP_1 =  \pi_1, \pi_2,
-  \pi_3,  \pi_4, \pi_5$, $EP_2  = \pi_1,  \pi_2, \pi_3,  \pi_4, \pi_6,
-  \pi_7, \pi_8$, and $EP_3 =  \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.  
+  We thus regard the body of the function as a tree and consider paths
+  from  the  root of  this  tree to  program  points  which trigger  a
+  evaluation---\SIF\  conditions and  \RETURN\  expressions.  We  call
+  such paths  {\em e-paths}.  For  the program shown, there  are three
+  such  paths $EP_1  = \pi_1,  \pi_2,  \pi_3, \pi_4,  \pi_5$, $EP_2  =
+  \pi_1, \pi_2, \pi_3, \pi_4, \pi_6, \pi_7, \pi_8$, and $EP_3 = \pi_1,
+  \pi_2, \pi_3, \pi_4, \pi_9$.
 
 The analysis  consists of  two maps: The  map $\cal{M}$ maps  a return
 path to a common liveness environment, and a second map $\cal{P}$ maps
@@ -915,30 +876,23 @@ labels. We  only need  to consider the  rules for {\LET},  {\SIF}, and
   $\emptyset$. This results in the empty map denoted by
   $\emptyset_{\cal{M}}$. 
   
-  The processing  {\LET} rule has an elegant formulation. Recollect
-  that our language permits lazy \LET s whose definitions can be
-  recursive   Thus, in the expression
-  $\LET~x \leftarrow~s~\IN~e$, $x$ can occur in $s$.  We model a let statement as a recursive function which captures an
-  arbitrary  number
-  of unrollings. We pass to this function the demand arising out of
-  the liveness of $x$  at the
-  beginning of $e$, and let the $the  
-  that is the  most complex among  all the
-  rules. A  {\LET} does  not add  any new label  but might  modify the
-  liveness values of  some variables or might add  liveness values for
-  the let bound variable. Since there might be more than one {\RETURN}
-  statement following a {\LET},  there might be multiple {\em E-paths}
-  reaching  the {\LET}.   The  demand  on the  let  variable might  be
-  different along  different {\em E-paths}. Therefore,  for each label
-  {\em  l}  in  $\cal{M}$,  the  liveness  of  the  let-expression  is
-  calculated  using the  liveness environment  $\Lv$  corresponding to
-  {\em l}.  Since the  {\LET} is lazy,  calculating its  livness might
-  require a fixed-point processing.
-  
+  The  processing {\LET}  rule has  an elegant  formulation. Recollect
+  that  our language  permits lazy  \LET  s whose  definitions can  be
+  recursive Thus,  in the expression  $\LET~x \leftarrow~s~\IN~e$, $x$
+  can occur  in $s$.   We model the  definition $x \leftarrow~s$  as a
+  possibly recursive  function which  captures an arbitrary  number of
+  unrollings of the  definition.  We pass to this  function the demand
+  arising  out of the  liveness of  $x$ along  all paths  reaching the
+  beginning of $e$, and let  the \Lfonly abstraction derive the demand
+  on the  variables of $s$.   
 
-\bigskip
-\hrule 
-\bigskip
+%% that is the  most complex among  all the
+%%   rules.  A  {\LET} does not  add any new  label but might  modify the
+%%   liveness values of  some variables or might add  liveness values for
+%%   the  let  bound  variable.   Since  there might  be  more  than  one
+%%   {\RETURN} statement following a {\LET}, there might be multiple {\em
+%%     E-paths}  reaching the  {\LET}.  The  demand on  the  let variable
+%%   might be different along different {\em E-paths}.
 
 %% First recall the classical formulation  of liveness (as sets of simple
 %% variables)        on        three-address       instructions,        $
@@ -976,7 +930,7 @@ labels. We  only need  to consider the  rules for {\LET},  {\SIF}, and
 %% expresses how the demand $\sigma$ on the result is transformed into demands on its parameters.
 %% Constants generate no liveness.
 
-The  function  $\mathcal{L}$ now  gives  the  (total)  liveness of  an
+\alan{The function  $\mathcal{L}$ now  gives  the  (total)  liveness of  an
 expression $e$.   The cases $\RETURN$ and  $\SIF$ are straightforward,
 but note the liveness $x.\epsilon$  generated by the latter.  The case
 $(\LET\   z\leftarrow   s\  \IN\   e')$   resembles  a   three-address
@@ -984,21 +938,10 @@ instruction:  the liveness  of $e$  is given  by taking  the liveness,
 $\Lv$, of $e'$, killing any liveness of $z$ and adding any incremental
 liveness from  $s$.  The main subtlety  is how the liveness  of $z$ in
 $\Lv$  is converted  to a  demand  $\Lv(z)$ to  be placed  on $s$  via
-$\mathit{ref}(s,\Lv(z),\Lfonly)$.
+$\mathit{ref}(s,\Lv(z),\Lfonly)$.}
 
-% \item
 %%%%%%\marginpar{Say $\mathcal{L}$ is monotonic?}
-Finally, the  judgement form $\mathit{Prog}  \len \Lfonly$ is  used to
-determine  $\Lfonly$\@.   Analogously   to  classical  liveness  being
-computed  as  a  solution  of  dataflow  equations,  we  require,  via
-inference   rule  ({\sc  live-define}),   $\Lfonly$  to   satisfy  the
-fixed-point property that:  when we assume $\Lfonly$ to  be the family
-of demand transformers for the program then the calculated liveness of
-each function  body $\mathcal{L}(e_f,\sigma,\Lfonly)$ agrees  with the
-assumed $\Lfonly$.   As usual, there  are often multiple  solutions to
-$\Lfonly$;  all are  safe (see  Section~\ref{sec:correctness})  but we
-prefer  the  least  one  as  giving  the  least  liveness  subject  to
-safety---and hence greatest amount of garbage collected.
+
 % \end{itemize}
 
 We make three observations: firstly the rule ({\sc live-define}) has a
@@ -1008,68 +951,75 @@ inference of mutually recursive  function definitions, and thirdly the
 asymmetry of  demand and liveness (compared to  post- and pre-liveness
 classically) is due to the functional formulation here.
 
-Section~\ref{sec:computing} shows how the demand transformers $\Lfonly$ for a program
-(representing a fully context-sensitive analysis)
-can be safely approximated, for each function, by a {\em procedure summary}
-(unifying the contexts in the style of 0-CFA)\@.
-The summary consists of a pair of a single demand and, for this demand,
-the corresponding tuple of demands the function makes on its
+Section~\ref{sec:computing}   shows   how   the  demand   transformers
+$\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
+analysis) can  be safely  approximated, for each  function, by  a {\em
+  procedure summary} (unifying the  contexts in the style of 0-CFA)\@.
+The  summary consists  of a  pair  of a  single demand  and, for  this
+demand, the corresponding  tuple of demands the function  makes on its
 arguments.
-
-%\comment{
-
-
-
-%}
-
-
-
-
-
 
 
 % \item
+\pagebreak
 
 \section{Implementation}
 % GC assumptions
-By the time the program starts executing, the liveness automata are created and stored in a file. 
-This is re-used every time the program executes. 
+By the  time the program  starts executing, the liveness  automata are
+created and stored in a file.   This is re-used every time the program
+executes.
 % GC points - mention reduction of gc points due to e-paths
-An important difference in GC of lazy language compared to an eager language is the point of 
-garbage collection. In case of eager languages only \CONS~ points and function calls are 
-the GC points. In a lazy language every \LET~ statement is a potential GC point. Hence we need to store 
-liveness automata corresponding to every \LET~ statement in the program. This leads to an explosion 
-in the number of automata. From our observation that along an {\em E-path} all program points have 
-the same liveness, we can reduce the number of automata state required by sharing the same automata 
-for all program points along an {\em E-path}. In the example program, we only need to create automata 
-for program points \ldots, since they are the only distinct {\em E-path}s in the program. 
+An important  difference in GC of  lazy language compared  to an eager
+language  is  the  point  of  garbage collection.  In  case  of  eager
+languages only \CONS~ points and  function calls are the GC points. In
+a lazy language  every \LET~ statement is a  potential GC point. Hence
+we  need  to store  liveness  automata  corresponding  to every  \LET~
+statement in the program. This leads  to an explosion in the number of
+automata. From our observation that  along an {\em E-path} all program
+points have  the same liveness, we  can reduce the  number of automata
+state required  by sharing  the same automata  for all  program points
+along an {\em E-path}. In the  example program, we only need to create
+automata for program  points \ldots, since they are  the only distinct
+{\em E-path}s in the program.
 % Abstract description of the GC algorithm
 % Liveness for cons cells & reachability for closures
-During GC, if the heap cell being processed is a cons cell, we consult the liveness automaton 
-corresponding to it and copy only the live paths. In case the heap cell points to a closure, 
-we safely approximate the liveness to be {\{0+1\}\*} and copy everything under the closure.
+During GC, if the heap cell being processed is a cons cell, we consult
+the  liveness automaton  corresponding to  it and  copy only  the live
+paths.  In  case  the  heap  cell  points  to  a  closure,  we  safely
+approximate the  liveness to be {\{0+1\}\*} and  copy everything under
+the closure.
 % Handling of mixture of LGC & RGC
-A consequence of copying everything under a closure is the fact that we can end up trying to copy 
-things which are not live and corrupt the heap. This can happen if at some $GC_k$ a cons cell is copied 
-using liveness. At a later stage this cons cell becomes part of a closure and hence during $GC_{k+n}$ the 
-algorithm tries to copy everything under the cons cell thus copying heap locations which might not be valid. 
-To avoid this behavior we either have to choose to do a full liveness based GC for closure or we should 
-ensure that any non-live references are not carried across GC's. We take the latter approach and ensure that 
-non-live references are set to null. After every GC, the live part of the buffer is scanned and any reference 
-which is not live is set to null. The correctness of this follows from the fact that any reference which is 
-decalred not live in a $GC_k$ will not be derefernced during later execution.
+A consequence of  copying everything under a closure  is the fact that
+we can end up trying to copy things which are not live and corrupt the
+heap. This  can happen if at some  $GC_k$ a cons cell  is copied using
+liveness. At  a later stage this  cons cell becomes part  of a closure
+and  hence during $GC_{k+n}$  the algorithm  tries to  copy everything
+under the  cons cell  thus copying heap  locations which might  not be
+valid.  To avoid  this behavior we either have to choose  to do a full
+liveness based  GC for closure or  we should ensure  that any non-live
+references are  not carried across  GC's. We take the  latter approach
+and ensure that  non-live references are set to  null. After every GC,
+the live part of the buffer  is scanned and any reference which is not
+live is  set to null.  The correctness of  this follows from  the fact
+that any reference which is decalred  not live in a $GC_k$ will not be
+derefernced during later execution.
 % A reference copied using LGC could become part of a closure in a later GC
 % and copy wrong locations. Avoiding it by setting non-live references to null after every GC.
 % Proof for the correctness. 
 % Difference between eager and lazy GC
-Another difference that is present in GC of lazy lanaguage is the presence of a print stack. In lazy 
-languages the evaluation of closures is driven by the print function. Hence, during a GC there will be 
-heap references that will be present on the stack which also have to copied/collected. One solution is to 
-assume that all references present on the print stack are fully live and copy everything pointed by them 
-akin to reachability. This is safe but copies heap cells which have already been printed. Since the print 
-function is not part of the executing program its liveness automata are not considered. Therefore we 
-simulate the liveness of the print function by using a flag in the heap cell. The flag ensures that only the 
-required parts of a cons cell are copied. The behavior of the GC algorithm is as described below,
+Another  difference that is  present in  GC of  lazy lanaguage  is the
+presence  of  a print  stack.  In  lazy  languages the  evaluation  of
+closures is  driven by  the print function.  Hence, during a  GC there
+will be heap  references that will be present on  the stack which also
+have  to  copied/collected.  One   solution  is  to  assume  that  all
+references  present  on  the  print  stack are  fully  live  and  copy
+everything  pointed by  them akin  to reachability.  This is  safe but
+copies heap  cells which  have already been  printed. Since  the print
+function is  not part of  the executing program its  liveness automata
+are not  considered. Therefore we  simulate the liveness of  the print
+function by using a flag in  the heap cell. The flag ensures that only
+the required parts  of a cons cell are copied. The  behavior of the GC
+algorithm is as described below,
 \begin{verbatim}
 copy cons cell to new loc
 if flag == false
@@ -1077,8 +1027,9 @@ if flag == false
   update cdr part of new loc
 end if
 \end{verbatim}
-We provide an intuition about the correctness of this algorithm. Consider the following facts about the print stack 
-during a GC,
+We   provide   an   intuition    about   the   correctness   of   this
+algorithm. Consider the following facts about the print stack during a
+GC,
 \begin{enumerate}
 \item The top of the stack always contains a reference to a closure.
 \item All other references on the print stack point to atomic values or cons cells, it can never contain a
@@ -1134,6 +1085,7 @@ experienced to expert user of \LaTeX, you may find reading
 it useful but please remember not to change it.
 %\balancecolumns % GM June 2007
 % That's all folks!
+
 \end{document}
 
 
