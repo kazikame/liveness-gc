@@ -866,7 +866,9 @@ In an  eager  language, \pw\  would  not have  been live  after
   The demand on the let variable might be different along different {\em E-paths}. Therefore,
   for each label {\em l} in $\cal{M}$, the liveness of the let-expression is calculated using 
   the liveness environment $\Lv$ corresponding to {\em l}. Since the {\LET} is lazy, 
-  calculating its livness might require a fixed-point processing. 
+  calculating its livness might require a fixed-point processing.
+
+  Consider the example program in Figure~\ref{fig:mot-example2}.
   
 
 \bigskip
@@ -951,15 +953,121 @@ arguments.
 
 %\comment{
 
+\section{Generating Liveness Equations}
+\begin{figure*}[t!]
+\begin{picture}(100,130)(0,-90)
+  \begin{tabular}{cc}
+    \begin{boxedminipage}{.5\textwidth}
+      {\sf
+        \renewcommand{\arraystretch}{1}{
+          \begin{uprogram}
+            \UNL{1} (\DEFINE\ (\length~\xl)
+            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
+            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\ $\pi_3\!\!:\,$ \px
+            \UNL{4} \hspace*{1.15cm} $\pi_4\!\!:\, (\RETURN_1~0)$
+            \UNL{4} \hspace*{1.15cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
+            \UNL{5} \hspace*{1.15cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
+            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\, (\RETURN_2~(1~+~\py))$)))))
+        \end{uprogram}}
+        \renewcommand{\arraystretch}{1}{
+	  \begin{uprogram}
+	  \UNL{1} $\pi_\mainpgm\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
+	  \UNL{2}   \hspace*{.78cm}              (\LET\ \pb\  $\leftarrow$  \ldots \IN 
+          \UNL{3}   \hspace*{.78cm}    $\pi_8\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \py) \IN~$\pi_{9}\!\!:\,$ (\RETURN\ \pw)))))))
+\end{uprogram}}
+        } 
+    \end{boxedminipage}
+    & 
+    \begin{boxedminipage}{.5\textwidth}
+      {\sf
+        \begin{tabular}{lc}
+        $\cal{M} = $ 
+            \begin{tabular}{lc}            
+              $[$
+              $\pi_{\mbox{7}} \mapsto \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \
+              \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon  \rbrace ,$ \\ 
+              $\pi_{\mbox{4}} \mapsto \lbrace \rbrace , $\\
+              $\pi_{\mbox{3}} \mapsto \lbrace \px.\epsilon, \xl.\epsilon \rbrace $  \\
+              $]$
+            \end{tabular} \\
+            $\cal{P} = [$
+              \begin{tabular}{lc}
+              $\pi_{\mbox{1}} \mapsto \lbrace \pi_{\mbox{3}},\pi_{\mbox{4}}, \pi_{\mbox{7}} \rbrace, $ \
+              $ \pi_{\mbox{2}} \mapsto \lbrace \pi_{\mbox{3}},\pi_{\mbox{4}}, \pi_{\mbox{7}} \rbrace, $ \\
+              $ \pi_{\mbox{3}} \mapsto \lbrace \pi_{\mbox{3}} \rbrace, $ \
+              $ \pi_{\mbox{4}} \mapsto \lbrace \pi_{\mbox{4}} \rbrace, $ \
+              $ \pi_{\mbox{5}} \mapsto \lbrace \pi_{\mbox{7}} \rbrace, $ \\
+              $ \pi_{\mbox{6}} \mapsto \lbrace \pi_{\mbox{7}} \rbrace, $ \
+              $ \pi_{\mbox{7}} \mapsto \lbrace \pi_{\mbox{7}} \rbrace $ \\
+              $]$
+            \end{tabular}
+        \end{tabular}
+      }
+    \end{boxedminipage}
+    \\
+    (a) Example program.&
+    \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
+        (b) {\em e-path} to liveness environment map \\
+        (c) Prog pt to {\em e-paths } map
+    \end{tabular}}
+  \end{tabular}
+\end{picture}
+\kern -3ex
 
+\caption{Example Program and its liveness maps.}\label{fig:mot-example2}    
+\end{figure*}
+
+ For our example program which has  a
+single function \length, this generates the following equations:
+
+  \begin{eqnarray*}
+    \Lf{\length}{1}{\sigma}
+    &=& \epsilonset \cup \acdr\Lf{\length}{1}{\epsilon}
+   \end{eqnarray*}
+
+\subsection{Generating Liveness Equations for Function bodies}
+For the running example, $\length$ has calls from $\mainpgm$ at $\pi_8$
+and a recursive call at $\pi_6$.
+\newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
+So $\sigma_{\length} =
+     \deltacall{\length}{\pi_8}{\mainpgm}  \cup \deltacall{\length}{\pi_6}{\length}$.
+Filling in  the values gives:
+
+\begin{align*}
+\sigma_{\length}    &=
+ \sigma_{\!all}  ~\cup~ \acdr\Lf{length}{1}{\sigma_{\mathit{\length}}}
+\end{align*}
+
+For the running example, containing unique GC points (corresponding to unique {\em e-paths} sets) $\pi_3, \pi_4, \pi_7$ in $\length$ and
+$\pi_9$ in $e_\mainpgm$, this gives
+
+\begin{align*}
+\Lanv{7}{\xl} &= \acdr\Lf{\length}{1}{\epsilon} \cup \epsilonset \\
+\Lanv{7}{\pu} &= \Lf{\length}{1}{\epsilon} \\
+\Lanv{7}{\py} &= \epsilonset \\
+\Lanv{3}{\xl} &= \epsilonset \\
+\Lanv{3}{\px} &= \epsilonset 
+\\[1ex]
+  \Lanv{9}{\pb}  &= \Lf{\length}{1}{\sigma_{\mathit{\!all}}} \\
+  \Lanv{9}{\pw}  &= \sigma_{\mathit{\!all}}
+\end{align*}
+
+\subsection{Solving liveness equations---the grammar interpretation}
+The  equations above can now be re-interpreted as a
+context-free grammar (CFG)  on the alphabet $\lbrace\acar, \acdr,
+\bcar, \bcdr\rbrace$.  Let  \var{$X$} denote the non-terminal for
+a variable  $X$ occurring on  the LHS of the  equations generated
+from the analysis.  We can  think of the resulting productions as
+being associated with several  grammars, one for each non-terminal
+\var{\Lanv{i}{x}} regarded as a start symbol.  As an example, the
+grammar    for   \var{\Lanv{7}{\xl}}   comprises    the   following
+productions:
+ \begin{eqnarray*}
+\var{\Lanv{7}{\xl}}  &\rightarrow&   \var{\acdr \Lf
+  {\length}{1}{\epsilon}} \mid \epsilon \\
+\end{eqnarray*}
 
 %}
-
-
-
-
-
-
 
 % \item
 
