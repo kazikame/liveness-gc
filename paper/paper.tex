@@ -14,7 +14,7 @@
 \usepackage{graphicx}
 \usepackage{graphpap}
 \usepackage{tabularx}
-\usepackage{algorithmic}
+\usepackage {algorithmic}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{pstricks}
@@ -23,6 +23,7 @@
 \usepackage{pst-tree}
 \usepackage{pst-rel-points}
 \usepackage{bcprules}
+%\usepackage{program}
 \input{fh_defs}
 \def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
       0pt width #2\hfill\vrule height #3 depth 0pt width #2\hfill
@@ -982,6 +983,24 @@ along an {\em E-path}. In the  example program, we only need to create
 automata for program  points \ldots, since they are  the only distinct
 {\em E-path}s in the program.
 % Abstract description of the GC algorithm
+\begin{algorithmic}
+\STATE $new\_cell\gets$ dup\_heapcell(cell)
+\IF{$celltype\ is\ cons\ and\ not(copied\_using\_rgc)$}
+\STATE $new\_car\gets$ copy($cell.car$)
+\STATE $new\_cell.car\gets$ $new\_car$ 
+\STATE $new\_cdr\gets$ copy(cell.cdr)
+\STATE $new\_cell.cdr\gets$ $new\_cdr$
+\ELSE
+\IF {$celltype\ is\ closure\ and\ cell\ not\ already\ copied$}
+\STATE $new\_cell\gets$ dup\_heapcell(cell)
+\STATE $new\_cell.arg1\gets$ copy($cell.arg1$)  
+\STATE $new\_cell.arg2\gets$ copy($cell.arg2$)  
+\ELSE
+\STATE $new\_cell\gets$ dup\_heapcell(cell)
+\ENDIF
+\ENDIF
+\end{algorithmic}
+
 % Liveness for cons cells & reachability for closures
 During GC, if the heap cell being processed is a cons cell, we consult
 the  liveness automaton  corresponding to  it and  copy only  the live
@@ -1007,6 +1026,7 @@ derefernced during later execution.
 % and copy wrong locations. Avoiding it by setting non-live references to null after every GC.
 % Proof for the correctness. 
 % Difference between eager and lazy GC
+<<<<<<< HEAD
 Another  difference that is  present in  GC of  lazy lanaguage  is the
 presence  of  a print  stack.  In  lazy  languages the  evaluation  of
 closures is  driven by  the print function.  Hence, during a  GC there
@@ -1020,6 +1040,7 @@ are not  considered. Therefore we  simulate the liveness of  the print
 function by using a flag in  the heap cell. The flag ensures that only
 the required parts  of a cons cell are copied. The  behavior of the GC
 algorithm is as described below,
+
 \begin{verbatim}
 copy cons cell to new loc
 if flag == false
@@ -1027,9 +1048,37 @@ if flag == false
   update cdr part of new loc
 end if
 \end{verbatim}
+
+
 We   provide   an   intuition    about   the   correctness   of   this
 algorithm. Consider the following facts about the print stack during a
-GC,
+GC, 
+
+======= 
+
+Another difference that is present in GC of lazy lanaguage
+is the presence of a print  stack. In lazy languages the evaluation of
+closures is  driven by  the print function.  Hence, during a  GC there
+will be heap  references that will be present on  the stack which also
+have  to  copied/collected.  One   solution  is  to  assume  that  all
+references  present  on  the  print  stack are  fully  live  and  copy
+everything  pointed by  them akin  to reachability.  This is  safe but
+copies heap  cells which  have already been  printed. Since  the print
+function is  not part of  the executing program its  liveness automata
+are not  considered. Therefore we  simulate the liveness of  the print
+function by using a flag in  the heap cell. The flag ensures that only
+the required parts  of a cons cell are copied. The  behavior of the GC
+algorithm is as described below,
+\begin{algorithmic}
+\STATE $new\_cell\gets$ dup\_heapcell(cell)
+\IF{$celltype\ is\ cons\ and\ not(processed\_car\_part)$}
+\STATE $new\_cdr\gets$ copy(cell.cdr)
+\STATE $new\_cell.cdr\gets$ $new\_cdr$
+\ENDIF
+\end{algorithmic}
+We provide an intuition about the correctness of this algorithm. Consider the following facts about the print stack 
+during a GC,
+>>>>>>> 636d397a1d2b616a2698bd11a1bef19ce1192ba9
 \begin{enumerate}
 \item The top of the stack always contains a reference to a closure.
 \item All other references on the print stack point to atomic values or cons cells, it can never contain a
@@ -1066,6 +1115,21 @@ some cons cells might be copied using reachability. We can avoid repeated traver
 tracking the states. This only requires the knowledge of whether the cons cell was copied using reachability. 
 Hence we use a flag to remember if the heap cell was copied using reachability at any time, if it is set we do 
 not traverse any further.
+
+\section{Results}
+%Add graphs for memort usage LGC vs RGC
+%Add graphs/table showing the GC times and other statistics
+\section{Conclusion and Future Work}
+%Mention lower peak memory usage. 
+%Mention faster GC than full LGC and more garbage collected than RGC.
+%Pitch it as sweet spot between full LGC and RGC.
+%Future work
+%Mention full LGC
+%Mention k-liveness, use length example to show 1-liveness is not sufficient.
+%Mention mixed mode GC, 
+% - doing RGC most of the times and switching to LGC in case RGC fails to collect any garbage
+% - doing LGC most of the times but regularly checking the reachability of the heap and 
+% switching to RGC if LGC almost equals RGC
 
 \subsection{References}
 \bibliography{fun_hra}{}
