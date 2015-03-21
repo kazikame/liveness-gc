@@ -9,6 +9,17 @@
 		(let ((res (cons y ys)))
 		  res))))))))
 
+(define (length l)
+  (let ((c (null? l)))
+    (if c
+	(let ((ans 0))
+	  ans)
+	(let ((k 1))
+	  (let ((tail (cdr l)))
+	    (let ((len1 (length tail)))
+	      (let ((res (+ k len1)))
+		res)))))))
+
 (let ((a ()))
   (let ((a1 1))
     (let ((b2 2))
@@ -21,7 +32,7 @@
 		  (let ((f (null? b)))
 		    (let ((j (pair? e)))
 		      (if j
-			  (let ((g (mapsq d)))
+			  (let ((g (length d)))
 			    g)
 			  (let ((h (cons a0 a)))
 			    h)))))))))))))

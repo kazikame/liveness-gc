@@ -368,6 +368,17 @@
 
 
 
+(define (length l)
+  (let ((c (null? l)))
+    (if c
+	(let ((res 0))
+	  res)
+	(let ((k 1))
+	  (let ((rest (cdr l)))
+	    (let ((tail-len (length rest)))
+	      (let ((len (+ k tail-len)))
+		len)))))))
+
 (let ((_var156 10))
      (let ((_var158 7))
           (let ((_var160 2))
@@ -376,4 +387,6 @@
                                                       _var158
                                                       _var160
                                                       _var162)))
-                         _var157)))))
+		      (let ((_var163 (car _var157)))
+                        (let ((_var164 (length _var163)))
+                         _var157)))))))
