@@ -1,3 +1,8 @@
+(define (or a b)
+  (if a
+      a
+      b))
+
 (define (divide a b)
         (let ((_var0 0))
              (let ((_var1 (divide1 a
