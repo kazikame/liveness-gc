@@ -205,10 +205,25 @@
                                                                                   (let ((_var97 '()))
                                                                                        _var97)
                                                                                   (let ((_var98 100))
-                                                                                       (let ((_var100 100))
+                                                                                       (let ((_var100 (touchNodes longLivedTree)))
                                                                                             (let ((_var99 (cons _var98
                                                                                                                 _var100)))
                                                                                                  _var99)))))))))))))))))))
+
+
+
+(define (touchNodes Tree) 
+  (let ((c (eq? Tree '())))
+  (if c
+      0
+      (let ((ltree (Left Tree )))
+	(let ((lsum (touchNodes ltree)))
+	  (let ((rtree (Right Tree)))
+	    (let ((rsum (touchNodes rtree)))
+	      (let ((treesum (+ lsum rsum)))
+		(let ((one 1))
+		  (let ((res (+ one treesum)))
+		    res))))))))))
 
 (let ((_var102 16))
      (let ((_var104 10))
