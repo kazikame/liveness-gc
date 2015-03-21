@@ -1,6 +1,6 @@
 all: 
 	pslatex paper && dvips -q paper.dvi -o paper.ps && ps2pdf paper.ps;
-	scp -p -r * as@surya:livenstrict/paper/.
+#	scp -p -r * as@surya:livenstrict/paper/.
 rel:
 	pslatex paper && bibtex paper && pslatex paper && pslatex paper && \
                      dvips -q paper.dvi -o paper.ps && ps2pdf paper.ps
