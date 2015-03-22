@@ -1,4 +1,4 @@
-include makefile
+include Makefile
 
 CPPFLAGS:=$(CPPFLAGS) -DGC_ENABLE_STATS
 

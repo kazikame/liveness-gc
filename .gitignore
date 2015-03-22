@@ -25,4 +25,7 @@ lazy-scheme/src/position.hh
 lazy-scheme/src/scheme.output
 lazy-scheme/src/scheme.tab.h
 lazy-scheme/src/stack.hh
-
+lazy-scheme/src/TAGS
+lazy-scheme/src/cscope.out
+lazy-scheme/src/cscope.tmplst
+lazy-scheme/src/tags

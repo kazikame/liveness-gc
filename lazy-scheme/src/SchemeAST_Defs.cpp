@@ -32,7 +32,6 @@ unsigned int reduction_count = 0;
 //extern map<cons*, int> heap_map;
 //extern map<int, string> root_var_map;
 
-
 std::string curr_return_addr;
 
 
@@ -275,6 +274,7 @@ cons* IntConstExprNode::evaluate()
 	cons *heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 	{
+        GC_STAT_UPDATE_LAST_USE(heap_cell);
 		return heap_cell;
 	}
 
@@ -283,6 +283,7 @@ cons* IntConstExprNode::evaluate()
 	retval->val.intVal = *pIntVal;
 	retval->inWHNF = true;
 	retval->reduction_id = ++reduction_count;
+    GC_STAT_UPDATE_LAST_USE(retval);
 	return retval;
 }
 
@@ -319,6 +320,7 @@ cons* StrConstExprNode::evaluate()
     assert(0 && "ToBeDone-- Amey");
 	if (heap_cell->inWHNF)
 	{
+        GC_STAT_UPDATE_LAST_USE(heap_cell);
 		return heap_cell;
 	}
 
@@ -327,6 +329,7 @@ cons* StrConstExprNode::evaluate()
 	retval->val.stringVal = pStrVal;
 	retval->inWHNF = true;
 	retval->reduction_id = ++reduction_count;
+    GC_STAT_UPDATE_LAST_USE(retval);
 	return retval;
 }
 
@@ -359,6 +362,7 @@ cons* BoolConstExprNode::evaluate()
     assert(0 && "ToBeDone-- Amey");
 	if (heap_cell->inWHNF)
 	{
+        GC_STAT_UPDATE_LAST_USE(heap_cell);
 		return heap_cell;
 	}
 
@@ -367,6 +371,7 @@ cons* BoolConstExprNode::evaluate()
 	retval->val.boolval = *pBoolVal;
 	retval->inWHNF = true;
 	retval->reduction_id = ++reduction_count;
+    GC_STAT_UPDATE_LAST_USE(retval);
 	return retval;
 }
 
@@ -430,6 +435,7 @@ cons* IfExprNode::evaluate()
 	update_heap_refs.push(cond_heap_ref);
 
 	cons* cond_resultValue = this->pCond->evaluate();
+    GC_STAT_UPDATE_LAST_USE(cond_resultValue);
 
 	cons* temp = update_heap_refs.top();
 	temp->inWHNF = cond_resultValue->inWHNF;
@@ -700,6 +706,7 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 
 
 		assert(arg1->typecell == consExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 
 		assert(is_valid_address(arg1->val.cell.car));
 
@@ -720,7 +727,7 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 		heap_cell->reduction_id = ++reduction_count;
 		return heap_cell;
 	}
-return heap_cell;
+    return heap_cell;
 }
 
 cons* UnaryPrimExprNode::evaluateCdrExpr()
@@ -740,6 +747,7 @@ cons* UnaryPrimExprNode::evaluateCdrExpr()
 
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 
 		update_heap_refs.push(arg1->val.cell.cdr);
 		cons* retval = reduceParamToWHNF(arg1->val.cell.cdr);
@@ -781,6 +789,7 @@ cons* UnaryPrimExprNode::evaluateNullqExpr()
 
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 
 		cons* heap_cell = update_heap_refs.top();
 		heap_cell->inWHNF = true;
@@ -813,6 +822,7 @@ cons* UnaryPrimExprNode::evaluatePairqExpr()
 
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 		cons* heap_cell = update_heap_refs.top();
 		heap_cell->inWHNF = true;
 
@@ -972,6 +982,8 @@ cons* BinaryPrimExprNode::evaluateAdd( )
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal + arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 
@@ -1012,6 +1024,8 @@ cons* BinaryPrimExprNode::evaluateSub()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal - arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 //	cerr << "Updated sub operation for node " << heap_cell << endl;
 	heap_cell->reduction_id = ++reduction_count;
@@ -1049,6 +1063,8 @@ cons* BinaryPrimExprNode::evaluateMul()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal * arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
 }
@@ -1086,6 +1102,8 @@ cons* BinaryPrimExprNode::evaluateDiv()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal / arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1125,6 +1143,8 @@ cons* BinaryPrimExprNode::evaluateMod()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal % arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1164,6 +1184,8 @@ cons* BinaryPrimExprNode::evaluateLT()
 	heap_cell->typecell = constBoolExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal < arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1203,6 +1225,8 @@ cons* BinaryPrimExprNode::evaluateGT()
 	heap_cell->typecell = constBoolExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal > arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1244,6 +1268,8 @@ cons* BinaryPrimExprNode::evaluateEQ()
 
 
 	assert(is_valid_address(arg1) && is_valid_address(arg2));
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	bool isequal = false;
 	if (arg1->typecell == arg2->typecell)
