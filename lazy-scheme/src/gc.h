@@ -40,7 +40,47 @@ using namespace Scheme::AST;
  * Author : Amey Karkare
  * */
 //#define GC_ENABLE_STATS
-#ifdef __DEBUG__GC
+// Macros to enable GC statistics collection!
+#ifdef GC_ENABLE_STATS
+#  define GC_STAT_CLOCK_TICK()  tick()
+#  define GC_STAT_MARK_REACHABLE(_cell_)  _cell_->is_reachable = 1    
+#  define GC_STAT_SAVE_LIVE_HALF()  array_stats = (cons*) buffer_live
+#  define GC_STAT_INIT_PARAMS() {                                              \
+                  array_stats = (cons*)buffer_live;                         \
+                  last_pos = ((cons*)freept - (cons*)buffer_live); \
+                  clear_rch_flag();                                                     \
+    }
+#  define GC_STAT_MARK_CREATED(_cell_)  {        \
+           _cell_->created = gc_clock();        \
+           _cell_->is_reachable = 0;               \
+           _cell_->is_used = 0;                       \
+    } 
+# define GC_STAT_UPDATE_LAST_USE(_cell_) update_last_use(_cell_)
+ /* declarations of GC statistics related functions */
+clock_tick gc_clock();
+void tick();
+void init_gc_stats();
+void clear_rch_flag();
+void dump_garbage_stats();
+void finish_gc_stats();
+void update_last_use(cons *cell);
+  
+/* variables to traverse the cons cells for the statistics */
+extern cons* array_stats;
+extern unsigned long last_pos;
+extern clock_tick current_cons_tick;
+#else
+#  define GC_STAT_CLOCK_TICK()          (void)0
+#  define GC_STAT_MARK_REACHABLE(_cell_) (void)0
+#  define GC_STAT_SAVE_LIVE_HALF()               (void)0
+#  define GC_STAT_INIT_PARAMS()             (void)0
+#  define GC_STAT_MARK_CREATED(_cell_)     (void)0
+#  define GC_STAT_UPDATE_LAST_USE(_cell_) (void)0
+#endif
+
+
+
+#if __DEBUG__GC
 #define DBG(stmt) stmt
 #else
 #define DBG(stmt) (void)0

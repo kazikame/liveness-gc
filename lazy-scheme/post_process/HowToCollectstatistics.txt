@@ -1,0 +1,13 @@
+1. run 'gen_gc_stats.sh' with proper arguments
+   - calls * process.awk
+           * lag_drag.awk
+	   * merge.awk
+
+2. run 'plotall'
+   - generates .eps files
+
+3. run 'consolidate' with proper arguments
+   - generates * 
+	       * DragData.tex
+	       * TotVsDrag.eps
+   - copies all files to <paper>/BM_data directory

@@ -91,27 +91,15 @@ void set_cdr(void* loc,  void* ref);
 
 
 #ifdef GC_ENABLE_STATS
-/* declarations of GC statistics related functions */
-static clock_tick gc_clock();
-static void tick();
-void init_gc_stats();
-static void clear_rch_flag();
-void dump_garbage_stats();
-void finish_gc_stats();
-static void update_last_use(cons *cell);
 /* variables to traverse the cons cells for the statistics */
-static cons* array_stats;
-static unsigned long last_pos;
-static clock_tick current_cons_tick;
-
-#else /* stubs */
-
-//static clock_tick gc_clock() {return 0;}
+cons* array_stats = NULL;
+unsigned long last_pos = 0;
+clock_tick current_cons_tick = 0;
+#else
+/* stubs */
 void init_gc_stats() {}
-//static void clear_rch_flag() {}
 void dump_garbage_stats() {}
 void finish_gc_stats() {}
-//static void update_last_use(cons *cell) {}
 #endif
 
 
@@ -300,9 +288,7 @@ cons* copy(cons* node, ostream& out)
 	{
 		heapslot=heapslot+1;
 		cons *conscell=(cons*)node;
-#ifdef GC_ENABLE_STATS
-		conscell->is_reachable = 1;
-#endif
+        GC_STAT_MARK_REACHABLE(conscell);
 		if((conscell->forward >= buffer_live) &&
 				(boundary_live > conscell->forward))
 		{
@@ -427,9 +413,7 @@ cons* copy(cons* node)
 	{
 		heapslot=heapslot+1;
 		cons *conscell=(cons*)node;
-#ifdef GC_ENABLE_STATS
-		conscell->is_reachable = 1;
-#endif
+        MARK_REACHABLE(conscell);
 		if((conscell->forward >= buffer_live) &&
 				(boundary_live > conscell->forward))
 		{
@@ -579,10 +563,7 @@ void allocate_heap(unsigned long size)
 
     FILE *f=fopen("./output/garbage-dump.txt","w");
     fclose(f);
-
-#ifdef GC_ENABLE_STATS
-    array_stats = (cons*)buffer_live;
-#endif
+    GC_STAT_SAVE_LIVE_HALF();
 }
 
 void calculate_garbage()
@@ -605,12 +586,8 @@ void detail_gc()
 void swap_buffer()
 {
     void *temp;
-#ifdef GC_ENABLE_STATS
-    /* point to the old buffer to collect statistics */
-    array_stats = (cons*)buffer_live;
-    last_pos = ((cons*)freept - (cons*)buffer_live);
-    clear_rch_flag();
-#endif
+    GC_STAT_INIT_PARAMS();
+    
     //swap buffers
     temp=buffer_dead;
     buffer_dead=buffer_live;
@@ -669,11 +646,7 @@ void* dup_cons(cons* cell)
 
 cons* allocate_cons()
 {
-#ifdef GC_ENABLE_STATS
-    /* cons clock tick */
-    tick();
-#endif
-
+    GC_STAT_CLOCK_TICK();
     if (check_space(sizeof(cons))==0)
     {
     	fprintf(stderr,"No Sufficient Memory - cons\n");
@@ -690,11 +663,7 @@ cons* allocate_cons()
     conscell->forward = NULL;
     conscell->copied_using_rgc = false;
     ++num_of_allocations;
- #ifdef GC_ENABLE_STATS
-    conscell->created = gc_clock();
-    conscell->is_reachable = 0;
-    conscell->is_used = 0;
-#endif
+    GC_STAT_MARK_CREATED(conscell);
 #ifdef TEST_RUN
     set_max_reachability();
 #endif
@@ -995,10 +964,7 @@ void printval(void *ref, ostream& out)
 
 	cons *cref;
 	cref=(cons *)ref;
-#ifdef GC_ENABLE_STATS
-	update_last_use(cref);
-#endif
-
+	GC_STAT_UPDATE_LAST_USE(cref);
 
 	if(!cref->inWHNF)
 	{
@@ -1076,6 +1042,7 @@ cons* getCar(void* ref, const char fromGC)
 	   cout << "Error dereferencing a NULL pointer for car" << endl;
 	cons *conscell=(cons*)ref;
 #ifdef GC_ENABLE_STATS
+    assert(0);
     if (!fromGC)
         update_last_use(conscell);
 #endif
@@ -1094,6 +1061,7 @@ cons* getCdr(void* ref, const char fromGC)
 		   cout << "Error dereferencing a NULL pointer for cdr" << endl;
     cons *conscell=(cons*)ref;
 #ifdef GC_ENABLE_STATS
+    assert(0);
     if (!fromGC)
         update_last_use(conscell);
 #endif
@@ -1108,6 +1076,7 @@ cons* getCdr(void* ref, const char fromGC)
 int isEqualCons (cons* v1,cons* v2, const char fromGC)
 {
 #ifdef GC_ENABLE_STATS
+    assert(0);
     if (!fromGC)
     {
         update_last_use(v1);
@@ -2941,12 +2910,12 @@ state_index get_target_dfastate(state_index i1, state_index i2)
 #ifdef GC_ENABLE_STATS
 /* Garbage collection statistics */
 /* author : Amey Karkare */
-static clock_tick gc_clock()
+clock_tick gc_clock()
 {
     return current_cons_tick;
 }
 
-static void tick()
+void tick()
 {
     ++current_cons_tick;
 }
@@ -2963,7 +2932,7 @@ void init_gc_stats()
     DBG(printf("<== init_gc_stats\n"));
 }
 
-static void clear_rch_flag()
+void clear_rch_flag()
 {
     DBG(printf("clear_rch_flag ==>\n"));
     unsigned long i;
@@ -3017,7 +2986,7 @@ void dump_garbage_stats()
 
 void finish_gc_stats()
 {
-    DBG(printf("finish_gc_stats ==>"));
+    DBG(printf("finish_gc_stats ==>\n"));
     unsigned long i;
     array_stats = (cons*)buffer_live;
     last_pos = ((cons*)freept - (cons*)buffer_live);
@@ -3028,9 +2997,10 @@ void finish_gc_stats()
         dump_cell_stats(&array_stats[i]);
 
     fclose(gc_stats_outfile);
+    DBG(printf("<== finish_gc_stats\n"));
 }
 
-static void update_last_use(cons *cell)
+void update_last_use(cons *cell)
 {
     DBG(printf("updating last use(%p) ==>\n", cell));
     if (cell == NULL)
