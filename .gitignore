@@ -1,3 +1,4 @@
+
 paper/paper.pdf
 paper/paper.log
 paper/paper.aux
@@ -10,17 +11,9 @@ lazy-scheme/benchmarks/anf_prog.txt
 lazy-scheme/benchmarks/gc_addr.txt
 lazy-scheme/benchmarks/output/
 lazy-scheme/gc_addr.txt
-lazy-scheme/src/SchemeAST_ANFs.o
-lazy-scheme/src/SchemeAST_Defs.o
-lazy-scheme/src/SchemeAST_Demands.o
-lazy-scheme/src/SchemeAST_Print.o
-lazy-scheme/src/SchemeDriver.o
-lazy-scheme/src/Simulator
-lazy-scheme/src/demands.o
-lazy-scheme/src/gc.o
+lazy-scheme/src/*.o
 lazy-scheme/src/gc_addr.txt
-lazy-scheme/src/lexer.o
 lazy-scheme/src/make.log
-lazy-scheme/src/output.o
-lazy-scheme/src/parser.o
+lazy-scheme/src/lexer.cpp
+lazy-scheme/src/parser.cpp
 
