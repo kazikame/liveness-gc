@@ -35,6 +35,7 @@ std::ostream null_stream(&null_buffer);
 extern GCStatus gc_status;
 extern double gctime;
 extern int gcinvoke;
+extern string outdir;
 
 //globals
 void *freept;
@@ -1040,7 +1041,6 @@ cons* getCar(void* ref, const char fromGC)
 	   cout << "Error dereferencing a NULL pointer for car" << endl;
 	cons *conscell=(cons*)ref;
 #ifdef GC_ENABLE_STATS
-    assert(0);
     if (!fromGC)
         update_last_use(conscell);
 #endif
@@ -1059,7 +1059,6 @@ cons* getCdr(void* ref, const char fromGC)
 		   cout << "Error dereferencing a NULL pointer for cdr" << endl;
     cons *conscell=(cons*)ref;
 #ifdef GC_ENABLE_STATS
-    assert(0);
     if (!fromGC)
         update_last_use(conscell);
 #endif
@@ -1074,7 +1073,6 @@ cons* getCdr(void* ref, const char fromGC)
 int isEqualCons (cons* v1,cons* v2, const char fromGC)
 {
 #ifdef GC_ENABLE_STATS
-    assert(0);
     if (!fromGC)
     {
         update_last_use(v1);
@@ -2845,7 +2843,7 @@ void initialize (string program_name, state_index numkeys, GCStatus gc_type)
 			state_transition_table[i][1]=0;
 		}
 
-		string filepath = "../benchmarks/programs/" + program_name + "/fsmdump-" + program_name;
+		string filepath = outdir + program_name + "/fsmdump-" + program_name;
 		//cout << "Reading " << (filepath + "-state-map") << endl;
 		read_state_map_from_file(filepath + "-state-map");
 		//cout << "Reading " << (filepath + "-state-transition-table") << endl;
@@ -2863,7 +2861,7 @@ void initialize (string program_name, state_index numkeys, GCStatus gc_type)
 			state_transition_table[i][1]=0;
 		}
 
-		string filepath = "../benchmarks/programs/" + program_name + "/fsmdump-" + program_name;
+		string filepath = outdir + program_name + "/fsmdump-" + program_name;
 		//cout << "Reading " << (filepath + "-state-map") << endl;
 		read_state_map_from_file(filepath + "-state-map");
 		//cout << "Reading " << (filepath + "-state-transition-table") << endl;

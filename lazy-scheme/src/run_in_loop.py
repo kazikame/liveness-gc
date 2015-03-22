@@ -5,7 +5,7 @@ import time
 import datetime
 from collections import namedtuple
 
-prog_size = {'nqueens':10000, 'nperm':40000, 'fibheap':500, 'treejoin':1616535, 'sudoku':4075, 'lcss':550, 'lambda':2790}
+prog_size = {'nqueens':10000, 'nperm':40000, 'fibheap':500, 'treejoin':1616535, 'sudoku':4075, 'lcss':550, 'lambda':27900}
 
 gc_info = namedtuple("gc_info", "heap_total heap_left heap_used gc_invocations gc_time exec_time")
 gc_stat = namedtuple("gc_stat", "prog_name reachability liveness")
@@ -29,7 +29,6 @@ def collect_gc_results(filename, prog_dir_path, gc_type):
     heap_total_cmd = grep_cmd + " \"Heap total=[0-9]* \"  " + result_file_name  + int_grep
     heap_left_cmd = grep_cmd + " \"Heap left=[0-9]*\"  " +  result_file_name  + int_grep
     heap_used_cmd = grep_cmd + " \"Heap used=[0-9]*\"   " +  result_file_name  + int_grep
-A
     gc_invocations_cmd = grep_cmd + " \"GC Invocations=[0-9]*\"   " +  result_file_name  + int_grep
     gc_time_cmd = grep_cmd + " \"GC Time=[0-9]*(\.[0-9]*)?\"   " +  result_file_name  + float_grep
     prog_execution_time_cmd = grep_cmd + " \"Program Execution Time=[0-9]*(\.[0-9]*)?\"   " +  result_file_name  + float_grep
