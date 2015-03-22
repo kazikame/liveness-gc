@@ -7,8 +7,6 @@
 //============================================================================
 #include <iostream>
 #include <fstream>
-//#include "gc.h"
-//#include "Utils.hpp"
 #include "Simulator.h"
 #include <unordered_map>
 #include "Demands.h"
