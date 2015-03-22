@@ -34,7 +34,7 @@ clean: remove
 
 remove:
 	rm -rf *~ *.ghc
-	rm -rf *.o scheme_lexer.cc
+	rm -rf *.o scheme_lexer.cc parser.cpp
 	rm -rf location.hh position.hh stack.hh
 	rm -rf scheme.tab.h scheme.tab.c scheme.output
 	rm -rf PostGC*.txt GC*.txt PreGC*.txt gc_messages.txt pre_gc_addr.txt

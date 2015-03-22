@@ -1,0 +1,8 @@
+include makefile
+
+CPPFLAGS:=$(CPPFLAGS) -DGC_ENABLE_STATS
+
+stats: clean scheme.tab.h Simulator_Stats
+
+Simulator_Stats: $(OBJS) $(TARGET).o 
+		 $(CPP) -o $@ $(CFLAGS) $(TARGET).o $(OBJS)
