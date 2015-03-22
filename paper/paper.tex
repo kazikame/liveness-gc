@@ -850,9 +850,9 @@ every program  point from $\pi_8$ up  to the beginning  of the program
 function as  a tree and consider paths  from the root of  this tree to
 program  points  which  trigger  a evaluation---\SIF\  conditions  and
 \RETURN\  expressions.  We  call such  paths {\em  e-paths}.   For the
-program shown, there are three such paths $EP_1 = \pi_1, \pi_2, \pi_3,
-\pi_4,  \pi_5$, $EP_2  =  \pi_1, \pi_2,  \pi_3,  \pi_4, \pi_6,  \pi_7,
-\pi_8$, and $EP_3 = \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.
+program shown, there are three such paths $ep_1 = \lbrace\pi_1, \pi_2, \pi_4 \rbrace$, 
+$ep_2  =  \lbrace \pi_1, \pi_2,  \pi_5,  \pi_6,  \pi_7 \rbrace$,
+ and $ep_3 = \lbrace \pi_3, \pi_2, \pi_1 \rbrace$.
 
 The analysis  consists of  two maps: The  map $\cal{M}$ maps  a return
 path to a common liveness environment, and a second map $\cal{P}$ maps
@@ -860,9 +860,10 @@ a program  point to the set of  e-paths on which  the point lies.
 If a  program  point happens to fall  on more than one  such path, then
 the  liveness environment of  the program  point is  the variable-wise
 union of  the liveness environments  of the individual paths.   In the
-example program, ${\cal M}(EP_1)= \ldots$, ${\cal M}(EP_2)=\ldots$ and
-${\cal M}(EP_3)=  \ldots$.  Since  ${\cal P}(pi_4)$ is  $\lbrace EP_1,
-EP_2, EP_3 \rbrace$, the liveness  of $pi_4$ is \ldots.  In summary,
+example program, ${\cal M}(ep_1)= \lbrace \rbrace$, ${\cal M}(ep_2)= \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon  \rbrace  $ and
+${\cal M}(ep_3)= \lbrace \px.\epsilon, \xl.\epsilon \rbrace $.
+Since  ${\cal P}(\pi_1)$ is  $\lbrace ep_1,ep_2, ep_3 \rbrace$, 
+the liveness  of $\pi_1$ is $\lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon,  \px.\epsilon  \rbrace$.  In summary,
 our propagation of liveness is flow-insensitive but path-sensitive.
 In the sequel
 we  shall  describe  how  to  obtain $\cal{M}$.   The  formulation  of
@@ -925,52 +926,70 @@ arguments.
 
 \section{Generating Liveness Equations}
 \begin{figure*}[t!]
-\begin{picture}(100,130)(0,-90)
+%%\begin{picture}(100,130)(0,-90)
+\begin{picture}(100,130)(0, -50)
   \begin{tabular}{cc}
-    \begin{boxedminipage}{.5\textwidth}
+    \begin{boxedminipage}{.51\textwidth}
       {\sf
+        \small
         \renewcommand{\arraystretch}{1}{
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
             \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
-            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\ $\pi_3\!\!:\,$ \px
-            \UNL{4} \hspace*{1.15cm} $\pi_4\!\!:\, (\RETURN_1~0)$
+            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF$_{ep_3}$\ $\pi_3\!\!:\,$ \px
+            \UNL{4} \hspace*{1.15cm} $\pi_4\!\!:\, (\RETURN_{ep_1}~0)$
             \UNL{4} \hspace*{1.15cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
             \UNL{5} \hspace*{1.15cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
-            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\, (\RETURN_2~(1~+~\py))$)))))
+            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\, (\RETURN_{ep_2}~(1~+~\py))$)))))
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
-	  \UNL{1} $\pi_\mainpgm\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
-	  \UNL{2}   \hspace*{.78cm}              (\LET\ \pb\  $\leftarrow$  \ldots \IN 
-          \UNL{3}   \hspace*{.78cm}    $\pi_8\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \py) \IN~$\pi_{9}\!\!:\,$ (\RETURN\ \pw)))))))
+	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_8\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
+	  \UNL{2}   \hspace*{.78cm}   $\pi_9\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
+          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN~$\pi_{11}\!\!:\,$ (\RETURN$_{ep_4}$\ \pw)))))))
 \end{uprogram}}
         } 
     \end{boxedminipage}
     & 
-    \begin{boxedminipage}{.5\textwidth}
+    \begin{boxedminipage}{.49\textwidth}
       {\sf
+        \small
         \begin{tabular}{lc}
-        $\cal{M} = $ 
+        $\cal{M_{\mbox{\tiny length}}} = $ 
             \begin{tabular}{lc}            
               $[$
-              $\pi_{\mbox{7}} \mapsto \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \
+              $ep_2 \mapsto \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \
               \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon  \rbrace ,$ \\ 
-              $\pi_{\mbox{4}} \mapsto \lbrace \rbrace , $\\
-              $\pi_{\mbox{3}} \mapsto \lbrace \px.\epsilon, \xl.\epsilon \rbrace $  \\
+              $ep_1 \mapsto \lbrace \rbrace , $\\
+              $ep_3 \mapsto \lbrace \px.\epsilon, \xl.\epsilon \rbrace $  \\
               $]$
             \end{tabular} \\
-            $\cal{P} = [$
+            $\cal{P_{\mbox{\tiny length}}} = [$
               \begin{tabular}{lc}
-              $\pi_{\mbox{1}} \mapsto \lbrace \pi_{\mbox{3}},\pi_{\mbox{4}}, \pi_{\mbox{7}} \rbrace, $ \
-              $ \pi_{\mbox{2}} \mapsto \lbrace \pi_{\mbox{3}},\pi_{\mbox{4}}, \pi_{\mbox{7}} \rbrace, $ \\
-              $ \pi_{\mbox{3}} \mapsto \lbrace \pi_{\mbox{3}} \rbrace, $ \
-              $ \pi_{\mbox{4}} \mapsto \lbrace \pi_{\mbox{4}} \rbrace, $ \
-              $ \pi_{\mbox{5}} \mapsto \lbrace \pi_{\mbox{7}} \rbrace, $ \\
-              $ \pi_{\mbox{6}} \mapsto \lbrace \pi_{\mbox{7}} \rbrace, $ \
-              $ \pi_{\mbox{7}} \mapsto \lbrace \pi_{\mbox{7}} \rbrace $ \\
-              $]$
-            \end{tabular}
+                $\pi_{\mbox{1}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \
+                $ \pi_{\mbox{2}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \\
+                $ \pi_{\mbox{3}} \mapsto \lbrace ep_3 \rbrace, $ \
+                $ \pi_{\mbox{4}} \mapsto \lbrace ep_1 \rbrace, $ \
+                $ \pi_{\mbox{5}} \mapsto \lbrace ep_2 \rbrace, $ \\
+                $ \pi_{\mbox{6}} \mapsto \lbrace ep_2 \rbrace, $ \
+                $ \pi_{\mbox{7}} \mapsto \lbrace ep_2 \rbrace $ \\
+                $]$
+              \end{tabular}\\
+              $\cal{M_{\mbox{\tiny main}}} = $ 
+              \begin{tabular}{lc}            
+                $[$
+                  $ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
+                  $]$
+              \end{tabular} \\
+              $\cal{P_{\mbox{\tiny main}}} = [$
+                \begin{tabular}{lc}
+                  $\pi_{\mbox{8}} \mapsto \lbrace ep_4 \rbrace, $ \
+                  $ \pi_{\mbox{9}} \mapsto \lbrace ep_4 \rbrace, $ \\
+                  $ \pi_{\mbox{10}} \mapsto \lbrace ep_4 \rbrace, $ \
+                  $ \pi_{\mbox{11}} \mapsto \lbrace ep_4 \rbrace, $ \
+                  $ \ldots  $ \
+                  $]$  
+                \end{tabular}
         \end{tabular}
       }
     \end{boxedminipage}
@@ -983,7 +1002,7 @@ arguments.
   \end{tabular}
 \end{picture}
 \kern -3ex
-
+\vspace{0.5in}
 \caption{Example Program and its liveness maps.}\label{fig:mot-example2}    
 \end{figure*}
 
@@ -996,11 +1015,11 @@ single function \length, this generates the following equations:
    \end{eqnarray*}
 
 \subsection{Generating Liveness Equations for Function bodies}
-For the running example, $\length$ has calls from $\mainpgm$ at $\pi_8$
+For the running example, $\length$ has calls from $\main$ at $\pi_{11}$
 and a recursive call at $\pi_6$.
 \newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
 So $\sigma_{\length} =
-     \deltacall{\length}{\pi_8}{\mainpgm}  \cup \deltacall{\length}{\pi_6}{\length}$.
+     \deltacall{\length}{\pi_{11}}{\main}  \cup \deltacall{\length}{\pi_6}{\length}$.
 Filling in  the values gives:
 
 \begin{align*}
@@ -1008,15 +1027,15 @@ Filling in  the values gives:
  \sigma_{\!all}  ~\cup~ \acdr\Lf{length}{1}{\sigma_{\mathit{\length}}}
 \end{align*}
 
-For the running example, containing unique GC points (corresponding to unique {\em e-paths} sets) $\pi_3, \pi_4, \pi_7$ in $\length$ and
-$\pi_9$ in $e_\mainpgm$, this gives
+For the running example, containing unique GC points (corresponding to unique {\em e-paths} sets) $ep_1, ep_2, ep_3$ in $\length$ and
+$ep_4$ in $e_\main$, this gives
 
 \begin{align*}
-\Lanv{7}{\xl} &= \acdr\Lf{\length}{1}{\epsilon} \cup \epsilonset \\
-\Lanv{7}{\pu} &= \Lf{\length}{1}{\epsilon} \\
-\Lanv{7}{\py} &= \epsilonset \\
-\Lanv{3}{\xl} &= \epsilonset \\
-\Lanv{3}{\px} &= \epsilonset 
+\Lanv{7}{\xl} &= \acdr\Lf{\length}{1}{\bX\sigma_{\mathit{\length}}} \cup \bX\sigma_{\mathit{\length}} \\
+\Lanv{7}{\pu} &= \Lf{\length}{1}{\bX\sigma_{\mathit{\length}}} \\
+\Lanv{7}{\py} &= \bX\sigma_{\mathit{\length}} \\
+\Lanv{3}{\xl} &= \bX\sigma_{\mathit{\length}} \\
+\Lanv{3}{\px} &= \bX\sigma_{\mathit{\length}}
 \\[1ex]
   \Lanv{9}{\pb}  &= \Lf{\length}{1}{\sigma_{\mathit{\!all}}} \\
   \Lanv{9}{\pw}  &= \sigma_{\mathit{\!all}}
@@ -1062,23 +1081,23 @@ along an {\em E-path}. In the  example program, we only need to create
 automata for program  points \ldots, since they are  the only distinct
 {\em E-path}s in the program.
 % Abstract description of the GC algorithm
-\begin{algorithmic}
-\STATE $new\_cell\gets$ dup\_heapcell(cell)
-\IF{$celltype\ is\ cons\ and\ not(copied\_using\_rgc)$}
-\STATE $new\_car\gets$ copy($cell.car$)
-\STATE $new\_cell.car\gets$ $new\_car$ 
-\STATE $new\_cdr\gets$ copy(cell.cdr)
-\STATE $new\_cell.cdr\gets$ $new\_cdr$
-\ELSE
-\IF {$celltype\ is\ closure\ and\ cell\ not\ already\ copied$}
-\STATE $new\_cell\gets$ dup\_heapcell(cell)
-\STATE $new\_cell.arg1\gets$ copy($cell.arg1$)  
-\STATE $new\_cell.arg2\gets$ copy($cell.arg2$)  
-\ELSE
-\STATE $new\_cell\gets$ dup\_heapcell(cell)
-\ENDIF
-\ENDIF
-\end{algorithmic}
+%% \begin{algorithmic}
+%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
+%% \IF{$celltype\ is\ cons\ and\ not(copied\_using\_rgc)$}
+%% \STATE $new\_car\gets$ copy($cell.car$)
+%% \STATE $new\_cell.car\gets$ $new\_car$ 
+%% \STATE $new\_cdr\gets$ copy(cell.cdr)
+%% \STATE $new\_cell.cdr\gets$ $new\_cdr$
+%% \ELSE
+%% \IF {$celltype\ is\ closure\ and\ cell\ not\ already\ copied$}
+%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
+%% \STATE $new\_cell.arg1\gets$ copy($cell.arg1$)  
+%% \STATE $new\_cell.arg2\gets$ copy($cell.arg2$)  
+%% \ELSE
+%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
+%% \ENDIF
+%% \ENDIF
+%% \end{algorithmic}
 
 % Liveness for cons cells & reachability for closures
 During GC, if the heap cell being processed is a cons cell, we consult
@@ -1120,13 +1139,13 @@ are not  considered. Therefore we  simulate the liveness of  the print
 function by using a flag in  the heap cell. The flag ensures that only
 the required parts  of a cons cell are copied. The  behavior of the GC
 algorithm is as described below,
-\begin{algorithmic}
-\STATE $new\_cell\gets$ dup\_heapcell(cell)
-\IF{$celltype\ is\ cons\ and\ not(processed\_car\_part)$}
-\STATE $new\_cdr\gets$ copy(cell.cdr)
-\STATE $new\_cell.cdr\gets$ $new\_cdr$
-\ENDIF
-\end{algorithmic}
+%% \begin{algorithmic}
+%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
+%% \IF{$celltype\ is\ cons\ and\ not(processed\_car\_part)$}
+%% \STATE $new\_cdr\gets$ copy(cell.cdr)
+%% \STATE $new\_cell.cdr\gets$ $new\_cdr$
+%% \ENDIF
+%% \end{algorithmic}
 We   provide   an   intuition    about   the   correctness   of   this
 algorithm. Consider the following facts about the print stack during a
 GC, 
