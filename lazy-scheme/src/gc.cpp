@@ -67,6 +67,8 @@ unsigned int num_of_allocations = 0;
 map<cons*, int> heap_map;
 map<int, string> root_var_map;
 
+
+
 #ifdef __DEBUG__GC
 ofstream gcout("gc_messages.txt", ios::out);
 #else
@@ -1044,10 +1046,10 @@ void printval(void *ref, ostream& out)
 		out<<")";
 	}
 	else if(cref->typecell == constIntExprClosure)
-	  {
-	    out << cref->val.intVal;
-	    out << endl;
-	  }
+	{
+		out << cref->val.intVal;
+		out << endl;
+	}
 	else if(cref->typecell == constBoolExprClosure)
 		out << cref->val.boolval;
 	else if(cref->typecell == constStringExprClosure)
@@ -1412,6 +1414,7 @@ void reachability_gc()
 	}
 	update_heap_ref_stack(pre, 0);
 #ifdef __DEBUG__GC
+	DBG(pre << "Number of cells copied " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
 	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
 	create_heap_bft(postgc);
 	postgc.close();
@@ -2451,7 +2454,9 @@ void print_heap_cell_list(vector<cons*> heap_cell_list, map<cons*, int> heap_map
 	out << "Starting GC " << endl;
 	for(auto elem : heap_cell_list)
 	{
-		assert(elem);
+		//assert(elem);
+		if(!elem)
+			continue;
 
 		if (index < num_root_vars)
 		{
@@ -2562,58 +2567,61 @@ void create_heap_bft(ostream& out)
 	{
 
 		cons* curr_cell = heap_cell_list[curr_index];
-
-		switch(curr_cell->typecell)
+		if (curr_cell)
 		{
-		case consExprClosure: {
-			cons* car_part = curr_cell->val.cell.car;
 
-			if (heap_map.find(car_part) == heap_map.end())
+			switch(curr_cell->typecell)
 			{
-				heap_map[car_part] = index;
-				++index;
-				heap_cell_list.push_back(car_part);
-			}
-			cons* cdr_part = curr_cell->val.cell.cdr;
-			if (heap_map.find(cdr_part) == heap_map.end())
-			{
-				heap_map[cdr_part] = index;
-				++index;
-				heap_cell_list.push_back(cdr_part);
-			}
-		}
-		break;
-		case unaryprimopExprClosure: {
-			cons* arg1 = curr_cell->val.closure.arg1;
-			if (arg1 && (heap_map.find(arg1) == heap_map.end()))
-			{
-				heap_map[arg1] = index;
-				++index;
-				heap_cell_list.push_back(arg1);
-			}
-		}
-		break;
-		case binaryprimopExprClosure:
-		case funcApplicationExprClosure:
-		case funcArgClosure: {
-			cons* arg1 = curr_cell->val.closure.arg1;
-			if (arg1 && (heap_map.find(arg1) == heap_map.end()))
-			{
-				heap_map[arg1] = index;
-				++index;
-				heap_cell_list.push_back(arg1);
-			}
-			cons* arg2 = curr_cell->val.closure.arg2;
-			if (arg2 && (heap_map.find(arg2) == heap_map.end()))
-			{
-				heap_map[arg2] = index;
-				++index;
-				heap_cell_list.push_back(arg2);
-			}
-		}
-		break;
-		default : break;
+			case consExprClosure: {
+				cons* car_part = curr_cell->val.cell.car;
 
+				if (heap_map.find(car_part) == heap_map.end())
+				{
+					heap_map[car_part] = index;
+					++index;
+					heap_cell_list.push_back(car_part);
+				}
+				cons* cdr_part = curr_cell->val.cell.cdr;
+				if (heap_map.find(cdr_part) == heap_map.end())
+				{
+					heap_map[cdr_part] = index;
+					++index;
+					heap_cell_list.push_back(cdr_part);
+				}
+			}
+			break;
+			case unaryprimopExprClosure: {
+				cons* arg1 = curr_cell->val.closure.arg1;
+				if (arg1 && (heap_map.find(arg1) == heap_map.end()))
+				{
+					heap_map[arg1] = index;
+					++index;
+					heap_cell_list.push_back(arg1);
+				}
+			}
+			break;
+			case binaryprimopExprClosure:
+			case funcApplicationExprClosure:
+			case funcArgClosure: {
+				cons* arg1 = curr_cell->val.closure.arg1;
+				if (arg1 && (heap_map.find(arg1) == heap_map.end()))
+				{
+					heap_map[arg1] = index;
+					++index;
+					heap_cell_list.push_back(arg1);
+				}
+				cons* arg2 = curr_cell->val.closure.arg2;
+				if (arg2 && (heap_map.find(arg2) == heap_map.end()))
+				{
+					heap_map[arg2] = index;
+					++index;
+					heap_cell_list.push_back(arg2);
+				}
+			}
+			break;
+			default : break;
+
+			}
 		}
 		++curr_index;
 	}

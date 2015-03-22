@@ -551,7 +551,11 @@ cons* LetExprNode::evaluate()
 		if (!isFunctionCall )
 			num_cells_reqd = 1;
 		else if (isFunctionCall)
+		{
 			num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
+			//We need to handle 0-ary functions. We need at least one cons cell even for a 0-ary function call.
+			num_cells_reqd = (num_cells_reqd == 0) ? 1 : num_cells_reqd;
+		}
 //		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
 		if (check_space(num_cells_reqd * sizeof(cons)) == 0)
 		{
