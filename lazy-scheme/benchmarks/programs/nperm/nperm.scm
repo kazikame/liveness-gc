@@ -379,10 +379,10 @@
 	      (let ((len (+ k tail-len)))
 		len)))))))
 
-(let ((_var156 10))
-     (let ((_var158 7))
-          (let ((_var160 2))
-               (let ((_var162 1))
+(let ((_var156 1000))
+     (let ((_var158 5))
+          (let ((_var160 20))
+               (let ((_var162 2))
                     (let ((_var157 (tenperm-benchmark _var156
                                                       _var158
                                                       _var160

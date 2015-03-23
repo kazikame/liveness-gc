@@ -15,6 +15,7 @@ using namespace Scheme::Demands;
 
 
 extern demand_grammar gLivenessData;
+extern std::string outdir;
 
 static unsigned long state_counter = 0;
 
@@ -601,7 +602,7 @@ std::vector<std::string> splitLivenessString(std::string ls)
 int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::map<std::string, std::unordered_set<std::string>> prog_pt_map)
 {
 	int numkeys = 1;
-	std::ofstream state_map("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map");
+	std::ofstream state_map(outdir + pgmname + "/fsmdump-" + pgmname + "-state-map");
 	std::map<std::string, int> st_map;
 	for(auto st_tuple:dfa->second)
 	{
@@ -622,7 +623,7 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::ma
 		++numkeys;
 	}
 	state_map.close();
-	std::ofstream transition_table("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-transition-table");
+	std::ofstream transition_table(outdir + pgmname + "/fsmdump-" + pgmname + "-state-transition-table");
 	for(auto st_tuple:dfa->second)
 	{
 		int src_state = st_map[st_tuple.first];

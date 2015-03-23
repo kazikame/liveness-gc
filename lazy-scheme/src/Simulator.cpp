@@ -7,8 +7,6 @@
 //============================================================================
 #include <iostream>
 #include <fstream>
-//#include "gc.h"
-//#include "Utils.hpp"
 #include "Simulator.h"
 #include <unordered_map>
 #include "Demands.h"
@@ -123,6 +121,8 @@ void write_grammar_to_text_file(demand_grammar *g, string filename)
 	return;
 }
 
+string outdir = "./output/";
+
 Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //This method or the constructor should take other parameters like gctype, heap size etc...
 {
 	//Do any per program initialization here.
@@ -140,8 +140,10 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 ///////////////////////////////////////////////////////////////////////
 	bool filesCached = true;
 	struct stat buffer;
-	bool state_map_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map").c_str(), &buffer) == 0);
-	bool state_transition_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
+    mkdir(outdir.c_str(), 0755);
+    mkdir((outdir+pgmname).c_str(), 0755);
+	bool state_map_file =  (stat ((outdir + pgmname + "/fsmdump-" + pgmname + "-state-map").c_str(), &buffer) == 0);
+	bool state_transition_file =  (stat ((outdir + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
 	filesCached = state_map_file && state_transition_file;
 
 	if (gc_type == gc_live && !filesCached)
@@ -160,30 +162,30 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 
 
 		//cout << "program name " << pgmname << endl;
-		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
+		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/program-cfg.txt");
 		//Simplify grammar
 		simplifyCFG(&gLivenessData);
-		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/simplified-program-cfg.txt");
+		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/simplified-program-cfg.txt");
 		//Convert CFG to strongly regular grammar
 		regular_demand_grammar *reg = regularize(&gLivenessData);
 		cout << "Converted CFG into strongly regular grammar" << endl;
 		gLivenessData.clear(); //clear the original grammar
 		gLivenessData.swap(*(reg->first));
-		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-reg.txt");
+		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/program-reg.txt");
 		Scheme::Demands::sanitize(&gLivenessData); //Remove empty productions
 		std::cout << "Sanitized the regular grammar"<<std::endl;
 
 
 		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
-		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-nfa.txt");
+		Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-nfa.txt");
 
 		std::unordered_set<std::string> start_states;
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
 		Scheme::Demands::simplifyNFA(start_states, nfa);
-		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
+		Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-simplified-nfa.txt");
 		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
-		Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
+		Scheme::Demands::printNFAToFile(dfa, outdir + pgmname + "/program-dfa.txt");
 
 		//While converting DFA to 2D array and writing to file, set the associations for the (prog_pt, varname) instead of e-paths
 		std::map<std::string, std::unordered_set<std::string>> label_set_map;
@@ -204,7 +206,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		cout <<"Reading data from cached files "<<endl;
 		const int SZ = 1024 * 1024;
 		std::vector<char> buff(SZ, '\0');
-		ifstream ifs( "../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map" );
+		ifstream ifs( outdir + pgmname + "/fsmdump-" + pgmname + "-state-map" );
 		int n = 0;
 		while( int cc = FileRead( ifs, buff ) )
 		{

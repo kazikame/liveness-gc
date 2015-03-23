@@ -30,6 +30,8 @@
                            right)))
              _var8))
 
+
+
 (define (Power2 i)
         (let ((_var9 1))
              (let ((_var10 (eq? _var9
@@ -204,11 +206,60 @@
                                                                               (if _var87
                                                                                   (let ((_var97 '()))
                                                                                        _var97)
-                                                                                  (let ((_var98 100))
-                                                                                       (let ((_var100 100))
+                                                                                  (let ((_var98 50))
+                                                                                       (let ((_var100 (createTreeList kLongLivedTreeDepth _var98)))
                                                                                             (let ((_var99 (cons _var98
                                                                                                                 _var100)))
                                                                                                  _var99)))))))))))))))))))
+
+
+
+(define (touchNodes Tree) 
+  (let ((isnulltree (null? Tree)))
+  (let ((c (not isnulltree)))
+    (if isnulltree
+	(let ((ret 0))
+	  ret)
+	(let ((ltree (car Tree)))
+	  (let ((lsum (touchNodes ltree)))
+	    (let ((rtree (cdr Tree)))
+	      (let ((rsum (touchNodes rtree)))
+		(let ((treesum (+ lsum rsum)))
+		  (let ((one 1))
+		    (let ((res (+ one treesum)))
+		      res)))))))))))
+
+(define (createTreeList d i)
+  (let ((j 0))
+    (let ((c (eq? i j)))
+      (if c
+	  (let ((ret '()))
+	    ret)
+	  (let ((Tree (MakeTree d)))
+	    (let ((hd (touchNodes Tree)))
+	      (let ((one 1))
+		(let ((k (- i one)))
+		  (let ((tl (createTreeList d k)))
+		    (let ((res (cons Tree tl)))
+		      res))))))))))
+
+;; (define (sum l)
+;;   (let ((nil (null? l)))
+;;     (if nil 
+;; 	(let ((r 0))
+;; 	  r)
+;; 	(let ((hd1 (car l)))
+;; 	  (let ((tl1 (cdr l)))
+;; 	    (let ((tlsum (sum tl1)))
+;; 	      (let ((ans (+ hd1 tlsum)))
+;; 		ans)))))))
+
+;; (define (sumTreeSizeList T)
+;;   (let ((i1 10))
+;;     (let ((tsizelst (createTreeLengthList T i1)))
+;;       (let ((tsum (sum tsizelst)))
+;; 	tsum))))
+  
 
 (let ((_var102 16))
      (let ((_var104 10))

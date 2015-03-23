@@ -22,7 +22,7 @@
 		  (let ((ret (cons hd tl)))
 		    ret)))))))))
 
-(let ((num 100000))
+(let ((num 2))
   (let ((ans (loop num)))
     ans))
 
