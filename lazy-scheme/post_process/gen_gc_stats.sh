@@ -29,6 +29,7 @@ parse()
 	    shift
 	elif [ "$ARG" =  "-gcopt" ]; then
 	    GCOPT="$1"
+	    GCOPTBASE=`echo $GCOPT | cut -f1 -d=`
 	    shift
 	elif [ "$ARG" =  "-heap" ]; then
 	    HEAPSIZE="$1"
@@ -72,7 +73,7 @@ if [ "$PPONLY" = "false" -a ! -d $TEST ]; then
 fi
 
 TESTNAME=`basename $TEST`
-OUTPUT=$CPWD/output/${TESTNAME}_${GCOPT}_output
+OUTPUT=$CPWD/output/${TESTNAME}_${GCOPTBASE}_output
 mkdir -p $OUTPUT;
 
 LOG=$OUTPUT/runtime

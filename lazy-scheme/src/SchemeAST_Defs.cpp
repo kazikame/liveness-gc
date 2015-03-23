@@ -539,10 +539,10 @@ cons* LetExprNode::evaluate()
                 last_gc_clock = GC_STAT_GET_CLOCK();
             }
         }
-        else if ((!isFunctionCall && (current_heap() < 1))
+        if ((!isFunctionCall && (current_heap() < 1))
                  || (isFunctionCall && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) 
         {
-            if (gc_status == gc_plain)
+            if ((gc_status == gc_plain) || (gc_status == gc_freq)) // try to get more space even if gc-freq 
             {
                 // cerr << "DOING RGC"<<endl;
                 //TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files

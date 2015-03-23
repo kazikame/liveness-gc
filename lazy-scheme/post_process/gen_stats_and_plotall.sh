@@ -21,12 +21,12 @@ help()
     echo ""
 }
 
-OPTARG="-pp -reuseanf"
+OPTARG="-pp"
 while [ $# -gt 0 ]; do
     ARG=$1
     shift
     if [ "$ARG" = "-genStats" ]; then
-        OPTARG="-reuseanf"
+        OPTARG=""
     elif [ "$ARG" = "-bm" ]; then
 	BMs="$BMs $1"
 	shift
@@ -46,12 +46,25 @@ limit["sudoku"]=1728
 limit["fft"]=3300
 limit["lcss"]=52321
 limit["gc_bench"]=131091
-limit["nperm"]=202617
+limit["nperm"]=27429
 limit["fibheap"]=300000
 limit["knightstour"]=508245
 limit["treejoin"]=525508
 limit["nqueens"]=1819599
-limit["lambda"]=1000
+limit["lambda"]=20466
+
+declare -A freq
+
+freq["sudoku"]=2050;
+freq["fft"]=2050;
+freq["lcss"]=1000;
+freq["gc_bench"]=4000;
+freq["nperm"]=1450;
+freq["fibheap"]=700;
+freq["knightstour"]=8500;
+freq["treejoin"]=1300;
+freq["nqueens"]=3000;
+freq["lambda"]=1000;
 
 declare -A xtics
 declare -A ytics
@@ -64,7 +77,7 @@ xtics["fibheap"]=70000; ytics["fibheap"]=30000
 xtics["knightstour"]=850000; ytics["knightstour"]=40000
 xtics["treejoin"]=130000; ytics["treejoin"]=110000
 xtics["nqueens"]=3000000; ytics["nqueens"]=210000
-xtics["lambda"]=900; ytics["lambda"]=100
+xtics["lambda"]=90000; ytics["lambda"]=10000
 
 if [ "x$BMs" = "x" ]; then
     BMs=$AllBMs
@@ -73,13 +86,13 @@ fi
 for bm in $BMs
 do
     #for opt in gc-plain gc-live
-    #for opt in gc-plain gc-live gc-freq
-    #do 
-     	#echo "Processing $bm [$opt]"
-     	#$DIR/gen_gc_stats.sh $OPTARG \
-     	    #-bmdir ../benchmarks/programs/$bm \
-     	    #-gcopt $opt -heap ${limit[$bm]}
-    #done
+    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    do 
+     	echo "Processing $bm [$opt]"
+     	$DIR/gen_gc_stats.sh $OPTARG \
+     	    -bmdir ../benchmarks/programs/$bm \
+     	    -gcopt $opt -heap ${limit[$bm]}
+    done
     bash $DIR/val.plot $bm ${xtics[$bm]} ${ytics[$bm]}
     echo "$bm Done"
 done
