@@ -1,4 +1,3 @@
-
 paper/paper.pdf
 paper/paper.log
 paper/paper.aux
@@ -29,3 +28,4 @@ lazy-scheme/src/TAGS
 lazy-scheme/src/cscope.out
 lazy-scheme/src/cscope.tmplst
 lazy-scheme/src/tags
+lazy-scheme/post_process/process_fast
