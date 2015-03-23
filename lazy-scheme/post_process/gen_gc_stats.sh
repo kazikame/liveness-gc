@@ -33,8 +33,6 @@ parse()
 	elif [ "$ARG" =  "-heap" ]; then
 	    HEAPSIZE="$1"
 	    shift
-	elif [ "$ARG" =  "-reuseanf" ]; then
-	    ANFREUSE="true"
 	else
 	    echo ""
 	    echo "      ERROR!!! Bag argument or filename" $ARG
@@ -59,7 +57,6 @@ help()
     echo "   -bmdir    : benchmark directory to process"
     echo "   -gcopt    : garbage collection type -- one of 'gc-disable', 'gc-plain', 'gc-live', 'gc-freq'"
     echo "   -heap     : heap size (half heap for copying collector)"
-    echo "   -reuseanf : reuse anf file for the test (if anf file exists)"
     echo ""
     echo " Options -bmdir, -gcopt, and -heap should all be specified together." 
     echo ""
@@ -81,17 +78,11 @@ mkdir -p $OUTPUT;
 LOG=$OUTPUT/runtime
 echo -n 'Start At : ' > $LOG
 date                 >> $LOG
-
+EXECNAME=/home/karkare/Work/liveNstrict/lazy-scheme/src/Simulator_Stats
 STATSFILE=GC_STATS.txt
 SCMFILE=$TEST/${TESTNAME}.scm
-ANFFILE=$TEST/anf-${TESTNAME}.scm
 if [ "$PPONLY" = "false" ]; then
-    # run the test
-    export LD_LIBRARY_PATH=.:$D_LIBRARY_PATH
-    if [ "$ANFREUSE" = "false" -o ! -f $ANFFILE ]; then
-      python anf.py $SCMFILE > $ANFFILE
-    fi
-    python collector_gc.py $ANFFILE $HEAPSIZE $GCOPT 
+    $EXECNAME $SCMFILE $HEAPSIZE $GCOPT
     if [ $? = 0 ]; then
        mv output/$STATSFILE $OUTPUT/$STATSFILE
        mv output/garbage-dump.txt $OUTPUT/
