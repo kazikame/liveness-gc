@@ -99,7 +99,6 @@ clock_tick current_cons_tick = 0;
 #else
 /* stubs */
 void init_gc_stats() {}
-void dump_garbage_stats() {}
 void finish_gc_stats() {}
 #endif
 

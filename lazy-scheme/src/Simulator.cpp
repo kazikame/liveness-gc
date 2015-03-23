@@ -199,7 +199,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	}
 	else if (gc_type == gc_live) //TODO : Make it compile conditionally only when we are dumping graphviz files
 	{
-		std::ofstream file("anf_prog.txt");
+		std::ofstream file(outdir + "anf_prog.txt");
 		driver.get_anf_prog()->print(file, 0, true, true, Scheme::output::SCHEME);
 		file.close();
 
@@ -232,11 +232,14 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	//remove the psuedo-main environment added
 	delete_environment();
 
-	std::string filepath;
+	std::string filepath = "diable.txt";
 	if (gc_type == gc_live)
-		filepath = "./live.txt";
-	else
-		filepath = "./plain.txt";
+		filepath = outdir + "live.txt";
+	else if (gc_type == gc_plain)
+		filepath = outdir + "plain.txt";
+    else if (gc_type == gc_freq)
+        filepath = outdir + "freq.txt";
+
 
 	std::ofstream outfile(filepath, ios::out);
 
@@ -264,21 +267,26 @@ Simulator::~Simulator()
 {
 }
 
+clock_tick gc_freq_threshold = 20; // some random value
 GCStatus getGCType(string gctypestr)
 {
 	GCStatus gc_type;
-	if (gctypestr == "gc-plain")
+    std::string gc_freq_prefix("gc-freq=");
+    if (!gctypestr.compare(0, gc_freq_prefix.size(), gc_freq_prefix)) {
+        gc_freq_threshold = atoi(gctypestr.substr(gc_freq_prefix.size()).c_str());
+        gc_type = gc_freq;
+    }
+    else if (gctypestr == "gc-freq")
+		gc_type = gc_freq;
+    else if (gctypestr == "gc-plain")
 		gc_type = gc_plain;
 	else if (gctypestr == "gc-live")
 		gc_type = gc_live;
-	else if (gctypestr == "gc-freq")
-		gc_type = gc_freq;
 	else
 		gc_type = gc_disable;
 
 	return gc_type;
 }
-
 
 int main(int argc, char ** argv)
 {
@@ -295,7 +303,9 @@ int main(int argc, char ** argv)
 	string filepath = argv[1];
 	long heapsize = stol(argv[2]);
 	GCStatus gctype = getGCType(argv[3]);
-	cout << "Calling " << prog_name << " with " << filepath << " " << heapsize << " " << gctype << endl;
+	cout << "Calling " << prog_name << " with " << filepath << " " << heapsize << " " << gctype;
+    if (gctype == gc_freq) cout << "=" << gc_freq_threshold;
+    cout << endl;
 
 	Simulator s(gctype);
 	try

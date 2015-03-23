@@ -525,51 +525,64 @@ cons* LetExprNode::evaluate()
 //	cout << "Current heap = " << current_heap() << endl;
 
 #endif
+	bool isFunctionCall = getVarExpr()->isFunctionCallExpression();
+    /* -------------------------------------------------------------------------------------------------------------*/
+    /* This is where we do the GC. Can this be made independent of ExprNode class? */
+    static clock_tick last_gc_clock = 0;
+	if (gc_status != gc_disable) 
+    {
+        if (gc_status == gc_freq) {
+            if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD()) {
+                reachability_gc();
+                //return_stack().return_point = curr_let_pgmpt;
+                GC_STAT_DUMP_GARBAGE_STATS();
+                last_gc_clock = GC_STAT_GET_CLOCK();
+            }
+        }
+        else if ((!isFunctionCall && (current_heap() < 1))
+                 || (isFunctionCall && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) 
+        {
+            if (gc_status == gc_plain)
+            {
+                // cerr << "DOING RGC"<<endl;
+                //TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
+                //std::string curr_let_pgmpt = return_stack().return_point;
+                //return_stack().return_point = getLabel();
+                reachability_gc();
+                //return_stack().return_point = curr_let_pgmpt;
+                GC_STAT_DUMP_GARBAGE_STATS();
+            }
+            else
+            {
+                assert(gc_status == gc_live);
+                // cerr << "DOING LGC"<< endl;
+                std::string curr_let_pgmpt = return_stack().return_point;
+                return_stack().return_point = getLabel();
+                liveness_gc();
+                GC_STAT_DUMP_GARBAGE_STATS();
+                return_stack().return_point = curr_let_pgmpt;
+            }
+            //We have to check for this condition here for lazy languages
+            int num_cells_reqd = 0;
+            if (!isFunctionCall )
+                num_cells_reqd = 1;
+            else // (isFunctionCall)
+            {
+                num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
+                //We need to handle 0-ary functions. We need at least one cons cell even for a 0-ary function call.
+                num_cells_reqd = (num_cells_reqd == 0) ? 1 : num_cells_reqd;
+            }
+            //		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
+            if (check_space(num_cells_reqd * sizeof(cons)) == 0)
+            {
+                fprintf(stderr,"No Sufficient Memory - cons\n");
+                throw bad_alloc();
+            }
+        }
+    }
+    /* End of GC related stuff */
+    /* -------------------------------------------------------------------------------------------------------------*/
 
-	bool isFunctionCall = getVarExpr()->isFunctionCallExpression(); 
-	if ((gc_status != gc_disable) && (
-			(!isFunctionCall && (current_heap() < 1))
-			||
-			  (isFunctionCall && 
-					(current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) )
-	{
-
-		if (gc_status != gc_live)
-		{
-//			cerr << "DOING RGC"<<endl;
-			//TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
-			//std::string curr_let_pgmpt = return_stack().return_point;
-			//return_stack().return_point = getLabel();
-			reachability_gc();
-			//return_stack().return_point = curr_let_pgmpt;
-
-		}
-		else
-		{
-//			cerr << "DOING LGC"<< endl;
-			std::string curr_let_pgmpt = return_stack().return_point;
-			return_stack().return_point = getLabel();
-			liveness_gc();
-			return_stack().return_point = curr_let_pgmpt;
-		}
-		//We have to check for this condition here for lazy languages
-		int num_cells_reqd = 0;
-		if (!isFunctionCall )
-			num_cells_reqd = 1;
-		else if (isFunctionCall)
-		{
-			num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
-			//We need to handle 0-ary functions. We need at least one cons cell even for a 0-ary function call.
-			num_cells_reqd = (num_cells_reqd == 0) ? 1 : num_cells_reqd;
-		}
-//		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
-		if (check_space(num_cells_reqd * sizeof(cons)) == 0)
-		{
-			fprintf(stderr,"No Sufficient Memory - cons\n");
-			throw bad_alloc();
-		}
-	}
-	
 
 	//Create an entry for the variable where it will be allocated on the heap
 	make_reference_addr(this->getVar().c_str(), getfree());

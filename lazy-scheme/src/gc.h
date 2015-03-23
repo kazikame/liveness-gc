@@ -41,8 +41,11 @@ using namespace Scheme::AST;
  * */
 //#define GC_ENABLE_STATS
 // Macros to enable GC statistics collection!
+#define GC_FREQ_THRESHOLD() gc_freq_threshold
 #ifdef GC_ENABLE_STATS
+#  define GC_STAT_DUMP_GARBAGE_STATS() dump_garbage_stats()
 #  define GC_STAT_CLOCK_TICK()  tick()
+#  define GC_STAT_GET_CLOCK()  gc_clock()
 #  define GC_STAT_MARK_REACHABLE(_cell_)  _cell_->is_reachable = 1    
 #  define GC_STAT_SAVE_LIVE_HALF()  array_stats = (cons*) buffer_live
 #  define GC_STAT_INIT_PARAMS() {                                              \
@@ -55,7 +58,7 @@ using namespace Scheme::AST;
            _cell_->is_reachable = 0;               \
            _cell_->is_used = 0;                       \
     } 
-# define GC_STAT_UPDATE_LAST_USE(_cell_) update_last_use(_cell_)
+#  define GC_STAT_UPDATE_LAST_USE(_cell_) update_last_use(_cell_)
  /* declarations of GC statistics related functions */
 clock_tick gc_clock();
 void tick();
@@ -70,15 +73,16 @@ extern cons* array_stats;
 extern unsigned long last_pos;
 extern clock_tick current_cons_tick;
 #else
-#  define GC_STAT_CLOCK_TICK()          (void)0
-#  define GC_STAT_MARK_REACHABLE(_cell_) (void)0
-#  define GC_STAT_SAVE_LIVE_HALF()               (void)0
-#  define GC_STAT_INIT_PARAMS()             (void)0
-#  define GC_STAT_MARK_CREATED(_cell_)     (void)0
+#  define GC_STAT_DUMP_GARBAGE_STATS() (void)0
+#  define GC_STAT_GET_CLOCK()                       (clock_tick)0
+#  define GC_STAT_CLOCK_TICK()                      (void)0
+#  define GC_STAT_MARK_REACHABLE(_cell_)  (void)0
+#  define GC_STAT_SAVE_LIVE_HALF()                (void)0
+#  define GC_STAT_INIT_PARAMS()                     (void)0
+#  define GC_STAT_MARK_CREATED(_cell_)      (void)0
 #  define GC_STAT_UPDATE_LAST_USE(_cell_) (void)0
 #endif
-
-
+extern clock_tick gc_freq_threshold;
 
 #if __DEBUG__GC
 #define DBG(stmt) stmt
