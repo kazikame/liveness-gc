@@ -59,12 +59,12 @@ freq["sudoku"]=2050;
 freq["fft"]=2050;
 freq["lcss"]=1000;
 freq["gc_bench"]=4000;
-freq["nperm"]=1450;
+freq["nperm"]=145;
 freq["fibheap"]=700;
 freq["knightstour"]=8500;
 freq["treejoin"]=1300;
 freq["nqueens"]=3000;
-freq["lambda"]=1000;
+freq["lambda"]=100;
 
 declare -A xtics
 declare -A ytics
