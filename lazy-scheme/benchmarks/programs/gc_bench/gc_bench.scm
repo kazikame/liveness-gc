@@ -207,7 +207,7 @@
                                                                                   (let ((_var97 '()))
                                                                                        _var97)
                                                                                   (let ((_var98 50))
-                                                                                       (let ((_var100 (createTreeLengthList kLongLivedTreeDepth _var98)))
+                                                                                       (let ((_var100 (createTreeList kLongLivedTreeDepth _var98)))
                                                                                             (let ((_var99 (cons _var98
                                                                                                                 _var100)))
                                                                                                  _var99)))))))))))))))))))
@@ -229,7 +229,7 @@
 		    (let ((res (+ one treesum)))
 		      res)))))))))))
 
-(define (createTreeLengthList d i)
+(define (createTreeList d i)
   (let ((j 0))
     (let ((c (eq? i j)))
       (if c
@@ -239,8 +239,8 @@
 	    (let ((hd (touchNodes Tree)))
 	      (let ((one 1))
 		(let ((k (- i one)))
-		  (let ((tl (createTreeLengthList d k)))
-		    (let ((res (cons hd tl)))
+		  (let ((tl (createTreeList d k)))
+		    (let ((res (cons Tree tl)))
 		      res))))))))))
 
 ;; (define (sum l)

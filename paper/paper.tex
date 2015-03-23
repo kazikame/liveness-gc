@@ -1019,23 +1019,23 @@ For the running example, $\length$ has calls from $\main$ at $\pi_{11}$
 and a recursive call at $\pi_6$.
 \newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
 So $\sigma_{\length} =
-     \deltacall{\length}{\pi_{11}}{\main}  \cup \deltacall{\length}{\pi_6}{\length}$.
+     \deltacall{\length}{\pi_{11}}{\main}  \cup \deltacall{length}{\pi_6}{\length}$.
 Filling in  the values gives:
 
 \begin{align*}
 \sigma_{\length}    &=
- \sigma_{\!all}  ~\cup~ \acdr\Lf{length}{1}{\sigma_{\mathit{\length}}}
+ \sigma_{\!all}  ~\cup~ \acdr\Lf{length}{1}{\sigma_{\mathit{length}}}
 \end{align*}
 
 For the running example, containing unique GC points (corresponding to unique {\em e-paths} sets) $ep_1, ep_2, ep_3$ in $\length$ and
 $ep_4$ in $e_\main$, this gives
 
 \begin{align*}
-\Lanv{7}{\xl} &= \acdr\Lf{\length}{1}{\bX\sigma_{\mathit{\length}}} \cup \bX\sigma_{\mathit{\length}} \\
-\Lanv{7}{\pu} &= \Lf{\length}{1}{\bX\sigma_{\mathit{\length}}} \\
-\Lanv{7}{\py} &= \bX\sigma_{\mathit{\length}} \\
-\Lanv{3}{\xl} &= \bX\sigma_{\mathit{\length}} \\
-\Lanv{3}{\px} &= \bX\sigma_{\mathit{\length}}
+\Lanv{7}{\xl} &= \acdr\Lf{length}{1}{\bX\sigma_{\mathit{length}}} \cup \bX\sigma_{\mathit{length}} \\
+\Lanv{7}{\pu} &= \Lf{length}{1}{\bX\sigma_{\mathit{\length}}} \\
+\Lanv{7}{\py} &= \bX\sigma_{\mathit{length}} \\
+\Lanv{3}{\xl} &= \bX\sigma_{\mathit{length}} \\
+\Lanv{3}{\px} &= \bX\sigma_{\mathit{length}}
 \\[1ex]
   \Lanv{9}{\pb}  &= \Lf{\length}{1}{\sigma_{\mathit{\!all}}} \\
   \Lanv{9}{\pw}  &= \sigma_{\mathit{\!all}}

@@ -974,7 +974,8 @@ void printval(void *ref, ostream& out)
 		cons *temp = cref->val.closure.expr->evaluate();
 
 		//assert(is_valid_address(temp));
-		cref = update_heap_refs.top();
+		//cref = update_heap_refs.top();
+		cref = print_stack.top();
 		//assert(is_valid_address(cref));
 
 		cref->typecell = temp->typecell;
@@ -1138,58 +1139,60 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		if (gc_type == 0)
 		{
 			followpaths_reachability(heap_ref);
+			heap_ref = static_cast<cons*>(heap_ref->forward);
 		}
 		else
-//		out << "Processing heap reference in print " << heap_ref << " with index " << (heap_ref - (cons*)buffer_dead)<<endl;
-//		out << heap_ref->forward << endl;
-		if (heap_ref->forward == NULL)
+		if (heap_ref)
 		{
-			cons* new_ref;
-//			out << "Heap ref was not copied during GC." << endl;
-
-			if (gc_type == 1 && (heap_ref->typecell == consExprClosure))
+			if (heap_ref->forward == NULL)
 			{
-				//If it is liveness based GC and we are copying a cons cell then check for can_delete_car flag
-				//whether to copy the cdr part or not
-				new_ref = copy(heap_ref);
-//				out << "Copying " << heap_ref << " with index " << (heap_ref - (cons*)buffer_dead) << endl;
-				if (heap_ref->val.cell.can_delete_car == false)
+				cons* new_ref;
+				//			out << "Heap ref was not copied during GC." << endl;
+
+				if (gc_type == 1 && (heap_ref->typecell == consExprClosure))
 				{
-					//How can we assert that the memory pointed to by the car pointer will be on print stack and will
-					//be copied eventually?
-					//If this assertion is true then we do not need to copy the car part.
-					//assert(heap_ref->val.cell.car->forward != NULL);
+
+					if (heap_ref->val.cell.can_delete_car == false)
+					{
+						//If it is liveness based GC and we are copying a cons cell then check for can_delete_car flag
+						//whether to copy the cdr part or not
+						new_ref = copy(heap_ref);
+						//How can we assert that the memory pointed to by the car pointer will be on print stack and will
+						//be copied eventually?
+						//If this assertion is true then we do not need to copy the car part.
+						//assert(heap_ref->val.cell.car->forward != NULL);
+						//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
+						//					out << "Not copying the car part for cell " << (heap_ref - (cons*)buffer_dead) << endl;
+						cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type, out);
+						new_ref->val.cell.cdr = static_cast<cons*>(cdr_ref);
+					}
 					//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
-//					out << "Not copying the car part for cell " << (heap_ref - (cons*)buffer_dead) << endl;
-					cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type, out);
-					new_ref->val.cell.cdr = static_cast<cons*>(cdr_ref);
-				}
-				//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
-				//TODO  Since this will never be accessed can we set it to NULL here?????
-				if (new_ref->val.cell.car && new_ref->val.cell.car->forward != NULL)
-				{
-					new_ref->val.cell.car = static_cast<cons*>(new_ref->val.cell.car->forward);
+					//TODO  Since this will never be accessed can we set it to NULL here?????
+//					if (new_ref->val.cell.car && new_ref->val.cell.car->forward != NULL)
+//					{
+//						new_ref->val.cell.car = static_cast<cons*>(new_ref->val.cell.car->forward);
+//					}
+//					else
+//					{
+//						new_ref->val.cell.car = NULL;
+//					}
+					//new_ref->val.cell.car = static_cast<cons*>(static_cast<void*>(0x1)); //Set it to an invalid address,
+					//				assert(heap_ref->val.cell.cdr->forward != NULL);
+					//				out << "Setting the cdr ptr to " << ((cons*)(heap_ref->val.cell.cdr->forward) - getbufferlive()) << endl;
+					//new_ref->val.cell.cdr = static_cast<cons*>(heap_ref->val.cell.cdr->forward);
 				}
 				else
 				{
-					new_ref->val.cell.car = NULL;
+					//				out << "Copying reference from print buffer " << (heap_ref - (cons*)buffer_dead) << endl;
+					new_ref = deep_copy(heap_ref, gc_type, out);
 				}
-				//new_ref->val.cell.car = static_cast<cons*>(static_cast<void*>(0x1)); //Set it to an invalid address,
-//				assert(heap_ref->val.cell.cdr->forward != NULL);
-//				out << "Setting the cdr ptr to " << ((cons*)(heap_ref->val.cell.cdr->forward) - getbufferlive()) << endl;
-				new_ref->val.cell.cdr = static_cast<cons*>(heap_ref->val.cell.cdr->forward);
+				//out << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
 			}
-			else
-			{
-//				out << "Copying reference from print buffer " << (heap_ref - (cons*)buffer_dead) << endl;
-				new_ref = deep_copy(heap_ref, gc_type, out);
-			}
-			//out << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
-		}
-//		assert(heap_ref->forward != NULL);
+			//		assert(heap_ref->forward != NULL);
 
-		heap_ref = static_cast<cons*>(heap_ref->forward);
-//		assert(is_valid_address(heap_ref));
+			heap_ref = static_cast<cons*>(heap_ref->forward);
+			//		assert(is_valid_address(heap_ref));
+		}
 		temp.push(heap_ref);
 		print_stack.pop();
 	}
