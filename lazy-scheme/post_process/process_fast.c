@@ -4,8 +4,8 @@
 #include <assert.h>
 
 #define MAXLINE 256
-#define MAXCELL 14437514
-#define MAXGC 50000
+#define MAXCELL 50000000
+#define MAXGC 100000
 
 static const char *FS="|";
 static long c_total  = 0;
@@ -23,12 +23,13 @@ void parse(const char* line);
 int main(int argc, char* argv[]) 
 {
     int len;
-    size_t n = MAXLINE;
+    size_t n = MAXLINE, ncell = 0;
     char *line = malloc(sizeof(char)*MAXLINE);
     const char *filename = (argc == 1) ? "GC_STATS.txt" : argv[1];
     FILE* statsfile = fopen(filename, "r");
     
     while ((len = getline(&line, &n, statsfile)) >0) {
+        ncell++;
         parse(line);
     }
     fclose(statsfile);
@@ -61,7 +62,8 @@ int main(int argc, char* argv[])
 long get2ndVal(const char* line) 
 {
     long val;
-    char* str = strdup(line);
+    static char str[MAXLINE];
+    strcpy(str,line);
     char* token;
     token = strtok(str, FS);
     token = strtok(NULL, FS);
@@ -76,7 +78,8 @@ void getValues(const char *line,
                long *first_use,
                long *last_use) 
 {
-    char* str = strdup(line);
+    static char str[MAXLINE];
+    strcpy(str,line);
     char* token;
     token = strtok(str, FS);
     sscanf(token, "%ld", this_gc_time);
@@ -123,7 +126,12 @@ void parse(const char* line)
     long first_use, last_use, time_gc;
     long create_time, address;
     getValues(line, &time_gc, &address, &create_time, &first_use, &last_use);
-    assert(time_gc == this_gc_time);
+    assert(last_use < MAXCELL);
+    if (time_gc != this_gc_time) {
+        fprintf(stderr, "Error_1 in GC statistics\n\t");
+        fprintf(stderr, "%ld != %ld\n", time_gc, this_gc_time);
+        exit(0);
+    }
     
     c_total++;
     if ((c_total %  10000) == 0)
@@ -138,13 +146,19 @@ void parse(const char* line)
         t_dragged += (time_gc - last_use);
     }
     
-    
+    assert(gc_count < MAXGC);
+ 
     int idx;
     long the_time;
     for (idx = 0; idx < gc_count; idx++) {
         the_time = gc_times[idx];
-        assert(the_time <= this_gc_time);
-
+	assert(the_time < MAXCELL);
+        if (time_gc > this_gc_time) {
+            fprintf(stderr, "Error_2 in GC statistics\n\t");
+            fprintf(stderr, "%ld > %ld\n", time_gc, this_gc_time);
+            assert(the_time <= this_gc_time);
+        }
+        
         if (the_time < create_time)
             continue;
         gc_reachable[the_time]++;
@@ -158,4 +172,3 @@ void parse(const char* line)
     }
     return;
 }
-
