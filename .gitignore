@@ -11,6 +11,8 @@ lazy-scheme/benchmarks/gc_addr.txt
 lazy-scheme/benchmarks/output/
 lazy-scheme/gc_addr.txt
 lazy-scheme/src/*.o
+lazy-scheme/src/*.out
+lazy-scheme/src/*.eps
 lazy-scheme/src/gc_addr.txt
 lazy-scheme/src/make.log
 lazy-scheme/src/lexer.cpp
@@ -29,3 +31,4 @@ lazy-scheme/src/cscope.out
 lazy-scheme/src/cscope.tmplst
 lazy-scheme/src/tags
 lazy-scheme/post_process/process_fast
+lazy-scheme/post_process/process
