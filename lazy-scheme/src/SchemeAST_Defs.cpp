@@ -32,7 +32,6 @@ unsigned int reduction_count = 0;
 //extern map<cons*, int> heap_map;
 //extern map<int, string> root_var_map;
 
-
 std::string curr_return_addr;
 
 
@@ -275,6 +274,7 @@ cons* IntConstExprNode::evaluate()
 	cons *heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 	{
+        GC_STAT_UPDATE_LAST_USE(heap_cell);
 		return heap_cell;
 	}
 
@@ -283,6 +283,7 @@ cons* IntConstExprNode::evaluate()
 	retval->val.intVal = *pIntVal;
 	retval->inWHNF = true;
 	retval->reduction_id = ++reduction_count;
+    GC_STAT_UPDATE_LAST_USE(retval);
 	return retval;
 }
 
@@ -319,6 +320,7 @@ cons* StrConstExprNode::evaluate()
     assert(0 && "ToBeDone-- Amey");
 	if (heap_cell->inWHNF)
 	{
+        GC_STAT_UPDATE_LAST_USE(heap_cell);
 		return heap_cell;
 	}
 
@@ -327,6 +329,7 @@ cons* StrConstExprNode::evaluate()
 	retval->val.stringVal = pStrVal;
 	retval->inWHNF = true;
 	retval->reduction_id = ++reduction_count;
+    GC_STAT_UPDATE_LAST_USE(retval);
 	return retval;
 }
 
@@ -359,6 +362,7 @@ cons* BoolConstExprNode::evaluate()
     assert(0 && "ToBeDone-- Amey");
 	if (heap_cell->inWHNF)
 	{
+        GC_STAT_UPDATE_LAST_USE(heap_cell);
 		return heap_cell;
 	}
 
@@ -367,6 +371,7 @@ cons* BoolConstExprNode::evaluate()
 	retval->val.boolval = *pBoolVal;
 	retval->inWHNF = true;
 	retval->reduction_id = ++reduction_count;
+    GC_STAT_UPDATE_LAST_USE(retval);
 	return retval;
 }
 
@@ -430,6 +435,7 @@ cons* IfExprNode::evaluate()
 	update_heap_refs.push(cond_heap_ref);
 
 	cons* cond_resultValue = this->pCond->evaluate();
+    GC_STAT_UPDATE_LAST_USE(cond_resultValue);
 
 	cons* temp = update_heap_refs.top();
 	temp->inWHNF = cond_resultValue->inWHNF;
@@ -519,47 +525,64 @@ cons* LetExprNode::evaluate()
 //	cout << "Current heap = " << current_heap() << endl;
 
 #endif
+	bool isFunctionCall = getVarExpr()->isFunctionCallExpression();
+    /* -------------------------------------------------------------------------------------------------------------*/
+    /* This is where we do the GC. Can this be made independent of ExprNode class? */
+    static clock_tick last_gc_clock = 0;
+	if (gc_status != gc_disable) 
+    {
+        if (gc_status == gc_freq) {
+            if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD()) {
+                reachability_gc();
+                //return_stack().return_point = curr_let_pgmpt;
+                GC_STAT_DUMP_GARBAGE_STATS();
+                last_gc_clock = GC_STAT_GET_CLOCK();
+            }
+        }
+        if ((!isFunctionCall && (current_heap() < 1))
+                 || (isFunctionCall && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) 
+        {
+            if ((gc_status == gc_plain) || (gc_status == gc_freq)) // try to get more space even if gc-freq 
+            {
+                // cerr << "DOING RGC"<<endl;
+                //TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
+                //std::string curr_let_pgmpt = return_stack().return_point;
+                //return_stack().return_point = getLabel();
+                reachability_gc();
+                //return_stack().return_point = curr_let_pgmpt;
+                GC_STAT_DUMP_GARBAGE_STATS();
+            }
+            else
+            {
+                assert(gc_status == gc_live);
+                // cerr << "DOING LGC"<< endl;
+                std::string curr_let_pgmpt = return_stack().return_point;
+                return_stack().return_point = getLabel();
+                liveness_gc();
+                GC_STAT_DUMP_GARBAGE_STATS();
+                return_stack().return_point = curr_let_pgmpt;
+            }
+            //We have to check for this condition here for lazy languages
+            int num_cells_reqd = 0;
+            if (!isFunctionCall )
+                num_cells_reqd = 1;
+            else // (isFunctionCall)
+            {
+                num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
+                //We need to handle 0-ary functions. We need at least one cons cell even for a 0-ary function call.
+                num_cells_reqd = (num_cells_reqd == 0) ? 1 : num_cells_reqd;
+            }
+            //		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
+            if (check_space(num_cells_reqd * sizeof(cons)) == 0)
+            {
+                fprintf(stderr,"No Sufficient Memory - cons\n");
+                throw bad_alloc();
+            }
+        }
+    }
+    /* End of GC related stuff */
+    /* -------------------------------------------------------------------------------------------------------------*/
 
-	bool isFunctionCall = getVarExpr()->isFunctionCallExpression(); 
-	if ((gc_status != gc_disable) && (
-			(!isFunctionCall && (current_heap() < 1))
-			||
-			  (isFunctionCall && 
-					(current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) )
-	{
-
-		if (gc_status != gc_live)
-		{
-//			cerr << "DOING RGC"<<endl;
-			//TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
-			//std::string curr_let_pgmpt = return_stack().return_point;
-			//return_stack().return_point = getLabel();
-			reachability_gc();
-			//return_stack().return_point = curr_let_pgmpt;
-
-		}
-		else
-		{
-//			cerr << "DOING LGC"<< endl;
-			std::string curr_let_pgmpt = return_stack().return_point;
-			return_stack().return_point = getLabel();
-			liveness_gc();
-			return_stack().return_point = curr_let_pgmpt;
-		}
-		//We have to check for this condition here for lazy languages
-		int num_cells_reqd = 0;
-		if (!isFunctionCall )
-			num_cells_reqd = 1;
-		else if (isFunctionCall)
-			num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
-//		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
-		if (check_space(num_cells_reqd * sizeof(cons)) == 0)
-		{
-			fprintf(stderr,"No Sufficient Memory - cons\n");
-			throw bad_alloc();
-		}
-	}
-	
 
 	//Create an entry for the variable where it will be allocated on the heap
 	make_reference_addr(this->getVar().c_str(), getfree());
@@ -700,6 +723,7 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 
 
 		assert(arg1->typecell == consExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 
 		assert(is_valid_address(arg1->val.cell.car));
 
@@ -720,7 +744,7 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 		heap_cell->reduction_id = ++reduction_count;
 		return heap_cell;
 	}
-return heap_cell;
+    return heap_cell;
 }
 
 cons* UnaryPrimExprNode::evaluateCdrExpr()
@@ -740,6 +764,7 @@ cons* UnaryPrimExprNode::evaluateCdrExpr()
 
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 
 		update_heap_refs.push(arg1->val.cell.cdr);
 		cons* retval = reduceParamToWHNF(arg1->val.cell.cdr);
@@ -781,6 +806,7 @@ cons* UnaryPrimExprNode::evaluateNullqExpr()
 
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 
 		cons* heap_cell = update_heap_refs.top();
 		heap_cell->inWHNF = true;
@@ -813,6 +839,7 @@ cons* UnaryPrimExprNode::evaluatePairqExpr()
 
 		assert(is_valid_address(arg1));
 		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
+        GC_STAT_UPDATE_LAST_USE(arg1);
 		cons* heap_cell = update_heap_refs.top();
 		heap_cell->inWHNF = true;
 
@@ -972,6 +999,8 @@ cons* BinaryPrimExprNode::evaluateAdd( )
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal + arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 
@@ -1012,6 +1041,8 @@ cons* BinaryPrimExprNode::evaluateSub()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal - arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 //	cerr << "Updated sub operation for node " << heap_cell << endl;
 	heap_cell->reduction_id = ++reduction_count;
@@ -1049,6 +1080,8 @@ cons* BinaryPrimExprNode::evaluateMul()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal * arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
 }
@@ -1086,6 +1119,8 @@ cons* BinaryPrimExprNode::evaluateDiv()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal / arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1125,6 +1160,8 @@ cons* BinaryPrimExprNode::evaluateMod()
 	heap_cell->typecell = constIntExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal % arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1164,6 +1201,8 @@ cons* BinaryPrimExprNode::evaluateLT()
 	heap_cell->typecell = constBoolExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal < arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1203,6 +1242,8 @@ cons* BinaryPrimExprNode::evaluateGT()
 	heap_cell->typecell = constBoolExprClosure;
 	heap_cell->inWHNF = true;
 	heap_cell->val.intVal = arg1->val.intVal > arg2->val.intVal;
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	heap_cell->reduction_id = ++reduction_count;
 	return heap_cell;
@@ -1244,6 +1285,8 @@ cons* BinaryPrimExprNode::evaluateEQ()
 
 
 	assert(is_valid_address(arg1) && is_valid_address(arg2));
+    GC_STAT_UPDATE_LAST_USE(arg1);
+    GC_STAT_UPDATE_LAST_USE(arg2);
 
 	bool isequal = false;
 	if (arg1->typecell == arg2->typecell)

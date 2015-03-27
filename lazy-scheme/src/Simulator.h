@@ -22,5 +22,6 @@ public:
 };
 extern double gctime;
 extern int gcinvoke;
+extern string outdir;
 
 #endif

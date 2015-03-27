@@ -4,12 +4,13 @@
 #include "SchemeDriver.h"
 #include "Utils.hpp"
 
-
 Scheme::output::options Scheme::output::global_options;
 
 using namespace std;
 
 using Scheme::output::global_options;
+
+extern string outdir;
 
 
 std::string make_key(std::unordered_set<std::string>&);
@@ -166,7 +167,7 @@ long Scheme::SchemeDriver::process()
     program->doLabel(true);
     anf_program->doLabel(true);
     
-    std::ofstream file("anf_prog.txt"); 
+    std::ofstream file(outdir + "anf_prog.txt"); 
     anf_program->print(file, 0, true, true, Scheme::output::SCHEME);
     file.close();
     
