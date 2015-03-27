@@ -4,7 +4,7 @@
 #include <assert.h>
 
 #define MAXLINE 256
-#define MAXCELL 14437514
+#define MAXCELL 50000000
 
 static const char *FS="|";
 static long c_total  = 0;
@@ -57,7 +57,8 @@ int main(int argc, char* argv[])
 long get2ndVal(const char* line) 
 {
     long val;
-    char* str = strdup(line);
+    static char str[MAXLINE];
+    strcpy(str,line);
     char* token;
     token = strtok(str, FS);
     token = strtok(NULL, FS);
@@ -72,7 +73,8 @@ void getValues(const char *line,
                long *first_use,
                long *last_use) 
 {
-    char* str = strdup(line);
+    static char str[MAXLINE];
+    strcpy(str,line);
     char* token;
     token = strtok(str, FS);
     sscanf(token, "%ld", this_gc_time);
