@@ -1017,8 +1017,9 @@ relation $\hookrightarrow$ over sets of access paths:
 %% \end{eqnarray*}
 %% \end{minipage}\\
 
-The reflexive transitive closure of $\hookrightarrow$ will be denoted
-as $\stackrel{*}{\hookrightarrow}$. The following proposition relates \Lfunonly\   and \Lfunonly$'$:
+The reflexive transitive closure  of $\hookrightarrow$ will be denoted
+as $\stackrel{*}{\hookrightarrow}$.  The following proposition relates
+\Lfunonly\ and \Lfunonly$'$:
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{figure}[t]  
@@ -1054,25 +1055,26 @@ as $\stackrel{*}{\hookrightarrow}$. The following proposition relates \Lfunonly\
 \end{figure}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{proposition}
-Assume that  a liveness computation  based on  \Lfunonly\   gives  the liveness of
-the variable $x$ at a program point $\pi_i$ as $\sigma$ (symbolically, $\Lanv{i}{x}=
-\sigma$).  Further,  let $\Lanv{i}{x}= \sigma'$ when \Lfunonly$'$ is
-used instead of \Lfunonly.   Then  $\sigma' \stackrel{*}{\hookrightarrow}
-\sigma$.
+Assume  that a  liveness  computation based  on  \Lfunonly\ gives  the
+liveness of  the variable $x$ at  a program point  $\pi_i$ as $\sigma$
+(symbolically,  $\Lanv{i}{x}=  \sigma$).   Further, let  $\Lanv{i}{x}=
+\sigma'$  when  \Lfunonly$'$  is  used  instead  of  \Lfunonly.   Then
+$\sigma' \stackrel{*}{\hookrightarrow} \sigma$.
 \end{proposition}
 
-To see  why the proposition is  true, consider an analysis  based on
-\Lfunonly$'$ in which   $\sigma$ appears in
-the  context  $\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)$.  Let $\alpha  \in \sigma$.  The
-symbol  \bcar(\bcdr)  merely  marks  a  place in  $\alpha$  where  the
-original  \CONS\  rule  would  have erased  an  immediately  following
-\acar(\acdr),  or, in  absence of  such a  symbol, would  have dropped
-$\alpha$ itself.  Since the application  of any rule in \Lfunonly$'$ merely
-adds  symbols at  the beginning  of  $\alpha$, the  markers and  other
-symbols in $\alpha$ are propagated to other dependent parts of program
-in their same relative positions.  Consequently, the erasure carried out at the end of the analysis with
-$\stackrel{*}{\hookrightarrow}$ gives the same result as obtained
-through \Lfunonly.  
+To  see why the  proposition is  true, consider  an analysis  based on
+\Lfunonly$'$    in   which   $\sigma$    appears   in    the   context
+$\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)$.     Let    $\alpha   \in
+\sigma$.   The symbol \bcar(\bcdr)  merely marks  a place  in $\alpha$
+where  the  original \CONS\  rule  would  have  erased an  immediately
+following \acar(\acdr),  or, in absence  of such a symbol,  would have
+dropped  $\alpha$  itself.   Since  the  application of  any  rule  in
+\Lfunonly$'$  merely adds symbols  at the  beginning of  $\alpha$, the
+markers  and  other  symbols  in  $\alpha$  are  propagated  to  other
+dependent  parts   of  program  in  their   same  relative  positions.
+Consequently, the erasure carried out  at the end of the analysis with
+$\stackrel{*}{\hookrightarrow}$  gives  the  same result  as  obtained
+through \Lfunonly.
 
 \subsection{Generating equations for the demand transformer \Lfonly}
 \label{sec:Lfonlysymbolically}
@@ -1082,8 +1084,10 @@ We  shall  consider the  program  in  Figure~\ref{fig:examp-pgm} as  a
 running example;
 this is the  ANF version of the program in Figure~\ref{fig:mot-example}.
 
-%%AM no longer used: In what follows,  we shall overload the semantics of
-%% \Lfunonly\ so that  \Lfun{e}{\sigma}{\Lfonly} additionally records the liveness environment at every sub-expression of $e$ during its computation.  
+%%AM no longer used: In  what follows, we shall overload the semantics
+%% of   \Lfunonly\  so  that   \Lfun{e}{\sigma}{\Lfonly}  additionally
+%% records  the liveness  environment at  every sub-expression  of $e$
+%% during its computation.
 %mean the generation
 %of equations $\Lanv{i}{x}  = \ldots$, where $\pi_i$ is  the label of a
 %sub-expression of $e$ and $x$ is a variable in scope at $\pi_i$.
