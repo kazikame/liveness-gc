@@ -945,8 +945,8 @@ arguments.
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
 	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_8\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
-	  \UNL{2}   \hspace*{.78cm}   $\pi_9\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
-          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN~$\pi_{11}\!\!:\,$ (\RETURN$_{ep_4}$\ \pw)))))))
+	  \UNL{2}   \hspace*{.78cm}   $\pi_9\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  (\CAR~\pa) \IN 
+          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pa) \IN~$\pi_{11}\!\!:\,$ (\RETURN$_{ep_4}$\ \pw)))))))
 \end{uprogram}}
         } 
     \end{boxedminipage}
@@ -978,7 +978,7 @@ arguments.
               $\cal{M_{\mbox{\tiny main}}} = $ 
               \begin{tabular}{lc}            
                 $[$
-                  $ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
+                  $ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pa.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
                   $]$
               \end{tabular} \\
               $\cal{P_{\mbox{\tiny main}}} = [$
@@ -1067,19 +1067,20 @@ productions:
 By the  time the program  starts executing, the liveness  automata are
 created and stored in a file.   This is re-used every time the program
 executes.
+\subsection{GC points and automata sharing}
 % GC points - mention reduction of gc points due to e-paths
-An important  difference in GC of  lazy language compared  to an eager
-language  is  the  point  of  garbage collection.  In  case  of  eager
-languages only \CONS~ points and  function calls are the GC points. In
-a lazy language  every \LET~ statement is a  potential GC point. Hence
-we  need  to store  liveness  automata  corresponding  to every  \LET~
-statement in the program. This leads  to an explosion in the number of
-automata. From our observation that  along an {\em E-path} all program
-points have  the same liveness, we  can reduce the  number of automata
-state required  by sharing  the same automata  for all  program points
-along an {\em E-path}. In the  example program, we only need to create
-automata for program  points \ldots, since they are  the only distinct
-{\em E-path}s in the program.
+We describe a simple outline of the GC algorthm in figure {\em add refernce to algorithm}.
+In a lazy language each \LET~ expression creates a closure, and hence allocates memory 
+on the heap. Therefore in contrast to an eager language, every \LET~ statement is a  potential GC point. 
+As a GC can be triggered at any of the \LET~ expressions, we  need  to store  liveness  automata  
+corresponding  to every  \LET~ statement in the program. 
+Even though this leads  to an explosion in the number of
+automata, we can optimize it using our observation that  along an {\em E-path} all program
+points have  the same liveness. We therefore create a single liveness environment corresponding to each 
+unique {\em E-path} sets and share the same automata  for all  program points
+having a common {\em E-path} set. In the  example program {\em refer to the example program}, we only need to create
+automata for the {\em E-path} sets \ldots, since they are  the only distinct
+{\em E-path} sets in the program.
 % Abstract description of the GC algorithm
 %% \begin{algorithmic}
 %% \STATE $new\_cell\gets$ dup\_heapcell(cell)
@@ -1099,33 +1100,36 @@ automata for program  points \ldots, since they are  the only distinct
 %% \ENDIF
 %% \end{algorithmic}
 
+\subsection{Liveness based GC algorithm}
 % Liveness for cons cells & reachability for closures
-During GC, if the heap cell being processed is a cons cell, we consult
-the  liveness automaton  corresponding to  it and  copy only  the live
-paths.  In  case  the  heap  cell  points  to  a  closure,  we  safely
-approximate the  liveness to be {\{0+1\}\*} and  copy everything under
-the closure.
-% Handling of mixture of LGC & RGC
-A consequence of  copying everything under a closure  is the fact that
-we can end up trying to copy things which are not live and corrupt the
-heap. This  can happen if at some  $GC_k$ a cons cell  is copied using
-liveness. At  a later stage this  cons cell becomes part  of a closure
-and  hence during $GC_{k+n}$  the algorithm  tries to  copy everything
-under the  cons cell  thus copying heap  locations which might  not be
-valid.  To avoid  this behavior we either have to choose  to do a full
-liveness based  GC for closure or  we should ensure  that any non-live
-references are  not carried across  GC's. We take the  latter approach
-and ensure that  non-live references are set to  null. After every GC,
-the live part of the buffer  is scanned and any reference which is not
-live is  set to null.  The correctness of  this follows from  the fact
-that any reference which is decalred  not live in a $GC_k$ will not be
-derefernced during later execution.
+When ever the program runs out of memory, we scan the current buffer and we check if 
+each reference is live or not and using a depth first traversal copy its children recursively.
+The handling of a heap cell depends on the type of data it stores, as described in the algorithm{\em add reference to algorithm}.
+\begin{itemize}
+\item An atomic value is copied if it is live.
+\item A \CONS~ cell is copied if it is live. Its \CAR~ and \CDR~ part are copied recursively if they are live.
+\item A closure and everything reachable from it are copied if it is live otherwise nothing is copied. 
+\end{itemize}
+
+Observe that we are using liveness based GC for \CONS~ cells whereas we do a reachability based GC for closures. 
+Since we do not nullify references that are not live this can lead to copying of incorrect references. 
+Consider a \CONS~ cell {\em c} whose \CAR~ part is live but \CDR~ part is not live. During GC the pointer corresponding to the 
+\CDR~ part is neither copied and nor nullified. Post GC if this cell becomes part of a closure then during a subsequent GC we will do 
+a reachability based GC on {\em c} and hence try to chase the pointer corresponding to its \CDR~ part. 
+One way to avoid this problem is by setting references which are not live to null. Doing this during GC is expensive as it 
+requires an alias analysis. We avoid this overhead by waiting for the GC to end and then setting any references which point to 
+the dead buffer to null. From the definition of liveness any reference which is declared not live will not be referenced beyond that 
+execution point till the end of the execution. Hence once the GC is complete any pointer in the live buffer which points to a location 
+in the dead buffer can be nullified safely. Although this involves scanning the entire live buffer again, the overhead is not too bad as 
+the expected number of live heap cells in the live buffer (immediately after a GC) is usually much less compared to the size of the live buffer. Also, by 
+copying closures using reachability we can perform certain optimizations which will not be possible if we use only liveness  based GC.
+We describe this optimization in section{\em add reference}.
 % A reference copied using LGC could become part of a closure in a later GC
 % and copy wrong locations. Avoiding it by setting non-live references to null after every GC.
 % Proof for the correctness. 
 % Difference between eager and lazy GC
 
-
+\subsection{Printing and GC on the print stack}
 Another  difference that is  present in  GC of  lazy language  is the
 presence  of  a print  stack.  In  lazy  languages the  evaluation  of
 closures is  driven by the print  function.  Hence, during  a GC there
