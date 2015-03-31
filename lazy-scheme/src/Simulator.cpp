@@ -19,7 +19,7 @@ using namespace Scheme::Demands;
 using namespace Scheme::output;
 
 double gctime=0;
-int gcinvoke=0;
+int gccount=0;
 extern demand_grammar gLivenessData;
 
 
@@ -257,7 +257,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	if (gc_type == gc_live)
 		cleanup(numkeys-1);
 
-	cout << "GC Invocations="<<gcinvoke<<" GC Time="<<gctime<<endl;
+	cout << "GC Invocations="<<gccount<<" GC Time="<<gctime<<endl;
 	cout << "Program Execution Time="<<((double(pend - pstart)/CLOCKS_PER_SEC) - gctime)<<" seconds"<<endl;
 
 	return *this;

@@ -50,7 +50,7 @@ limit["nperm"]=27429
 limit["fibheap"]=300000
 limit["knightstour"]=508245
 limit["treejoin"]=525508
-limit["nqueens"]=1819599
+limit["nqueens"]=210000
 limit["lambda"]=20466
 
 declare -A freq

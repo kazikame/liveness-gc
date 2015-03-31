@@ -34,7 +34,6 @@ std::ostream null_stream(&null_buffer);
 
 extern GCStatus gc_status;
 extern double gctime;
-extern int gcinvoke;
 extern string outdir;
 
 //globals
@@ -49,7 +48,7 @@ unsigned long newheapcells,oldheapcells;
 unsigned long copycells,heapslot,garbagecells;
 actRec *stack_start, *stack_top;
 GCStatus gc_status = gc_plain;
-int &gccount = gcinvoke;
+extern int gccount;
 
 //ofstream gout("gc_addr.txt", ios::app);
 
@@ -2972,6 +2971,7 @@ void dump_garbage_stats()
     DBG(printf("dump_garbage_stats ==>\n"));
     fprintf(gc_stats_outfile, "//--- GC #%d | %lu \n",
             ++num_gcs, TIME_ms(gc_clock()));
+    assert(num_gcs == gccount);
     unsigned long i = 0;
     for (i = 0; i < last_pos; ++i)
     {
