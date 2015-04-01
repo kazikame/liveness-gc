@@ -49,7 +49,7 @@ limit["gc_bench"]=131091
 limit["nperm"]=27429
 limit["fibheap"]=300000
 limit["knightstour"]=508245
-limit["treejoin"]=525508
+limit["treejoin"]=1800000
 limit["nqueens"]=210000
 limit["lambda"]=20466
 
