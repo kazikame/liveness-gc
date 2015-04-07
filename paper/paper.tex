@@ -1063,17 +1063,17 @@ arguments.
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
             \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
-            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF$_{ep_3}$\ $\pi_3\!\!:\,$ \px
-            \UNL{4} \hspace*{1.15cm} $\pi_4\!\!:\, (\RETURN_{ep_1}~0)$
-            \UNL{4} \hspace*{1.15cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
-            \UNL{5} \hspace*{1.15cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
-            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\, (\RETURN_{ep_2}~(1~+~\py))$)))))
+            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\ $\psi_3\!\!:\,$ \px
+            \UNL{4} \hspace*{1.15cm} $\psi_1\!\!:\, (\RETURN~0)$
+            \UNL{4} \hspace*{1.15cm}    $\pi_3\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
+            \UNL{5} \hspace*{1.15cm}   $\pi_4\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
+            \UNL{6} \hspace*{1.15cm} $\psi_2\!\!:\, (\RETURN~(1~+~\py))$)))))
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
-	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_8\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
-	  \UNL{2}   \hspace*{.78cm}   $\pi_9\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
-          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN~$\pi_{11}\!\!:\,$ (\RETURN$_{ep_4}$\ \pw)))))))
+	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_5\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
+	  \UNL{2}   \hspace*{.78cm}   $\pi_6\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
+          \UNL{3}   \hspace*{.78cm}    $\pi_{7}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN~$\psi_{4}\!\!:\,$ (\RETURN\ \pw)))))))
 \end{uprogram}}
         } 
     \end{boxedminipage}
@@ -1082,38 +1082,38 @@ arguments.
       {\sf
         \small
         \begin{tabular}{lc}
-        $\cal{M_{\mbox{\tiny length}}} = $ 
+        $\cal{M_{\mbox{\tiny \length}}} = $ 
             \begin{tabular}{lc}            
               $[$
-              $ep_2 \mapsto \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \
+              $\psi_2 \mapsto \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \
               \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon  \rbrace ,$ \\ 
-              $ep_1 \mapsto \lbrace \rbrace , $\\
-              $ep_3 \mapsto \lbrace \px.\epsilon, \xl.\epsilon \rbrace $  \\
+              $\psi_1 \mapsto \lbrace \rbrace , $\\
+              $\psi_3 \mapsto \lbrace \px.\epsilon, \xl.\epsilon \rbrace $  \\
               $]$
             \end{tabular} \\
-            $\cal{P_{\mbox{\tiny length}}} = [$
+            $\cal{P_{\mbox{\tiny \length}}} = [$
               \begin{tabular}{lc}
-                $\pi_{\mbox{1}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \
-                $ \pi_{\mbox{2}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \\
-                $ \pi_{\mbox{3}} \mapsto \lbrace ep_3 \rbrace, $ \
-                $ \pi_{\mbox{4}} \mapsto \lbrace ep_1 \rbrace, $ \
-                $ \pi_{\mbox{5}} \mapsto \lbrace ep_2 \rbrace, $ \\
-                $ \pi_{\mbox{6}} \mapsto \lbrace ep_2 \rbrace, $ \
-                $ \pi_{\mbox{7}} \mapsto \lbrace ep_2 \rbrace $ \\
+                $\pi_{\mbox{1}} \mapsto \lbrace \psi_1, \psi_2, \psi_3 \rbrace, $ \
+                $ \pi_{\mbox{2}} \mapsto \lbrace \psi_1, \psi_2, \psi_3 \rbrace, $ \\
+                $ \pi_{\mbox{3}} \mapsto \lbrace \psi_3 \rbrace, $ \
+                $ \pi_{\mbox{4}} \mapsto \lbrace \psi_1 \rbrace, $ \
+                $ \pi_{\mbox{5}} \mapsto \lbrace \psi_2 \rbrace, $ \\
+                $ \pi_{\mbox{6}} \mapsto \lbrace \psi_2 \rbrace, $ \
+                $ \pi_{\mbox{7}} \mapsto \lbrace \psi_2 \rbrace $ \\
                 $]$
               \end{tabular}\\
-              $\cal{M_{\mbox{\tiny main}}} = $ 
+              $\cal{M_{\mbox{\tiny \main}}} = $ 
               \begin{tabular}{lc}            
                 $[$
-                  $ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
+                  $\psi_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
                   $]$
               \end{tabular} \\
-              $\cal{P_{\mbox{\tiny main}}} = [$
+              $\cal{P_{\mbox{\tiny \main}}} = [$
                 \begin{tabular}{lc}
-                  $\pi_{\mbox{8}} \mapsto \lbrace ep_4 \rbrace, $ \
-                  $ \pi_{\mbox{9}} \mapsto \lbrace ep_4 \rbrace, $ \\
-                  $ \pi_{\mbox{10}} \mapsto \lbrace ep_4 \rbrace, $ \
-                  $ \pi_{\mbox{11}} \mapsto \lbrace ep_4 \rbrace, $ \
+                  $\pi_{\mbox{8}} \mapsto \lbrace \psi_4 \rbrace, $ \
+                  $ \pi_{\mbox{9}} \mapsto \lbrace \psi_4 \rbrace, $ \\
+                  $ \pi_{\mbox{10}} \mapsto \lbrace \psi_4 \rbrace, $ \
+                  $ \pi_{\mbox{11}} \mapsto \lbrace \psi_4 \rbrace, $ \
                   $ \ldots  $ \
                   $]$  
                 \end{tabular}
@@ -1476,38 +1476,39 @@ membership of forward paths.
 %  
   
   \raggedright{\bf Steps:}
- \begin{algorithmic}
-   \STATE $i \leftarrow 0$ 
-   \STATE $\nt_0 \leftarrow$ Equivalent NFA of \ntbar\
-   without $\epsilon$-moves \cite{hopcraft90toc}
+ %% \begin{algorithmic}
+%%    \COMMENT Fix the algorithm issue
+%%    %% \STATE $i \leftarrow 0$ 
+%%    %% \STATE $\nt_0 \leftarrow$ Equivalent NFA of \ntbar\
+%%    %% without $\epsilon$-moves \cite{hopcraft90toc}
 
-   \REPEAT
-   \STATE $\nt'_{i+1} \leftarrow \nt_i$
-   \FORALL{states $q$ in $\nt_i$ such that $q$ has an incoming
-     edge from $q'$ with label $\bcar$ and
-     outgoing edge to $q''$ with label $\acar$} 
-   \STATE add an edge in $\nt'_{i+1}$ from $q'$ to $q''$ with
-   label $\epsilon$.
-   \COMMENT{bypass  $\bcar\acar$ using $\epsilon$}
-   \ENDFOR
+%%    %% \REPEAT
+%%    %% \STATE $\nt'_{i+1} \leftarrow \nt_i$
+%%    %% \FORALL{states $q$ in $\nt_i$ such that $q$ has an incoming
+%%    %%   edge from $q'$ with label $\bcar$ and
+%%    %%   outgoing edge to $q''$ with label $\acar$} 
+%%    %% \STATE add an edge in $\nt'_{i+1}$ from $q'$ to $q''$ with
+%%    %% label $\epsilon$.
+%%    %% \COMMENT{bypass  $\bcar\acar$ using $\epsilon$}
+%%    %% \ENDFOR
 
-   \FORALL{states $q$ in $\nt_i$ such that $q$ has an incoming
-     edge from $q'$ with label $\bcdr$ and outgoing edge to
-     $q''$ with label $\acdr$} 
-   \STATE add an edge in $\nt'_{i+1}$ from $q'$ to $q''$ with
-     label $\epsilon$.
-   \COMMENT{bypass  $\bcdr\acdr$ using $\epsilon$}
-   \ENDFOR
+%%    %% \FORALL{states $q$ in $\nt_i$ such that $q$ has an incoming
+%%    %%   edge from $q'$ with label $\bcdr$ and outgoing edge to
+%%    %%   $q''$ with label $\acdr$} 
+%%    %% \STATE add an edge in $\nt'_{i+1}$ from $q'$ to $q''$ with
+%%    %%   label $\epsilon$.
+%%    %% \COMMENT{bypass  $\bcdr\acdr$ using $\epsilon$}
+%%    %% \ENDFOR
    
-   \STATE   $\nt_{i+1}    \leftarrow$   Equivalent   NFA   of
-   $\nt'_{i+1}$ without $\epsilon$-moves
+%%    %% \STATE   $\nt_{i+1}    \leftarrow$   Equivalent   NFA   of
+%%    %% $\nt'_{i+1}$ without $\epsilon$-moves
 
-   \STATE $i \leftarrow i+1$
-   \UNTIL ($\nt_{i} = \nt_{i-1}$)
+%%    %% \STATE $i \leftarrow i+1$
+%%    %% \UNTIL ($\nt_{i} = \nt_{i-1}$)
    
-   \STATE $\nt \leftarrow \nt_i$
-%   \STATE delete all edges with label \bcar\ or \bcdr\ in \nt.
- \end{algorithmic}
+%%    %% \STATE $\nt \leftarrow \nt_i$
+%% %   \STATE delete all edges with label \bcar\ or \bcdr\ in \nt.
+%%  \end{algorithmic}
 \end{center}
 \end{boxedminipage}
  \caption{Algorithm for transforming an NFA to  accept forward

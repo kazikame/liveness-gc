@@ -1226,8 +1226,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		update_heap_refs.push(temp.top());
 		temp.pop();
 	}
-//cerr<<"Completed updated print & heap ref stacks"<<endl;
-//	assert(temp.empty());
+
 }
 
 //garbage collector functions
