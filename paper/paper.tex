@@ -1074,10 +1074,10 @@ The  defintions of \bcar\, \bcdr\ and \cbar\  induce   the  following
 relation $\hookrightarrow$ over sets of access paths:
 \begin{align*}
   &\sigma_1\bcar\sigma_2  \hookrightarrow 
-  \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \bcar\sigma_2',\\
+  \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
 &\sigma_1\bcdr\sigma_2  \hookrightarrow 
   \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
-  \bcdr\sigma_2',~\mbox{and}\\  
+  \acdr\sigma_2',~\mbox{and}\\  
 &\sigma_1\cbar \emptyset \hookrightarrow \emptyset
 \end{align*}
 
@@ -1129,7 +1129,7 @@ how  to generate  the equations  describing the  demand transformation
 \Lfonly$_\mathit{f}$.   Starting with a  symbolic demand  $\sigma$, we
 determine   \Lfun{e_{\mathit{f}}}{\sigma}{\Lfonly}.    Of   particular
 interest  is the liveness  at the  program point  at the  beginning of
-beginning of  $e_{\mathit{f}}$ (assumed  to be $\pi_1$).   We generate
+$e_{\mathit{f}}$ (assumed  to be $\pi_1$).   We generate
 equations     of     the     form    $\Lf{\mathit{f}}{i}{\sigma}     =
 \Lanv{\pi_1}{x_i}$, where  $x_i$ is the  $i^{\mbox{\footnotesize th}}$
 parameter of $\mathit{f}$. Doing this for \length, we get:
@@ -1147,8 +1147,8 @@ case of \length,  \Lan{\pi_1}\ may, in turn, be  expressed in terms of
 \Lfone{\mathit{f}}.
 
 
-As mentioned earlier, each of  the liveness rules modifies a demand by
-prefixing   with   symbols   in   the   above   set,   and   therefore
+As mentioned earlier\comment{Check if already mentioned}, each of  the liveness rules modifies a demand by
+prefixing   it with   symbols   in   the   above   set,   and   therefore
 $\Lf{f}{i}{\sigma}$ has the closed form:
 \begin{eqnarray}
 \label{eq:LF:DI}
@@ -1157,7 +1157,7 @@ $\Lf{f}{i}{\sigma}$ has the closed form:
 where \Df{f}{i} are sets of  strings over the alphabet $\lbrace \acar,
 \acdr,\bcar, \bcdr, \cbar \rbrace$.   Substituting the guessed form in
 the  equation  describing  \Lfonly$_{\mathit  f}$, and  factoring  out
-$\sigma$,  we  get the  following  equation  for  \Df{f}{i}: that  are
+$\sigma$,  we  get an  equation  for  \Df{f}{i} that is
 independent of $\sigma$.  Any solution for \Df{f}{i} yields a solution
 for \Lfonly$_{\mathit f}$.  Applied to \Lfonly$_{\mathit \length}$, we
 get:
@@ -1166,7 +1166,8 @@ get:
     \cup \acdr\Df{\length}{1}
   \end{align*}
  
-Note that this equation can also be viewed as CFGs.
+Note that this equation can also be viewed as a CFG with \{\acdr,
+\cbar\} as the terminal symbols and \Df{\length}{1} as the sole non-terminal.
 
 \subsection{Generating liveness equations \Lv\  for function bodies}
 \label{sec:bodylivenessbodies}
@@ -1185,7 +1186,7 @@ site $\pi$  in $g$).  Thus, supposing  the $k$ call  sites to function
 $f$  are  $\pi^1$ (in  function  $g^1$)  \ldots  $\pi^k$ (in  function
 $g^k$),  then  the  over-approximation  requirement on  $\sigma_f$  is
 achieved by  taking $\sigma_f =  \deltacall{f}{\pi^1}{g^1} \cup \cdots
-\cup \deltacall{f}{\pi^k}{g^k}$.
+\cup \deltacall{f}{\pi^k}{g^k}$\comment{Rewrite, copied from earlier paper}.
 
 
 The expression $e_{\mainpgm}$  is a special case; we  assume it may be
@@ -1217,6 +1218,20 @@ set notation if the map notation spills over:
 \Lan{\pi_5} &= \Lan{\pi_6} = \Lan{\pi_7} \ldots \\
 \Lan{\pi_8} &= \Lan{\pi_9} = \Lan{\pi_{10}} \ldots
 \end{align*}
+
+
+In summary, the equations generated during liveness analysis are:
+\begin{enumerate}
+\item   For    each   function   $\mathit{f}$,    equations   defining
+\Df{f}{i} for use by \Lfonly$_{\mathit f}$.
+\item  For  each   function  $\mathit{f}$, an  equation  defining
+the summary demand  $\sigma_{\mathit f}$ on $e_f$.
+% \marginpar{Consistency: summary vs cumulative?}
+\item For each function $\mathit{f}$ (including $\mainpgm$ for
+  $e_\mainpgm$) \comment{Have we defined GC points for lazy languages?}
+an equation defining
+  liveness at each GC point of $e_{\mathit f}$.
+
 \subsection{Solving liveness equations---the grammar interpretation}
 The  equations above can now be re-interpreted as a
 context-free grammar (CFG)  on the alphabet $\lbrace\acar, \acdr,
@@ -1231,44 +1246,7 @@ productions:
 \var{\Lanv{7}{\xl}}  &\rightarrow&   \var{\acdr \Lf
   {\length}{1}{\epsilon}} \mid \epsilon \\
 \end{eqnarray*}
-
-In summary, the equations generated during liveness analysis are:
-\begin{enumerate}
-\item   For    each   function   $\mathit{f}$,    equations   defining
-\Uf{f}{i} and \Df{f}{i} for use by \Lfonly$_{\mathit f}$.
-\item  For  each   function  $\mathit{f}$, an  equation  defining
-the summary demand  $\sigma_{\mathit f}$ on $e_f$.
-% \marginpar{Consistency: summary vs cumulative?}
-\item For each function $\mathit{f}$ (including $\mainpgm$ for $e_\mainpgm$)
-an equation defining
-  liveness at each GC point of $e_{\mathit f}$.
-
-
-\subsection{Solving liveness equations---the grammar interpretation}
-The  equations above can now be re-interpreted as a
-context-free grammar (CFG)  on the alphabet $\lbrace\acar, \acdr,
-\bcar, \bcdr\rbrace$.  Let  \var{$X$} denote the non-terminal for
-a variable  $X$ occurring on  the LHS of the  equations generated
-from the analysis.  We can  think of the resulting productions as
-% being a grammar with multiple start symbols---one for
-% for each nonterminal \var{\Lanv{i}{x}}.
-being associated with several  grammars, one for each non-terminal
-\var{\Lanv{i}{x}} regarded as a start symbol.  As an example, the
-grammar    for   \var{\Lanv{9}{y}}   comprises    the   following
-productions:
- \begin{eqnarray*}
-\var{\Lanv{9}{y}}  &\rightarrow&  \var{\Uf{\append}{1}} \mid  \var{\Df
-  {\append}{1}}        (\epsilon         \mid        \acdr        \mid
- \acdr\acar\var{$\sigma_{\mathit{\!all}}$})\\
-  \var{\Uf{\append}{1}}    &\rightarrow&    \epsilon   \mid
-  \acdr\var{\Uf{\append}{1}}\\         
-  \var{\Df{\append}{1}}
-  &\rightarrow&               \acar\bcar               \mid
-  \acdr\var{\Df{\append}{1}}\bcdr\\
-\var{$\sigma_{\mathit{\!all}}$} &\rightarrow & \epsilon \mid \acar
-\var{$\sigma_{\mathit{\!all}}$} \mid \acdr
-\var{$\sigma_{\mathit{\!all}}$}
-\end{eqnarray*}
+\comment{Pick up a richer equation or more than one liveness equations}
 Other equations can be converted  similarly.     The  language  generated  by  \var{\Lanv{i}{x}},
 denoted $\mathscr{L}(\var{\Lanv{i}{x}})
 $,  is the desired  solution of
@@ -1285,14 +1263,19 @@ of forward paths only. Then does $\alpha \in \sigma$?
 We could convert  the  rules  defining  $\hookrightarrow$  into
 productions and  add them to the grammar. However, this results
 in  an {\em  unrestricted grammar}~\cite{hopcraft90toc},  and the
-membership  problem   for  such  grammars   is  undecidable.   We
-circumvent the problem by over-approximating the CFG generated by the analysis to  {\em
+membership  problem   for  such  grammars   is
+undecidable. \comment{Rewrite it to say that this is a CFG with 3
+  unrestricted rules and the membership for even this grammar is undecidable}
+\comment{State the undecidability of the decision problem above.}
+
+  We circumvent the problem by over-approximating the CFG generated by the analysis to  {\em
   strongly  regular}  CFGs which  have   easy
 translations to non-deterministic finite state automata (NFA). The
 NFAs are then simplified on the
 basis  of  the  $\hookrightarrow$  rules to  enable  checking  of
 membership of forward access paths. The resulting NFAs are   finally
 converted to DFAs for use during garbage collection.
+\comment{Fix all comments and produce first draft}
 %------------------------------------------------------------%
 \subsubsection{Approximating CFGs using NFAs.}
 \label{sec:NFA-approx}
