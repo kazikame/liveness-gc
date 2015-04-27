@@ -648,12 +648,6 @@ abuse notation to  juxtapose an edge label and a  set of access paths:
 $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$. A more
 elaborate explanation of these notions appear in \cite{asati14lgc}
 
-%% Finally, we use $\Lfonly$  to range over {\em demand transformers}.
-%% These transform  demands on  a function call  into demands  for its
-%% formal  parameters:   given  a   user  function  $f$,   defined  by
-%% $(\DEFINE\ (f\  x_1\ \ldots\ x_n)\  \ e_f)$ and called  with demand
-%% $\sigma$,  then $\Lf{f}{i}{\sigma}$  is  the liveness  of $x_i$  at
-%% $e_f$.
 
 \subsection{Liveness Analysis for lazy languages}
 
@@ -694,28 +688,16 @@ garbage is collected.
   
 
 
-%%   Analogously to classical liveness being computed as a solution of
-%% dataflow   equations,  we   require,  via   inference   rule  ({\sc
-%% live-define}), $\Lfonly$ to  satisfy the fixed-point property that:
-%% when we  assume $\Lfonly$ to  be the family of  demand transformers
-%% for the program then the  calculated liveness of each function body
-%% $\mathcal{L}(e_f,\sigma,\Lfonly)$    agrees   with    the   assumed
-%% $\Lfonly$.   As  usual,  there  are  often  multiple  solutions  to
-%% $\Lfonly$; all are  safe (see Section~\ref{sec:correctness}) but we
-%% prefer  the least  one  as  giving the  least  liveness subject  to
-%% safety---and hence greatest amount of garbage collected.
-
 
 We next  describe the function $\mathcal{L}$  that propagates liveness
 across  expressions.   This brings  us  to  the  second way  in  which
 liveness analysis for lazy languages differ from eager languages---the
 point  where  an  expression   gets  evaluated  cannot  be  statically
 determined.  To  deal with this, we introduce an analysis which is
-flow insensitive but path-sensitive\comment{Check the terminology} into
+flow-insensitive but path-sensitive\comment{Check the terminology} into
 our  analysis.  
 
 \begin{figure*}[t!]
-%%\begin{picture}(100,130)(0,-90)
 \begin{picture}(100,130)(0, -50)
   \begin{tabular}{cc}
     \begin{boxedminipage}{.51\textwidth}
@@ -748,7 +730,7 @@ our  analysis.
       {\sf
         \small
         \begin{tabular}{lc}
-        $\cal{M_{\mbox{\tiny length}}} = $ 
+        $\cal{M_{\mbox{\tiny \length}}} = $ 
             \begin{tabular}{lc}            
               $[$
               $ep_2 \mapsto \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \
@@ -757,7 +739,7 @@ our  analysis.
               $ep_3 \mapsto \lbrace \px.\epsilon, \xl.\epsilon \rbrace $  \\
               $]$
             \end{tabular} \\
-            $\cal{P_{\mbox{\tiny length}}} = [$
+            $\cal{P_{\mbox{\tiny \length}}} = [$
               \begin{tabular}{lc}
                 $\pi_{\mbox{1}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \
                 $ \pi_{\mbox{2}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \\
@@ -768,13 +750,13 @@ our  analysis.
                 $ \pi_{\mbox{7}} \mapsto \lbrace ep_2 \rbrace $ \\
                 $]$
               \end{tabular}\\
-              $\cal{M_{\mbox{\tiny main}}} = $ 
+              $\cal{M_{\mbox{\tiny \main}}} = $ 
               \begin{tabular}{lc}            
                 $[$
                   $ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
                   $]$
               \end{tabular} \\
-              $\cal{P_{\mbox{\tiny main}}} = [$
+              $\cal{P_{\mbox{\tiny \main}}} = [$
                 \begin{tabular}{lc}
                   $\pi_{\mbox{8}} \mapsto \lbrace ep_4 \rbrace, $ \
                   $ \pi_{\mbox{9}} \mapsto \lbrace ep_4 \rbrace, $ \\
@@ -797,7 +779,6 @@ our  analysis.
 \kern -3ex
 \vspace{0.5in}
 \caption{Example Program and its liveness maps.}\label{fig:mot-example2}    
-%% >>>>>>> 67d5a8ebe45703d9726af91b752e9d74152ae455
 \end{figure*}
 
 
@@ -1006,11 +987,8 @@ analysis) can  be safely  approximated, for each  function, by  a {\em
 The  summary consists  of a  pair  of a  single demand  and, for  this
 demand, the corresponding  tuple of demands the function  makes on its
 arguments.
+
 \section{Computing liveness and its encoding as a table}\label{sec:computing}
-
-
-
-
 Section~\ref{sec:liveness} gave a context-sensitive liveness
 analysis and {\color {red}  proved it correct with reference
   to   a  {\em   minefield}   semantics}.   In   particular,
@@ -1544,9 +1522,331 @@ heap cell was  copied using reachability at any time, if  it is set we
 do not traverse any further.
 
 \section{Results}
+To demonstrate the effectiveness of liveness-based garbage collection,
+we  have  built a  prototype  consisting  of  an interpreter  for  our
+language,  a  liveness  analyzer  and  a copying  collector  that  can
+optionally use the results of liveness analysis for marking instead of
+reachability. When the collector uses liveness for marking, we call it
+a  {\em liveness-based  collector} (LGC),  else we  use the  term {\em
+  reachability-based  collector}  (RGC).   The  copying  collector  is
+neither incremental nor generational.  As a consequence, any cell that
+becomes unreachable or  dead is assuredly collected in  the next round
+of garbage collection.
+
+While exploring the activation record of a function, LGC uses the DFAs
+at  the latest  program  point traversed  in the function's body.  Thus, if  LGC
+is invoked  at the program point   $\pi$,  it would  use  the
+liveness  DFAs at  $\pi$ itself for exploring the root set of the
+current activation record. For any other activation record in the
+stack, say for a function ${\mathit f}$ calling ${\mathit g}$ in the call-chain,
+the DFAs at the point of call to  ${\mathit g}$ would be used.
+
+Let $\dfa{\pi}{x}$  denote the DFA  for the variable  and program
+point  pair ($x$,  $\pi$).  We  assume that  there is  a function
+$\mathsf{initial}(\dfa{\pi}{x})$  returning the initial  state of
+$\dfa{\pi}{x}$.    
+Considering   a   DFA   as   a   table,
+$\dfa{\pi}{x}\mathit{(q,sym)}$  returns the  next  state for  the
+state $q$ and the  symbol $\mathit{sym}$, where $\mathit{sym}$ is
+\acar\      or     \acdr.       We      shall     also      write
+$\dfa{\pi}{x}\mathit{(q,sym)\mathsf{?}}$    for    a    predicate
+indicating  whether there  is a  transition from  $q$ on
+$\mathit{sym}$.  The LGC action to chase the root variable $x$ at
+$\pi$ can be described as  follows: If $\mathscr{L}(\dfa{\pi}{x})$ is
+empty,  then  nothing  needs  to  be  done.   Otherwise  we  call
+$\mathsf{copy}(\dfa{\pi}{x},\mathsf{initial}(\dfa{\pi}{x}),    x)$
+in   Figure~\ref{algo:LGC-main-loop}  and  assign   the  returned
+pointer to $x$.
+The function $\mathsf{move\_to\_tospace}(x)$  copies the value of
+$x$  in the  other semi-space  and returns  the new  address.  It
+hides  details such as  returning the  forwarding pointer  if the
+value  of $x$  is  already copied,  and  creating the  forwarding
+pointer otherwise.
+
+The graphs  in Figure~\ref{fig:memory-usage} show the  number of cells
+in the heap over time for RGC and LGC---here time is measured in terms
+of the number of cons cells allocated. In addition, they also show the
+number of  reachable cells and the  number of cells  that are actually
+live\footnote{This   is  statically   approximated  by   our  liveness
+  analysis}.  Since  the programs have  different memory requirements,
+we have tuned the size of heap for each program to ensure a reasonable
+number of  collections. An invocation  of RGC decreases the  number of
+cells  in heap  till  it touches  the  curve of  reachable cells.   An
+invocation of LGC decreases the number  of heap cells to no lower than
+the curve of live cells.
+
+To construct the  reachable and live curves, we  record for every cell
+its creation time (\CreateTime), its last use time (\UseTime), and the
+earliest time  when the  cell becomes unreachable  and can  be garbage
+collected (\CollTime).  For accurate recording of  \CollTime, we force
+frequent invocations  of a reachability based collector  in a separate
+run.     A    cell   is    live    at    time   \mbox{\exectime}    if
+\mbox{$\mbox{\CreateTime}       \leq       \mbox{\exectime}       \leq
+  \mbox{\UseTime}$}.       If      \mbox{$\mbox{\CreateTime}      \leq
+  \mbox{\exectime} \leq \mbox{\CollTime}$}, it is reachable.
+
+The benchmark programs are drawn from the {\tt no-fib} suite and other
+sources and have been  manually converted to  ANF.  All  graphs  except  {\tt  fibheap}  show  fewer  garbage
+collector  invocations for  LGC. The  number  of reachable  cells in  {\tt
+  fibheap} increases  initially, comes  down before the  heap becomes gets
+full and then  continues to remains low.  This results in  a single garbage
+collection in both RGC and LGC.  The graphs also show the precision of
+our liveness analysis.  For  all programs  except  {\tt nperms} and
+{\tt lambda} (Figure~\ref{fig:memory-usage-lambda}),  LGC
+manages to collect a good portion of the data that are not live.
+
+\subsection{Results}
+\begin{figure}[t] 
+\centering
+\begin{boxedminipage}{.75\textwidth}
+{\bf function} $\mathsf{copy}$($\mathsf{dfa}$, $q$, $x$)\\ 
+\noindent \hspace*{.35cm}$y \leftarrow \mathsf{move\_to\_tospace}(x)$\\
+\noindent \hspace*{.35cm}{\bf if} $x$.{\bf tag} $\neq$ \CONS\ {\bf
+  then} {\bf skip}\\ 
+\noindent \hspace*{.25cm}  {\bf else} {\bf if}  $\mathsf{dfa}(q,0)\mathsf{?}$ {\bf then}   $y.\CAR = \mathsf{copy}(\mathsf{dfa}, \mathsf{dfa}(q,0),x.\CAR)$\\ 
+\noindent \hspace*{0.95cm} {\bf if}  $\mathsf{dfa}(q, 1)\mathsf{?}$ {\bf then}  $y.\CDR = \mathsf{copy}(\mathsf{dfa}, \mathsf{dfa}(q,1),x.\CDR)$\\
+\noindent \hspace*{.35cm}{\bf return} $y$
+\end{boxedminipage}
+\caption{Function       for       copying       a       root       set
+  variable.}\label{algo:LGC-main-loop} \figrule
+
+\end{figure}
+
+
+
+\begin{figure}[p]
+\begin{tabular}{@{}c@{}c@{}}
+\hskip -4mm{\epsfig{file=sudoku.eps, height=4cm, width=6.10cm}}
+&
+{\epsfig{file=lcss.eps, height=4cm, width=6.10cm}}
+\\
+\hskip -4mm{\epsfig{file=gc_bench.eps, height=4cm, width=6.10cm}}
+ &
+{\epsfig{file=nperm.eps, height=4cm, width=6.10cm}}
+\\
+\hskip -4mm{\epsfig{file=fibheap.eps, height=4cm, width=6.10cm}}
+&
+{\epsfig{file=knightstour.eps, height=4cm, width=6.10cm}}
+\\
+\hskip -4mm{\epsfig{file=nqueens.eps, height=4cm, width=6.10cm}}
+&
+{\epsfig{file=treejoin.eps, height=4cm, width=6.10cm}}
+\end{tabular}
+ \caption{Memory  usage of  programs. The blue and the red curves
+  indicate the number of cons cells in the active semi-space for RGC and
+  LGC respectively. The black curve represents the number of reachable
+  cells and the grey curve represents the number of cells that are
+  actually live (of which liveness analysis does  a static
+  approximation). x-axis is the time measured in number of cons-cells
+  allocated. y-axis is the number of cons-cells.}
+\label{fig:memory-usage} \figrule
+\end{figure}
+The  increased effectiveness  of LGC  over RGC  is also  shown  in the
+tables  in  Figure~\ref{fig:experimental-results}.   The  first  table
+provides  statistics  regarding the  analysis  itself.  The number  of
+states and the analysis times  are within tolerable limits. Precision
+of analysis refers to the percentage of dead cells that is collected by
+LGC, averaged over all invocations.
+The second table shows garbage  collection statistics for RGC and LGC.
+LGC  collects larger garbage  per invocation,  drags cells  for lesser
+time and requires a smaller heap size ({\em MinHeap}) for program to run
+in comparison with  RGC.  
+
+There are a couple of  issues of concern.  The garbage collection time
+is larger in the case of LGC for some programs. The reason is that the
+cost of consulting the liveness DFA may outweigh the combined benefits
+of  fewer   garbage  collections   and  fewer  markings   per  garbage
+collection.   The  other issue  is  illustrated  by  the program  {\tt
+  lambda}    (memory   usage  shown   separately    in
+Figure~\ref{fig:memory-usage-lambda}).  As can be seen from the table
+in Figure~\ref{fig:experimental-results}, the  number of
+touched cells\footnote{These  are the  cells which are  visited during
+  marking phase, often  more than once due to  sharing.} in this
+example is much higher for
+LGC.  This  increase is due to  excessive sharing among  heap nodes in
+this program.  Note  that a node re-visited because  of sharing is not
+explored  any   further  during  a  RGC   collection.   However,  this
+curtailment cannot happen in  LGC because of the possibility that the
+node,  re-visited in a  different liveness  state, may  mark a  set of
+cells different from the earlier visit.
+\begin{figure}[t]
+\footnotesize
+
+\centering
+
+\scalebox{.9}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+\hline
+{Program} & {\sf sudoku} & {\sf lcss} & {\sf gc\_bench} &  {\sf
+  nperm} &  {\sf fibheap} & {\sf knightstour} &
+{\sf treejoin} & {\sf nqueens} & {\sf lambda}\\
+\hline
+\hline
+{Time (msec)}&106.56 &2.19 &0.32 &1.16 &2.4 &3.05 &2.61 &0.71&8.68 \\
+{DFA size} &4206 &726 &258 &526 &675 &922 &737 &241 & 694\\
+{Precision(\%)} &98.4&98.8&99.9&87.1&100&94.3&99.6&98.8&79.7\\
+\hline
+\end{tabular}}
+
+
+
+\centerline{(a)}
+
+\medskip
+
+\scalebox{0.87}{\begin{tabular}{| c | r | r | r | r | r | r  |  r | r | r | r | r | r | r |}
+\hline
+    & \multicolumn{2}{c|}{\# Collected} & \multicolumn{2}{c|}{\# Touched}
+  & \multicolumn{2}{c|}{} & \multicolumn{2}{c|}{} &
+\multicolumn{2}{c|}{} & \multicolumn{2}{c|}{GC time} \\
+
+
+                      
+                            &   \multicolumn{2}{c|}{cells per GC}  
+                            &   \multicolumn{2}{c|}{cells per GC} 
+                            &   \multicolumn{2}{c|}{\#GCs} 
+                            &   \multicolumn{2}{c|}{MinHeap} 
+                            &   \multicolumn{2}{c|}{Avg. Drag} 
+                            &   \multicolumn{2}{c|}{(sec)} \\
+\cline{2-13}
+{Program}    &
+RGC & LGC & RGC & LGC  & RGC & LGC  &   RGC & LGC & RGC & LGC & RGC & LGC \\
+\hline
+\hline
+    {\sf   sudoku}  &381 &1107 &1268 &281 &8 &3 & 1346  &338 &527 &5 &.007 & .034 \\
+    {\sf  lcss } & 46522 &51101 &6216 &1363&8&7& 52301  &1701 &5147 &588 &.045 & .144 \\
+    {\sf   gc\_bench}  &129179 &131067 &1894 &4&9&9& 131071   &6 &16970  &4 &.086 & .075 \\
+     {\sf  nperm}  & 47586  &174478 &201585 &60882&14&4& 202597  &37507 &171878 &76618 &1.406 & .9  \\
+    {\sf  fibheap} &249502  &251525 &5555 &2997&1&1& 254520  &13558 &78720 &0 &.006 & .014  \\
+    {\sf  knightstour}  &2593 &314564 &907502 &319299&1161&10&508225   &307092 &206729 &82112 &464.902 & 14.124  \\
+    {\sf  treejoin} & 288666  &519943 &297570 &5547&2&1& 525488  &7150 &212653 &1954 &.356 & .217 \\
+    {\sf   nqueens} & 283822 &1423226 &2133001 &584143&46&9& 1819579  &501093 &521826 &39465 &70.314 & 24.811 \\     
+    {\sf   lambda}  &205 & 556 &2072&90345 &23 &8&966 & 721  &303 &95 &.093 &2.49  \\ 
+%    {\sf   fft }& &  & & &&&& ???? &???? &????? &????? &???? & ????  \\
+%    {\sf  nboyer} & &  & &   & &  & & &  \\
+%    {\sf   circsim?} & &  & &   & & & & &   \\
+ \hline
+\end{tabular}}
+
+
+\centerline{(b)}
+\vskip -2mm
+\caption{Experimental results comparing RGC and LGC. Table (a) gives
+  data related to liveness analysis, and (b) gives garbage collection
+  data. The average drag time is measured in allocated cons cells.}
+\label{fig:experimental-results}
+\normalsize
+\end{figure}
+
+\section{Collecting more garbage can never slow things down}
+\label{sec:lgc-always-better}
+Since garbage collection is  effectively asynchronous to the allocator
+thread, one might  worry as to how {\em  robust} our measurements are.
+For example,  while LGC would,  in general, collect more  garbage than
+RGC in the same heap state,  is it possible that on some programs, LGC
+might do  a larger number  of collections? We  prove a result  to show
+that   this  cannot   happen.    This  result   applies  to   classical
+mark-and-sweep and copying garbage  collectors and, we hypothesize, to
+generational collectors too.
+
+\begin{lemma}
+For the  same mutator,  a liveness-based collector  can never  do more
+garbage collections than a reachability-based collector.
+\end{lemma}
+ 
+\begin{proof}Assume, as before,  that time is measured in terms of the number of
+  cons cells allocated. Let us run  two copies of the mutator with the
+  two    different   collectors    but    with   synchronous    memory
+  allocations.   The   garbage    collections,   however,   happen
+  asynchronously.
+
+  To prove the lemma, it is enough to show the truth of the following 
+statement: After
+ every  LGC invocation,  the count of LGC invocations   is  no greater
+than  RGC invocations.   The  base case  holds  since the  first
+invocations of both GCs happen at the same time.  Assume the statement
+to be true after $n$ invocations of LGC.  Since LGC copies a subset of
+reachable cells, its heap would contain no more cells than RGC heap at
+the end  of the $n$th invocation.   Thus either RGC  is invoked next before
+LGC, or LGC and RGC are both invoked next at the same time.  In either
+case, the statement holds after $n+1$ invocations of LGC.
+\end{proof}
+
+
+
+%% \begin{figure}[h]
+%% \centerline{\epsfig{file=memory-usage.eps, width=12cm, height=15cm}}
+%% \caption{Memory  usage of  programs. The  solid  lines represents
+%%   number of  live cells and the  dashed lines show  the number of
+%%   reachable cells.  The red and blue  lines represent invocations
+%%   of RGC and  LGC---their heights indicate  the amount of memory
+%%   copied.   {\color{red}{Caution:  Figures  are from  a  previous
+%%       paper and are being used as placeholder}}}
+%% \label{fig:memory-usage} \figrule
+%% \end{figure}
+%%\clearpage
+
+\section{Related Work} Previous attempts to  increase  the space efficiency
+of functional programs by additional  reclamation of memory fall in two
+broad categories. In the first,  the program itself is instrumented to
+manage  reclamation and reallocation  without the  aid of  the garbage
+collector.    Such    attempts   include:   sharing    analysis   based
+reallocation~\cite{jones89compile},                       deforestation
+techniques~\cite{wadler88deforest,gill93ashort,chitil99deforest},   
+methods  based  on   linear  logic~\cite{hofmann00linear}  and  region
+analysis~\cite{tofte98region}.   Closer  to  our approach,  there  are
+methods   that  enable   the   garbage  collector   to  collect   more
+garbage~\cite{inoue88analysis,lee05static}   by
+explicitly  nullifying  pointers  that  are not  live.   However,  the
+nullification,  done   at  compile  time,   requires  sharing  (alias)
+analysis.  Our  method, in contrast, does not  require sharing because
+of the availability of the heap  itself at runtime.  To the best of our
+knowledge, this is the first  attempt at liveness-based marking of the
+heap during garbage collection.
+
+\begin{figure}[t]
+\centerline{\epsfig{file=lambda.eps, height=4cm, width=7cm}}
+ \caption{Memory  usage and garbage collection pattern of  {\tt lambda}.} 
+\label{fig:memory-usage-lambda} \figrule
+\end{figure}
+
+\section{Conclusions}
+\label{sec:conclusion}
+We have defined a notion of liveness on structured data;
+this generalizes classical liveness and strong liveness.
+We started with a general fully context-sensitive analysis which
+we proved correct with respect to a minefield semantics
+(this models the effect of garbage collection between every
+evaluation step).
+
+To avoid scalability issues (and to avoid performing part of
+the liveness computation at run time)
+we defined an 0-CFA version of this liveness analysis in which
+demands for function $f$ at all calling contexts are conflated into 
+a single demand $\sigma_f$.
+This enabled us to treat the liveness equations symbolically obtaining
+context-free grammars for liveness at each GC point (calls to user
+functions and to $\CONS$).
+These were then converted to DFAs for run-time consultation by the
+garbage collector. Experiments confirm the precision of the analysis.
+
+To obtain performance figures we compared a reachability-based garbage
+collector with a liveness-based  collector.  This showed a decrease in
+the  number   of  GCs,  more  garbage  collected   per  invocation.  A
+significant benefit of LGC is that programs can run in smaller memory when
+compared to RGC. This is potentially useful in situations where memory
+is limited---as with embedded systems. For a majority of programs, the
+garbage collection times were reduced.
+
+One issue we  highlighted was that while fewer  nodes were marked (and
+more garbage collected), sometimes  cons cells could be visited and
+traversed  multiple times  with different  sets of  liveness  paths to
+explore.  Further work includes  improvements to the classical copying
+collector to reduce the cost of this.
+
+
 %Add graphs for memort usage LGC vs RGC
 %Add graphs/table showing the GC times and other statistics
-\section{Conclusion and Future Work}
+
 %Mention lower peak memory usage. 
 %Mention faster GC than full LGC and more garbage collected than RGC.
 %Pitch it as sweet spot between full LGC and RGC.
