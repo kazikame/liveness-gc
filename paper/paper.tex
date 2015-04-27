@@ -1,4 +1,4 @@
-\documentclass[10pt]{sigplanconf}
+\documentclass[9pt]{sigplanconf}
 \usepackage{etex}
 \usepackage{float}
 \usepackage{mathrsfs}
@@ -1279,7 +1279,7 @@ converted to DFAs for use during garbage collection.
 %------------------------------------------------------------%
 \subsubsection{Approximating CFGs using NFAs.}
 \label{sec:NFA-approx}
-
+\comment{Change the language and the example}
 We use the   
 algorithm  by  Mohri  and Nederhof~\cite{mohri00regular}   to
 approximate a CFG  to a   {\em strongly regular\/} grammar.  The
@@ -1316,7 +1316,9 @@ The strongly regular CFGs obtained after the Mohri-Nederhof
 transformation are
   first converted  into  NFAs.  The        algorithm         described        in
 Figure~\ref{algo:simplify-NFA} converts  an NFA \ntbar\  to a NFA
-\nt\ such that  $\lang{\ntbar} \stackrel{*}{\hookrightarrow} \lang{\nt}$, where {\nt} accepts forward paths only.
+\nt\ such that  $\lang{\ntbar} \stackrel{*}{\hookrightarrow}
+\lang{\nt}$, where {\nt} accepts forward paths only.
+\comment{Rewrite the algorithm to handle \cbar and update the example automata}
 Thus  \nt\  can  be  used  to  check  
 membership of forward paths.
 
@@ -1377,10 +1379,10 @@ process is  continued till  a fixed point  is reached.   When the
 fixed point  is reached, the resulting NFA  contains all possible
 reductions corresponding  to all the  paths in the  original NFA.
 The proofs  of the termination  and correctness of  the algorithm
-are given in our earlier paper~\cite{karkare07liveness}.
+are given in an earlier paper~\cite{karkare07liveness}.
 
 \input{liveness-dfa.tex}
-
+\comment{change according to example}
 We  illustrate  the  algorithm  in  Figure~\ref{algo:simplify-NFA}  by
 constructing      the       automaton      for      \var{\Lanv{9}{y}}.
 Figure~\ref{fig:automata-construction}  (c)  shows  the automaton  for
@@ -1414,7 +1416,7 @@ eager  languages only  \CONS~ points  and  function calls  are the  GC
 points. In  a lazy  language every \LET~  statement is a  potential GC
 point. Hence we need to store liveness automata corresponding to every
 \LET~  statement in the  program. This  leads to  an explosion  in the
-number of  automata. From our  observation that along an  {\em E-path}
+number of  automata. \comment{Directly say that we share the automata}From our  observation that along an  {\em E-path}
 all program points have the same liveness, we can reduce the number of
 automata state required  by sharing the same automata  for all program
 points along an {\em E-path}. In  the example program, we only need to
@@ -1440,6 +1442,11 @@ distinct {\em E-path}s in the program.
 %% \end{algorithmic}
 
 % Liveness for cons cells & reachability for closures
+
+\comment{Mention the fact that liveness at a program point indicates
+  what references will be used by the program eventually. The exact
+  point where a reference will be used cannot be determined statically
+due to the language being lazy. }
 During GC, if the heap cell being processed is a cons cell, we consult
 the  liveness automaton  corresponding to  it and  copy only  the live
 paths.  In  case  the  heap  cell  points  to  a  closure,  we  safely
@@ -1468,7 +1475,7 @@ derefernced during later execution.
 
 Another  difference that is  present in  GC of  lazy language  is the
 presence  of  a print  stack.  In  lazy  languages the  evaluation  of
-closures is  driven by the print  function.  Hence, during  a GC there
+closures is  driven by the print  function\comment{Refer to SPJ's book}.  Hence, during  a GC there
 will be heap  references that will be present on  the stack which also
 have  to  copied/collected.   One  solution  is  to  assume  that  all
 references  present  on  the  print  stack are  fully  live  and  copy
