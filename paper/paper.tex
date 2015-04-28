@@ -695,7 +695,7 @@ across  expressions.   This brings  us  to  the  second way  in  which
 liveness analysis for lazy languages differ from eager languages---the
 point  where  an  expression   gets  evaluated  cannot  be  statically
 determined.  To  deal with this, we introduce an analysis which is
-flow-insensitive but path-sensitive\comment{Check the terminology} into
+flow-insensitive but path-sensitive\comment{Checked the terminology, path-sensitive means certain prooperties holding along a path only, http://en.wikipedia.org/wiki/Data-flow\_analysis} into
 our  analysis.  
 
 \begin{figure*}[t!]
@@ -713,8 +713,8 @@ our  analysis.
             \UNL{4} \hspace*{1.15cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
             \UNL{5} \hspace*{1.15cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
             \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\,
-            $(\LET~\pz\ $\leftarrow$ (1~+~\py))))))) \IN
-            \UNL{7} \hspace*{1.15cm} $\psi_3\!\!:\, (\RETURN ~\pz)$)))))
+            $(\LET~\pz\ $\leftarrow$ (1~+~\py) \IN
+            \UNL{7} \hspace*{1.15cm} $\psi_3\!\!:\, (\RETURN ~\pz)$))))))
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
@@ -733,36 +733,39 @@ our  analysis.
         \begin{tabular}{lc}
         $\cal{M_{\mbox{\tiny \length}}} = $ 
             \begin{tabular}{lc}            
-              $[$
-              $ep_2 \mapsto \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \
-              \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon  \rbrace ,$ \\ 
-              $ep_1 \mapsto \lbrace \rbrace , $\\
-              $ep_3 \mapsto \lbrace \px.\epsilon, \xl.\epsilon \rbrace $  \\
+              $[$ \\
+              $\psi_1 \mapsto \lbrace \px.\sigma_{\length}, \xl.\cbar\sigma_{\length} \rbrace ,$ \\ 
+              $\psi_2 \mapsto \lbrace \rbrace , $\\
+              $\psi_3 \mapsto \lbrace \pz.\sigma_{\length}, \py.\cbar\sigma_{\length}, $\\
+              $\pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}, \xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}} \rbrace $  \\
               $]$
             \end{tabular} \\
-            $\cal{P_{\mbox{\tiny \length}}} = [$
+            $\cal{P_{\mbox{\tiny \length}}} = $
               \begin{tabular}{lc}
-                $\pi_{\mbox{1}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \
-                $ \pi_{\mbox{2}} \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \\
-                $ \pi_{\mbox{3}} \mapsto \lbrace ep_3 \rbrace, $ \
-                $ \pi_{\mbox{4}} \mapsto \lbrace ep_1 \rbrace, $ \
-                $ \pi_{\mbox{5}} \mapsto \lbrace ep_2 \rbrace, $ \\
-                $ \pi_{\mbox{6}} \mapsto \lbrace ep_2 \rbrace, $ \
-                $ \pi_{\mbox{7}} \mapsto \lbrace ep_2 \rbrace $ \\
+                $[$ \\
+                $\pi_{\mbox{1}} \mapsto \lbrace \psi_1, \psi_2, \psi_3 \rbrace, $ \
+                $ \pi_{\mbox{2}} \mapsto \lbrace \psi_1, \psi_2, \psi_3 \rbrace, $ \\
+                $ \psi_{\mbox{1}} \mapsto \lbrace \psi_1 \rbrace, $ \
+                $ \psi_{\mbox{2}} \mapsto \lbrace \psi_2 \rbrace, $ \
+                $ \pi_{\mbox{5}} \mapsto \lbrace \psi_3 \rbrace, $ \\
+                $ \pi_{\mbox{6}} \mapsto \lbrace \psi_3 \rbrace, $ \
+                $ \pi_{\mbox{7}} \mapsto \lbrace \psi_3 \rbrace $ \\
+                $ \psi_{\mbox{3}} \mapsto \lbrace \psi_3 \rbrace $ \\
                 $]$
               \end{tabular}\\
               $\cal{M_{\mbox{\tiny \main}}} = $ 
               \begin{tabular}{lc}            
                 $[$
-                  $ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
+                  $\psi_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
                   $]$
               \end{tabular} \\
-              $\cal{P_{\mbox{\tiny \main}}} = [$
+              $\cal{P_{\mbox{\tiny \main}}} = $
                 \begin{tabular}{lc}
-                  $\pi_{\mbox{8}} \mapsto \lbrace ep_4 \rbrace, $ \
-                  $ \pi_{\mbox{9}} \mapsto \lbrace ep_4 \rbrace, $ \\
-                  $ \pi_{\mbox{10}} \mapsto \lbrace ep_4 \rbrace, $ \
-                  $ \pi_{\mbox{11}} \mapsto \lbrace ep_4 \rbrace, $ \
+                  $[$ \
+                  $\pi_{\mbox{8}} \mapsto \lbrace \psi_4 \rbrace, $ \
+                  $ \pi_{\mbox{9}} \mapsto \lbrace \psi_4 \rbrace, $ \
+                  $ \pi_{\mbox{10}} \mapsto \lbrace \psi_4 \rbrace, $ \
+                  $ \psi_{\mbox{4}} \mapsto \lbrace \psi_4 \rbrace, $ \
                   $ \ldots  $ \
                   $]$  
                 \end{tabular}
@@ -850,9 +853,9 @@ program  points  which  trigger  a evaluation\footnote{Program points
   which trigger evaluation are labelled with $\psi$}---\SIF\  conditions  and
 \RETURN\  expressions.  We  call such  paths {\em
   e-paths}. \comment{Update the e-path labels}  For the
-program shown, there are three such paths $EP_1 = \pi_1, \pi_2, \pi_3,
-\pi_4,  \pi_5$, $EP_2  =  \pi_1, \pi_2,  \pi_3,  \pi_4, \pi_6,  \pi_7,
-\pi_8$, and $EP_3 = \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.
+function \length, there are three such paths $\psi_1 = \pi_1, \pi_2, \pi_3,
+\pi_4,  \pi_5$, $\psi_2  =  \pi_1, \pi_2,  \pi_3,  \pi_4, \pi_6,  \pi_7,
+\pi_8$, and $\psi_3 = \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.
 
 The analysis  consists of  two maps: The  map $\cal{M}$ maps  a e-path to a common liveness environment, and a second map $\cal{P}$ maps
 a program  point to the set of  e-paths on which  the point lies.
@@ -860,8 +863,8 @@ If a  program  point happens to fall  on more than one  such path, then
 the  liveness environment of  the program  point is  the variable-wise
 union of  the liveness environments  of the individual paths.   In the
 example program, ${\cal M}(\psi_1)= \ldots$, ${\cal M}(\psi_2)=\ldots$ and
-${\cal M}(\psi_3)=  \ldots$.  Since  ${\cal P}(pi_4)$ is  $\lbrace EP_1,
-EP_2, EP_3 \rbrace$, the liveness  of $pi_4$ is \ldots.  In summary,
+${\cal M}(\psi_3)=  \ldots$.  Since  ${\cal P}(pi_4)$ is  $\lbrace \psi_1,
+\psi_2, \psi_3 \rbrace$, the liveness  of $pi_4$ is \ldots.  In summary,
 our propagation of liveness is flow-insensitive but path-sensitive.
 In the sequel
 we  shall  describe  how  to  obtain $\cal{M}$.   The  formulation  of
@@ -1157,12 +1160,12 @@ equations     of     the     form    $\Lf{\mathit{f}}{i}{\sigma}     =
 \Lanv{\pi_1}{x_i}$, where  $x_i$ is the  $i^{\mbox{\footnotesize th}}$
 parameter of $\mathit{f}$. Doing this for \length, we get:
 \begin{align*}
- \Lanv{\pi_1}{\xl} &= \cbar\sigma \cup \acdr\Lf{\length}{1}{\sigma}
+ \Lanv{\pi_1}{\xl} &= \cbar\sigma \cup \acdr\Lf{\length}{1}{\cbar\sigma}
 \end{align*}
 Which gives the following equation for \Lfone{\length}: 
   \begin{eqnarray*}
     \Lf{\length}{1}{\sigma}
-    &=& \cbar\sigma \cup \acdr\Lf{\length}{1}{\sigma}
+    &=& \cbar\sigma \cup \acdr\Lf{\length}{1}{\cbar\sigma}
    \end{eqnarray*}
 
 In general, the equations for  \Lfonly\ are recursive since, as in the
@@ -1170,7 +1173,7 @@ case of \length,  \Lan{\pi_1}\ may, in turn, be  expressed in terms of
 \Lfone{\mathit{f}}.
 
 
-As mentioned earlier\comment{Check if already mentioned}, each of  the liveness rules modifies a demand by
+As mentioned earlier\comment{Check if already mentioned, Not mentioned earlier}, each of  the liveness rules modifies a demand by
 prefixing   it with   symbols   in   the   above   set,   and   therefore
 $\Lf{f}{i}{\sigma}$ has the closed form:
 \begin{eqnarray}
@@ -1186,7 +1189,7 @@ for \Lfonly$_{\mathit f}$.  Applied to \Lfonly$_{\mathit \length}$, we
 get:
   \begin{align*}
     \Df{\length}{1} &= \lbrace\cbar\rbrace 
-    \cup \acdr\Df{\length}{1}
+    \cup \acdr\Df{\length}{1}\cbar
   \end{align*}
  
 Note that this equation can also be viewed as a CFG with \{\acdr,
@@ -1217,7 +1220,7 @@ called externally with demand $\sigma_\mainpgm = \{\acar,\acdr\}^\ast$
 (denoted $\sigma_{\!all}$).  This is because any part of its value may
 be used by the environment---for printing the result, for instance.
 {\color {red} What about print?}
-For the running example, $\length$ has calls from $\main$ at $\pi_{11}$
+For the running example, $\length$ has calls from $\main$ at $\pi_{10}$
 and a recursive call at $\pi_6$.
 %\newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
 So $\sigma_{\length} =
@@ -1226,18 +1229,19 @@ Filling in  the values gives:
 
 \begin{align*}
 \sigma_{\length}    &=
- \sigma_{\!all}  ~\cup~ \acdr\Lf{length}{1}{\sigma_{\mathit{\length}}}
+ \sigma_{\!all}  ~\cup~ \acdr\Lf{length}{1}{\cbar\sigma_{\mathit{\length}}}
 \end{align*}
 
 For some of the program points in \length\  and \main,  this gives
 {\color {red} Prasanna, please fill this correctly}. You could use the
 set notation if the map notation spills over: 
 \begin{align*}
-\Lan{\pi_1} &= \Lan{\pi_2} = \ldots \\
-\Lan{\pi_3} &= \ldots \\
-\Lan{\pi_4} &= \ldots \\
-\Lan{\pi_5} &= \Lan{\pi_6} = \Lan{\pi_7} \ldots \\
-\Lan{\pi_8} &= \Lan{\pi_9} = \Lan{\pi_{10}} \ldots
+\Lan{\pi_1} &= \lbrace  \px.\sigma_{\length}, \xl.\cbar\sigma_{\length}, \pz.\sigma_{\length},\
+              \py.\cbar\sigma_{\length}, \pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}, \xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}} \rbrace \\
+\Lan{\pi_2} & =  \lbrace  \px.\sigma_{\length}, \xl.\cbar\sigma_{\length}, \pz.\sigma_{\length},\
+                  \py.\cbar\sigma_{\length}, \pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}, \xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}} \rbrace \\
+\Lan{\pi_5} &= \lbrace \pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}, \xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}\rbrace \\
+\Lan{\pi_8} &= \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace 
 \end{align*}
 
 In summary, the equations generated during liveness analysis are:
@@ -1248,7 +1252,7 @@ In summary, the equations generated during liveness analysis are:
 the summary demand  $\sigma_{\mathit f}$ on $e_f$.
 % \marginpar{Consistency: summary vs cumulative?}
 \item For each function $\mathit{f}$ (including $\mainpgm$ for
-  $e_\mainpgm$) \comment{Have we defined GC points for lazy languages?}
+  $e_\mainpgm$) \comment{Have we defined GC points for lazy languages? No, we define it only in the implementation section as of now.}
 an equation defining
   liveness at each GC point of $e_{\mathit f}$.
 
@@ -1260,11 +1264,11 @@ a variable  $X$ occurring on  the LHS of the  equations generated
 from the analysis.  We can  think of the resulting productions as
 being associated with several  grammars, one for each non-terminal
 \var{\Lanv{i}{x}} regarded as a start symbol.  As an example, the
-grammar    for   \var{\Lanv{7}{\xl}}   comprises    the   following
+grammar    for   \var{\Lanv{5}{\xl}}   comprises    the   following
 productions:
  \begin{eqnarray*}
-\var{\Lanv{7}{\xl}}  &\rightarrow&   \var{\acdr \Lf
-  {\length}{1}{\epsilon}} \mid \epsilon \\
+\var{\Lanv{5}{\xl}}  &\rightarrow&   \var{\acdr \Lf
+  {\length}{1}{\cbar\sigma_{\length}}} \mid \cbar\sigma_{\length} \\
 \end{eqnarray*}
 \comment{Pick up a richer equation or more than one liveness equations}
 Other equations can be converted  similarly.     The  language  generated  by  \var{\Lanv{i}{x}},
