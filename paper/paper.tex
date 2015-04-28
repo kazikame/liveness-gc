@@ -1783,37 +1783,38 @@ RGC & LGC & RGC & LGC  & RGC & LGC  &   RGC & LGC & RGC & LGC & RGC & LGC \\
 
 \section{Collecting more garbage can never slow things down}
 \label{sec:lgc-always-better}
-Since garbage collection is  effectively asynchronous to the allocator
-thread, one might  worry as to how {\em  robust} our measurements are.
-For example,  while LGC would,  in general, collect more  garbage than
-RGC in the same heap state,  is it possible that on some programs, LGC
-might do  a larger number  of collections? We  prove a result  to show
-that   this  cannot   happen.    This  result   applies  to   classical
-mark-and-sweep and copying garbage  collectors and, we hypothesize, to
-generational collectors too.
 
-\begin{lemma}
-For the  same mutator,  a liveness-based collector  can never  do more
-garbage collections than a reachability-based collector.
-\end{lemma}
+%% Since garbage collection is  effectively asynchronous to the allocator
+%% thread, one might  worry as to how {\em  robust} our measurements are.
+%% For example,  while LGC would,  in general, collect more  garbage than
+%% RGC in the same heap state,  is it possible that on some programs, LGC
+%% might do  a larger number  of collections? We  prove a result  to show
+%% that   this  cannot   happen.    This  result   applies  to   classical
+%% mark-and-sweep and copying garbage  collectors and, we hypothesize, to
+%% generational collectors too.
+
+%% \begin{lemma}
+%% For the  same mutator,  a liveness-based collector  can never  do more
+%% garbage collections than a reachability-based collector.
+%% \end{lemma}
  
-\begin{proof}Assume, as before,  that time is measured in terms of the number of
-  cons cells allocated. Let us run  two copies of the mutator with the
-  two    different   collectors    but    with   synchronous    memory
-  allocations.   The   garbage    collections,   however,   happen
-  asynchronously.
+%% \begin{proof}Assume, as before,  that time is measured in terms of the number of
+%%   cons cells allocated. Let us run  two copies of the mutator with the
+%%   two    different   collectors    but    with   synchronous    memory
+%%   allocations.   The   garbage    collections,   however,   happen
+%%   asynchronously.
 
-  To prove the lemma, it is enough to show the truth of the following 
-statement: After
- every  LGC invocation,  the count of LGC invocations   is  no greater
-than  RGC invocations.   The  base case  holds  since the  first
-invocations of both GCs happen at the same time.  Assume the statement
-to be true after $n$ invocations of LGC.  Since LGC copies a subset of
-reachable cells, its heap would contain no more cells than RGC heap at
-the end  of the $n$th invocation.   Thus either RGC  is invoked next before
-LGC, or LGC and RGC are both invoked next at the same time.  In either
-case, the statement holds after $n+1$ invocations of LGC.
-\end{proof}
+%%   To prove the lemma, it is enough to show the truth of the following 
+%% statement: After
+%%  every  LGC invocation,  the count of LGC invocations   is  no greater
+%% than  RGC invocations.   The  base case  holds  since the  first
+%% invocations of both GCs happen at the same time.  Assume the statement
+%% to be true after $n$ invocations of LGC.  Since LGC copies a subset of
+%% reachable cells, its heap would contain no more cells than RGC heap at
+%% the end  of the $n$th invocation.   Thus either RGC  is invoked next before
+%% LGC, or LGC and RGC are both invoked next at the same time.  In either
+%% case, the statement holds after $n+1$ invocations of LGC.
+%% \end{proof}
 
 
 
