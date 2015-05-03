@@ -1,8 +1,8 @@
 #!/bin/bash 
 DIR=`dirname $0`
 PROGNAME=`basename $0`
-#AllBMs="   lambda sudoku lcss gc_bench nperm fibheap treejoin knightstour nqueens "
-AllBMs=" lambda sudoku lcss treejoin fibheap"
+#AllBMs="   lambda sudoku lcss small gc_bench nperm fibheap treejoin knightstour nqueens "
+AllBMs=" lambda sudoku lcss small treejoin fibheap"
 help()
 {
     echo ""
@@ -45,6 +45,7 @@ declare -A limit
 limit["sudoku"]=1728
 limit["fft"]=3300
 limit["lcss"]=52321
+limit["small"]=17
 limit["gc_bench"]=131091
 limit["nperm"]=27429
 limit["fibheap"]=300000
@@ -58,6 +59,7 @@ declare -A freq
 freq["sudoku"]=2050;
 freq["fft"]=2050;
 freq["lcss"]=1000;
+freq["small"]=1;
 freq["gc_bench"]=4000;
 freq["nperm"]=145;
 freq["fibheap"]=700;
@@ -71,6 +73,7 @@ declare -A ytics
 xtics["sudoku"]=2050; ytics["sudoku"]=250
 xtics["fft"]=2050; ytics["fft"]=250
 xtics["lcss"]=100000; ytics["lcss"]=9000
+xtics["small"]=1; ytics["small"]=1
 xtics["gc_bench"]=400000; ytics["gc_bench"]=20000
 xtics["nperm"]=145000; ytics["nperm"]=35000
 xtics["fibheap"]=70000; ytics["fibheap"]=30000

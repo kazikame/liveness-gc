@@ -79,7 +79,7 @@ mkdir -p $OUTPUT;
 LOG=$OUTPUT/runtime
 echo -n 'Start At : ' > $LOG
 date                 >> $LOG
-EXECNAME=/home/karkare/Work/liveNstrict/lazy-scheme/src/Simulator_Stats
+EXECNAME=~/livenstrict/livenstrict/lazy-scheme/src/Simulator_Stats
 STATSFILE=GC_STATS.txt
 SCMFILE=$TEST/${TESTNAME}.scm
 if [ "$PPONLY" = "false" ]; then

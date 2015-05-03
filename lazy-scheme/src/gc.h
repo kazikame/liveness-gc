@@ -59,6 +59,7 @@ using namespace Scheme::AST;
            _cell_->is_used = 0;                       \
     } 
 #  define GC_STAT_UPDATE_LAST_USE(_cell_) update_last_use(_cell_)
+#  define GC_STAT_UPDATE_LAST_GC(_cell_) update_last_gc(_cell_)
  /* declarations of GC statistics related functions */
 clock_tick gc_clock();
 void tick();
@@ -67,6 +68,7 @@ void clear_rch_flag();
 void dump_garbage_stats();
 void finish_gc_stats();
 void update_last_use(cons *cell);
+void update_last_gc(cons *cell);
   
 /* variables to traverse the cons cells for the statistics */
 extern cons* array_stats;
@@ -81,6 +83,7 @@ extern clock_tick current_cons_tick;
 #  define GC_STAT_INIT_PARAMS()                     (void)0
 #  define GC_STAT_MARK_CREATED(_cell_)      (void)0
 #  define GC_STAT_UPDATE_LAST_USE(_cell_) (void)0
+#  define GC_STAT_UPDATE_LAST_GC(_cell_) (void)0
 #endif
 extern clock_tick gc_freq_threshold;
 

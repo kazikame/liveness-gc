@@ -248,6 +248,8 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 					node->copied_using_rgc = true;
 					new_loc->val.cell.car = deep_copy(node->val.cell.car, 1, out);
 					new_loc->val.cell.cdr = deep_copy(node->val.cell.cdr, 1, out);
+
+					GC_STAT_UPDATE_LAST_GC(new_loc);
 					return new_loc;
 				}
 				else
@@ -264,8 +266,10 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				    (node->typecell == funcApplicationExprClosure) ||
 				    (node->typecell == funcArgClosure))
 				{
+					node->copied_using_rgc = true;
 					new_loc->val.closure.arg1 = deep_copy(node->val.closure.arg1, 1, out);
 					new_loc->val.closure.arg2 = deep_copy(node->val.closure.arg2, 1, out);
+					GC_STAT_UPDATE_LAST_GC(new_loc);
 				}
 				return new_loc;
 			}
@@ -661,6 +665,7 @@ cons* allocate_cons()
     conscell->isLive = false;
     conscell->forward = NULL;
     conscell->copied_using_rgc = false;
+    conscell->last_gc = -1;
     ++num_of_allocations;
     GC_STAT_MARK_CREATED(conscell);
 #ifdef TEST_RUN
@@ -1662,6 +1667,9 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  addr = deep_copy(loc->val.closure.arg2, 1, out);
 		  loccopy->val.closure.arg2 = addr;
 		  DBG(out << "Copied arg2 from " << oldarg2 << " to " << addr << endl);
+
+		  loc->copied_using_rgc = true;
+		  GC_STAT_UPDATE_LAST_GC(loccopy);
 	  }
 
   }
@@ -2946,20 +2954,21 @@ static void dump_cell_stats(cons* gs)
     if (gs->is_used)
     {
         fprintf(gc_stats_outfile,
-                /*GC  | Cell  |Create| First | Last */
-                /*Time| Addrs |Time  | Use   | Use  */
-                "%lu\t| %p  \t| %lu\t| %lu\t | %lu\t\n",
+                /*GC  | Cell  |Create| First | Last | Last*/
+                /*Time| Addrs |Time  | Use   | Use  | GC  */
+                "%lu\t| %p  \t| %lu\t| %lu\t | %lu\t| %ld \n",
                 TIME_ms(gc_clock()), gs,
                 TIME_ms(gs->created), TIME_ms(gs->first_use),
-                TIME_ms(gs->last_use));
+                TIME_ms(gs->last_use), TIME_ms(gs->last_gc) );
     }
     else
     { /* first and last use are -1 */
         fprintf(gc_stats_outfile,
-                /*GC  | Cell  |Create| First | Last */
-                /*Time| Addrs |Time  | Use   | Use  */
-                "%lu\t| %p  \t| %lu\t| -1\t  | -1\t \n",
-                TIME_ms(gc_clock()), gs, TIME_ms(gs->created));
+                /*GC  | Cell  |Create| First | Last | Last*/
+                /*Time| Addrs |Time  | Use   | Use  | GC  */
+                "%lu\t| %p  \t| %lu\t| -1\t  | -1\t | %ld \n",
+                TIME_ms(gc_clock()), gs, TIME_ms(gs->created),
+				TIME_ms(gs->last_gc) );
     }
 }
 
@@ -3020,6 +3029,22 @@ void update_last_use(cons *cell)
     DBG(printf("<== updating last use(%p)\n", cell));
 }
 
+
+void update_last_gc(cons *cell)
+{
+    DBG(printf("updating last gc(%p) ==>\n", cell));
+    if (cell == NULL)
+	//cout << "No need to count for a NULL list" << endl;
+	return;
+    assert(cell); // only valid cells allowed
+
+
+   	cell->last_gc = gc_clock();
+
+
+
+    DBG(printf("<== updating last gc(%p)\n", cell));
+}
 
 
 #endif

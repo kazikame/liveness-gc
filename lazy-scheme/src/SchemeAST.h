@@ -14,6 +14,7 @@
 
 //#define PRNT_DBG
 
+
 #ifdef PRNT_DBG
 #define DOUT(str) cout << str << endl;
 #else
@@ -94,6 +95,7 @@ struct cons
 	clock_tick created;       /* creation time of cell */
 	clock_tick first_use;     /* first use time of cell */
 	clock_tick last_use;      /* last use time of cell */
+	clock_tick last_gc;       /* last time when gc moved cell to to-space */
 	char       is_reachable:1,  /* true if cell is reachable during current gc */
 	is_used:1;       /* true if cell is dereferenced for use */
 	/*----------------------------------------------------------------------*/
