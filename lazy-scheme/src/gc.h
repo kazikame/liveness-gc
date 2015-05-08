@@ -57,6 +57,7 @@ using namespace Scheme::AST;
            _cell_->created = gc_clock();        \
            _cell_->is_reachable = 0;               \
            _cell_->is_used = 0;                       \
+           _cell_->last_gc = -1;                     \
     } 
 #  define GC_STAT_UPDATE_LAST_USE(_cell_) update_last_use(_cell_)
 #  define GC_STAT_UPDATE_LAST_GC(_cell_) update_last_gc(_cell_)
