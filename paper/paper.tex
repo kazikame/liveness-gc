@@ -14,7 +14,7 @@
 \usepackage{graphicx}
 \usepackage{graphpap}
 \usepackage{tabularx}
-\usepackage {algorithmic}
+\usepackage [plain,noend,noline,boxed]{algorithm2e}
 \usepackage{amssymb}
 \usepackage{amsmath}
 \usepackage{pstricks}
@@ -1202,6 +1202,24 @@ Note that this equation can also be viewed as a CFG with \{\acdr,
 \subsection{Generating liveness equations \Lv\  for function bodies}
 \label{sec:bodylivenessbodies}
 
+To avoid analysing the body of a function we assumed a symbolic demand $\sigma$
+and created a summary liveness for the function arguments and the variables 
+in the function. To get the actual liveness we have to substitute the actual 
+demands that are placed on the function. We calculate an over-approximation 
+of the actual demand, a {\em summary demand} and calculate the liveness at each GC point inside the 
+function. Even though we lose a bit of precision due to this, our 
+experiments show that this is acceptable \comment{Is this claim true?}.
+The {\em summary demand} is calculated by taking a union of the demand at 
+every call site of a function. A function call in our language can only be of the
+form $\pi\!\!:\!(\LET~x  \leftarrow (f\,y_1\,\ldots\,y_n)\ldots$. The demand on 
+$f$ due to this function call will be the liveness of $x$ at the program 
+point $\pi$. Denoting this demand as $\deltacall{f}{\pi_i}{g}$  for this demand  (contributed by call
+site $\pi$  in function $g$) we can write the {\em summary demand} as 
+$\sigma_f =  \deltacall{f}{\pi^1}{g^1} \cup \cdots
+\cup \deltacall{f}{\pi^k}{g^k}$.
+
+
+\comment{
 We now calculate a 0-CFA-style summary liveness for each GC point of a
 program.  There are two parts  to this.  First, for each function $f$,
 we determine a {\em  summary demand} $\sigma_f$ over-approximating any
@@ -1216,7 +1234,7 @@ site $\pi$  in $g$).  Thus, supposing  the $k$ call  sites to function
 $f$  are  $\pi^1$ (in  function  $g^1$)  \ldots  $\pi^k$ (in  function
 $g^k$),  then  the  over-approximation  requirement on  $\sigma_f$  is
 achieved by  taking $\sigma_f =  \deltacall{f}{\pi^1}{g^1} \cup \cdots
-\cup \deltacall{f}{\pi^k}{g^k}$\comment{Rewrite, copied from earlier paper}.
+\cup \deltacall{f}{\pi^k}{g^k}$Rewrite, copied from earlier paper}.
 
 
 The expression $e_{\mainpgm}$  is a special case; we  assume it may be
@@ -1335,8 +1353,12 @@ generated for  \var{\Df{\append}{1}} in  the original grammar  and the
 new       grammar      are       \acdr$^i$\acar\bcar\bcdr$^i$      and
 \acdr$^*$\acar\bcar\bcdr$^*$, showing a  loss of  precision.
  
-
-
+\subsubsection{Removing the $\cbar$ edges}
+Once the NFA's are created, we need to remove the transitions on 
+$\cbar$. This edge is replaced by an $\epsilon$ transition and the 
+$\cbar$ edge is deleted. If the original grammar had a non-null 
+$\sigma$ then the NFA reaches a final state throught this path 
+otherwise it does not reach a final state.\comment{Need to rewrite this}
 %------------------------------------------------------------%
 \subsubsection{Transforming NFAs to Accept Forward Paths:}
 %\label{sec:NFA-elim}
@@ -1410,7 +1432,7 @@ reductions corresponding  to all the  paths in the  original NFA.
 The proofs  of the termination  and correctness of  the algorithm
 are given in an earlier paper~\cite{karkare07liveness}.
 
-\input{liveness-dfa.tex}
+%%\input{liveness-dfa.tex}
 \comment{change according to example}
 We  illustrate  the  algorithm  in  Figure~\ref{algo:simplify-NFA}  by
 constructing      the       automaton      for      \var{\Lanv{9}{y}}.
@@ -1516,15 +1538,27 @@ are not  considered. Therefore we  simulate the liveness of  the print
 function by using a flag in  the heap cell. The flag ensures that only
 the required parts  of a cons cell are copied. The  behavior of the GC
 algorithm is as described below,
-%% \begin{algorithmic}
-%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
-%% \IF{$celltype\ is\ cons\ and\ not(processed\_car\_part)$}
-%% \STATE $new\_cdr\gets$ copy(cell.cdr)
-%% \STATE $new\_cell.cdr\gets$ $new\_cdr$
-%% \ENDIF
-%% \end{algorithmic}
+
+%% \begin{figure}
+%% \begin{algorithm}[H]
+%%  \KwData{this text}
+%%  \KwResult{how to write algorithm with \LaTeX2e }
+%%  initialization\;
+%%  \While{not at end of this document}{
+%%   read current\;
+%%   \eIf{understand}{
+%%    go to next section\;
+%%    current section becomes this one\;
+%%    }{
+%%    go back to the beginning of current section\;
+%%   }
+%%  }
+%%  \caption{How to write algorithms}
+%% \end{algorithm}
+%% \label{algo:LGC-Algo} \figrule
+%% \end{figure}
 We   provide   an   intuition    about   the   correctness   of   this
-algorithm. Consider the following facts about the print stack during a
+algorithm Figure~\ref{algo:LGC-Algo}. Consider the following facts about the print stack during a
 GC, 
 
 \begin{enumerate}
@@ -1592,6 +1626,8 @@ liveness  DFAs at  $\pi$ itself for exploring the root set of the
 current activation record. For any other activation record in the
 stack, say for a function ${\mathit f}$ calling ${\mathit g}$ in the call-chain,
 the DFAs at the point of call to  ${\mathit g}$ would be used.
+
+
 
 Let $\dfa{\pi}{x}$  denote the DFA  for the variable  and program
 point  pair ($x$,  $\pi$).  We  assume that  there is  a function
