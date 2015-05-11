@@ -1456,6 +1456,12 @@ prefix-closed property.
 
 \section{Implementation}
 % GC assumptions
+\subsection{GC Points}
+Unlike eager languages where GC happens only at \CONS~ points or at 
+function calls, every \LET~ point is a potential GC point. The number of 
+automata that needs to be stored is reduced by sharing automata along all 
+the program points along an {\em E-path}.
+\comment{
 By the  time the program  starts executing, the liveness  automata are
 created and stored in a file.   This is re-used every time the program
 executes.  An important difference in  GC of lazy language compared to
@@ -1464,10 +1470,10 @@ eager  languages only  \CONS~ points  and  function calls  are the  GC
 points. In  a lazy  language every \LET~  statement is a  potential GC
 point. Hence we need to store liveness automata corresponding to every
 \LET~  statement in the  program. This  leads to  an explosion  in the
-number of  automata. \comment{Directly say that we share the automata}From our  observation that along an  {\em E-path}
+number of  automata. From our  observation that along an  {\em E-path}
 all program points have the same liveness, we can reduce the number of
 automata state required  by sharing the same automata  for all program
-points along an {\em E-path}. In  the example program, we only need to
+points along an {\em E-path}.} In  the example program, we only need to
 create automata  for program  points \ldots, since  they are  the only
 distinct {\em E-path}s in the program.
 % Abstract description of the GC algorithm
