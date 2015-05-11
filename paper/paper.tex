@@ -420,7 +420,8 @@ The body of the program is the expression denoted by $e_\mainpgm$; for
 analysis purposes it is convenient to regard $e_\mainpgm$ as part of a
 function definition $(\DEFINE\ ({\tt main})\ e_\mainpgm)$ as in C\@.
 We write  $\pi\!:\!e$ to  associate the label  $\pi$ (not part  of the
-language syntax) with the program point just before expression $e$.
+language syntax) with the program point just before expression
+$e$. 
 
 % \paragraph{Inlining.}
 {\color{Myblue}In spite of the ANF  restrictions it is still possible to
@@ -610,36 +611,114 @@ x.\acdr\acdr,        y.\epsilon\}$        instead        of        $[x
   \mapsto\{\epsilon,\acdr,\acdr\acdr\},           y\mapsto\{\epsilon\},
   z\mapsto\{\}]$.    In  this   notation,  $x   \mapsto  \{\epsilon\}$
 represents access using $x$ itself and $x \mapsto \{\}$ indicates that
-$x$ is dead.  We associate  a liveness environment with program points
-denoted by $\pi$ and $\psi$.  The liveness at $\pi:e$  is the liveness just before executing
+$x$ is dead.  We associate  liveness environments with program points
+(denoted by $\pi$ and $\psi$).  The liveness at $\pi:e$  is the liveness just before executing
 $e$.
 
 
-A  notion related  to  liveness is  {\em  demand}.  The  demand on  an
-expression  $e$  is again  a  set  of  access paths---that  subset  of
-$\{\acar,\acdr\}^\ast$ which  the context of $e$ may  explore of $e$'s
-result.   To see  the need  for demands,  consider the  let expression
-$\pi:(\LET~x\leftarrow (\CDR~y)~\IN~ \pi':\RETURN~x)$. Assume that the
-context of  this expression produces the liveness  $[x \mapsto \lbrace
-  \epsilon, \acar  \rbrace]$ at $\pi'$.   Due to the  \LET\ definition
-which  binds $x$  to $(\CDR~y)$,  the liveness  of $x$  at  $\pi'$ now
-becomes  the  demand on  $(\CDR~y)$.   This,  in  turn, generates  the
-liveness $\lbrace y.\epsilon,  y.\acdr, y.\acdr\acar \rbrace$ at $\pi$
-(the set of $y$-rooted accesses required to explore $\lbrace \epsilon,
-\acar  \rbrace$  paths  of  the  result  of  $(\CDR~y)$)\footnote{The
-  classical analogue  is strong liveness  analysis, where $y$  and $z$
-  have  a  liveness  of  $\lbrace\epsilon\rbrace$  at  the  entry  $n:
-  x:=y+z$,    if   and    only   if    $x$   has    a    liveness   of
-  $\lbrace\epsilon\rbrace$ at  exit of  $n$.  In our  terminology, the
-  liveness of $x$  at exit from $n$ becomes the  demand on $y+z$. This
-  generates the  liveness $\lbrace y.\epsilon,  z.\epsilon \rbrace$ at
-  the entry of $n$.}.
+A  notion  related  to  liveness  is  {\em  demand}.   While  liveness
+represents the  future use of variables, demands  represent the future
+use of the  values of expressions. The demand on  an expression $e$ is
+again a  set of  access paths---that subset  of $\{\acar,\acdr\}^\ast$
+which the context of $e$ may explore of $e$'s result.  To see the need
+for  demands,  consider   the  let  expression  $\pi:(\LET~x\leftarrow
+(\CDR~y)~\IN~  \pi':\RETURN~x)$.  Assume  that  the  context  of  this
+expression produces  the liveness $[x \mapsto  \lbrace \epsilon, \acar
+  \rbrace]$ at $\pi'$.  Due to the \LET\ definition which binds $x$ to
+$(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes  the demand on
+$(\CDR~y)$.    This,  in   turn,  generates   the   liveness  $\lbrace
+y.\epsilon,  y.\acdr,  y.\acdr\acar  \rbrace$  at $\pi$  (the  set  of
+$y$-rooted  accesses  required  to  explore $\lbrace  \epsilon,  \acar
+\rbrace$  paths of  the result  of  $(\CDR~y)$)\footnote{The classical
+  analogue  is strong  liveness analysis,  where  $y$ and  $z$ have  a
+  liveness of  $\lbrace\epsilon\rbrace$ at  the entry $n:  x:=y+z$, if
+  and only if  $x$ has a liveness of  $\lbrace\epsilon\rbrace$ at exit
+  of $n$.   In our terminology, the  liveness of $x$ at  exit from $n$
+  becomes the  demand on $y+z$.  This, in turn,  generates the  liveness $\lbrace
+  y.\epsilon, z.\epsilon \rbrace$ at the entry of $n$.}.
 %% Exploring $\lbrace \epsilon, \acar \rbrace$ of the
 %% result of $(\CDR~y)$ first requires access using $y$ ( and the \CDR\ field of the cons cell pointed by
 %% $y$.
 Note that  liveness refers to  access using variables and  fields, and
 not  to $\CONS$  cells (i.e.\  to edges  in the  memory graph,  not to
 locations themselves).
+\begin{figure*}[t!]
+  \begin{tabular}{cc}
+    \begin{boxedminipage}{.51\textwidth}
+        \small
+        \renewcommand{\arraystretch}{1}{
+          \begin{uprogram}
+            \UNL{1} (\DEFINE\ (\length~\xl)
+            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
+            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\ $\psi_1\!\!:\,$ \px
+            \UNL{4} \hspace*{.27cm} $\psi_2\!\!:\, (\RETURN ~0)$
+            \UNL{4} \hspace*{.29cm}    $\pi_3\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
+            \UNL{5} \hspace*{.34cm}   $\pi_4\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
+            \UNL{6} \hspace*{.34cm} $\pi_5\!\!:\,
+            $(\LET~\pz\ $\leftarrow$ (1~+~\py) \IN
+            \UNL{7} \hspace*{.34cm} $\psi_3\!\!:\, (\RETURN ~\pz)$))))))
+        \end{uprogram}}
+        \renewcommand{\arraystretch}{1}{
+	  \begin{uprogram}
+	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_6\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
+	  \UNL{2}   \hspace*{.78cm}   $\pi_7\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
+          \UNL{3}   \hspace*{.78cm}    $\pi_8\!\!:\,
+          $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN
+          \UNL{4}  \hspace*{.78cm}  $\psi_{4}\!\!:\,$ (\RETURN\ \pw)))))))
+\end{uprogram}}
+        %%} 
+    \end{boxedminipage}
+
+    & 
+
+    \begin{boxedminipage}{.46\textwidth}
+
+        \small
+        \begin{tabular}{lc}
+        $\cal{M_{\mbox{\tiny \length}}} = $ 
+            \begin{tabular}{lc}            
+              $[~ep_1 \mapsto \lbrace \px.\sigma_{\length}, \xl.\cbar\sigma_{\length} \rbrace ,~ep_2 \mapsto \lbrace \rbrace , $\\
+              $~~ep_3 \mapsto \lbrace \pz.\sigma_{\length},
+                \py.\cbar\sigma_{\length}, \pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}, $\\
+              $~~~~~~~~~~~~~~\;\;
+                \xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}
+                \rbrace~\rbrack$ \\
+            \end{tabular} \\
+            $\cal{P_{\mbox{\tiny \length}}} = $
+              \begin{tabular}{lc}
+                $~[
+                  ~\pi_1 \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace, $ \
+                $ \pi_2 \mapsto \lbrace ep_1, ep_2, ep_3
+                  \rbrace, $\\
+                $~~\psi_1 \mapsto \lbrace ep_1 \rbrace, $ \
+                $ \psi_2 \mapsto \lbrace ep_2 \rbrace, $ \
+                $ \pi_5 \mapsto \lbrace ep_3 \rbrace, $ \\
+                $~~\pi_6 \mapsto \lbrace ep_3 \rbrace, $ \
+                $ \pi_7 \mapsto \lbrace ep_3 \rbrace,~ \psi_3 \mapsto \lbrace ep_3 \rbrace~\rbrack$
+              \end{tabular}\\
+              $\cal{M_{\mbox{\tiny \main}}} = $ 
+              \begin{tabular}{lc}            
+                $[$
+                  $ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}$, $\pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}$, $\ldots  \rbrace $ \
+                  $]$
+              \end{tabular} \\
+              $\cal{P_{\mbox{\tiny \main}}} = $
+                \begin{tabular}{lc}
+                  $~\lbrack$~$\pi_6 \mapsto \lbrace ep_4 \rbrace, $ \
+                  $ \pi_7 \mapsto \lbrace ep_4 \rbrace, $ \
+                  $\pi_8 \mapsto \lbrace ep_4 \rbrace,~\psi_4 \mapsto \lbrace ep_4 \rbrace~\rbrack$  
+                \end{tabular}
+        \end{tabular}
+
+    \end{boxedminipage} 
+    %% \end{ tabular}}
+  \end{tabular}
+%\end{picture}
+\kern -3ex
+\vspace{0.5in}
+\caption{Example Program and its liveness maps.{\color{red} Fix the
+    formatting of the table on the right}}\label{fig:mot-example2}    
+\end{figure*}
 
 We use $\sigma$  to range over demands, $\alpha$  to range over access
 paths  and $\Lv$ to  range over  liveness environments.   The notation
@@ -662,128 +741,46 @@ expressions.
  In each  rule defining $\mathit{ref}$, the  null demand ($\emptyset$)
  generates no  liveness.  Notice that this is  different from liveness
  of  eager  languages,  where,   for  instance,  (\CDR~$x$)  would  be
- evaluated even for the null  demand, and this would require an access
- using  $x$.   A  non-null   demand  of  $\sigma$  on  (\CDR~$x$),  is
- transformed  to  the  liveness  $\{x.\epsilon, x.\acdr\sigma\}$.   In  an
- opposite  sense, the  demand of  $\acdr\sigma$ on  (\CONS~$y$~$z$) is
- transformed to  the demand  $\sigma$ on $z$.   Note that  \CONS\ does
- not, by itself, dereference  its arguments. The rules for (\PRIM~x~y)
- and (\NULLQ~x) are on similar lines. Constants generate no liveness.
+ evaluated  even for  the null  demand. This  would require  an access
+ using $x$ resulting in  $x.\epsilon$ being live.  A non-null demand of
+ $\sigma$ on (\CDR~$x$), is transformed to the liveness $\{x.\epsilon,
+ x.\acdr\sigma\}$.  In an opposite  sense, the demand of $\acdr\sigma$
+ on  (\CONS~$y$~$z$) is  transformed to  the demand  $\sigma$  on $z$.
+ Note that \CONS\ does not,  by itself, dereference its arguments. The
+ rules for (\PRIM~x~y) and  (\NULLQ~x) are on similar lines. Constants
+ generate no liveness.
 
 
 For  the  case  of a  user-function  call  we  use a  third  parameter
 $\Lfonly$  that  represents the  summaries  of  all  functions in  the
-program.  $\Lfonly_f$  (the  component  of $\Lfonly$  for  a  specific
-function $f$),  expresses how the demand  $\sigma$ on the  result of a
-call to $f$ is transformed into  the liveness of its parameters at the
-beginning of the call.  $\Lfonly$  is determined by the judgement form
-$\mathit{Prog} \len \Lfonly$ using inference rule ({\sc live-define}).
-This  rule  describes the  fixed-point  property  to  be satisfied  by
-$\Lfonly$, namely, the demand transformation assumed for each function
-in  the  program should  be  the  same  as the  demand  transformation
-calculated    from   their    bodies.     As   we    shall   see    in
-Section~\ref{sec:grammar-formulation},  the least  solution satisfying
-the  rule  is obtained  by  converting  the  rule into  an  equivalent
-grammar (actually the language recognized by the grammar is the least solution).  The least solution also  ensures that the greatest amount of
-garbage is collected.
-  
-
-
+program.   $\Lfonly_{\mathit f}$  (the  component of  $\Lfonly$ for  a
+specific  function $f$),  expresses  how the  demand  $\sigma$ on  the
+result  of a  call to  $f$  is transformed  into the  liveness of  its
+parameters at the  beginning of the call.  $\Lfonly$  is determined by
+the judgement  form $\mathit{Prog} \len \Lfonly$  using inference rule
+({\sc live-define}).  This rule  describes the fixed-point property to
+be satisfied  by $\Lfonly$, namely, the  demand transformation assumed
+for each  function in  the program  should be the  same as  the demand
+transformation  calculated from  their  bodies.  As  we  shall see  in
+Section~\ref{sec:grammar-formulation},  we  convert  the rule  into  a
+grammar and  the least  solution satisfying the  rule is  the language
+generated by this  grammar.  The least solution also  ensures the safe
+collection of the greatest amount of garbage.
 
 We next  describe the function $\mathcal{L}$  that propagates liveness
-across  expressions.   This brings  us  to  the  second way  in  which
-liveness analysis for lazy languages differ from eager languages---the
+across  expressions.   This brings  us  to  the  second reason why 
+liveness analysis for lazy and eager languages are different---the
 point  where  an  expression   gets  evaluated  cannot  be  statically
-determined.  To  deal with this, we introduce an analysis which is
-flow-insensitive but path-sensitive\comment{Checked the terminology, path-sensitive means certain prooperties holding along a path only, http://en.wikipedia.org/wiki/Data-flow\_analysis} into
-our  analysis.  
+determined.   %% To deal  with this,  we introduce  an analysis  which is
+%% flow-insensitive  but path-sensitive\comment{Checked  the terminology,
+%%   path-sensitive means certain prooperties  holding along a path only,
+%%   http://en.wikipedia.org/wiki/Data-flow\_analysis} into our analysis.
+To see  the consequences of this, consider  an analysis  of the body  of $\length$  with a
+demand $\sigma$.  Clearly, this is also the demand on the return value
+$z$   giving  the   liveness  at   the  program   point   $\psi_3$  as
+$\{\pz.\sigma\}$.  The liveness at $\psi_3$ is propagated backwards as
+in traditional liveness analysis.
 
-\begin{figure*}[t!]
-\begin{picture}(100,130)(0, -50)
-  \begin{tabular}{cc}
-    \begin{boxedminipage}{.51\textwidth}
-      {\sf
-        \small
-        \renewcommand{\arraystretch}{1}{
-          \begin{uprogram}
-            \UNL{1} (\DEFINE\ (\length~\xl)
-            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
-            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\ $\psi_1\!\!:\,$ \px
-            \UNL{4} \hspace*{1.15cm} $\psi_2\!\!:\, (\RETURN ~0)$
-            \UNL{4} \hspace*{1.15cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
-            \UNL{5} \hspace*{1.15cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
-            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\,
-            $(\LET~\pz\ $\leftarrow$ (1~+~\py) \IN
-            \UNL{7} \hspace*{1.15cm} $\psi_3\!\!:\, (\RETURN ~\pz)$))))))
-        \end{uprogram}}
-        \renewcommand{\arraystretch}{1}{
-	  \begin{uprogram}
-	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_8\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
-	  \UNL{2}   \hspace*{.78cm}   $\pi_9\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
-          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\,
-          $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN
-          \UNL{4}  \hspace*{.78cm}  $\psi_{4}\!\!:\,$ (\RETURN\ \pw)))))))
-\end{uprogram}}
-        } 
-    \end{boxedminipage}
-    & 
-    \begin{boxedminipage}{.49\textwidth}
-      {\sf
-        \small
-        \begin{tabular}{lc}
-        $\cal{M_{\mbox{\tiny \length}}} = $ 
-            \begin{tabular}{lc}            
-              $[$ \\
-              $\psi_1 \mapsto \lbrace \px.\sigma_{\length}, \xl.\cbar\sigma_{\length} \rbrace ,$ \\ 
-              $\psi_2 \mapsto \lbrace \rbrace , $\\
-              $\psi_3 \mapsto \lbrace \pz.\sigma_{\length}, \py.\cbar\sigma_{\length}, $\\
-              $\pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}, \xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}} \rbrace $  \\
-              $]$
-            \end{tabular} \\
-            $\cal{P_{\mbox{\tiny \length}}} = $
-              \begin{tabular}{lc}
-                $[$ \\
-                $\pi_{\mbox{1}} \mapsto \lbrace \psi_1, \psi_2, \psi_3 \rbrace, $ \
-                $ \pi_{\mbox{2}} \mapsto \lbrace \psi_1, \psi_2, \psi_3 \rbrace, $ \\
-                $ \psi_{\mbox{1}} \mapsto \lbrace \psi_1 \rbrace, $ \
-                $ \psi_{\mbox{2}} \mapsto \lbrace \psi_2 \rbrace, $ \
-                $ \pi_{\mbox{5}} \mapsto \lbrace \psi_3 \rbrace, $ \\
-                $ \pi_{\mbox{6}} \mapsto \lbrace \psi_3 \rbrace, $ \
-                $ \pi_{\mbox{7}} \mapsto \lbrace \psi_3 \rbrace $ \\
-                $ \psi_{\mbox{3}} \mapsto \lbrace \psi_3 \rbrace $ \\
-                $]$
-              \end{tabular}\\
-              $\cal{M_{\mbox{\tiny \main}}} = $ 
-              \begin{tabular}{lc}            
-                $[$
-                  $\psi_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}}, \pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace $ \
-                  $]$
-              \end{tabular} \\
-              $\cal{P_{\mbox{\tiny \main}}} = $
-                \begin{tabular}{lc}
-                  $[$ \
-                  $\pi_{\mbox{8}} \mapsto \lbrace \psi_4 \rbrace, $ \
-                  $ \pi_{\mbox{9}} \mapsto \lbrace \psi_4 \rbrace, $ \
-                  $ \pi_{\mbox{10}} \mapsto \lbrace \psi_4 \rbrace, $ \
-                  $ \psi_{\mbox{4}} \mapsto \lbrace \psi_4 \rbrace, $ \
-                  $ \ldots  $ \
-                  $]$  
-                \end{tabular}
-        \end{tabular}
-      }
-    \end{boxedminipage}
-    \\
-    (a) Example program.&
-    \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
-        (b) {\em e-path} to liveness environment map \\
-        (c) Prog pt to {\em e-paths } map
-    \end{tabular}}
-  \end{tabular}
-\end{picture}
-\kern -3ex
-\vspace{0.5in}
-\caption{Example Program and its liveness maps.}\label{fig:mot-example2}    
-\end{figure*}
 
 
 %%%%%%%%%%%%%%%%%%%%%%
@@ -826,51 +823,58 @@ our  analysis.
 
 
 
-Consider  an analysis of  the body  of $\length$  with a  demand $\sigma$.
-Clearly, this is also the demand on the return value $z$ giving the
-liveness  at  the  program point  $\psi_3$ as $\{\pz.\sigma\}$.   
-The  liveness at $\psi_3$  is  propagated  backwards  as  in  traditional
-liveness analysis.
-
-Since   \pz\  is  $(1 + ~\py)$,  the   liveness  of   $\sigma$  for
-\pz\ translates  into a demand  of $\sigma$ on $(1+~\py)$,  which in
-turn  generates  a  liveness  of $\{\py.\epsilon\}$  at
-$\pi_7$.  The liveness of \py\ should be killed at $\pi_6$ since it is
-beyond the scope of the definition of \py.  However, this does not cause any imprecision
-in the way of the GC marking  more cells as live, since \py\ is yet to
-come into existence at $\pi_6$  and its liveness will not be consulted
-by the garbage collector at this point.
-In an eager language, \py\ would not have been live at $\psi_3$, the
-point of  its last  use. In a  lazy language, however,  the definition
-$\pz  \leftarrow (1+~\py)$,  does  not result  in  an evaluation  of
-$(1+~\py)$; instead  a closure is created.   The evaluation actually
-takes place while evaluating  $(\RETURN~\pz)$. Thus it is necessary to
-record the liveness  of $\py$ at the program  point $\psi_3$, indeed at
-every program  point from $\psi_3$ up  to the beginning  of the program
-(since  we do  not kill  liveness).  We  thus regard  the body  of the
-function as  a tree and consider paths  from the root of  this tree to
-program  points  which  trigger  a evaluation\footnote{Program points
-  which trigger evaluation are labelled with $\psi$}---\SIF\  conditions  and
-\RETURN\  expressions.  We  call such  paths {\em
-  e-paths}. \comment{Update the e-path labels}  For the
-function \length, there are three such paths $\psi_1 = \pi_1, \pi_2, \pi_3,
-\pi_4,  \pi_5$, $\psi_2  =  \pi_1, \pi_2,  \pi_3,  \pi_4, \pi_6,  \pi_7,
-\pi_8$, and $\psi_3 = \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.
-
-The analysis  consists of  two maps: The  map $\cal{M}$ maps  a e-path to a common liveness environment, and a second map $\cal{P}$ maps
-a program  point to the set of  e-paths on which  the point lies.
-If a  program  point happens to fall  on more than one  such path, then
-the  liveness environment of  the program  point is  the variable-wise
-union of  the liveness environments  of the individual paths.   In the
-example program, ${\cal M}(\psi_1)= \ldots$, ${\cal M}(\psi_2)=\ldots$ and
-${\cal M}(\psi_3)=  \ldots$.  Since  ${\cal P}(pi_4)$ is  $\lbrace \psi_1,
-\psi_2, \psi_3 \rbrace$, the liveness  of $pi_4$ is \ldots.  In summary,
-our propagation of liveness is flow-insensitive but path-sensitive.
-In the sequel
-we  shall  describe  how  to  obtain $\cal{M}$.   The  formulation  of
-$\cal{P}$ is easy and we do not elaborate it any further.
 
 
+Since   \pz\  is   $(1  +   \py)$,  the   liveness  of   $\sigma$  for
+\pz\ translates into a demand  of $\sigma$ on $(1+\py)$, which in turn
+generates a  liveness of $\{\py.\epsilon\}$ at  $\pi_5$.  We now make
+the following observations:
+\begin{enumerate}
+\item While the liveness of \py\  should be killed at $\pi_4$ since it
+  is  beyond the scope  of the  definition of  \py, we  do not  do so.
+  However, this  does not cause any  imprecision in the way  of the GC
+  marking more cells as live, since \py\ is yet to come into existence
+  at $\pi_4$,  and its liveness will  not be consulted  by the garbage
+  collector at  this point. 
+\item In an eager language, \py\ would not have been live at $\psi_3$,
+  a program point  beyond its last use.  In  a lazy language, however,
+  the  definition $\pz  \leftarrow  (1+\py)$, does  not  result in  an
+  evaluation  of  $(1+\py)$;  instead   a  closure  is  created.   The
+  evaluation  actually takes  place while  evaluating $(\RETURN~\pz)$.
+  We therefore  record  the liveness of $\py$ at the program  
+  point $\psi_3$,  indeed at every  program point from $\psi_3$  up to
+  the beginning  of the program (since  we do not  kill liveness).
+\end{enumerate}
+
+
+
+We thus regard  the body of the function as a  tree and consider paths
+from  the  root  of this  tree  to  program  points which  trigger  an
+evaluation\footnote{Program  points which  trigger  evaluation  are
+  labelled with  $\psi$ {\color {red} ---slightly late in the day}}---\SIF\ conditions and  \RETURN\ expressions.
+We call such paths {\em e-paths}.  For the function \length, there are
+three such paths $ep_1 = \langle \pi_1, \pi_2, \psi_1\rangle$, $ep_2 =
+\langle\pi_1, \pi_2, \psi_2\rangle$ and  $ep_3 = \langle \pi_1, \pi_2,
+\pi_3, \pi_4, \pi_5, \psi_3\rangle$.
+
+  
+Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
+analysis   comes   the    map   $\cal{M}_{\mathit   f}^{\sigma}$   (or
+$\cal{M}_{\mathit  f}$ when  the  demand $\sigma$  is  clear from  the
+context) maps  a e-path to a  liveness environment arising  out of all
+uses of variables  along the path. A second  map $\cal{P}_{\mathit f}$
+maps a  program point to the set  of e-paths sharing the  point.  If a
+program point  happens to fall  on more than  one such path,  then the
+liveness environment  of the program point is  the variable-wise union
+of the liveness environments of  the individual paths.  In the example
+program,  since ${\mathcal P}_{\length}(\pi_1)  = \lbrace  ep_1, ep_2,
+ep_3\rbrace$,  the liveness  at $\pi_1$  is  ${\cal M_{\length}}(ep_1)
+\cup {\cal  M_{\length}}(ep_2)\cup {\cal M_{\length}}(ep_3)$.   In the
+sequel   we   shall  describe   how   to   obtain  $\cal{M}$   through
+$\mathcal{L}$.  The  formulation of  $\cal{P}$ is easy  and we  do not
+elaborate it any further.
+
+{\color{red}  \hrule \hrule \hrule  \medskip }  
 
 
 Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\RETURN}.
@@ -953,47 +957,47 @@ empty map denoted by $\emptyset_{\cal{M}}$.
   \caption{Liveness equations and judgement rule}\label{fig:live-judge}
 \end{figure*}
 %======================================================================================
-In an eager language, \pw\ would not have been live after $\pi_7$, the
-point of  its last  use. In a  lazy language, however,  the definition
-$\pu  \leftarrow (\CDR~\pw)$,  does  not result  in  an evaluation  of
-$(\CDR~\pw)$; instead  a closure is created.   The evaluation actually
-takes place while evaluating  $(\RETURN~\pu)$. Thus it is necessary to
-record the liveness  of $\pw$ at the program  point $\pi_8$, indeed at
-every program  point from $\pi_8$ up  to the beginning  of the program
-(since  we do  not kill  liveness).  We  thus regard  the body  of the
-function as  a tree and consider paths  from the root of  this tree to
-program  points  which  trigger  a evaluation---\SIF\  conditions  and
-\RETURN\  expressions.  We  call such  paths {\em  e-paths}.   For the
-program shown, there are three such paths $ep_1 = \lbrace\pi_1, \pi_2, \pi_4 \rbrace$, 
-$ep_2  =  \lbrace \pi_1, \pi_2,  \pi_5,  \pi_6,  \pi_7 \rbrace$,
- and $ep_3 = \lbrace \pi_3, \pi_2, \pi_1 \rbrace$.
+%% \mycomment{In an eager language, \pw\ would not have been live after $\pi_7$, the
+%% point of  its last  use. In a  lazy language, however,  the definition
+%% $\pu  \leftarrow (\CDR~\pw)$,  does  not result  in  an evaluation  of
+%% $(\CDR~\pw)$; instead  a closure is created.   The evaluation actually
+%% takes place while evaluating  $(\RETURN~\pu)$. Thus it is necessary to
+%% record the liveness  of $\pw$ at the program  point $\pi_8$, indeed at
+%% every program  point from $\pi_8$ up  to the beginning  of the program
+%% (since  we do  not kill  liveness).  We  thus regard  the body  of the
+%% function as  a tree and consider paths  from the root of  this tree to
+%% program  points  which  trigger  a evaluation---\SIF\  conditions  and
+%% \RETURN\  expressions.  We  call such  paths {\em  e-paths}.   For the
+%% program shown, there are three such paths $ep_1 = \lbrace\pi_1, \pi_2, \pi_4 \rbrace$, 
+%% $ep_2  =  \lbrace \pi_1, \pi_2,  \pi_5,  \pi_6,  \pi_7 \rbrace$,
+%%  and $ep_3 = \lbrace \pi_3, \pi_2, \pi_1 \rbrace$.
 
-The analysis  consists of  two maps: The  map $\cal{M}$ maps  a return
-path to a common liveness environment, and a second map $\cal{P}$ maps
-a program  point to the set of  e-paths on which  the point lies.
-If a  program  point happens to fall  on more than one  such path, then
-the  liveness environment of  the program  point is  the variable-wise
-union of  the liveness environments  of the individual paths.   In the
-example program, ${\cal M}(ep_1)= \lbrace \rbrace$, ${\cal M}(ep_2)= \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon  \rbrace  $ and
-${\cal M}(ep_3)= \lbrace \px.\epsilon, \xl.\epsilon \rbrace $.
-Since  ${\cal P}(\pi_1)$ is  $\lbrace ep_1,ep_2, ep_3 \rbrace$, 
-the liveness  of $\pi_1$ is $\lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon,  \px.\epsilon  \rbrace$.  In summary,
-our propagation of liveness is flow-insensitive but path-sensitive.
-In the sequel
-we  shall  describe  how  to  obtain $\cal{M}$.   The  formulation  of
-$\cal{P}$ is easy and we do not elaborate it any further.
+%% The analysis  consists of  two maps: The  map $\cal{M}$ maps  a return
+%% path to a common liveness environment, and a second map $\cal{P}$ maps
+%% a program  point to the set of  e-paths on which  the point lies.
+%% If a  program  point happens to fall  on more than one  such path, then
+%% the  liveness environment of  the program  point is  the variable-wise
+%% union of  the liveness environments  of the individual paths.   In the
+%% example program, ${\cal M}(ep_1)= \lbrace \rbrace$, ${\cal M}(ep_2)= \lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon  \rbrace  $ and
+%% ${\cal M}(ep_3)= \lbrace \px.\epsilon, \xl.\epsilon \rbrace $.
+%% Since  ${\cal P}(\pi_1)$ is  $\lbrace ep_1,ep_2, ep_3 \rbrace$, 
+%% the liveness  of $\pi_1$ is $\lbrace \py.\epsilon, \pu.\Lf{\length}{\mbox{1}}{\epsilon}, \xl.\mbox{1}\Lf{\length}{\acdr}{\epsilon}, \xl.\epsilon,  \px.\epsilon  \rbrace$.  In summary,
+%% our propagation of liveness is flow-insensitive but path-sensitive.
+%% In the sequel
+%% we  shall  describe  how  to  obtain $\cal{M}$.   The  formulation  of
+%% $\cal{P}$ is easy and we do not elaborate it any further.
 
-Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\RETURN}.
-The  expression $\pi:(\RETURN~x)$  with  a demand  $\sigma$ forces  an
-evaluation  of  $x$  and  hence  a  new  map  ${\cal  M}=[\pi  \mapsto
-  \{x.\sigma\}] $  needs to  be created.  The  ${\cal M}$-map  for the
-expression $(\SIF~\pi:x~e_1~e_2)$  is a pointwise-union  of the ${\cal
-  M}$-maps of $e_1$ and $e_2$.   In addition, since the condition also
-triggers an evaluation of  $x$, the map $[\pi \mapsto \{x.\epsilon\}]$
-is created and added to  the union.  Also notice that the consequences
-of  laziness---the entire  expression including  the condition  is not
-evaluated if  the demand  on it is  $\emptyset$.  This results  in the
-empty map denoted by $\emptyset_{\cal{M}}$.
+%% Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\RETURN}.
+%% The  expression $\pi:(\RETURN~x)$  with  a demand  $\sigma$ forces  an
+%% evaluation  of  $x$  and  hence  a  new  map  ${\cal  M}=[\pi  \mapsto
+%%   \{x.\sigma\}] $  needs to  be created.  The  ${\cal M}$-map  for the
+%% expression $(\SIF~\pi:x~e_1~e_2)$  is a pointwise-union  of the ${\cal
+%%   M}$-maps of $e_1$ and $e_2$.   In addition, since the condition also
+%% triggers an evaluation of  $x$, the map $[\pi \mapsto \{x.\epsilon\}]$
+%% is created and added to  the union.  Also notice that the consequences
+%% of  laziness---the entire  expression including  the condition  is not
+%% evaluated if  the demand  on it is  $\emptyset$.  This results  in the
+%% empty map denoted by $\emptyset_{\cal{M}}$.}
 
   
  The  liveness of {\LET} has  an elegant  formulation.   Recollect that  our
@@ -1428,7 +1432,7 @@ reductions corresponding  to all the  paths in the  original NFA.
 The proofs  of the termination  and correctness of  the algorithm
 are given in an earlier paper~\cite{karkare07liveness}.
 
-\input{liveness-dfa.tex}
+%%\input{liveness-dfa.tex}
 \comment{change according to example}
 We  illustrate  the  algorithm  in  Figure~\ref{algo:simplify-NFA}  by
 constructing      the       automaton      for      \var{\Lanv{9}{y}}.
