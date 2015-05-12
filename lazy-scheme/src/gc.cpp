@@ -1552,6 +1552,12 @@ void liveness_gc()
     			  ++(((cons*)vhit->ref)->visited);
 #endif
     	  }
+    	  else
+    	  {
+    		  //The root variable is not live, set it to NULL as it might later become part of a closure and cause problems
+    		  //during GC.
+    		  vhit->ref = NULL;
+    	  }
       }
     }
   DBG(pre << "Completed liveness GC" << endl);
