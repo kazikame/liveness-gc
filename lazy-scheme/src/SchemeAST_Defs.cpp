@@ -529,6 +529,7 @@ cons* LetExprNode::evaluate()
     /* -------------------------------------------------------------------------------------------------------------*/
     /* This is where we do the GC. Can this be made independent of ExprNode class? */
     static clock_tick last_gc_clock = 0;
+
 	if (gc_status != gc_disable) 
     {
         if (gc_status == gc_freq) {
