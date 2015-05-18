@@ -24,6 +24,9 @@
 \usepackage{pst-rel-points}
 \usepackage{bcprules}
 %\usepackage{program}
+\usepackage{algorithmic}
+
+
 \input{fh_defs}
 \def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
       0pt width #2\hfill\vrule height #3 depth 0pt width #2\hfill
@@ -420,7 +423,7 @@ restriction of \LET\ to a single definition is for ease of exposition;
 generalization  to  multiple  definitions  does  not  pose  conceptual
 difficulties.  We  further restrict each  variable in a program  to be
 distinct, so  that no scope shadowing  occurs---this simplifies proofs
-of soundness.  The $\RETURN$  and \SIF\ expressions trigger evaluation
+of soundness.  The $\SRETURN$  and \SIF\ expressions trigger evaluation
 of  closures.
 
 The body  of a function ${\mathit  f}$ will be  denoted as $e_{\mathit
@@ -438,7 +441,7 @@ expression $e$.
   renaming  its  formals  and  locals  to be  disjoint  from  existing
   variables) by $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ e_f)$ is replaced by
   a  sequence of  $\LET$'s  of the  form $z_i\leftarrow  (\ID\,\,y_i)$
-  followed by the body $e_f$ but with its $(\RETURN\,\,w)$ expressions
+  followed by the body $e_f$ but with its $(\SRETURN\,\,w)$ expressions
   replaced by $(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.}
 
 \begin{figure*}[]
@@ -453,7 +456,7 @@ e \in \mathit{Expr} & ::= &
 \left\{\begin{array}{ll@{\hspace{4em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \mbox{\em --- conditional} \\ 
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) && \mbox{\em --- let binding} \\
-       (\RETURN\,\, x) && \mbox{\em --- return from function}
+       (\SRETURN\,\, x) && \mbox{\em --- return from function}
     \end{array}\right. \\
 s \in \mathit{Application} & ::= &
 \left\{\begin{array}{lr@{\hspace{1em}}l}
@@ -582,11 +585,11 @@ $H(\rho(x)) = (e,\rho')$ & \shortstack[c]{$\rho, S, H,
 $\rho'\oplus\rho, (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  e$} & \sc{if-clo} \\ 
 \hline
 \shortstack[c]{$H(\rho(x))~\mbox{is}$ \\$\mbox{whnf with value}~v$}& $\rho, (\rho', z, e)\!:\!S, H,
-(\RETURN~x)  \rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e$ & \sc{return-whnf}\\   
+(\SRETURN~x)  \rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e$ & \sc{return-whnf}\\   
 \hline
-$H(\rho(x)) = (e,\rho')$ & \shortstack[c]{$\rho, S, H, (\RETURN~x)
+$H(\rho(x)) = (e,\rho')$ & \shortstack[c]{$\rho, S, H, (\SRETURN~x)
   \rightsquigarrow$ \\
-$\rho'\oplus\rho,~ (\rho, x, (\RETURN~x))\!:\!S, H,  e$} & \sc{return-coo} \\
+$\rho'\oplus\rho,~ (\rho, x, (\SRETURN~x))\!:\!S, H,  e$} & \sc{return-coo} \\
 \hline
 \end{tabular}
 \caption{A small-step semantics for the language}\label{fig:lang-semantics}
@@ -629,7 +632,7 @@ use of the  values of expressions. The demand on  an expression $e$ is
 again a  set of  access paths---that subset  of $\{\acar,\acdr\}^\ast$
 which the context of $e$ may explore of $e$'s result.  To see the need
 for  demands,  consider   the  let  expression  $\pi:(\LET~x\leftarrow
-(\CDR~y)~\IN~  \pi':\RETURN~x)$.  Assume  that  the  context  of  this
+(\CDR~y)~\IN~  \pi':\SRETURN~x)$.  Assume  that  the  context  of  this
 expression produces  the liveness $[x \mapsto  \lbrace \epsilon, \acar
   \rbrace]$ at $\pi'$.  Due to the \LET\ definition which binds $x$ to
 $(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes  the demand on
@@ -646,6 +649,8 @@ $y$-rooted  accesses  required  to  explore $\lbrace  \epsilon,  \acar
 %% Exploring $\lbrace \epsilon, \acar \rbrace$ of the
 %% result of $(\CDR~y)$ first requires access using $y$ ( and the \CDR\ field of the cons cell pointed by
 %% $y$.
+
+
 Note that  liveness refers to  access using variables and  fields, and
 not  to $\CONS$  cells (i.e.\  to edges  in the  memory graph,  not to
 locations themselves). 
@@ -660,12 +665,12 @@ locations themselves).
             \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\ $\psi_1\!\!:\,$ \px
             \UNL{4} \hspace*{.27cm} $\pi_3\!\!:\,
             $(\LET\ \pv\ $\leftarrow 0$ \IN
-            \UNL{5} \hspace*{.32cm} $\pi_4\!\!:\, (\RETURN~\psi_2:\pv)$
+            \UNL{5} \hspace*{.32cm} $\pi_4\!\!:\, (\SRETURN~\psi_2:\pv)$
             \UNL{4} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
             \UNL{5} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
             \UNL{6} \hspace*{.34cm} $\pi_7\!\!:\,
             $(\LET~\pz\ $\leftarrow$ (1~+~\py) \IN
-            \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\, (\RETURN~\psi_3:\pz)$)))))))
+            \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\, (\SRETURN~\psi_3:\pz)$)))))))
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
@@ -674,7 +679,7 @@ locations themselves).
 	  \UNL{3}   \hspace*{.05cm}$\pi_{10}\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
           \UNL{4}   \hspace*{.15cm}    $\pi_{11}\!\!:\,
           $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN
-          \UNL{5}  \hspace*{.25cm}  $\pi_{12}\!\!:\, (\RETURN~\psi_4:\pw)))))$
+          \UNL{5}  \hspace*{.25cm}  $\pi_{12}\!\!:\, (\SRETURN~\psi_4:\pw)))))$
 \end{uprogram}}
         %%} 
     \end{boxedminipage}
@@ -729,6 +734,7 @@ $ ~~~\pi_3 \mapsto \lbrace ep_2
 \caption{Example Program and its liveness maps.{\color{red} Fix the
     formatting of the table on the right}}\label{fig:mot-example2}    
 \end{figure*}
+
 
 We use $\sigma$  to range over demands, $\alpha$  to range over access
 paths  and $\Lv$ to  range over  liveness environments.   The notation
@@ -787,6 +793,7 @@ the return value $z$ giving the liveness at the program point $\pi_8$
 as $\{\pz.\sigma\}$.  The liveness at $\pi_8$ is propagated backwards
 as in traditional liveness analysis.
 
+
 Since   \pz\  is   $(1  +   \py)$,  the   liveness  of   $\sigma$  for
 \pz\ translates into a demand  of $\sigma$ on $(1+\py)$, which in turn
 generates a  liveness of $\{\py.\epsilon\}$ at  $\pi_7$.  We now make
@@ -802,7 +809,7 @@ the following observations:
   a program point  beyond its last use.  In  a lazy language, however,
   the  definition $\pz  \leftarrow  (1+\py)$, does  not  result in  an
   evaluation  of  $(1+\py)$;  instead   a  closure  is  created.   The
-  evaluation  actually takes  place while  evaluating $(\RETURN~\pz)$.
+  evaluation  actually takes  place while  evaluating $(\SRETURN~\pz)$.
   We therefore  record  the liveness of $\py$ at the program  
   point $\pi_8$,  indeed at every  program point from $\pi_8$  up to
   the beginning  of the program $\pi_1$ (since  we do not  kill liveness).
@@ -814,7 +821,7 @@ We thus regard  the body of the function as a  tree and consider paths
 from  the  root   of  this  tree  to  program   points  which  trigger
 evaluation\footnote{Program   points  which  trigger   evaluation  are
   labelled  with   $\psi$  {\color  {red}  ---slightly   late  in  the
-    day}}---\SIF\ conditions  and \RETURN\ expressions.   We call such
+    day}}---\SIF\ conditions  and \SRETURN\ expressions.   We call such
 paths {\em e-paths}.   For the function \length, there  are three such
 paths  $ep_1   =  \langle   \pi_1,  \pi_2,  \psi_1\rangle$,   $ep_2  =
 \langle\pi_1, \pi_2, \pi_3, \pi_4,  \psi_2\rangle$ and $ep_3 = \langle
@@ -837,10 +844,8 @@ liveness at $\pi_1$ is ${\cal  M}(ep_1) \cup {\cal M}(ep_2) \cup {\cal
 the  sequel we shall  only define  $\mathcal{L}$.  The  formulation of
 $\cal{P}$ is easy and we do not elaborate it any further.
 
-
-
-Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\RETURN}.
-The  expression $(\RETURN~\psi:x)$  with a  demand $\sigma$  forces an
+Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\SRETURN}.
+The  expression $(\SRETURN~\psi:x)$  with a  demand $\sigma$  forces an
 evaluation  of   $x$  and  hence  a  new   map  $[\mathit{ep}  \mapsto
   \{x.\sigma\}] $  needs to  be created.  The  map for  the expression
 $(\SIF~\psi:x~e_1~e_2)$ is a pointwise-union  of the maps of $e_1$ and
@@ -850,6 +855,7 @@ added  to the  union.  Also  notice a  consequences  of laziness---the
 entire  expression including  the condition  is not  evaluated  if the
 demand on it is $\emptyset$.  This results in the empty map, which, by
 abuse of notation, is also denoted by $\emptyset_{\cal{M}}$.
+
 %==============================================================
 \begin{figure*}[t]  
 \begin{eqnarray*}
@@ -886,7 +892,7 @@ abuse of notation, is also denoted by $\emptyset_{\cal{M}}$.
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
-\mathcal{L}((\RETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{ep} \mapsto
+\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{ep} \mapsto
 x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
   new e-path terminating with $\psi$}\\
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
@@ -921,6 +927,7 @@ x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
   \caption{Liveness equations and judgement rule}\label{fig:live-judge}
 \end{figure*}
 
+
   
  The liveness  of {\LET} has  an elegant formulation.   Recollect that
  our language permits lazy {\LET}s whose definitions can be recursive,
@@ -936,7 +943,7 @@ x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
  
 
 \mycomment{The function  $\mathcal{L}$ now gives  the (total) liveness
-  of  an   expression  $e$.   The  cases  $\RETURN$   and  $\SIF$  are
+  of  an   expression  $e$.   The  cases  $\SRETURN$   and  $\SIF$  are
   straightforward, but note the liveness $x.\epsilon$ generated by the
   latter.   The case  $(\LET\  z\leftarrow s\  \IN\  e')$ resembles  a
   three-address instruction:  the liveness of  $e$ is given  by taking
@@ -945,9 +952,6 @@ x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
   liveness of  $z$ in $\Lv$  is converted to  a demand $\Lv(z)$  to be
   placed on $s$ via $\mathit{ref}(s,\Lv(z),\Lfonly)$.
 
-%%%%%%\marginpar{Say $\mathcal{L}$ is monotonic?}
-
-% \end{itemize}
 
 We make three observations: firstly the rule ({\sc live-define}) has a
 least  solution  as  $\mathcal{L}(\cdot)$  is monotonic  in  $\sigma$;
@@ -1878,6 +1882,7 @@ it useful but please remember not to change it.
 %% =======
 
 %------------------------------------------------------------%
+%\input{lazy-liveness}
 
 \end{document}
 

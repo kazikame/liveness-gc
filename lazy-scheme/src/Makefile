@@ -9,7 +9,7 @@ CPPFLAGS = -g -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive
 
 TARGET = Simulator
 
-all : scheme.tab.h $(TARGET)
+all : depend scheme.tab.h $(TARGET)
 
 OBJS = gc.o  parser.o lexer.o \
 	SchemeDriver.o SchemeAST_Print.o SchemeAST_ANFs.o \
@@ -39,7 +39,10 @@ remove:
 	rm -rf scheme.tab.h scheme.tab.c scheme.output
 	rm -rf PostGC*.txt GC*.txt PreGC*.txt gc_messages.txt pre_gc_addr.txt
 
-depend:
+depend: __depends
+
+__depends: *.cpp *.h
+	touch __depends
 	makedepend -f __depends *.cpp *.h 2> /dev/null
 
-include __depends
+sinclude __depends

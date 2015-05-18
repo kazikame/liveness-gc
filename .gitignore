@@ -32,3 +32,8 @@ lazy-scheme/src/cscope.tmplst
 lazy-scheme/src/tags
 lazy-scheme/post_process/process_fast
 lazy-scheme/post_process/process
+lazy-scheme/src/Simulator
+lazy-scheme/src/__depends.bak
+lazy-scheme/src/test_assert.scm
+lazy-scheme/src/test_list.scm
+lazy-scheme/src/__depends
