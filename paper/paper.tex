@@ -413,7 +413,7 @@ restriction of \LET\ to a single definition is for ease of exposition;
 generalization  to  multiple  definitions  does  not  pose  conceptual
 difficulties.  We  further restrict each  variable in a program  to be
 distinct, so  that no scope shadowing  occurs---this simplifies proofs
-of soundness.  The $\RETURN$  and \SIF\ expressions trigger evaluation
+of soundness.  The $\SRETURN$  and \SIF\ expressions trigger evaluation
 of  closures.
 
 The body of the program is the expression denoted by $e_\mainpgm$; for
@@ -430,7 +430,7 @@ language syntax) with the program point just before expression $e$.
   renaming  its  formals  and  locals  to be  disjoint  from  existing
   variables) by $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ e_f)$ is replaced by
   a  sequence of  $\LET$'s  of the  form $z_i\leftarrow  (\ID\,\,y_i)$
-  followed by the body $e_f$ but with its $(\RETURN\,\,w)$ expressions
+  followed by the body $e_f$ but with its $(\SRETURN\,\,w)$ expressions
   replaced by $(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.}
 
 \begin{figure*}[]
@@ -445,7 +445,7 @@ e \in \mathit{Expr} & ::= &
 \left\{\begin{array}{ll@{\hspace{4em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \mbox{\em --- conditional} \\ 
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) && \mbox{\em --- let binding} \\
-       (\RETURN\,\, x) && \mbox{\em --- return from function}
+       (\SRETURN\,\, x) && \mbox{\em --- return from function}
     \end{array}\right. \\
 s \in \mathit{Application} & ::= &
 \left\{\begin{array}{lr@{\hspace{1em}}l}
@@ -574,11 +574,11 @@ $H(\rho(x)) = (e,\rho')$ & \shortstack[c]{$\rho, S, H,
 $\rho'\oplus\rho, (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  e$} & \sc{if-clo} \\ 
 \hline
 \shortstack[c]{$H(\rho(x))~\mbox{is}$ \\$\mbox{whnf with value}~v$}& $\rho, (\rho', z, e)\!:\!S, H,
-(\RETURN~x)  \rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e$ & \sc{return-whnf}\\   
+(\SRETURN~x)  \rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e$ & \sc{return-whnf}\\   
 \hline
-$H(\rho(x)) = (e,\rho')$ & \shortstack[c]{$\rho, S, H, (\RETURN~x)
+$H(\rho(x)) = (e,\rho')$ & \shortstack[c]{$\rho, S, H, (\SRETURN~x)
   \rightsquigarrow$ \\
-$\rho'\oplus\rho,~ (\rho, x, (\RETURN~x))\!:\!S, H,  e$} & \sc{return-coo} \\
+$\rho'\oplus\rho,~ (\rho, x, (\SRETURN~x))\!:\!S, H,  e$} & \sc{return-coo} \\
 \hline
 \end{tabular}
 \caption{A small-step semantics for the language}\label{fig:lang-semantics}
@@ -619,7 +619,7 @@ A  notion related  to  liveness is  {\em  demand}.  The  demand on  an
 expression  $e$  is again  a  set  of  access paths---that  subset  of
 $\{\acar,\acdr\}^\ast$ which  the context of $e$ may  explore of $e$'s
 result.   To see  the need  for demands,  consider the  let expression
-$\pi:(\LET~x\leftarrow (\CDR~y)~\IN~ \pi':\RETURN~x)$. Assume that the
+$\pi:(\LET~x\leftarrow (\CDR~y)~\IN~ \pi':\SRETURN~x)$. Assume that the
 context of  this expression produces the liveness  $[x \mapsto \lbrace
   \epsilon, \acar  \rbrace]$ at $\pi'$.   Due to the  \LET\ definition
 which  binds $x$  to $(\CDR~y)$,  the liveness  of $x$  at  $\pi'$ now
@@ -726,16 +726,16 @@ our  analysis.
             \UNL{1} (\DEFINE\ (\length~\xl)
             \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
             \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF$_{ep_3}$\ $\pi_3\!\!:\,$ \px
-            \UNL{4} \hspace*{1.15cm} $\pi_4\!\!:\, (\RETURN_{ep_1}~0)$
+            \UNL{4} \hspace*{1.15cm} $\pi_4\!\!:\, (\SRETURN_{ep_1}~0)$
             \UNL{4} \hspace*{1.15cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
             \UNL{5} \hspace*{1.15cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
-            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\, (\RETURN_{ep_2}~(1~+~\py))$)))))
+            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\, (\SRETURN_{ep_2}~(1~+~\py))$)))))
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
 	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_8\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
 	  \UNL{2}   \hspace*{.78cm}   $\pi_9\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
-          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN~$\pi_{11}\!\!:\,$ (\RETURN$_{ep_4}$\ \pw)))))))
+          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN~$\pi_{11}\!\!:\,$ (\SRETURN$_{ep_4}$\ \pw)))))))
 \end{uprogram}}
         } 
     \end{boxedminipage}
@@ -827,8 +827,8 @@ our  analysis.
 %% 	  \UNL{4}\hspace*{-.45cm}      $\pi_4\!\!:\,
 %%           $(\SIF\ $\pi_5\!\!:\,$ \pz\ ~$\pi_6\!\!:\,$ (\LET~\ww\  $\leftarrow$  (\take~5~\px) \IN
 %% 	  \UNL{5}\hspace*{.45cm}     $\pi_7\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\pw)  \IN
-%% 	  \UNL{6}\hspace*{.45cm}  $\pi_8\!\!:\,(\RETURN_1~\pu)$))
-%%           \UNL{5}\hspace*{-.45cm}  $\pi_9\!\!:\, (\RETURN_2~\py)$)))))
+%% 	  \UNL{6}\hspace*{.45cm}  $\pi_8\!\!:\,(\SRETURN_1~\pu)$))
+%%           \UNL{5}\hspace*{-.45cm}  $\pi_9\!\!:\, (\SRETURN_2~\py)$)))))
 %% 	\end{uprogram}}
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% \medskip
@@ -855,13 +855,13 @@ In an eager language, \pw\ would not have been live after $\pi_7$, the
 point of  its last  use. In a  lazy language, however,  the definition
 $\pu  \leftarrow (\CDR~\pw)$,  does  not result  in  an evaluation  of
 $(\CDR~\pw)$; instead  a closure is created.   The evaluation actually
-takes place while evaluating  $(\RETURN~\pu)$. Thus it is necessary to
+takes place while evaluating  $(\SRETURN~\pu)$. Thus it is necessary to
 record the liveness  of $\pw$ at the program  point $\pi_8$, indeed at
 every program  point from $\pi_8$ up  to the beginning  of the program
 (since  we do  not kill  liveness).  We  thus regard  the body  of the
 function as  a tree and consider paths  from the root of  this tree to
 program  points  which  trigger  a evaluation---\SIF\  conditions  and
-\RETURN\  expressions.  We  call such  paths {\em  e-paths}.   For the
+\SRETURN\  expressions.  We  call such  paths {\em  e-paths}.   For the
 program shown, there are three such paths $EP_1 = \pi_1, \pi_2, \pi_3,
 \pi_4,  \pi_5$, $EP_2  =  \pi_1, \pi_2,  \pi_3,  \pi_4, \pi_6,  \pi_7,
 \pi_8$, and $EP_3 = \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.
@@ -883,8 +883,8 @@ $\cal{P}$ is easy and we do not elaborate it any further.
 
 
 
-Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\RETURN}.
-The  expression $\pi:(\RETURN~x)$  with  a demand  $\sigma$ forces  an
+Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\SRETURN}.
+The  expression $\pi:(\SRETURN~x)$  with  a demand  $\sigma$ forces  an
 evaluation  of  $x$  and  hence  a  new  map  ${\cal  M}=[\pi  \mapsto
   \{x.\sigma\}] $  needs to  be created.  The  ${\cal M}$-map  for the
 expression $(\SIF~\pi:x~e_1~e_2)$  is a pointwise-union  of the ${\cal
@@ -930,7 +930,7 @@ empty map denoted by $\emptyset_{\cal{M}}$.
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
-\mathcal{L}((\RETURN~x),\sigma,\Lfonly) &=& \{l \mapsto x.\sigma\}, \makebox[0mm]{\hspace*{3cm} where $l$ is a new label} \\
+\mathcal{L}((\SRETURN~x),\sigma,\Lfonly) &=& \{l \mapsto x.\sigma\}, \makebox[0mm]{\hspace*{3cm} where $l$ is a new label} \\
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
         \begin{array}{l l}
                     \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
@@ -974,7 +974,7 @@ empty map denoted by $\emptyset_{\cal{M}}$.
 
 
 \mycomment{The function  $\mathcal{L}$ now  gives  the  (total)  liveness of  an
-expression $e$.   The cases $\RETURN$ and  $\SIF$ are straightforward,
+expression $e$.   The cases $\SRETURN$ and  $\SIF$ are straightforward,
 but note the liveness $x.\epsilon$  generated by the latter.  The case
 $(\LET\   z\leftarrow   s\  \IN\   e')$   resembles  a   three-address
 instruction:  the liveness  of $e$  is given  by taking  the liveness,

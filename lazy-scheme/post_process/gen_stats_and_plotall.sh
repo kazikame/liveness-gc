@@ -44,14 +44,16 @@ declare -A limit
 #limit["sudoku"]=28940
 limit["sudoku"]=1728
 limit["fft"]=3300
-limit["lcss"]=52321
+#imit["lcss"]=52321
+limit["lcss"]=22243
 limit["gc_bench"]=131091
-limit["nperm"]=27429
-limit["fibheap"]=300000
+limit["nperm"]=27428
+limit["fibheap"]=38200
 limit["knightstour"]=508245
 limit["treejoin"]=1800000
-limit["nqueens"]=210000
-limit["lambda"]=20466
+limit["nqueens"]=25000
+#imit["lambda"]=20466
+limit["lambda"]=100000
 
 declare -A freq
 
@@ -76,7 +78,7 @@ xtics["nperm"]=145000; ytics["nperm"]=35000
 xtics["fibheap"]=70000; ytics["fibheap"]=30000
 xtics["knightstour"]=850000; ytics["knightstour"]=40000
 xtics["treejoin"]=130000; ytics["treejoin"]=110000
-xtics["nqueens"]=3000000; ytics["nqueens"]=210000
+xtics["nqueens"]=6000000; ytics["nqueens"]=105000
 xtics["lambda"]=90000; ytics["lambda"]=10000
 
 if [ "x$BMs" = "x" ]; then
@@ -85,8 +87,8 @@ fi
 
 for bm in $BMs
 do
-    #for opt in gc-plain gc-live
-    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    for opt in gc-plain gc-live
+    #for opt in gc-plain gc-live gc-freq=${freq[$bm]}
     do 
      	echo "Processing $bm [$opt]"
      	$DIR/gen_gc_stats.sh $OPTARG \
