@@ -1,0 +1,63 @@
+\begin{figure}[t]
+  \begin{boxedminipage}{\textwidth}
+    \begin{center}
+      \raggedright  {\bf  Input:}  Demand $\sigma$ \\
+      \raggedright  {\bf  Input:}  Demand Transformer LF \\
+      %
+      \raggedright{\bf Output:} Modified Liveness Environment Map
+      \\
+      %  
+      \raggedright{\bf Steps:}
+      \begin{algorithmic}
+        \STATE $M \leftarrow process\_liveness(e, \sigma, LF)$
+        \STATE $numargs \leftarrow$ number of arguments in $s$
+        \STATE $f \leftarrow$ a new function with $\myvec{x}$ as the argument vector
+        
+        \FORALL{$l$ in label\_set($e$)} 
+        \STATE $var \leftarrow let\_var$ 
+        \STATE $rexpr \leftarrow let\_expr$
+        \IF {$rexpr$ contains $var$}
+        \STATE $L_f \leftarrow process\_liveness (\ f, M[l, x],\ LF)$
+        \STATE $le \leftarrow \bigcup_{i=1}^{numargs} x_i.LF_{f}^{i}({\sigma})$
+        \ELSE
+        \STATE  $le \leftarrow  ref (s,\ \sigma,\ LF)$
+        \ENDIF
+        \STATE $M[l] = M[l] \bigcup le$
+        \ENDFOR
+        \RETURN $M$
+      \end{algorithmic}
+    \end{center}
+  \end{boxedminipage}
+  \caption{Algorithm for transforming demand for a lazy let}\label{algo:transform-lazy-let} \figrule
+\end{figure}
+
+\begin{figure}[t]
+  \begin{boxedminipage}{\textwidth}
+    \begin{center}
+      \raggedright  {\bf  Input:}  Program execution stack  $S$ \\
+      \raggedright  {\bf  Input:}  Print stack $P$ \\
+      %
+      \raggedright{\bf Output:} void \\
+      %  
+      \raggedright{\bf Steps:}
+      \begin{algorithmic}
+        \FORALL{$funccall$ in $S$} 
+        \STATE $pgm\_pt \leftarrow funccall.return\_pt$
+        \FORALL{$var$ in $funccall.varstack$} 
+        \STATE $var \leftarrow let\_var$ 
+        \STATE $rexpr \leftarrow let\_expr$
+        \IF {$rexpr$ contains $var$}
+        \STATE $L_f \leftarrow process\_liveness (\ f, M[l, x],\ LF)$
+        \STATE $le \leftarrow \bigcup_{i=1}^{numargs} x_i.LF_{f}^{i}({\sigma})$
+        \ELSE
+        \STATE  $le \leftarrow  ref (s,\ \sigma,\ LF)$
+        \ENDIF
+        \STATE $M[l] = M[l] \bigcup le$
+        \ENDFOR
+        \ENDFOR
+        \RETURN $M$
+      \end{algorithmic}
+    \end{center}
+  \end{boxedminipage}
+  \caption{Algorithm for Liveness based GC}\label{algo:lazy-lgc} \figrule
+\end{figure}

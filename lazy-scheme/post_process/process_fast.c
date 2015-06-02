@@ -16,6 +16,7 @@ static long this_gc_time;
 
 static long gc_reachable[MAXCELL];
 static long gc_used[MAXCELL];
+static long gc_rgcied[MAXCELL];
 static long gc_times[MAXGC];
 static int  gc_count = 0;
 
@@ -45,16 +46,20 @@ int main(int argc, char* argv[])
     FILE* file1 = fopen("rch.out", "w");
     FILE* file2 = fopen("use.out", "w");
     FILE* file3 = fopen("gbg.out", "w");
+    FILE* file4 = fopen("rgc.out", "w");
     unsigned int the_time;    
     for(the_time = 0; the_time <= this_gc_time;  the_time++) {
         long rch = gc_reachable[the_time];
         long use = gc_used[the_time];
+	long rgc = gc_rgcied[the_time];
         fprintf(file2, "%u %ld\n", the_time, use);
         if ((the_time > 0) && (rch == 0)) /* ignore */
             continue;
         
         fprintf(file1, "%u %ld\n", the_time, rch);
         fprintf(file3, "%u %ld\n", the_time, rch-use);
+	if (rgc > 0)
+	  fprintf(file4, "%u %ld\n", the_time, rgc);
     }
     return 0;
 }
@@ -76,7 +81,8 @@ void getValues(const char *line,
                long *address,
                long *create_time,
                long *first_use,
-               long *last_use) 
+               long *last_use,
+	       long *last_copied) 
 {
     static char str[MAXLINE];
     strcpy(str,line);
@@ -91,6 +97,8 @@ void getValues(const char *line,
     sscanf(token, "%ld", first_use);
     token = strtok(NULL, FS);
     sscanf(token, "%ld", last_use);
+    token = strtok(NULL, FS);
+    sscanf(token, "%ld", last_copied);
     return;
 }
 
@@ -122,10 +130,12 @@ void parse(const char* line)
     }
 
     /* Finally, the real data about cells */
-    /* fields: gctime | Address | Create | 1stUse | LastUse */
-    long first_use, last_use, time_gc;
+    /* fields: gctime | Address | Create | 1stUse | LastUse | LastCP */
+    long first_use, last_use, time_gc, last_copied;
     long create_time, address;
-    getValues(line, &time_gc, &address, &create_time, &first_use, &last_use);
+    getValues(line, &time_gc, &address, &create_time, &first_use,
+	      &last_use, &last_copied);
+
     assert(last_use < MAXCELL);
     if (time_gc != this_gc_time) {
         fprintf(stderr, "Error_1 in GC statistics\n\t");
@@ -145,7 +155,6 @@ void parse(const char* line)
         c_dragged++;
         t_dragged += (time_gc - last_use);
     }
-    
     assert(gc_count < MAXGC);
  
     int idx;
@@ -162,9 +171,23 @@ void parse(const char* line)
         if (the_time < create_time)
             continue;
         gc_reachable[the_time]++;
+	/* this cell copied using RGC inside a closure while doing LGC */
+	if (last_copied != -1) {
+	  if (last_use < last_copied) {
+	    gc_rgcied[the_time]++;
+	  }
+	}
         long next_gc_time = (idx + 1 == gc_count) ? -1 : gc_times[idx+1];
-        if ((the_time != this_gc_time) && (the_time + 1 != next_gc_time))
-            gc_reachable[the_time+1]++;
+        if ((the_time != this_gc_time) && (the_time + 1 != next_gc_time)) {
+	  gc_reachable[the_time+1]++;
+	  
+	  /* this cell copied using RGC inside a closure while doing LGC */
+	  if (last_copied != -1) {
+	    if (last_use < last_copied) {
+	      gc_rgcied[the_time+1]++;
+	    }
+	  }
+	}
     }
     
     for(the_time=create_time; the_time <= last_use; the_time++) {

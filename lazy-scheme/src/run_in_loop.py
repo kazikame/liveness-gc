@@ -5,8 +5,7 @@ import time
 import datetime
 from collections import namedtuple
 
-prog_size = {'nqueens':40000, 'nperm':27429, 'fibheap':38001, 'treejoin':1616535, 'sudoku':4075, 'lcss':22243, 'lambda':20466, 'gc_bench':204850}
-
+prog_size = {'nqueens':22729, 'nperm':27429, 'fibheap':38001, 'treejoin':1616535, 'sudoku':4075, 'lcss':22243, 'lambda':20466, 'gc_bench':204850}
 gc_info = namedtuple("gc_info", "heap_total heap_left heap_used gc_invocations gc_time exec_time")
 gc_stat = namedtuple("gc_stat", "prog_name reachability liveness")
 gc_stat_list = []
@@ -25,12 +24,12 @@ def collect_gc_results(filename, prog_dir_path, gc_type):
     result_file_name =  prog_dir_path + '/results/' + filename + '-' + gc_type
     print result_file_name
     int_grep = "| egrep -o \"[0-9]*\" | tr -d \'\\n\'"
-    float_grep = "| egrep -o \"[0-9]*(\.[0-9]*)?\" | tr -d \'\\n\'"
+    float_grep = "| egrep -o \"(([0-9][0-9]*\.?[0-9]*)|(\.[0-9]+))([Ee][+-]?[0-9]+)?\" | tr -d \'\\n\'"
     heap_total_cmd = grep_cmd + " \"Heap total=[0-9]* \"  " + result_file_name  + int_grep
     heap_left_cmd = grep_cmd + " \"Heap left=[0-9]*\"  " +  result_file_name  + int_grep
     heap_used_cmd = grep_cmd + " \"Heap used=[0-9]*\"   " +  result_file_name  + int_grep
     gc_invocations_cmd = grep_cmd + " \"GC Invocations=[0-9]*\"   " +  result_file_name  + int_grep
-    gc_time_cmd = grep_cmd + " \"GC Time=[0-9]*(\.[0-9]*)?\"   " +  result_file_name  + float_grep
+    gc_time_cmd = grep_cmd + " \"GC Time=(([0-9][0-9]*\.?[0-9]*)|(\.[0-9]+))([Ee][+-]?[0-9]+)?\"   " +  result_file_name  + float_grep
     prog_execution_time_cmd = grep_cmd + " \"Program Execution Time=[0-9]*(\.[0-9]*)?\"   " +  result_file_name  + float_grep
     heap_total = os.popen(heap_total_cmd).read()
     heap_left = os.popen(heap_left_cmd).read()
@@ -84,7 +83,7 @@ def main():
         f.write('\\begin{tabular}\n')
         f.write('{| l | r | r | r | r | r |}\n')
         f.write('\\hline\n')
-        f.write('Prog Name & Num RGC & Num LGC & Avg. RGC Time & Avg. LGC Time & RGC/LGC \\\\ \\hline\n')
+        f.write('Prog Name & Num RGC & Num LGC & Avg. RGC Time & Avg. LGC Time & LGC/RGC \\\\ \\hline\n')
         for g in gc_stat_list:
             f.write('\\verb@' + g.prog_name + '@'  + 
                     '&' + str(g.reachability.gc_invocations/float(numTimes)) +

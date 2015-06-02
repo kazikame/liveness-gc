@@ -57,8 +57,8 @@
 \newcommand{\Dponly}{\ensuremath{\mathsf{DP}}}
 \newcommand{\De}[3]{\ensuremath{\Deonly(#1, #2, #3)}}
 \newcommand{\Deonly}{\ensuremath{\mathsf{DE}}}
-\newcommand{\Deb}[3]{\ensuremath{\Debonly(#1, #2, #3)}}
-\newcommand{\Debonly}{\ensuremath{\Deonly!}}
+%%\newcommand{\Deb}[3]{\ensuremath{\Debonly(#1, #2, #3)}}
+%%\newcommand{\Debonly}{\ensuremath{\Deonly!}}
 \newcommand{\Dv}{\ensuremath{\mathsf{D}}}
 \newcommand{\Dvphi}{\ensuremath{\Dv^\emptyset}}
 \newcommand{\derefs}{{\sf derefs}}
@@ -337,11 +337,11 @@
 %%   \ifdim\lastskip<1.5em \hskip-\lastskip
 %%   \hskip1.5em plus0em minus0.5em \fi \nobreak
 %%   \vrule height0.75em width0.5em depth0.25em\  fi}
-%% \newenvironment{proof}[1][Proof]{\begin{trivlist}
-%% \item[\hskip \labelsep {\bfseries #1}]}{\hfill\qed\end{trivlist}}
+ \newenvironment{proof}[1][Proof]{\begin{trivlist}
+ \item[\hskip \labelsep {\bfseries #1}]}{\hfill\qed\end{trivlist}}
 
 \newcommand{\expr}[1]{\ensuremath{#1}}
-\newcommand{\pv}[1] {\mbox{\tt #1}}
+%\newcommand{\pv}[1] {\mbox{\tt #1}}
 \newcommand{\db}[1]{{\bf [\![}#1{\bf ]\!]}}
 \newcommand{\nat}{I\!\!N}
 \newcommand{\lenprime}{\ \vdash^{l'}\ }

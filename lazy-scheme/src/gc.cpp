@@ -245,9 +245,11 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				if (node->forward == NULL || node->copied_using_rgc == false)
 				{
 					cons* new_loc = copy(node, out);
-					node->copied_using_rgc = true;
+					//node->copied_using_rgc = true;
 					new_loc->val.cell.car = deep_copy(node->val.cell.car, 1, out);
 					new_loc->val.cell.cdr = deep_copy(node->val.cell.cdr, 1, out);
+
+					GC_STAT_UPDATE_LAST_GC(new_loc);
 					return new_loc;
 				}
 				else
@@ -264,8 +266,10 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				    (node->typecell == funcApplicationExprClosure) ||
 				    (node->typecell == funcArgClosure))
 				{
+					//node->copied_using_rgc = true;
 					new_loc->val.closure.arg1 = deep_copy(node->val.closure.arg1, 1, out);
 					new_loc->val.closure.arg2 = deep_copy(node->val.closure.arg2, 1, out);
+					GC_STAT_UPDATE_LAST_GC(new_loc);
 				}
 				return new_loc;
 			}
@@ -1139,14 +1143,11 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 			followpaths_reachability(heap_ref);
 			heap_ref = static_cast<cons*>(heap_ref->forward);
 		}
-		else
-		if (heap_ref)
+		else if (heap_ref)
 		{
 			if (heap_ref->forward == NULL)
 			{
 				cons* new_ref;
-				//			out << "Heap ref was not copied during GC." << endl;
-
 				if (gc_type == 1 && (heap_ref->typecell == consExprClosure))
 				{
 
@@ -1154,42 +1155,21 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 					{
 						//If it is liveness based GC and we are copying a cons cell then check for can_delete_car flag
 						//whether to copy the cdr part or not
+
 						new_ref = copy(heap_ref);
-						//How can we assert that the memory pointed to by the car pointer will be on print stack and will
-						//be copied eventually?
-						//If this assertion is true then we do not need to copy the car part.
-						//assert(heap_ref->val.cell.car->forward != NULL);
-						//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
-						//					out << "Not copying the car part for cell " << (heap_ref - (cons*)buffer_dead) << endl;
+						GC_STAT_UPDATE_LAST_GC(new_ref);
+						//Should we count this during garbage collection?
+
 						cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type, out);
 						new_ref->val.cell.cdr = static_cast<cons*>(cdr_ref);
 					}
-					//new_ref->val.cell.car = static_cast<cons*>(heap_ref->val.cell.car->forward);
-					//TODO  Since this will never be accessed can we set it to NULL here?????
-//					if (new_ref->val.cell.car && new_ref->val.cell.car->forward != NULL)
-//					{
-//						new_ref->val.cell.car = static_cast<cons*>(new_ref->val.cell.car->forward);
-//					}
-//					else
-//					{
-//						new_ref->val.cell.car = NULL;
-//					}
-					//new_ref->val.cell.car = static_cast<cons*>(static_cast<void*>(0x1)); //Set it to an invalid address,
-					//				assert(heap_ref->val.cell.cdr->forward != NULL);
-					//				out << "Setting the cdr ptr to " << ((cons*)(heap_ref->val.cell.cdr->forward) - getbufferlive()) << endl;
-					//new_ref->val.cell.cdr = static_cast<cons*>(heap_ref->val.cell.cdr->forward);
 				}
 				else
 				{
-					//				out << "Copying reference from print buffer " << (heap_ref - (cons*)buffer_dead) << endl;
 					new_ref = deep_copy(heap_ref, gc_type, out);
 				}
-				//out << "In print stack copying " << heap_ref << " to " << new_ref << " or " << heap_ref->forward << endl;
 			}
-			//		assert(heap_ref->forward != NULL);
-
 			heap_ref = static_cast<cons*>(heap_ref->forward);
-			//		assert(is_valid_address(heap_ref));
 		}
 		temp.push(heap_ref);
 		print_stack.pop();
@@ -1199,9 +1179,6 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		print_stack.push(temp.top());
 		temp.pop();
 	}
-//cerr<< "Completed processing print stack"<<endl;
-
-//	out << "Updating the heap_ref stack with size "<< update_heap_refs.size() <<  endl;
 	int i = 0;
 	while(!update_heap_refs.empty())
 	{
@@ -1212,10 +1189,8 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 			cout << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
 			assert(false);
 		}
-//		assert(!is_valid_address(heap_ref) && heap_ref->forward != NULL);
 
 		heap_ref = static_cast<cons*>(heap_ref->forward);
-//		assert(is_valid_address(heap_ref));
 		temp.push(heap_ref);
 		update_heap_refs.pop();
 		++i;
@@ -1225,8 +1200,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		update_heap_refs.push(temp.top());
 		temp.pop();
 	}
-//cerr<<"Completed updated print & heap ref stacks"<<endl;
-//	assert(temp.empty());
+
 }
 
 //garbage collector functions
@@ -1578,6 +1552,12 @@ void liveness_gc()
     			  ++(((cons*)vhit->ref)->visited);
 #endif
     	  }
+    	  else
+    	  {
+    		  //The root variable is not live, set it to NULL as it might later become part of a closure and cause problems
+    		  //during GC.
+    		  vhit->ref = NULL;
+    	  }
       }
     }
   DBG(pre << "Completed liveness GC" << endl);
@@ -1663,6 +1643,9 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  addr = deep_copy(loc->val.closure.arg2, 1, out);
 		  loccopy->val.closure.arg2 = addr;
 		  DBG(out << "Copied arg2 from " << oldarg2 << " to " << addr << endl);
+
+		  loc->copied_using_rgc = true;
+		  GC_STAT_UPDATE_LAST_GC(loccopy);
 	  }
 
   }
@@ -2947,20 +2930,21 @@ static void dump_cell_stats(cons* gs)
     if (gs->is_used)
     {
         fprintf(gc_stats_outfile,
-                /*GC  | Cell  |Create| First | Last */
-                /*Time| Addrs |Time  | Use   | Use  */
-                "%lu\t| %p  \t| %lu\t| %lu\t | %lu\t\n",
+                /*GC  | Cell  |Create| First | Last | Last*/
+                /*Time| Addrs |Time  | Use   | Use  | GC  */
+                "%lu\t| %p  \t| %lu\t| %lu\t | %lu\t| %ld \n",
                 TIME_ms(gc_clock()), gs,
                 TIME_ms(gs->created), TIME_ms(gs->first_use),
-                TIME_ms(gs->last_use));
+                TIME_ms(gs->last_use), TIME_ms(gs->last_gc) );
     }
     else
     { /* first and last use are -1 */
         fprintf(gc_stats_outfile,
-                /*GC  | Cell  |Create| First | Last */
-                /*Time| Addrs |Time  | Use   | Use  */
-                "%lu\t| %p  \t| %lu\t| -1\t  | -1\t \n",
-                TIME_ms(gc_clock()), gs, TIME_ms(gs->created));
+                /*GC  | Cell  |Create| First | Last | Last*/
+                /*Time| Addrs |Time  | Use   | Use  | GC  */
+                "%lu\t| %p  \t| %lu\t| -1\t  | -1\t | %ld \n",
+                TIME_ms(gc_clock()), gs, TIME_ms(gs->created),
+				TIME_ms(gs->last_gc) );
     }
 }
 
@@ -3021,6 +3005,22 @@ void update_last_use(cons *cell)
     DBG(printf("<== updating last use(%p)\n", cell));
 }
 
+
+void update_last_gc(cons *cell)
+{
+    DBG(printf("updating last gc(%p) ==>\n", cell));
+    if (cell == NULL)
+	//cout << "No need to count for a NULL list" << endl;
+	return;
+    assert(cell); // only valid cells allowed
+
+
+   	cell->last_gc = gc_clock();
+
+
+
+    DBG(printf("<== updating last gc(%p)\n", cell));
+}
 
 
 #endif
