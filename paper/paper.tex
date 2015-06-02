@@ -232,7 +232,7 @@ subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
 &
 \begin{minipage}{.45\textwidth}
 
-\hspace*{2cm}{\epsfig{file=motiv-example.eps, height=4cm}}
+%\hspace*{2cm}{\epsfig{file=motiv-example.eps, height=4cm}}
 
 \end{minipage}
 
@@ -464,37 +464,6 @@ Figure~\ref{fig:lang-syntax} describes the  syntax of our language. It
 is a first order language with lazy semantics. Programs are restricted
 to        be        in        Administrative        Normal        Form
 (ANF)~\cite{chakravarty03perspective}  where all actual  parameters to
-<<<<<<< HEAD
-functions   are   variables.   This   restriction   does  not   affect
-expressibility  (and we ignore  it in  examples when  inessential). In
-addition, this  form also explicates the creation  of closures through
-$\LET$s which are lazy.  A consequence  of lazy $\LET$ is that $x$ can
-also occur  in $s$  in $\LET\,\, x  \leftarrow s\,\, \IN\,\,  e$. This
-enables  creation of  graph-like structures  in a  pure  language. The
-restriction of \LET\ to a single definition is for ease of exposition;
-generalization  to  multiple  definitions  does  not  pose  conceptual
-difficulties.  We  further restrict each  variable in a program  to be
-distinct, so  that no scope shadowing  occurs---this simplifies proofs
-of soundness.  The $\SRETURN$  and \SIF\ expressions trigger evaluation
-of  closures.
-
-The body of the program is the expression denoted by $e_\mainpgm$; for
-analysis purposes it is convenient to regard $e_\mainpgm$ as part of a
-function definition $(\DEFINE\ ({\tt main})\ e_\mainpgm)$ as in C\@.
-We write  $\pi\!:\!e$ to  associate the label  $\pi$ (not part  of the
-language syntax) with the program point just before expression $e$.
-
-% \paragraph{Inlining.}
-{\color{Myblue}In spite of the ANF  restrictions it is still possible to
-  inline non-recursive functions (a fact we use to prove the safety of
-  liveness  analysis).  A user-function  call $(\LET\,\,  x \leftarrow
-  (f\,y_1\,\ldots\,y_n) \,\, \IN\,\, e)$  to a function defined (after
-  renaming  its  formals  and  locals  to be  disjoint  from  existing
-  variables) by $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ e_f)$ is replaced by
-  a  sequence of  $\LET$'s  of the  form $z_i\leftarrow  (\ID\,\,y_i)$
-  followed by the body $e_f$ but with its $(\SRETURN\,\,w)$ expressions
-  replaced by $(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.}
-=======
 functions  are  variables.  While  this  restriction  does not  affect
 expressibility,  this form  has  the benefit  of  making explicit  the
 creation  of closures through  the $\LET$  construct.  $\LET$s  in our
@@ -528,7 +497,6 @@ it
   $\LET$'s of  the form  $z_i\leftarrow (\ID\,\,y_i)$ followed  by the
   body $e_f$  but with  its $(\SRETURN\,\,w)$ expressions  replaced by
   $(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.}
->>>>>>> 99027c53f9aff4b3e6de509e0eed1df9cbd3a7ff
 
 \begin{figure*}[]
 \footnotesize
@@ -540,16 +508,10 @@ it
     \hspace{2.2em} \ \ \ \ \mbox{\em --- function definition} \\
 e \in \mathit{Expr} & ::= &
 \left\{\begin{array}{ll@{\hspace{4em}}l}
-<<<<<<< HEAD
-       (\SIF\,\, x\,\, e_1\,\, e_2) && \mbox{\em --- conditional} \\ 
-       (\LET\,\, x \leftarrow s\,\, \IN\,\, e) && \mbox{\em --- let binding} \\
-       (\SRETURN\,\, x) && \mbox{\em --- return from function}
-=======
        (\SIF\,\, x\,\, e_1\,\, e_2) && \!\!\!\mbox{\em --- conditional} \\
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) &&\!\!\! \mbox{\em --- let
 binding} \\
        (\SRETURN\,\, x) && \!\!\!\mbox{\em --- return from function}
->>>>>>> 99027c53f9aff4b3e6de509e0eed1df9cbd3a7ff
     \end{array}\right. \\
 s \in \mathit{Application} & ::= &
 \left\{\begin{array}{lr@{\hspace{1em}}l}
@@ -710,14 +672,6 @@ $H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho, S, H,
 {\color {red} \rho \oplus \rho'}, (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  s$} &
 \sc{if-clo} \\
 \hline
-<<<<<<< HEAD
-\shortstack[c]{$H(\rho(x))~\mbox{is}$ \\$\mbox{whnf with value}~v$}& $\rho, (\rho', z, e)\!:\!S, H,
-(\SRETURN~x)  \rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e$ & \sc{return-whnf}\\   
-\hline
-$H(\rho(x)) = (e,\rho')$ & \shortstack[c]{$\rho, S, H, (\SRETURN~x)
-  \rightsquigarrow$ \\
-$\rho'\oplus\rho,~ (\rho, x, (\SRETURN~x))\!:\!S, H,  e$} & \sc{return-coo} \\
-=======
 {$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& $\rho, (\rho', z,
 e)\!:\!S, H,
 (\SRETURN~x)  \rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e$ &
@@ -727,7 +681,6 @@ $H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho, S, H, (\SRETURN~x)
   \rightsquigarrow$
 ${\color {red}\rho\oplus\rho'},~ (\rho, x, (\SRETURN~x))\!:\!S, H,  s$} &
 \sc{return-clo} \\
->>>>>>> 99027c53f9aff4b3e6de509e0eed1df9cbd3a7ff
 \hline
 \end{tabular}
 \caption{A small-step semantics for the language. {\color {red} Can we
@@ -761,32 +714,6 @@ writing $\{x.\epsilon, x.\acdr, x.\acdr\acdr, y.\epsilon\}$ instead of
 $[x     \mapsto\{\epsilon,\acdr,\acdr\acdr\},    y\mapsto\{\epsilon\},
   z\mapsto\{\}]$.    In  this   notation,  $x   \mapsto  \{\epsilon\}$
 represents access using $x$ itself and $x \mapsto \{\}$ indicates that
-<<<<<<< HEAD
-$x$ is dead.  We associate  a liveness environment with program points
-$\pi$.  The liveness at $\pi:e$  is the liveness just before executing
-$e$.
-
-
-A  notion related  to  liveness is  {\em  demand}.  The  demand on  an
-expression  $e$  is again  a  set  of  access paths---that  subset  of
-$\{\acar,\acdr\}^\ast$ which  the context of $e$ may  explore of $e$'s
-result.   To see  the need  for demands,  consider the  let expression
-$\pi:(\LET~x\leftarrow (\CDR~y)~\IN~ \pi':\SRETURN~x)$. Assume that the
-context of  this expression produces the liveness  $[x \mapsto \lbrace
-  \epsilon, \acar  \rbrace]$ at $\pi'$.   Due to the  \LET\ definition
-which  binds $x$  to $(\CDR~y)$,  the liveness  of $x$  at  $\pi'$ now
-becomes  the  demand on  $(\CDR~y)$.   This,  in  turn, generates  the
-liveness $\lbrace y.\epsilon,  y.\acdr, y.\acdr\acar \rbrace$ at $\pi$
-(the set of $y$-rooted accesses required to explore $\lbrace \epsilon,
-\acar  \rbrace$  paths  of  the  result  of  $(\CDR~y)$)\footnote{The
-  classical analogue  is strong liveness  analysis, where $y$  and $z$
-  have  a  liveness  of  $\lbrace\epsilon\rbrace$  at  the  entry  $n:
-  x:=y+z$,    if   and    only   if    $x$   has    a    liveness   of
-  $\lbrace\epsilon\rbrace$ at  exit of  $n$.  In our  terminology, the
-  liveness of $x$  at exit from $n$ becomes the  demand on $y+z$. This
-  generates the  liveness $\lbrace y.\epsilon,  z.\epsilon \rbrace$ at
-  the entry of $n$.}.
-=======
 $x$ is dead.  We  associate liveness environments with program points.
 The liveness at $\pi:e$ is the liveness just before executing $e$.
 
@@ -811,7 +738,6 @@ of $y$-rooted  accesses required  to explore $\lbrace  \epsilon, \acar
   of $n$.   In our terminology, the  liveness of $x$ at  exit from $n$
   becomes the demand on $y+z$.   This, in turn, generates the liveness
   $\lbrace y.\epsilon, z.\epsilon \rbrace$ at the entry of $n$.}.
->>>>>>> 99027c53f9aff4b3e6de509e0eed1df9cbd3a7ff
 %% Exploring $\lbrace \epsilon, \acar \rbrace$ of the
 %% result of $(\CDR~y)$ first requires access using $y$ ( and the \CDR\
 %% field of the cons cell pointed by
@@ -919,20 +845,6 @@ paths  $ep_1   =  \langle   \pi_1,  \pi_2,  \psi_1\rangle$,   $ep_2  =
         \renewcommand{\arraystretch}{1}{
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
-<<<<<<< HEAD
-            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
-            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF$_{ep_3}$\ $\pi_3\!\!:\,$ \px
-            \UNL{4} \hspace*{1.15cm} $\pi_4\!\!:\, (\SRETURN_{ep_1}~0)$
-            \UNL{4} \hspace*{1.15cm}    $\pi_5\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\xl)  \IN
-            \UNL{5} \hspace*{1.15cm}   $\pi_6\!\!:\, $(\LET~\py\  $\leftarrow$  (\length~\pu)  \IN
-            \UNL{6} \hspace*{1.15cm} $\pi_7\!\!:\, (\SRETURN_{ep_2}~(1~+~\py))$)))))
-        \end{uprogram}}
-        \renewcommand{\arraystretch}{1}{
-	  \begin{uprogram}
-	  \UNL{1} $\pi_\mainpgm\!\!:\, \pi_8\!\!:\, $(\LET\  \pa\  $\leftarrow$ \ldots  \IN
-	  \UNL{2}   \hspace*{.78cm}   $\pi_9\!\!:\,      $ (\LET\ \pb\  $\leftarrow$  \ldots \IN 
-          \UNL{3}   \hspace*{.78cm}    $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN~$\pi_{11}\!\!:\,$ (\SRETURN$_{ep_4}$\ \pw)))))))
-=======
             \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
 (\NULLQ~\xl) \IN
             \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
@@ -961,7 +873,6 @@ $\leftarrow$  \ldots \IN
           $(\LET\ \pw\  $\leftarrow$  (\length\ \pb) \IN
           \UNL{5}  \hspace*{.25cm}  $\pi_{12}\!\!:\,
 (\SRETURN~\psi_4:\pw)))))$
->>>>>>> 99027c53f9aff4b3e6de509e0eed1df9cbd3a7ff
 \end{uprogram}}
         %%}
     \end{minipage}
@@ -1015,197 +926,6 @@ maps.}\label{fig:mot-example2}
 \end{figure*}
 
 
-<<<<<<< HEAD
-% Push this to a later point
-
-
-%% Unlike eager languages, a variable may be bound to an expression
-%%   that is not fully evaluated. i.e. a closure.
-
-
-%% To  deal with the  first issue,  we apply  the results  of liveness
-%% analysis only to fully evaluated data.  If the marking phase during
-%% garbage collection leads to a closure, and the closure is not dead,
-%% we  mark  the  entire   reachable  memory  under  the  closure  for
-%% collection.   A  better scheme  would  be  to  garbage collect  the
-%% closure based on  the liveness at the point  of its creation.  This
-%% is sound because our  language is statically scoped.  However, this
-%% is  work  in progress,  and  the  method  described in  this  paper
-%% switches over to reachability while collecting closures.
-
-%% %%%%%%%%%%%%%%%%%%%%%%%%
-
-
-%% \renewcommand{\arraystretch}{1}{
-%% 	  \begin{uprogram}
-%% 	  \UNL{0}\hspace*{-.5cm} (\DEFINE\ (\pf~\pa)
-%% 	  \UNL{1}\hspace*{-.5cm}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\CONS~1~\px) \IN
-%% 	  \UNL{2}\hspace*{-.5cm}      $\pi_2\!\!:\, $(\LET~\py\ $\leftarrow $\ (\CDR~\px) \IN  
-%%           \UNL{3}\hspace*{-.5cm} \hspace*{.05cm}     $\pi_3\!\!:\,
-%%           $(\LET\ \pz\  $\leftarrow$\   (\NULLQ~\pa) \IN
-%% 	  \UNL{4}\hspace*{-.45cm}      $\pi_4\!\!:\,
-%%           $(\SIF\ $\pi_5\!\!:\,$ \pz\ ~$\pi_6\!\!:\,$ (\LET~\ww\  $\leftarrow$  (\take~5~\px) \IN
-%% 	  \UNL{5}\hspace*{.45cm}     $\pi_7\!\!:\, $(\LET~\pu\  $\leftarrow$  (\CDR~\pw)  \IN
-%% 	  \UNL{6}\hspace*{.45cm}  $\pi_8\!\!:\,(\SRETURN_1~\pu)$))
-%%           \UNL{5}\hspace*{-.45cm}  $\pi_9\!\!:\, (\SRETURN_2~\py)$)))))
-%% 	\end{uprogram}}
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% \medskip
-
-
-
-Consider  an analysis of  the body  of $\pf$  with a  demand $\sigma$.
-Clearly, this is also the demand on the return values $u$ and $y$
-giving the liveness  at  the  program points  $\pi_7$  and $\pi_8$  as
-$\lbrace  \pu.\sigma \rbrace$ and  $\{\py.\sigma\}$.  The  liveness at
-$\pi_7$  and  $\pi_8$  are  propagated  backwards  as  in  traditional
-liveness analysis.
-
-Since   \pu\  is  $(\CDR~   \pw)$,  the   liveness  of   $\sigma$  for
-\pu\ translates  into a demand  of $\sigma$ on $(\CDR~\pw)$,  which in
-turn  generates  a  liveness  of $\{\pw.\epsilon,  ~\pw.1\sigma\}$  at
-$\pi_7$.  The liveness of \pu\ should be killed at $\pi_7$ since it is
-not in the scope of \pu.  However, this does not cause any imprecision
-in the way of the GC marking  more cells as live, since \pu\ is yet to
-come into existence at $\pi_7$  and its liveness will not be consulted
-by the garbage collector at this point.
-
-In an eager language, \pw\ would not have been live after $\pi_7$, the
-point of  its last  use. In a  lazy language, however,  the definition
-$\pu  \leftarrow (\CDR~\pw)$,  does  not result  in  an evaluation  of
-$(\CDR~\pw)$; instead  a closure is created.   The evaluation actually
-takes place while evaluating  $(\SRETURN~\pu)$. Thus it is necessary to
-record the liveness  of $\pw$ at the program  point $\pi_8$, indeed at
-every program  point from $\pi_8$ up  to the beginning  of the program
-(since  we do  not kill  liveness).  We  thus regard  the body  of the
-function as  a tree and consider paths  from the root of  this tree to
-program  points  which  trigger  a evaluation---\SIF\  conditions  and
-\SRETURN\  expressions.  We  call such  paths {\em  e-paths}.   For the
-program shown, there are three such paths $EP_1 = \pi_1, \pi_2, \pi_3,
-\pi_4,  \pi_5$, $EP_2  =  \pi_1, \pi_2,  \pi_3,  \pi_4, \pi_6,  \pi_7,
-\pi_8$, and $EP_3 = \pi_1, \pi_2, \pi_3, \pi_4, \pi_9$.
-
-The analysis  consists of  two maps: The  map $\cal{M}$ maps  a return
-path to a common liveness environment, and a second map $\cal{P}$ maps
-a program  point to the set of  e-paths on which  the point lies.
-If a  program  point happens to fall  on more than one  such path, then
-the  liveness environment of  the program  point is  the variable-wise
-union of  the liveness environments  of the individual paths.   In the
-example program, ${\cal M}(EP_1)= \ldots$, ${\cal M}(EP_2)=\ldots$ and
-${\cal M}(EP_3)=  \ldots$.  Since  ${\cal P}(pi_4)$ is  $\lbrace EP_1,
-EP_2, EP_3 \rbrace$, the liveness  of $pi_4$ is \ldots.  In summary,
-our propagation of liveness is flow-insensitive but path-sensitive.
-In the sequel
-we  shall  describe  how  to  obtain $\cal{M}$.   The  formulation  of
-$\cal{P}$ is easy and we do not elaborate it any further.
-
-
-
-
-Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\SRETURN}.
-The  expression $\pi:(\SRETURN~x)$  with  a demand  $\sigma$ forces  an
-evaluation  of  $x$  and  hence  a  new  map  ${\cal  M}=[\pi  \mapsto
-  \{x.\sigma\}] $  needs to  be created.  The  ${\cal M}$-map  for the
-expression $(\SIF~\pi:x~e_1~e_2)$  is a pointwise-union  of the ${\cal
-  M}$-maps of $e_1$ and $e_2$.   In addition, since the condition also
-triggers an evaluation of  $x$, the map $[\pi \mapsto \{x.\epsilon\}]$
-is created and added to  the union.  Also notice that the consequences
-of  laziness---the entire  expression including  the condition  is not
-evaluated if  the demand  on it is  $\emptyset$.  This results  in the
-empty map denoted by $\emptyset_{\cal{M}}$.
-%==============================================================
-\begin{figure*}[t]  
-\begin{eqnarray*}
-\mathit{ref\/}(\kappa,\sigma,\Lfonly)
-          &=& \{\,\} \mbox{, for $\kappa$ a constant, including $\NIL$}\\
-\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
-          &=& \{x.\alpha \mid \acar\alpha \in \sigma\} \cup \{y.\alpha \mid \acdr\alpha \in \sigma\} \\
-\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in
-\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((\CDR~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in
-\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((\PRIM~x~y),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon, y.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((\NULLQ~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((f~\myvec{x}),\sigma,\Lfonly)
-%          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
-          &=&  \begin{array}{@{}l}  % to discourage \displaystyle
-               \bigcup_{i=1}^n x_i.\Lf{f}{i}{\sigma}
-               \end{array}
-%          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
-\\[1ex]
-\mathcal{L}((\SRETURN~x),\sigma,\Lfonly) &=& \{l \mapsto x.\sigma\}, \makebox[0mm]{\hspace*{3cm} where $l$ is a new label} \\
-\mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
-        \begin{array}{l l}
-                    \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
-        \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
-        \{l \mapsto  \{x.\epsilon\}\},  & \mbox{if}~\sigma \ne \emptyset\\
-        \emptyset_{\cal{M}?}  & \mbox{otherwise}
-                 \end{array} \\
- \makebox[0mm]{\hspace*{3.8cm} where $l$ is a new label}\\
-\mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-        \{ l \mapsto \Ldonly_{x \leftarrow s}(\Lv(x)) \mid l \mapsto \Lv
-        \in \mathcal{M}\}
-\mbox{ where } \mathcal{M} = \mathcal{L}(e,\sigma,\Lfonly)\\
-\Ldonly_{x \leftarrow s} &=& \Lfonly_f, \mbox{where}~f~\mbox{is a new function}\\
- \makebox[0mm]{\hspace*{7cm}   
- $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
-           x_2\, \ldots\, x_n)/x]))$,} \\
- \makebox[0mm]{\hspace*{5.5cm} and 
-     $(\ x_1\, \ldots\, x_n)$ are the variables in $s$}
-\end{eqnarray*}
-\begin{minipage}{0.85\textwidth}
-\infrule[live-define]
-        {\mathcal{L}(e_f,\sigma,\Lfonly) = 
-           \bigcup_{i=1}^n z_i.\Lf{f}{i}{\sigma}
-              \mbox{ for each $f$ and $\sigma$}
-        }
-        { d_1 \ldots d_k \len \Lfonly
-\\ \makebox[0mm]{where
-     $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $d_1 \ldots d_k$}}
-\end{minipage}
-  \caption{Liveness equations and judgement rule}\label{fig:live-judge}
-\end{figure*}
-  
- The  {\LET} rule  has  an elegant  formulation.   Recollect that  our
- language permits lazy \LET~s whose definitions can be recursive Thus,
- in the expression $\LET~x  \leftarrow~s~\IN~e$, $x$ can occur in $s$.
- We  model the  definition $x  \leftarrow~s$ as  a  possibly recursive
- function which captures an  arbitrary number of ``unrollings'' of the
- definition.  We pass  to this function the demand  arising out of the
- liveness   of  $x$   at   the   beginning  of   $e$,   and  let   the
- \Lfonly\ abstraction derive the liveness on the variables of $s$.
-
-
-\mycomment{The function  $\mathcal{L}$ now  gives  the  (total)  liveness of  an
-expression $e$.   The cases $\SRETURN$ and  $\SIF$ are straightforward,
-but note the liveness $x.\epsilon$  generated by the latter.  The case
-$(\LET\   z\leftarrow   s\  \IN\   e')$   resembles  a   three-address
-instruction:  the liveness  of $e$  is given  by taking  the liveness,
-$\Lv$, of $e'$, killing any liveness of $z$ and adding any incremental
-liveness from  $s$.  The main subtlety  is how the liveness  of $z$ in
-$\Lv$  is converted  to a  demand  $\Lv(z)$ to  be placed  on $s$  via
-$\mathit{ref}(s,\Lv(z),\Lfonly)$.
-
-%%%%%%\marginpar{Say $\mathcal{L}$ is monotonic?}
-
-% \end{itemize}
-=======
 
 
 Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
@@ -1263,7 +983,6 @@ abuse of notation, is also denoted by $\emptyset_{\cal{M}}$.
   liveness of  $z$ in $\Lv$  is converted to  a demand $\Lv(z)$  to be
   placed on $s$ via $\mathit{ref}(s,\Lv(z),\Lfonly)$.
 
->>>>>>> 99027c53f9aff4b3e6de509e0eed1df9cbd3a7ff
 
 We make three observations: firstly the rule ({\sc live-define}) has a
 least  solution  as  $\mathcal{L}(\cdot)$  is monotonic  in  $\sigma$;
