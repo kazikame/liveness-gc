@@ -39,6 +39,7 @@
 \newcommand{\mycomment}[1]{}
 \definecolor{Myblue}{rgb}{.2,0,1}
 \newcommand{\comment}[1]{{\color{Myblue}{(#1)}}}
+\newcommand{\cred}[1]{{\color{red}{(#1)}}}
 \newcommand{\alan}[1]{{\color{red}{\medskip \hrule\medskip
     #1 \medskip \hrule \medskip}}}
 \newcommand{\blankout}[1]{}
@@ -231,7 +232,7 @@ subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
 &
 \begin{minipage}{.45\textwidth}
 
-%\hspace*{2cm}{\epsfig{file=motiv-example.eps, height=4cm}}
+\hspace*{1cm}{\epsfig{file=motiv-example.eps, height=4cm}}
 
 \end{minipage}
 
@@ -1495,53 +1496,54 @@ prefix-closed property.
 
 \section{Implementation}
 % GC assumptions
-In this section we describe in detail the process of liveness based garbage collection. 
-During the execution of a program if it runs of out of memory, execution is stopped and the 
-garbage collector is invoked. At this point all the references on the stack are checked for 
-liveness and only live references are copied and the program continues execution. 
-The main complexity in our algorithm is the way closures are handled. The following sub-sections 
-show two diffrent ways of handling closures along with their pros and cons.
+\cred{Introduction}
+
+In this  section we describe in  detail the process  of liveness based
+garbage collection.  During  the execution of a program  if it runs of
+out  of memory,  execution is  stopped  and the  garbage collector  is
+invoked. At this point all the references on the stack are checked for
+liveness and only live references are copied and the program continues
+execution.  The main  complexity in our algorithm is  the way closures
+are  handled. The  following sub-sections  show two  different  ways of
+handling closures along with their pros and cons.
 \subsection{A simple LGC Algorithm}
+\cred{Introduce terminology}
 % Abstract description of the GC algorithm
 \begin{verbatim}
 procedure copy (cell)
- new_cell <-  dup_heapcell(cell)
- IF{celltype is cons}
-     IF {cell.car is live}
+ IF {cell is live}
+   new_cell <-  dup_heapcell(cell)
+   IF{celltype is cons}
         new_car        <-  copy(cell.car)
         new_cell.car   <-  new_car
-     ENDIF
-     IF {cell.cdr is live}
+      
         new_cdr        <-  copy(cell.cdr)
         new_cell.cdr   <-  new_cdr
-     ENDIF
+    ENDIF
  ELSE
   IF {celltype is closure}
-    new_cell      <-  dup_heapcell(cell)
-    IF {cell.arg1 is live}
        new_cell.arg1 <-  copy(cell.arg1)
-    ENDIF
-    IF {cell.arg2 is live}
        new_cell.arg2 <-  copy(cell.arg2)
-    ENDIF
- ENDIF
+   ENDIF
  ENDIF
  copy_references_on_print_stack()
 \end{verbatim}
 In the simple algorithm presented we consult liveness automata for copying both \CONS cells and closures. 
 Copying \CONS cells are simple and just involve consulting the liveness automaton corresponding to them 
 and recursively copying. In case of closures, it is more complicated as they might refer to data/closures 
-which might be created in a different environment(function). To overcome this we we carry some extra data 
+which might be created in a different environment(function), all of
+which might not even exist on the program stack. To overcome this we we carry some extra data 
 with each closure, we carry the program point at which it was evaluated and also the names of the free 
 variables contained in the closure. This gives us precise liveness information of the free variables of a 
 closure but involves run-time overhead of updating the program point correctly. To avoid this overhead we 
 go for a safer approximation by storing the creation point of the closure and using it to check liveness. 
 This is safe since the liveness at the creation point of the closure encompasses all possible uses of the 
 closure but it might be very imprecise as at run-time the actual liveness required might be way less than 
-what is found at the creation point.
+what is found at the creation point. \cred{repeated traversals if sharing}.
 
 \subsection{Modified GC Algorithm}
-Since the first algorithm requires a lot of bookkeeping and is not precise, we use a modified algorithm 
+Since the first algorithm requires a lot of bookkeeping and is not
+precise, we have a second version of the algorithm 
 which does not use liveness for copying closures. 
 \begin{verbatim}
 procedure copy (cell)
@@ -1572,20 +1574,21 @@ optimize some of the processing by not traversing cells more than once. This is 
 sub-section[]. \comment{Once experimental results are obtained compare the two algorithms here}
 Since we mix both liveness based GC and reachability the garbage collector has to be more careful 
 and ensure references marked non-live are never copied using reachability. We discuss this issue 
-and its solution in sub-section[].
+and its solution in sub-section[]\comment{hanging like a sore thumb}.
 
 \subsection{Optimization for RGC for closures}
 One of the  reasosn why reachability based GC  is faster than liveness
 based GC is  due to the fact that  in case we try to copy  a cons cell
 which is  already copied  we do  not need to  traverse it  any further.
  The  same is not true in the case  of LGC, as the set
-of  liveness paths  may not  be similar  in both  the  traversals. One
+of  liveness paths  may not  be similar  in both  the
+traversals. \cred{Push earlier: One
 optimization is  to keep  track of all  the liveness  automaton states
 that a particular  cons cell has been visited with  and ensure that we
 do  not  traverse  it  with  the  same state  more  than  once.   This
 optimization requires extra memory  for each heap cell and potentially
 it can hold  all the automata states.  Therefore it  is not a feasible
-solution. In case of lazy  languages since we use reachability to copy
+solution.} In case of lazy  languages since we use reachability to copy
 closures, some cons  cells might be copied using  reachability. We can
 avoid  repeated traversals of  these cons  cells without  tracking the
 states. This only requires the  knowledge of whether the cons cell was
@@ -1626,7 +1629,9 @@ copies heap  cells which  have already been  printed. Since  the print
 function is  not part of  the executing program its  liveness automata
 are not  considered. Therefore we  simulate the liveness of  the print
 function by using a flag in  the heap cell. The flag ensures that only
-the required parts  of a cons cell are copied.
+the required parts  of a cons cell are copied.\cred{Very sketchy: Make
+  another attempt to write}
+
 %% \begin{figure}
 %% \begin{algorithm}[H]
 %%  \KwData{this text}
