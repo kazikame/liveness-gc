@@ -10,8 +10,8 @@ using namespace std;
 using namespace Scheme::AST;
 
 
-#define _OPT_TIME
-//#undef _OPT_TIME
+//#define _OPT_TIME
+#undef _OPT_TIME
 
 #ifdef _OPT_TIME
 #undef _OPT_FULL_LGC

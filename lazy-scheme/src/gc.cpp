@@ -365,6 +365,8 @@ cons* followpaths_reachability(cons* loc, ostream& out)
 	return loccopy;
 }
 #else
+//Doing full liveness for closures
+
 void print_gc_move(cons* from, cons* to)
 {
 	if (from != NULL && to != NULL)
@@ -416,7 +418,7 @@ cons* copy(cons* node)
 	{
 		heapslot=heapslot+1;
 		cons *conscell=(cons*)node;
-        MARK_REACHABLE(conscell);
+        GC_STAT_MARK_REACHABLE(conscell);
 		if((conscell->forward >= buffer_live) &&
 				(boundary_live > conscell->forward))
 		{
@@ -1685,10 +1687,10 @@ void liveness_gc()
 	  cerr << "Processing function " << stackit->funcname << endl;
 	  for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
       {
-    	  pre << "Doing gc at return point " << stackit->return_point << endl;
+    	  cerr << "Doing gc at return point " << stackit->return_point << endl;
 		  string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
     	  stateMapIter got = statemap.find(nodeName);
-
+    	  cerr << "Looking up " << nodeName << endl;
     	  if (got != statemap.end())
     	  {
 
@@ -1716,9 +1718,9 @@ void liveness_gc()
 #endif
   clock_t pend = clock();
   double gc_time = ((double(pend - pstart)/CLOCKS_PER_SEC));
-  cout << "GC Time for " << gccount << " = " << gc_time << endl;
+ // cout << "GC Time for " << gccount << " = " << gc_time << endl;
   gctime += gc_time;
-  cerr << "Number of cells copied = " << numcopied << endl;
+  //cerr << "Number of cells copied = " << numcopied << endl;
   return;
 }
 
@@ -1776,7 +1778,7 @@ cons* followpaths(cons* loc, state_index index)
   break;
   case binaryprimopExprClosure:
   {
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
 
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())

@@ -6,6 +6,7 @@ cat > run.gnu <<EOF
 set terminal postscript dashed color portrait "Helvetica" 16
 # else, for black & white graphs in paper, uncomment next line
 #set terminal postscript portrait butt "Helvetica" 16
+#set terminal size 1300,600
 
 set size ratio 0 1, .5
 
@@ -30,7 +31,7 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot  "output/$1_gc-live_output/rch.sort"  w l ls 1 notitle, \
+plot [0:1e7]  "output/$1_gc-live_output/rch.sort"  w l ls 1 notitle, \
     "output/$1_gc-plain_output/rch.sort" w l ls 2 notitle, \
     "output/$1_gc-freq_output/rch.sort"  w l ls 3 notitle,  \
     "output/$1_gc-live_output/use.sort"  w l ls 4 notitle
