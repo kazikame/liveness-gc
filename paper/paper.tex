@@ -1492,59 +1492,105 @@ prefix-closed property.
 
 \section{Implementation}
 % GC assumptions
-\subsection{GC Points}
-Unlike eager languages where GC happens only at \CONS~ points or at
-function calls, every \LET~ point is a potential GC point. The number
-of
-automata that needs to be stored is reduced by sharing automata along
-all
-the program points along an {\em E-path}.
-\comment{
-By the  time the program  starts executing, the liveness  automata are
-created and stored in a file.   This is re-used every time the program
-executes.  An important difference in  GC of lazy language compared to
-an  eager language is  the point  of garbage  collection.  In  case of
-eager  languages only  \CONS~ points  and  function calls  are the  GC
-points. In  a lazy  language every \LET~  statement is a  potential GC
-point. Hence we need to store liveness automata corresponding to every
-\LET~  statement in the  program. This  leads to  an explosion  in the
-number of  automata. From our  observation that along an  {\em E-path}
-all program points have the same liveness, we can reduce the number of
-automata state required  by sharing the same automata  for all program
-points along an {\em E-path}.} In  the example program, we only need to
-create automata  for program  points \ldots, since  they are  the only
-distinct {\em E-path}s in the program.
+In this section we describe in detail the process of liveness based garbage collection. 
+During the execution of a program if it runs of out of memory, execution is stopped and the 
+garbage collector is invoked. At this point all the references on the stack are checked for 
+liveness and only live references are copied and the program continues execution. 
+The main complexity in our algorithm is the way closures are handled. The following sub-sections 
+show two diffrent ways of handling closures along with their pros and cons.
+\subsection{A simple LGC Algorithm}
 % Abstract description of the GC algorithm
-%% \begin{algorithmic}
-%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
-%% \IF{$celltype\ is\ cons\ and\ not(copied\_using\_rgc)$}
-%% \STATE $new\_car\gets$ copy($cell.car$)
-%% \STATE $new\_cell.car\gets$ $new\_car$
-%% \STATE $new\_cdr\gets$ copy(cell.cdr)
-%% \STATE $new\_cell.cdr\gets$ $new\_cdr$
-%% \ELSE
-%% \IF {$celltype\ is\ closure\ and\ cell\ not\ already\ copied$}
-%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
-%% \STATE $new\_cell.arg1\gets$ copy($cell.arg1$)
-%% \STATE $new\_cell.arg2\gets$ copy($cell.arg2$)
-%% \ELSE
-%% \STATE $new\_cell\gets$ dup\_heapcell(cell)
-%% \ENDIF
-%% \ENDIF
-%% \end{algorithmic}
+\begin{verbatim}
+procedure copy (cell)
+ new_cell <-  dup_heapcell(cell)
+ IF{celltype is cons}
+     IF {cell.car is live}
+        new_car        <-  copy(cell.car)
+        new_cell.car   <-  new_car
+     ENDIF
+     IF {cell.cdr is live}
+        new_cdr        <-  copy(cell.cdr)
+        new_cell.cdr   <-  new_cdr
+     ENDIF
+ ELSE
+  IF {celltype is closure}
+    new_cell      <-  dup_heapcell(cell)
+    IF {cell.arg1 is live}
+       new_cell.arg1 <-  copy(cell.arg1)
+    ENDIF
+    IF {cell.arg2 is live}
+       new_cell.arg2 <-  copy(cell.arg2)
+    ENDIF
+ ENDIF
+ ENDIF
+ copy_references_on_print_stack()
+\end{verbatim}
+In the simple algorithm presented we consult liveness automata for copying both \CONS cells and closures. 
+Copying \CONS cells are simple and just involve consulting the liveness automaton corresponding to them 
+and recursively copying. In case of closures, it is more complicated as they might refer to data/closures 
+which might be created in a different environment(function). To overcome this we we carry some extra data 
+with each closure, we carry the program point at which it was evaluated and also the names of the free 
+variables contained in the closure. This gives us precise liveness information of the free variables of a 
+closure but involves run-time overhead of updating the program point correctly. To avoid this overhead we 
+go for a safer approximation by storing the creation point of the closure and using it to check liveness. 
+This is safe since the liveness at the creation point of the closure encompasses all possible uses of the 
+closure but it might be very imprecise as at run-time the actual liveness required might be way less than 
+what is found at the creation point.
 
-% Liveness for cons cells & reachability for closures
+\subsection{Modified GC Algorithm}
+Since the first algorithm requires a lot of bookkeeping and is not precise, we use a modified algorithm 
+which does not use liveness for copying closures. 
+\begin{verbatim}
+procedure copy (cell)
+ new_cell <-  dup_heapcell(cell)
+ IF{celltype is cons}
+     IF {cell.car is live}
+        new_car        <-  copy(cell.car)
+        new_cell.car   <-  new_car
+     ENDIF
+     IF {cell.cdr is live}
+        new_cdr        <-  copy(cell.cdr)
+        new_cell.cdr   <-  new_cdr
+     ENDIF
+ ELSE
+  IF {celltype is closure && cell is not copied}
+    new_cell      <-  dup_heapcell(cell)
+    new_cell.arg1 <-  copy(cell.arg1)
+    new_cell.arg2 <-  copy(cell.arg2)
+  ENDIF
+ ENDIF
+ copy_references_on_print_stack()
+\end{verbatim}
 
-\comment{Mention the fact that liveness at a program point indicates
-  what references will be used by the program eventually. The exact
-  point where a reference will be used cannot be determined statically
-due to the language being lazy. }
-During GC, if the heap cell being processed is a cons cell, we consult
-the  liveness automaton  corresponding to  it and  copy only  the live
-paths.  In  case  the  heap  cell  points  to  a  closure,  we  safely
-approximate the  liveness to be {\{0+1\}\*} and  copy everything under
-the closure.
-% Handling of mixture of LGC & RGC
+In this algorithm we consult the liveness automata only if it is a cons cell, for closures we 
+assume everything under it to be live and copy everything that is reachable. Although this might 
+lead to copying more cells it is faster as there are no liveness checks. Additionally we can 
+optimize some of the processing by not traversing cells more than once. This is described in 
+sub-section[]. \comment{Once experimental results are obtained compare the two algorithms here}
+Since we mix both liveness based GC and reachability the garbage collector has to be more careful 
+and ensure references marked non-live are never copied using reachability. We discuss this issue 
+and its solution in sub-section[].
+
+\subsection{Optimization for RGC for closures}
+One of the  reasosn why reachability based GC  is faster than liveness
+based GC is  due to the fact that  in case we try to copy  a cons cell
+which is  already copied  we do  not need to  traverse it  any further.
+ The  same is not true in the case  of LGC, as the set
+of  liveness paths  may not  be similar  in both  the  traversals. One
+optimization is  to keep  track of all  the liveness  automaton states
+that a particular  cons cell has been visited with  and ensure that we
+do  not  traverse  it  with  the  same state  more  than  once.   This
+optimization requires extra memory  for each heap cell and potentially
+it can hold  all the automata states.  Therefore it  is not a feasible
+solution. In case of lazy  languages since we use reachability to copy
+closures, some cons  cells might be copied using  reachability. We can
+avoid  repeated traversals of  these cons  cells without  tracking the
+states. This only requires the  knowledge of whether the cons cell was
+copied using  reachability.  Hence  we use a  flag to remember  if the
+heap cell was  copied using reachability at any time, if  it is set we
+do not traverse any further.\comment{Maybe add a diagram to make it clearer}
+
+\subsection{Issues with mixing LGC and RGC}
 A consequence of  copying everything under a closure  is the fact that
 we can end up trying to copy things which are not live and corrupt the
 heap. This  can happen if at some  $GC_k$ a cons cell  is copied using
@@ -1552,7 +1598,7 @@ liveness. At  a later stage this  cons cell becomes part  of a closure
 and  hence during $GC_{k+n}$  the algorithm  tries to  copy everything
 under the  cons cell  thus copying heap  locations which might  not be
 valid.  To avoid  this behavior we either have to choose  to do a full
-liveness based  GC for closure or  we should ensure  that any non-live
+liveness based  GC for closures or  we should ensure  that any non-live
 references are  not carried across  GC's. We take the  latter approach
 and ensure that  non-live references are set to  null. After every GC,
 the live part of the buffer  is scanned and any reference which is not
@@ -1564,9 +1610,7 @@ later GC
 % and copy wrong locations. Avoiding it by setting non-live references
 to null after every GC.
 % Proof for the correctness.
-% Difference between eager and lazy GC
-
-
+\subsection{Garbage collection for references on print stack}
 Another  difference that is  present in  GC of  lazy language  is the
 presence  of  a print  stack.  In  lazy  languages the  evaluation  of
 closures is  driven by the print  function\comment{Refer to SPJ's
@@ -1579,9 +1623,7 @@ copies heap  cells which  have already been  printed. Since  the print
 function is  not part of  the executing program its  liveness automata
 are not  considered. Therefore we  simulate the liveness of  the print
 function by using a flag in  the heap cell. The flag ensures that only
-the required parts  of a cons cell are copied. The  behavior of the GC
-algorithm is as described below,
-
+the required parts  of a cons cell are copied.
 %% \begin{figure}
 %% \begin{algorithm}[H]
 %%  \KwData{this text}
@@ -1600,60 +1642,85 @@ algorithm is as described below,
 %% \end{algorithm}
 %% \label{algo:LGC-Algo} \figrule
 %% \end{figure}
-We   provide   an   intuition    about   the   correctness   of   this
-algorithm Figure~\ref{algo:LGC-Algo}. Consider the following facts
-about the print stack during a
-GC,
+%% We   provide   an   intuition    about   the   correctness   of   this
+%% algorithm Figure~\ref{algo:LGC-Algo}. Consider the following facts
+%% about the print stack during a
+%% GC,
 
-\begin{enumerate}
-\item The top of the stack always contains a reference to a closure.
-\item All other references on the print stack point to atomic values or
-cons cells, it can never contain a
-reference to a closure. The components of the cons cell can contain
-reference to closures.
-\item If a reference on the print stack is a cons cell, either its car
-part or its cdr part will also be
-present on the stack.
-\end{enumerate}
-%Needs to be formatted and re-written
-Sketch of the proof
-Since all closures are copied fully and atomic values are copied, only
-cons cells need to be handled.
-Consider the following cases,
-\begin{enumerate}
-\item the car part of the cons  cell is on the print stack. This means
-  that the GC happened while the car part was being processed. The cdr
-  part is yet to be processed and the reference to the cdr part is not
-  on the print stack. Hence it is sufficient to copy only the cdr part
-  of the  cons cell. Any  references necessary for processing  the car
-  part will be copied due to references on the print stack.
-\item the cdr part of the cons  cell is on the print stack. This means
-  that GC  happened while the cdr  part was being  processed.  The car
-  part has already been processed and printed, hence we do not need to
-  copy the car  part. Additionally any references that  are needed for
-  printing the cdr  part will also be copied due  to the references on
-  the print stack and hence nothing needs to be copied in this case.
-\end{enumerate}
+%% \begin{enumerate}
+%% \item The top of the stack always contains a reference to a closure.
+%% \item All other references on the print stack point to atomic values or
+%% cons cells, it can never contain a
+%% reference to a closure. The components of the cons cell can contain
+%% reference to closures.
+%% \item If a reference on the print stack is a cons cell, either its car
+%% part or its cdr part will also be
+%% present on the stack.
+%% \end{enumerate}
+%% %Needs to be formatted and re-written
+%% Sketch of the proof
+%% Since all closures are copied fully and atomic values are copied, only
+%% cons cells need to be handled.
+%% Consider the following cases,
+%% \begin{enumerate}
+%% \item the car part of the cons  cell is on the print stack. This means
+%%   that the GC happened while the car part was being processed. The cdr
+%%   part is yet to be processed and the reference to the cdr part is not
+%%   on the print stack. Hence it is sufficient to copy only the cdr part
+%%   of the  cons cell. Any  references necessary for processing  the car
+%%   part will be copied due to references on the print stack.
+%% \item the cdr part of the cons  cell is on the print stack. This means
+%%   that GC  happened while the cdr  part was being  processed.  The car
+%%   part has already been processed and printed, hence we do not need to
+%%   copy the car  part. Additionally any references that  are needed for
+%%   printing the cdr  part will also be copied due  to the references on
+%%   the print stack and hence nothing needs to be copied in this case.
+%% \end{enumerate}
+\hrule
+\comment{
+Unlike eager languages where GC happens only at \CONS~ points or at
+function calls, every \LET~ point is a potential GC point. The number
+of
+automata that needs to be stored is reduced by sharing automata along
+all
+the program points along an {\em E-path}.
+
+By the  time the program  starts executing, the liveness  automata are
+created and stored in a file.   This is re-used every time the program
+executes.  An important difference in  GC of lazy language compared to
+an  eager language is  the point  of garbage  collection.  In  case of
+eager  languages only  \CONS~ points  and  function calls  are the  GC
+points. In  a lazy  language every \LET~  statement is a  potential GC
+point. Hence we need to store liveness automata corresponding to every
+\LET~  statement in the  program. This  leads to  an explosion  in the
+number of  automata. From our  observation that along an  {\em E-path}
+all program points have the same liveness, we can reduce the number of
+automata state required  by sharing the same automata  for all program
+points along an {\em E-path}.} In  the example program, we only need to
+create automata  for program  points \ldots, since  they are  the only
+distinct {\em E-path}s in the program.
+
+% Liveness for cons cells & reachability for closures
+
+\comment{Mention the fact that liveness at a program point indicates
+  what references will be used by the program eventually. The exact
+  point where a reference will be used cannot be determined statically
+due to the language being lazy. }
+During GC, if the heap cell being processed is a cons cell, we consult
+the  liveness automaton  corresponding to  it and  copy only  the live
+paths.  In  case  the  heap  cell  points  to  a  closure,  we  safely
+approximate the  liveness to be {\{0+1\}\*} and  copy everything under
+the closure.
+% Handling of mixture of LGC & RGC
+
+% Difference between eager and lazy GC
+
+
+
 % Doing GC for  references on the print stack - using  a flag to avoid
 % copying non-live  cells Optimizing  GC for closures  - use  a copied
 % using rgc flag for closures to avoid multiple traversals
-One of the  reasosn why reachability based GC  is faster than liveness
-based GC is  due to the fact that  in case we try to copy  a cons cell
-which is  already copied  we do  not need to  traverse it  any further
-while doing RGC. The  same is not true in the case  of LGC, as the set
-of  liveness paths  may not  be similar  in both  the  traversals. One
-optimization is  to keep  track of all  the liveness  automaton states
-that a particular  cons cell has been visited with  and ensure that we
-do  not  traverse  it  with  the  same state  more  than  once.   This
-optimization requires extra memory  for each heap cell and potentially
-it can hold  all the automata states.  Therefore it  is not a feasible
-solution. In case of lazy  languages since we use reachability to copy
-closures, some cons  cells might be copied using  reachability. We can
-avoid  repeated traversals of  these cons  cells without  tracking the
-states. This only requires the  knowledge of whether the cons cell was
-copied using  reachability.  Hence  we use a  flag to remember  if the
-heap cell was  copied using reachability at any time, if  it is set we
-do not traverse any further.
+
 
 \section{Results}
 To demonstrate the effectiveness of liveness-based garbage collection,
@@ -2078,6 +2145,6 @@ it useful but please remember not to change it.
 %% =======
 
 %------------------------------------------------------------%
-\input{lazy-liveness}
+%\input{lazy-liveness}
 
 \end{document}
