@@ -65,7 +65,6 @@
 
 \title{Liveness-Based Garbage Collection for Lazy Languages}
 
-%
 % You need the command \numberofauthors to handle the 'placement
 % and alignment' of the authors beneath the title.
 %
@@ -535,7 +534,7 @@ and generic arithmetic} \\
 \end{figure*}
 
 
-\subsubsection{Semantics}
+\subsection{Semantics}
 We now give  a small-step semantics for our  language.
 We first specify the domains used by the semantics:
 \[
@@ -717,7 +716,7 @@ represents access using $x$ itself and $x \mapsto \{\}$ indicates that
 $x$ is dead.  We  associate liveness environments with program points.
 The liveness at $\pi:e$ is the liveness just before executing $e$.
 
-
+ 
 A  notion  related  to  liveness  is  {\em  demand}.   While  liveness
 represents the future use of variables, a demand represents the future
 use of the value of an  expression. The demand on an expression $e$ is
@@ -731,13 +730,13 @@ $(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes  the demand on
 $(\CDR~y)$.    This,  in   turn,  generates   the   liveness  $\lbrace
 y.\epsilon, y.\acdr, y.\acdr\acar \rbrace$ at $\pi$. These are the set
 of $y$-rooted  accesses required  to explore $\lbrace  \epsilon, \acar
-\rbrace$  paths of  the result  of  $(\CDR~y)$\footnote{The classical
-  analogue  is strong  liveness analysis,  where  $y$ and  $z$ have  a
-  liveness of  $\lbrace\epsilon\rbrace$ at  the entry $n:  x:=y+z$, if
-  and only if  $x$ has a liveness of  $\lbrace\epsilon\rbrace$ at exit
-  of $n$.   In our terminology, the  liveness of $x$ at  exit from $n$
-  becomes the demand on $y+z$.   This, in turn, generates the liveness
-  $\lbrace y.\epsilon, z.\epsilon \rbrace$ at the entry of $n$.}.
+\rbrace$  paths   of  the  result   of  $(\CDR~y)$\footnote{Reproduced
+  from~\cite{asati14lgc}: In  classical strong liveness  analysis, $y$
+  and $z$  are live at the  entry $n: x:=y+z$,  if and only if  $x$ is
+  live  at exit  of $n$.   In our  terminology, the  liveness $\lbrace
+  \epsilon\rbrace $ of $x$ at the  exit from $n$ becomes the demand on
+  $y+z$, and this, in turn generates the liveness $\lbrace y.\epsilon,
+  z.\epsilon \rbrace$ at the entry of $n$.}.
 %% Exploring $\lbrace \epsilon, \acar \rbrace$ of the
 %% result of $(\CDR~y)$ first requires access using $y$ ( and the \CDR\
 %% field of the cons cell pointed by
@@ -759,46 +758,44 @@ elaborate explanation of these notions appear in \cite{asati14lgc}
 \subsection{Liveness Analysis for lazy languages}
 
 Figure~\ref{fig:live-judge}  describes  our  analysis  which  has  two
-parts. The function $\mathit{ref}$,  when given an application $s$ and
-a demand $\sigma$, returns  the incremental liveness generated for the
+parts. The function $\mathit{ref}$,  takes  an application $s$ and
+a demand $\sigma$, and returns  the incremental liveness generated for the
 free  variables   of  $s$  due  to  the   application.   The  function
 $\mathcal{L}$  uses   $\mathit{ref}$  to  propagate   liveness  across
 expressions.
 
- In each  rule defining $\mathit{ref}$, the  null demand ($\emptyset$)
- generates no  liveness.  Notice that this is  different from liveness
- of  eager  languages,  where,   for  instance,  (\CDR~$x$)  would  be
- evaluated  even for  the null  demand. This  would require  an access
- using $x$ resulting in  $x.\epsilon$ being live.  A non-null demand of
- $\sigma$ on (\CDR~$x$), is transformed to the liveness $\{x.\epsilon,
- x.\acdr\sigma\}$.  In an opposite  sense, the demand of $\acdr\sigma$
- on  (\CONS~$y$~$z$) is  transformed to  the demand  $\sigma$  on $z$.
- Note that \CONS\ does not,  by itself, dereference its arguments. The
- rules for (\PRIM~x~y) and  (\NULLQ~x) are on similar lines. Constants
- generate no liveness.
+ Since  in a  lazy language,  an  expression is  not evaluated  unless
+ required, the null demand ($\emptyset$) does not generate liveness in
+ any  of  the  rules  defining  $\mathit{ref}$  or  $\mathcal{L}$.   A
+ non-null  demand of  $\sigma$ on  (\CDR~$x$), is  transformed  to the
+ liveness $\{x.\epsilon, x.\acdr\sigma\}$.   In an opposite sense, the
+ demand  of $\acdr\sigma$  on  (\CONS~$y$~$z$) is  transformed to  the
+ demand  $\sigma$ on  $z$.   Note  that \CONS\  does  not, by  itself,
+ dereference its  arguments. The rules for  (\PRIM~x~y) and (\NULLQ~x)
+ are similar. Constants do not generate any liveness.
 
 For  the  case  of a  user-function  call  we  use a  third  parameter
 $\Lfonly$  that  represents the  summaries  of  all  functions in  the
 program.   $\Lfonly_{\mathit f}$  (the  component of  $\Lfonly$ for  a
-specific  function $f$),  expresses  how the  demand  $\sigma$ on  the
-result  of a  call to  $f$  is transformed  into the  liveness of  its
-parameters at the  beginning of the call.  $\Lfonly$  is determined by
-the judgement  form $\mathit{Prog} \len \Lfonly$  using inference rule
-({\sc live-define}).  This rule  describes the fixed-point property to
-be satisfied  by $\Lfonly$, namely, the  demand transformation assumed
-for each  function in  the program  should be the  same as  the demand
-transformation  calculated from  their  bodies.  As  we  shall see  in
+specific function $f$), expresses how the demand $\sigma$ on a call to
+$f$  is  transformed  into  the  liveness of  its  parameters  at  the
+beginning of the call.  $\Lfonly$  is determined by the judgement form
+$\mathit{Prog} \len \Lfonly$ using inference rule ({\sc live-define}).
+This  rule  describes the  fixed-point  property  to  be satisfied  by
+$\Lfonly$, namely, the demand transformation assumed for each function
+in  the  program should  be  the  same  as the  demand  transformation
+calculated    from    its    body.      As    we    shall    see    in
 Section~\ref{sec:grammar-formulation},  we  convert  the rule  into  a
-grammar and  the least  solution satisfying the  rule is  the language
-generated by this  grammar.  The least solution also  ensures the safe
-collection of the greatest amount of garbage.
+grammar  and the  the  language  generated by  this  grammar is  least
+solution satisfying  the rule. We  prefer the least solution  since it
+ensures the safe collection of the greatest amount of garbage.
 
 We next  describe the function $\mathcal{L}$  that propagates liveness
 across expressions.  Note that,  unlike eager languages, the syntactic
 occurrence  of an expression  in a  program denotes  the point  of
 creation of its closure, not necessarily its evaluation.
 To see the  consequences of this, consider
-Figure~\cite{fig:mot-example2} which shows an analysis  of the body of
+Figure~\ref{fig:mot-example2} which shows an analysis  of the body of
 a function $\length$ with a demand $\sigma$.  Clearly, this is also the
 demand on the return value $z$ giving the liveness at the program point
 $\pi_8$ as $\{\pz.\sigma\}$.  The liveness at $\pi_8$ is propagated
@@ -837,6 +834,244 @@ paths {\em e-paths}.   For the function \length, there  are three such
 paths  $ep_1   =  \langle   \pi_1,  \pi_2,  \psi_1\rangle$,   $ep_2  =
 \langle\pi_1, \pi_2, \pi_3, \pi_4,  \psi_2\rangle$ and $ep_3 = \langle
 \pi_1, \pi_2, \pi_5, \pi_6, \pi_7, \pi_8, \psi_3\rangle$.
+
+%==============================================================
+\begin{figure*}[t]
+\begin{eqnarray*}
+\mathit{ref\/}(\kappa,\sigma,\Lfonly)
+          &=& \{\,\} \mbox{, for $\kappa$ a constant, including
+$\NIL$}\\
+\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
+          &=& \{x.\alpha \mid \acar\alpha \in \sigma\} \cup \{y.\alpha
+\mid \acdr\alpha \in \sigma\} \\
+\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in
+\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
+\mathit{ref\/}((\CDR~x),\sigma,\Lfonly)
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in
+\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
+\mathit{ref\/}((\PRIM~x~y),\sigma,\Lfonly)
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon, y.\epsilon\},  & \mbox{if}~\sigma \ne
+\emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
+\mathit{ref\/}((\NULLQ~x),\sigma,\Lfonly)
+          &=&    \begin{array}{l l}
+                    \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+                    \emptyset  & \mbox{otherwise}
+                 \end{array} \\
+\mathit{ref\/}((f~\myvec{x}),\sigma,\Lfonly)
+%          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
+          &=&  \begin{array}{@{}l}  % to discourage \displaystyle
+               \bigcup_{i=1}^n x_i.\Lf{f}{i}{\sigma}
+               \end{array}
+%          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
+\\[1ex]
+\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{ep}
+\mapsto
+x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
+  new e-path terminating with $\psi$}\\
+\mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
+        \begin{array}{l l}
+                    \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
+        \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
+        \lbrack\lbrace \mathit{ep} \mapsto
+\{x.\epsilon\}\rbrace\rbrack,  & \mbox{if}~\sigma \ne \emptyset\\
+        \emptyset_{\cal{M}?}  & \mbox{otherwise}
+                 \end{array} \\
+&&\mbox{where $\mathit{ep}$ is a new e-path
+  terminating with $\psi$}\\
+\mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+        \lambda\;\mathit{ep}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
+\mbox{where}~\mathcal{M} =
+\mathcal{L}(e,\sigma,\Lfonly),~\Lv \in
+\mathcal{M}(ep),~\mbox{and}~f~\mbox{is the new function}\\
+&& \makebox[0mm]{\hspace*{7cm}
+ $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
+           x_2\, \ldots\, x_n)/x]))$,} \\
+ \makebox[0mm]{\hspace*{8cm} where
+     $x_1\, \ldots\, x_n$ are the variables in $s$}
+\end{eqnarray*}
+\begin{minipage}{0.85\textwidth}
+\infrule[live-define]
+        {\mathcal{L}(e_f,\sigma,\Lfonly) =
+           \bigcup_{i=1}^n z_i.\Lf{f}{i}{\sigma}
+              \mbox{ for each $f$ and $\sigma$}
+        }
+        { \mathit{df_1} \ldots \mathit{df_k} \len \Lfonly
+\\ \makebox[0mm]{where
+     $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $\mathit{df_1}
+\ldots \mathit{df_k}$}}
+\end{minipage}
+  \caption{Liveness equations and judgement rule}\label{fig:live-judge}
+\end{figure*}
+
+
+
+Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
+analysis  computes  two   maps:  $\mathcal{L}(e_f,  \sigma,  \Lfonly)$
+computes a  map that takes a  e-path in ${\mathit f}$  and returns the
+liveness environment  arising out of  all uses of variables  along the
+e-path.  A second map $\cal{P}_{\mathit  f}$ maps any program point in
+$\mathit f$  to the set  of e-paths sharing  the point.  If  a program
+point happens to fall on more  than one such e-path, then the liveness
+environment of  the program  point is the  variable-wise union  of the
+liveness  environments  of the  individual  e-paths.   In the  example
+program,  since ${\mathcal P}_{\length}(\pi_1)  = \lbrace  ep_1, ep_2,
+ep_3\rbrace$, the  liveness at $\pi_1$  is ${\cal M}(ep_1)  \cup {\cal
+  M}(ep_2) \cup  {\cal M}(ep_3)$,  where ${\cal M}  = \mathcal{L}(e_f,
+\sigma, \Lfonly)$.  In the  sequel we shall only define $\mathcal{L}$.
+The formulation  of $\cal{P}$ is easy  and we do not  elaborate it any
+further.
+
+Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\SRETURN}.
+The  expression $(\SRETURN~\psi:x)$  with a  demand $\sigma$  forces an
+evaluation  of   $x$  and  hence  a  new   map  $[\mathit{ep}  \mapsto
+  \{x.\sigma\}] $  needs to  be created, where the $ep$ is a fresh
+evaluation path terminating in $\psi$.  The  map for  the expression
+$(\SIF~\psi:x~e_1~e_2)$ is a pointwise-union  of the maps of $e_1$ and
+$e_2$. In addition, since the condition also triggers an evaluation of
+$x$,  the map  $[\mathit{ep} \mapsto  \{x.\epsilon\}]$ is  created and
+added  to the  union.  Also  notice a  consequences  of laziness---the
+entire  expression including  the condition  is not  evaluated  if the
+demand on it is $\emptyset$.  This results in the empty map, which, by
+abuse of notation, is also denoted by $\emptyset_{\cal{M}}$.
+
+
+
+ The liveness  of {\LET} has  an elegant formulation.   Recollect that
+ our language permits lazy {\LET}s whose definitions can be recursive,
+ i.e.  in the expression $\LET~x \leftarrow~s~\IN~e$, $x$ can occur in
+ $s$.   We  model  the  definition  $x  \leftarrow~s$  as  a  possibly
+ recursive function (named $\mathit{f}$ in the rule) which captures an
+ arbitrary number of ``unrollings'' of the definition\footnote{The $*$
+   in  the definition  of ${\mathit  f}$  represents non-deterministic
+   choice.  During   liveness  it  can  be  assumed   to  generate  no
+   liveness.}.   We pass to  the demand  transformer $\Lfonly_{\mathit
+   f}$ of this function the demand  arising out of the liveness of $x$
+ at the beginning of $e$. This  gives the liveness of the variables of
+ $s$.
+
+
+\mycomment{The function  $\mathcal{L}$ now gives  the (total) liveness
+  of  an   expression  $e$.   The  cases  $\SRETURN$   and  $\SIF$  are
+  straightforward, but note the liveness $x.\epsilon$ generated by the
+  latter.   The case  $(\LET\  z\leftarrow s\  \IN\  e')$ resembles  a
+  three-address instruction:  the liveness of  $e$ is given  by taking
+  the liveness, $\Lv$, of $e'$, killing any liveness of $z$ and adding
+  any incremental  liveness from  $s$.  The main  subtlety is  how the
+  liveness of  $z$ in $\Lv$  is converted to  a demand $\Lv(z)$  to be
+  placed on $s$ via $\mathit{ref}(s,\Lv(z),\Lfonly)$.
+
+
+We make three observations: firstly the rule ({\sc live-define}) has a
+least  solution  as  $\mathcal{L}(\cdot)$  is monotonic  in  $\sigma$;
+secondly  that  ({\sc  live-define})   resembles  the  rule  for  type
+inference of mutually recursive  function definitions, and thirdly the
+asymmetry of  demand and liveness (compared to  post- and pre-liveness
+classically) is due to the functional formulation here.
+}%mycomment
+
+Section~\ref{sec:computing}   shows   how   the  demand   transformers
+$\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
+analysis) can be safely approximated by a {\em procedure summary}. for
+each function.   The summary  is in the  form of a  demand transformer
+that maps a demand on a call to the function to demands on each of its
+arguments.  
+
+{\color{red} Proof of correctness of the liveness analysis...}
+
+
+\section{Computing liveness and its encoding as DFA}\label{sec:computing}
+Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis
+and  {\color  {red}  proved  it  correct  with  reference  to  a  {\em
+    minefield} semantics}.  In  particular, $\mathcal{L}$ and \pmap{f}
+together described a liveness set for each program point in a function
+in terms of  a given $\sigma$ and \Lfonly.  However,  we still have to
+describe how to obtain demand transformers \Lfonly\ from the rule {\sc
+  live-define} and how to compute the specific demand $\sigma$ on each
+function.
+
+To  answer these  questions, it  is convenient  to cast  the equations
+arising out of $\mathit{ref}$  and $\mathcal{L}$ as the rules of a
+grammar.   But first  we modify  the rules  themselves to  a different
+form.
+
+
+
+
+
+
+
+
+
+\subsection{Modifying the liveness rules.}
+
+The      $\mathit{ref}$     rule      for     \CONS,      shown     in
+Figure~\ref{fig:live-judge},  requires   us  to  remove   the  leading
+\acar\ and \acdr\  from the access paths in  $\sigma$.  Similarly, the
+rules for  \CAR, \CDR, \PRIM, \NULLQ,  and \SIF\ require  us to return
+$\emptyset$, if  $\sigma$ itself $\emptyset$.  To  realize these rules
+$\sigma$ needs to be known. This creates difficulties since we want to
+solve the equations arising out of liveness symbolically.
+
+The  solution  is  to   also  treat  the  operations  mentioned  above
+symbolically.  We  introduce three  new  symbols.   First, \bcar\  and
+\bcdr\ are defined as:
+\begin{align*}
+ \bcar\sigma &\triangleq \{\alpha \mid 0\alpha \in \sigma\}\\
+ \bcdr\sigma &\triangleq \{\alpha \mid 1\alpha \in \sigma\}
+\end{align*}
+and \cbar\ as:
+\begin{align*}
+ \cbar\sigma \triangleq& \emptyset~\mbox{if}~\sigma = \emptyset\\
+                       & \{\epsilon\} ~\mbox{otherwise}
+\end{align*}
+
+We can now rewrite the \CONS\ and the \CAR\ rules of $\mathit{ref}$ as:
+\begin{align*}
+&\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
+= x.\bcar\sigma \cup y.\bcdr\sigma  \label{eqn:mod-cons},~
+\mbox{and} \\
+&\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
+          =   x.\cbar\sigma \cup x.0\sigma
+\end{align*}
+and the \Lfunonly\ rule
+for \SIF\ as:
+\begin{align*}
+\mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) =
+                    &\mathcal{L}(e_1,\sigma,\Lfonly)~\uplus
+        \mathcal{L}(e_2,\sigma,\Lfonly)~\uplus\\
+        &[\,\mathit{ep} \mapsto  x.\cbar \sigma]
+\end{align*}
+The rules for \CDR, \PRIM\ and  \NULLQ\  are also modified in a manner
+similar to \CAR.
+The  defintions of \bcar\, \bcdr\ and \cbar\  induce   the  following
+relation $\hookrightarrow$ over sets of access paths:
+\begin{align*}
+  &\sigma_1\bcar\sigma_2  \hookrightarrow
+  \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
+&\sigma_1\bcdr\sigma_2  \hookrightarrow
+  \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
+  \acdr\sigma_2',~\mbox{and}\\
+&\sigma_1\cbar \emptyset \hookrightarrow \emptyset
+\end{align*}
+
+
+The reflexive  transitive closure of  $\hookrightarrow$ will
+be   denoted    as   $\stackrel{*}{\hookrightarrow}$.    The
+following proposition relates  the original and the modified
+liveness rules.
+
+
+
 
 \begin{figure*}[t!]
   \begin{tabular}{cc}
@@ -924,240 +1159,7 @@ $\leftarrow$  \ldots \IN
 \caption{(a) Example program and (b) its liveness
 maps.}\label{fig:mot-example2}
 \end{figure*}
-
-
-
-
-Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
-analysis  computes  two   maps:  $\mathcal{L}(e_f,  \sigma,  \Lfonly)$
-computes a  map that takes a  e-path in ${\mathit f}$  and returns the
-liveness environment  arising out of  all uses of variables  along the
-e-path.  A second map $\cal{P}_{\mathit  f}$ maps any program point in
-$\mathit f$  to the set  of e-paths sharing  the point.  If  a program
-point happens to fall on more  than one such e-path, then the liveness
-environment of  the program  point is the  variable-wise union  of the
-liveness  environments  of the  individual  e-paths.   In the  example
-program,  since ${\mathcal P}_{\length}(\pi_1)  = \lbrace  ep_1, ep_2,
-ep_3\rbrace$, the  liveness at $\pi_1$  is ${\cal M}(ep_1)  \cup {\cal
-  M}(ep_2) \cup  {\cal M}(ep_3)$,  where ${\cal M}  = \mathcal{L}(e_f,
-\sigma, \Lfonly)$.  In the  sequel we shall only define $\mathcal{L}$.
-The formulation  of $\cal{P}$ is easy  and we do not  elaborate it any
-further.
-
-Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\SRETURN}.
-The  expression $(\SRETURN~\psi:x)$  with a  demand $\sigma$  forces an
-evaluation  of   $x$  and  hence  a  new   map  $[\mathit{ep}  \mapsto
-  \{x.\sigma\}] $  needs to  be created, where the $ep$ is a fresh
-evaluation path terminating in $\psi$.  The  map for  the expression
-$(\SIF~\psi:x~e_1~e_2)$ is a pointwise-union  of the maps of $e_1$ and
-$e_2$. In addition, since the condition also triggers an evaluation of
-$x$,  the map  $[\mathit{ep} \mapsto  \{x.\epsilon\}]$ is  created and
-added  to the  union.  Also  notice a  consequences  of laziness---the
-entire  expression including  the condition  is not  evaluated  if the
-demand on it is $\emptyset$.  This results in the empty map, which, by
-abuse of notation, is also denoted by $\emptyset_{\cal{M}}$.
-
-
-
- The liveness  of {\LET} has  an elegant formulation.   Recollect that
- our language permits lazy {\LET}s whose definitions can be recursive,
- i.e.  in the expression $\LET~x \leftarrow~s~\IN~e$, $x$ can occur in
- $s$.   We  model  the  definition  $x  \leftarrow~s$  as  a  possibly
- recursive function (named $\mathit{f}$ in the rule) which captures an
- arbitrary number of ``unrollings'' of the definition\footnote{The $*$
-   in  the definition  of ${\mathit  f}$  represents non-deterministic
-   choice,  but  can  be  treated   as  a  constant  for  purposes  of
-   analysis.}.   We pass to  the demand  transformer $\Lfonly_{\mathit
-   f}$ of this function the demand  arising out of the liveness of $x$
- at the beginning of $e$. This  gives the liveness of the variables of
- $s$.
-
-
-\mycomment{The function  $\mathcal{L}$ now gives  the (total) liveness
-  of  an   expression  $e$.   The  cases  $\SRETURN$   and  $\SIF$  are
-  straightforward, but note the liveness $x.\epsilon$ generated by the
-  latter.   The case  $(\LET\  z\leftarrow s\  \IN\  e')$ resembles  a
-  three-address instruction:  the liveness of  $e$ is given  by taking
-  the liveness, $\Lv$, of $e'$, killing any liveness of $z$ and adding
-  any incremental  liveness from  $s$.  The main  subtlety is  how the
-  liveness of  $z$ in $\Lv$  is converted to  a demand $\Lv(z)$  to be
-  placed on $s$ via $\mathit{ref}(s,\Lv(z),\Lfonly)$.
-
-
-We make three observations: firstly the rule ({\sc live-define}) has a
-least  solution  as  $\mathcal{L}(\cdot)$  is monotonic  in  $\sigma$;
-secondly  that  ({\sc  live-define})   resembles  the  rule  for  type
-inference of mutually recursive  function definitions, and thirdly the
-asymmetry of  demand and liveness (compared to  post- and pre-liveness
-classically) is due to the functional formulation here.
-}%mycomment
-
-Section~\ref{sec:computing}   shows   how   the  demand   transformers
-$\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
-analysis) can be safely approximated  by a {\em procedure summary} for
-each function  (unifying the contexts  in the style of  0-CFA)\@.  The
-summary consists  of a pair of  a single demand and,  for this demand,
-the  corresponding  tuple  of   demands  the  function  makes  on  its
-arguments.
-
-{\color{red} Proof of correctness of the liveness analysis...}
-
-
-\section{Computing liveness and its encoding as a
-table}\label{sec:computing}
-Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis
-and  {\color  {red}  proved  it  correct  with  reference  to  a  {\em
-    minefield} semantics}.  In  particular, $\mathcal{L}$ and \pmap{f}
-together described a liveness set for each program point in a function
-in terms of  a given $\sigma$ and \Lfonly.  However,  we still have to
-describe how to obtain demand transformers \Lfonly\ from the rule {\sc
-  live-define} and how to compute the specific demand $\sigma$ on each
-function.
-
-To  answer these  questions, it  is convenient  to cast  the equations
-arising out of the $\mathit{ref}$  and $\mathcal{L}$ as the rules of a
-grammar.   But first  we modify  the rules  themselves to  a different
-form.
-
-
-
-
-
-\subsubsection{Modifying the liveness rules.}
-
-The      $\mathit{ref}$     rule      for     \CONS,      shown     in
-Figure~\ref{fig:live-judge},  requires   us  to  remove   the  leading
-\acar\ and \acdr\  from the access paths in  $\sigma$.  Similarly, the
-rules for  \CAR, \CDR, \PRIM, \NULLQ,  and \SIF\ require  us to return
-$\emptyset$, if  $\sigma$ itself $\emptyset$.  To  realize these rules
-$\sigma$ needs to be known. This creates difficulties since we want to
-solve the equations arising out of liveness symbolically.
-
-The  solution  is  to   also  treat  the  operations  mentioned  above
-symbolically.  We  introduce three  new  symbols.   First, \bcar\  and
-\bcdr\ are defined as:
-\begin{align*}
- \bcar\sigma &\triangleq \{\alpha \mid 0\alpha \in \sigma\}\\
- \bcdr\sigma &\triangleq \{\alpha \mid 1\alpha \in \sigma\}
-\end{align*}
-and \cbar\ as:
-\begin{align*}
- \cbar\sigma \triangleq& \emptyset~\mbox{if}~\sigma = \emptyset\\
-                       & \{\epsilon\} ~\mbox{otherwise}
-\end{align*}
-
-We can now rewrite the \CONS\ and the \CAR\ rules of $\mathit{ref}$ as:
-\begin{align*}
-&\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
-= x.\bcar\sigma \cup y.\bcdr\sigma  \label{eqn:mod-cons},~
-\mbox{and} \\
-&\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
-          =   x.\cbar\sigma \cup x.0\sigma
-\end{align*}
-and the \Lfunonly\ rule
-for \SIF\ as:
-\begin{align*}
-\mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) =
-                    &\mathcal{L}(e_1,\sigma,\Lfonly)~\uplus
-        \mathcal{L}(e_2,\sigma,\Lfonly)~\uplus\\
-        &[\,\mathit{ep} \mapsto  x.\cbar \sigma]
-\end{align*}
-The rules for \CDR, \PRIM\ and  \NULLQ\  are also modified in a manner
-similar to \CAR.
-The  defintions of \bcar\, \bcdr\ and \cbar\  induce   the  following
-relation $\hookrightarrow$ over sets of access paths:
-\begin{align*}
-  &\sigma_1\bcar\sigma_2  \hookrightarrow
-  \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
-&\sigma_1\bcdr\sigma_2  \hookrightarrow
-  \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
-  \acdr\sigma_2',~\mbox{and}\\
-&\sigma_1\cbar \emptyset \hookrightarrow \emptyset
-\end{align*}
-
-
-The reflexive  transitive closure of  $\hookrightarrow$ will
-be   denoted    as   $\stackrel{*}{\hookrightarrow}$.    The
-following proposition relates  the original and the modified
-liveness rules.
-
-%==============================================================
-\begin{figure*}[t]
-\begin{eqnarray*}
-\mathit{ref\/}(\kappa,\sigma,\Lfonly)
-          &=& \{\,\} \mbox{, for $\kappa$ a constant, including
-$\NIL$}\\
-\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
-          &=& \{x.\alpha \mid \acar\alpha \in \sigma\} \cup \{y.\alpha
-\mid \acdr\alpha \in \sigma\} \\
-\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in
-\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((\CDR~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in
-\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((\PRIM~x~y),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon, y.\epsilon\},  & \mbox{if}~\sigma \ne
-\emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((\NULLQ~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}((f~\myvec{x}),\sigma,\Lfonly)
-%          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
-          &=&  \begin{array}{@{}l}  % to discourage \displaystyle
-               \bigcup_{i=1}^n x_i.\Lf{f}{i}{\sigma}
-               \end{array}
-%          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
-\\[1ex]
-\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{ep}
-\mapsto
-x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
-  new e-path terminating with $\psi$}\\
-\mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
-        \begin{array}{l l}
-                    \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
-        \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
-        \lbrack\lbrace \mathit{ep} \mapsto
-\{x.\epsilon\}\rbrace\rbrack,  & \mbox{if}~\sigma \ne \emptyset\\
-        \emptyset_{\cal{M}?}  & \mbox{otherwise}
-                 \end{array} \\
-&&\mbox{where $\mathit{ep}$ is a new e-path
-  terminating with $\psi$}\\
-\mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-        \lambda\;\mathit{ep}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
-\mbox{where}~\mathcal{M} =
-\mathcal{L}(e,\sigma,\Lfonly),~\Lv \in
-\mathcal{M}(ep),~\mbox{and}~f~\mbox{is the new function}\\
-&& \makebox[0mm]{\hspace*{7cm}
- $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
-           x_2\, \ldots\, x_n)/x]))$,} \\
- \makebox[0mm]{\hspace*{8cm} where
-     $x_1\, \ldots\, x_n$ are the variables in $s$}
-\end{eqnarray*}
-\begin{minipage}{0.85\textwidth}
-\infrule[live-define]
-        {\mathcal{L}(e_f,\sigma,\Lfonly) =
-           \bigcup_{i=1}^n z_i.\Lf{f}{i}{\sigma}
-              \mbox{ for each $f$ and $\sigma$}
-        }
-        { \mathit{df_1} \ldots \mathit{df_k} \len \Lfonly
-\\ \makebox[0mm]{where
-     $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $\mathit{df_1}
-\ldots \mathit{df_k}$}}
-\end{minipage}
-  \caption{Liveness equations and judgement rule}\label{fig:live-judge}
-\end{figure*}
+%================================================================
 
 
 \begin{proposition}
@@ -1172,11 +1174,12 @@ For  an explanation  of why  the  proposition holds  for the  modified
 \CONS\  rule,   we  refer   the  reader  to   \cite{asati14lgc}.   The
 proposition also holds for other modified rules for similar reasons.
 
-{\color{red} \medskip \hrule \hrule \hrule  \medskip }
+%Thick red line 
+%{\color{red} \medskip \hrule \hrule \hrule  \medskip }
 
 \newcommand{\emm}[2]{\ensuremath{\mathcal{#1}_{#2}}}
 
-\section{Generating Liveness Equations}
+\subsection{Generating Liveness Equations}
 The  program  in  Figure~\ref{fig:mot-example2}  serves as  a  running
 example.   Given a  function $\mathit{f}$,  we now  describe  how to
 generate    equations    for     the    demand    transformation
@@ -2078,6 +2081,6 @@ it useful but please remember not to change it.
 %% =======
 
 %------------------------------------------------------------%
-\input{lazy-liveness}
+%\input{lazy-liveness}
 
 \end{document}
