@@ -39,7 +39,7 @@
 \newcommand{\mycomment}[1]{}
 \definecolor{Myblue}{rgb}{.2,0,1}
 \newcommand{\comment}[1]{{\color{Myblue}{(#1)}}}
-\newcommand{\cred}[1]{{\color{red}{(#1)}}}
+\newcommand{\cred}[1]{{\color{red}{#1}}}
 \newcommand{\alan}[1]{{\color{red}{\medskip \hrule\medskip
     #1 \medskip \hrule \medskip}}}
 \newcommand{\blankout}[1]{}
@@ -1005,14 +1005,6 @@ arising out of $\mathit{ref}$  and $\mathcal{L}$ as the rules of a
 grammar.   But first  we modify  the rules  themselves to  a different
 form.
 
-
-
-
-
-
-
-
-
 \subsection{Modifying the liveness rules.}
 
 The      $\mathit{ref}$     rule      for     \CONS,      shown     in
@@ -1032,10 +1024,10 @@ symbolically.  We  introduce three  new  symbols.   First, \bcar\  and
 \end{align*}
 and \cbar\ as:
 \begin{align*}
- \cbar\sigma \triangleq& \emptyset~\mbox{if}~\sigma = \emptyset\\
+ \cbar\sigma \triangleq\; & \emptyset~\mbox{if}~\sigma = \emptyset\\
                        & \{\epsilon\} ~\mbox{otherwise}
 \end{align*}
-
+Note that \cbar\ is idempotent. 
 We can now rewrite the \CONS\ and the \CAR\ rules of $\mathit{ref}$ as:
 \begin{align*}
 &\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
@@ -1076,7 +1068,7 @@ liveness rules.
 
 \begin{figure*}[t!]
   \begin{tabular}{cc}
-    \begin{minipage}{.45\textwidth}
+    \begin{minipage}{.40\textwidth}
         \small
         \renewcommand{\arraystretch}{1}{
           \begin{uprogram}
@@ -1120,14 +1112,17 @@ $\leftarrow$  \ldots \IN
         \small
 \begin{eqnarray*}
         \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
-              [\;ep_1 \mapsto \lbrace \px.\sigma_{\length},
-\xl.\cbar\sigma_{\length} \rbrace ,~ep_2 \mapsto \lbrace \rbrace,\\
- &&          \;\;  ep_3 \mapsto \lbrace \pz.\sigma_{\length},
-                \py.\cbar\sigma_{\length},
-\pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}},\\
-&&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}
-                \rbrace~\rbrack \\
+              [\;ep_1 \mapsto \lbrace \px.\cbar \sigma,
+\xl.\cbar\sigma\rbrace ,~ep_2 \mapsto \lbrace \cred{
+\pv.\sigma}  \rbrace,\\
+ &&          \;\;  ep_3 \mapsto \lbrace \pz.\sigma,
+                \py.\cbar\sigma,
+\pu.\Lf{\length}{\mbox{1}}{\cbar\sigma},\\
+&&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; 
+\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\cbar\sigma} \cup 
+%%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
+\cred{\cbar\Lf{\length}{1}{\cbar\sigma}}\}\}
+             \rbrack \\
             \cal{P_{\mbox{\tiny \length}}} &=&
                 [\;\pi_1 \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace,  \
                  \pi_2 \mapsto \lbrace ep_1, ep_2, ep_3
@@ -1137,17 +1132,17 @@ $\leftarrow$  \ldots \IN
                   \rbrace, \pi_5 \mapsto \lbrace  ep_3 \rbrace, \\
  &&  \;\;                        \pi_6 \mapsto \lbrace ep_3 \rbrace,
 \pi_7 \mapsto
-                  \lbrace ep_3\rbrace, \pi_8 \mapsto \lbrace ep_3
+                   \lbrace ep_3\rbrace, \pi_8 \mapsto \lbrace ep_3
 \rbrace~\rbrack\\
               \mathcal{L}(e_{\main},\sigma,\Lfonly) &=&
                 [\;
-                  ep_4 \mapsto \lbrace \pw.\sigma_{\mathit{\!all}},
-\pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots\rbrace
-                  ]\\
-              \cal{P_{\mbox{\tiny \main}}} &=&
-                  \lbrack~\pi_6 \mapsto \lbrace ep_4 \rbrace,  \
-                   \pi_7 \mapsto \lbrace ep_4 \rbrace,  \
-                  \pi_8 \mapsto \lbrace ep_4 \rbrace~\rbrack
+                  ep_4 \mapsto \lbrace \pw.\sigma,
+           \pb.\Lf{\length}{\mbox{1}}{\sigma}, \ldots\rbrace
+                   ] \\
+               \cal{P_{\mbox{\tiny \main}}} &=&
+                   \lbrack~\pi_9 \mapsto \lbrace ep_4 \rbrace,  \
+                    \pi_{10} \mapsto \lbrace ep_4 \rbrace,  \
+                   \pi_{11} \mapsto \lbrace ep_4 \rbrace,  \pi_{12} \mapsto \lbrace ep_4 \rbrace~\rbrack
 \end{eqnarray*}
     \end{minipage} \\
 (a)&
@@ -1194,12 +1189,13 @@ $e_{\mathit{f}}$ (assumed  to be  $\pi_1$). By the rule {\sc
 same as $\Lf{f}{i}{\sigma}$. Applying this to  \length, we have:
 \begin{eqnarray*}
 && \Lanv{1}{\xl} = \cbar\sigma \cup \acdr\Lf{\length}{1}{\cbar\sigma}
+  \cup \cbar\Lf{\length}{1}{\cbar\sigma}
 \end{eqnarray*}
 and  the only equation defining \Lfone{\length} is:
   \begin{eqnarray*}
    && \Lf{\length}{1}{\sigma}
-    =  \cbar\sigma \cup \acdr\Lf{\length}{1}{\cbar\sigma}
-   \end{eqnarray*}
+    =  \cbar\sigma \cup \acdr\Lf{\length}{1}{\cbar\sigma} \cup \cbar\Lf{\length}{1}{\cbar\sigma}
+\end{eqnarray*}
 
 In general, the equations for  \Lfonly\ are recursive since, as in the
 case  of  \length,  \Lan{1}\  may   have  been  defined  in  terms  of
@@ -1213,33 +1209,32 @@ closed form:
 \label{eq:LF:DI}
   \Lf{f}{i}{\sigma} = \Df{f}{i}.\sigma
 \end{eqnarray}
-where \Df{f}{i} are sets of  strings over the alphabet mentioned above.
-  Substituting the guessed form in
-the  equation  describing  \Lfonly$_{\mathit  f}$, and  factoring  out
-$\sigma$,  we get  an equation  for \Df{f}{i}  that is  independent of
-$\sigma$.   Any   solution  for   \Df{f}{i}  yields  a   solution  for
-\Lfonly$_{\mathit  f}$.  Applied  to  \Lfonly$_{\mathit \length}$,  we
-get:
+where \Df{f}{i} are sets of strings over the alphabet mentioned above.
+Substituting   the   guessed   form   in   the   equation   describing
+\Lfonly$_{\mathit f}$, and factoring  out $\sigma$, we get an equation
+for  \Df{f}{i} that  is  independent of  $\sigma$.   Any solution  for
+\Df{f}{i}  yields a  solution for  \Lfonly$_{\mathit f}$.   Applied to
+\Lfonly$_{\mathit \length}$, we get:
   \begin{eqnarray*}
-  &&  \Df{\length}{1}.\sigma = \cbar.\sigma
-    \cup \acdr\Df{\length}{1}(\cbar\sigma), ~\mbox{or}\\
-  &&  \Df{\length}{1} = \lbrace\cbar\rbrace
-    \cup \acdr\Df{\length}{1}\cbar
+&&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}.\sigma,~\mbox{and}\\
+&&   \Df{\length}{1} = \cbar \cup \acdr\Df{\length}{1}\cbar 
+       \cup \cbar\Df{\length}{1}.{\cbar}
   \end{eqnarray*}
 
 Note that this equation can also be viewed as a CFG with \{\acdr,
-\cbar\} as the terminal symbols and \Df{\length}{1} as the sole
+\cbar\} as terminal symbols and \Df{\length}{1} as the sole
 non-terminal.
 
 \subsection{Generating liveness equations \Lv\  for function bodies}
 \label{sec:bodylivenessbodies}
 
-To avoid analysing the body of a function for each call, we calculated
+To avoid analyzing the body of a function for each call, we calculated
 the liveness  for the arguments and  the variables in  a function with
 respect to a symbolic demand  $\sigma$.  To get the actual liveness we
 calculate an over-approximation of the  actual demands made by all the
 calls by a {\em summary demand} and calculate the liveness at each GC
-point inside the  function based on this summary  demand.  Even though
+point \comment{have we defined what a garbage collection point
+  is?} inside the  function based on this summary  demand.  Even though
 we  lose precision  due to  this, our  experiments show  that  this is
 acceptable  \comment{Is  this  claim  true?}.   The  0-CFA-style  {\em
   summary demand}  is calculated by taking  a union of  the demands at
@@ -1250,7 +1245,9 @@ $\pi\!\!:\!(\LET~x   \leftarrow   (f\,y_1\,\ldots\,y_n)~\IN~\pi_i:e)$.
 Let the  demand on $g$  be $\sigma_g$ and,  based on this  demand, the
 liveness of  $x$ at $\pi_i$ be  $\Lanv{i}{x}$.  By the  $\LET$ rule of
 Figure~\ref{fig:live-judge},    the   call   at    $\pi$   contributes
-$\Lanv{i}{x}$ to  the demand $\sigma_f$.  Assuming that  there are $k$
+$\Lanv{i}{x}$ to  the demand $\sigma_f$. Let us denote the
+contribution of a call site $\pi$ in a function $g$ to the overall
+demand on the function $f$ as $\deltacall{f}{\pi}{g}$. Assuming that  there are $k$
 call sites to function $f$, $\pi^1$ (in function $g^1$) \ldots $\pi^k$
 (in   function  $g^k$),  the   over-approximation  of   $\sigma_f$  is
 $\deltacall{f}{\pi^1}{g^1} \cup \cdots \cup \deltacall{f}{\pi^k}{g^k}$.
@@ -1261,34 +1258,21 @@ is called through a  printing mechanism with demand $\sigma_\mainpgm =
 
 For  the  running  example,   $\length$  has  calls  from  $\main$  at
 $\pi_{10}$ and a recursive call at $\pi_6$.
-%\newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
 So $\sigma_{\length} =
-     \deltacall{\length}{\pi_{11}}{\main}  \cup
+     \deltacall{\length}{\pi_{11}}{\main}  \cup 
 \deltacall{\length}{\pi_6}{\length}$.
 Filling in  the values gives:
 \begin{eqnarray*}
 \sigma_{\length}    &=&
- \sigma_{\!all}  ~\cup~
-\acdr\Lf{\length}{1}{\cbar\sigma_{\mathit{\length}}}
+ \sigma_{\!all}  ~\cup~{\cbar\sigma_{\mathit{\length}}}
 \end{eqnarray*}
-For some of the program points in \length\  and \main,  this gives
-{\color {red} Prasanna, please fill this correctly}. You could use the
-set notation if the map notation spills over:
+As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pb} in terms
+of  $\sigma_{\length}$ are:
 \begin{align*}
-\Lan{1} &= \lbrace  \px.\sigma_{\length}, \xl.\cbar\sigma_{\length},
-\pz.\sigma_{\length},\
-              \py.\cbar\sigma_{\length}, \\
-&~~~~~~~\pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}},
-\xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}} \rbrace \\
-\Lan{2} & =  \lbrace  \px.\sigma_{\length}, \xl.\cbar\sigma_{\length},
-\pz.\sigma_{\length},\
-                  \py.\cbar\sigma_{\length}, \\
-&\pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}},
-\xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}} \rbrace \\
-\Lan{5} &= \lbrace \pu.\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}},
-\xl.\acdr\Lf{\length}{\mbox{1}}{\cbar\sigma_{\length}}\rbrace \\
-\Lan{8} &= \lbrace \pw.\sigma_{\mathit{\!all}},
-\pb.\Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}, \ldots  \rbrace
+\Lanv{1}{\pl} &= \cbar\sigma_{\length} \cup \acdr\Lf{\length}{1}{\cbar\sigma_{\length}}
+  \cup \cbar\Lf{\length}{1}{\cbar\sigma_{\length}}
+ \\
+\Lanv{9}{\pb} &= \Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}
 \end{align*}
 
 In summary, the equations generated during liveness analysis are:
@@ -1297,13 +1281,11 @@ In summary, the equations generated during liveness analysis are:
 \Df{f}{i} for use by \Lfonly$_{\mathit f}$.
 \item  For  each   function  $\mathit{f}$, an  equation  defining
 the summary demand  $\sigma_{\mathit f}$ on $e_f$.
-% \marginpar{Consistency: summary vs cumulative?}
 \item For each function $\mathit{f}$ (including $\mainpgm$ for
-  $e_\mainpgm$) \comment{Have we defined GC points for lazy languages?
-No, we define it only in the implementation section as of now.}
+  $e_\mainpgm$) 
 an equation defining
   liveness at each GC point of $e_{\mathit f}$.
-
+\end{enumerate}
 \subsection{Solving liveness equations---the grammar
 interpretation}\label{sec:grammar-formulation}
 The  equations above can now be re-interpreted as a
@@ -1460,33 +1442,32 @@ membership of forward paths.
    paths only.}\label{algo:simplify-NFA} \figrule
 \end{figure*}
 
-The algorithm repeatedly introduces  $\epsilon$ edges to bypass a
-pair of consecutive edges labelled \bcar\acar\ or \bcdr\acdr.  The
-process is  continued till  a fixed point  is reached.   When the
-fixed point  is reached, the resulting NFA  contains all possible
-reductions corresponding  to all the  paths in the  original NFA.
-The proofs  of the termination  and correctness of  the algorithm
-are given in an earlier paper~\cite{karkare07liveness}.
+The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
+of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
+is continued till  a fixed point is reached.  When  the fixed point is
+reached,   the  resulting   NFA  contains   all   possible  reductions
+corresponding to all the paths in the original NFA.  The proofs of the
+termination and correctness  of the algorithm are given  in an earlier
+paper~\cite{karkare07liveness}.
 
 %%\input{liveness-dfa.tex}
-\comment{change according to example}
-We  illustrate  the  algorithm  in  Figure~\ref{algo:simplify-NFA}  by
-constructing      the       automaton      for      \var{\Lanv{9}{y}}.
-Figure~\ref{fig:automata-construction}  (c)  shows  the automaton  for
-\var{\Lanv{9}{y}}   constructed   by   composing  the   automata   for
-\var{\Uf{\append}{1}}, \var{\Df{\append}{1}} and $(\epsilon \mid \acdr
-\mid \acdr\acar\sigma_{\mathit{\!all}})$.  After $\epsilon$ removal we
-get (d). We  add an $\epsilon$ edge from $q_2$  to $q_3$ bypassing the
-\bcdr\acdr\ pair from $q_2$ to $q_2$  and then to $q_3$. This is shown
-in (e).  The $\epsilon$ edge is removed in (f) and a second $\epsilon$
-is added to the automaton bypassing the \bcar\acar\ pair from $q_1$ to
-$q_2$.   Removing this $\epsilon$  edge gives  the automaton  shown in
-(g).  Restricting  this automaton  to forward edges  only, we  get the
-final   automaton   shown    in   (h).   This   automaton   recognizes
-$\acdr^{*}\!\mid\acdr^{*}\acar  \sigma_{\mathit \!all}$,  showing that
-the entire list \py, including  its elements, is live at $\pi_9$. Also
-note that the  language accepted by the final  automaton satisfies the
-prefix-closed property.
+\comment{change according  to example} We illustrate  the algorithm in
+Figure~\ref{algo:simplify-NFA}  by   constructing  the  automaton  for
+\var{\Lanv{9}{y}}.   Figure~\ref{fig:automata-construction}  (c) shows
+the  automaton  for  \var{\Lanv{9}{y}}  constructed by  composing  the
+automata   for    \var{\Uf{\append}{1}},   \var{\Df{\append}{1}}   and
+$(\epsilon \mid \acdr \mid \acdr\acar\sigma_{\mathit{\!all}})$.  After
+$\epsilon$ removal we get (d). We add an $\epsilon$ edge from $q_2$ to
+$q_3$ bypassing the  \bcdr\acdr\ pair from $q_2$ to  $q_2$ and then to
+$q_3$. This  is shown in (e).   The $\epsilon$ edge is  removed in (f)
+and  a second  $\epsilon$  is  added to  the  automaton bypassing  the
+\bcar\acar\ pair  from $q_1$ to $q_2$.  Removing  this $\epsilon$ edge
+gives  the automaton  shown  in (g).   Restricting  this automaton  to
+forward edges  only, we  get the final  automaton shown in  (h).  This
+automaton  recognizes  $\acdr^{*}\!\mid\acdr^{*}\acar  \sigma_{\mathit
+  \!all}$, showing  that the entire list \py,  including its elements,
+is live at $\pi_9$. Also note  that the language accepted by the final
+automaton satisfies the prefix-closed property.
 
 
 \hrule
@@ -1528,18 +1509,24 @@ procedure copy (cell)
  ENDIF
  copy_references_on_print_stack()
 \end{verbatim}
-In the simple algorithm presented we consult liveness automata for copying both \CONS cells and closures. 
-Copying \CONS cells are simple and just involve consulting the liveness automaton corresponding to them 
-and recursively copying. In case of closures, it is more complicated as they might refer to data/closures 
-which might be created in a different environment(function), all of
-which might not even exist on the program stack. To overcome this we we carry some extra data 
-with each closure, we carry the program point at which it was evaluated and also the names of the free 
-variables contained in the closure. This gives us precise liveness information of the free variables of a 
-closure but involves run-time overhead of updating the program point correctly. To avoid this overhead we 
-go for a safer approximation by storing the creation point of the closure and using it to check liveness. 
-This is safe since the liveness at the creation point of the closure encompasses all possible uses of the 
-closure but it might be very imprecise as at run-time the actual liveness required might be way less than 
-what is found at the creation point. \cred{repeated traversals if sharing}.
+In  the simple algorithm  presented we  consult liveness  automata for
+copying both \CONS cells and closures.  Copying \CONS cells are simple
+and just  involve consulting  the liveness automaton  corresponding to
+them  and  recursively  copying.  In  case of  closures,  it  is  more
+complicated  as  they might  refer  to  data/closures  which might  be
+created in  a different environment(function), all of  which might not
+even exist  on the program  stack. To overcome  this we we  carry some
+extra data with  each closure, we carry the program  point at which it
+was evaluated  and also the names  of the free  variables contained in
+the closure.  This gives us  precise liveness information of  the free
+variables of a closure but  involves run-time overhead of updating the
+program  point correctly. To  avoid this  overhead we  go for  a safer
+approximation by storing  the creation point of the  closure and using
+it to check liveness.  This is safe since the liveness at the creation
+point of the closure encompasses  all possible uses of the closure but
+it might be very imprecise as at run-time the actual liveness required
+might   be   way  less   than   what   is   found  at   the   creation
+point. \cred{repeated traversals if sharing}.
 
 \subsection{Modified GC Algorithm}
 Since the first algorithm requires a lot of bookkeeping and is not
@@ -2137,7 +2124,7 @@ experienced to expert user of \LaTeX, you may find reading
 it useful but please remember not to change it.
 %\balancecolumns % GM June 2007
 % That's all folks!
-\end{enumerate}
+
 
 
 
