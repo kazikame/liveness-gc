@@ -188,7 +188,7 @@
 	  l
 	  ))))
 
-(let ((_var102 10))
+(let ((_var102 4))
   (let ((l '()))
      (let ((_var103 (nqueens _var102)))
           _var103)))
