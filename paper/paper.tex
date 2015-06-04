@@ -1510,6 +1510,14 @@ handling closures along with their pros and cons.
 \cred{Introduce terminology}
 % Abstract description of the GC algorithm
 \begin{verbatim}
+proceudre lgc()
+ FOREACH reference in root set
+ DO
+   IF reference is live
+     copy(cell)
+   ENDIF
+ DONE
+
 procedure copy (cell)
  IF {cell is live}
    new_cell <-  dup_heapcell(cell)
@@ -1519,9 +1527,9 @@ procedure copy (cell)
       
         new_cdr        <-  copy(cell.cdr)
         new_cell.cdr   <-  new_cdr
-    ENDIF
+   ENDIF
  ELSE
-  IF {celltype is closure}
+   IF {celltype is closure}
        new_cell.arg1 <-  copy(cell.arg1)
        new_cell.arg2 <-  copy(cell.arg2)
    ENDIF
@@ -1532,14 +1540,28 @@ In the simple algorithm presented we consult liveness automata for copying both 
 Copying \CONS cells are simple and just involve consulting the liveness automaton corresponding to them 
 and recursively copying. In case of closures, it is more complicated as they might refer to data/closures 
 which might be created in a different environment(function), all of
-which might not even exist on the program stack. To overcome this we we carry some extra data 
-with each closure, we carry the program point at which it was evaluated and also the names of the free 
+which might not even exist on the program stack. To overcome this we need to carry extra information 
+with each closure, the program point at which it was evaluated and also the names of the free 
 variables contained in the closure. This gives us precise liveness information of the free variables of a 
 closure but involves run-time overhead of updating the program point correctly. To avoid this overhead we 
 go for a safer approximation by storing the creation point of the closure and using it to check liveness. 
 This is safe since the liveness at the creation point of the closure encompasses all possible uses of the 
 closure but it might be very imprecise as at run-time the actual liveness required might be way less than 
-what is found at the creation point. \cred{repeated traversals if sharing}.
+what is found at the creation point. 
+
+The advantage of this method is that it collects all dead cells even if they are part of a closure and hence 
+will reduce the memory requirements and the number of garbage collections. The main drawbacks of this method 
+is the fact that the algorithm might do multiple traversals over the same structure. Assume that two references 
+point to the same list, now using reachability if it is garbage collected using one reference there is no need 
+to traverse using the other reference as everything reachable from the root node would have been copied. 
+Unfortunately, this is not the case with liveness based GC as the two references might make different sections 
+of the list as live and copy them. Liveness based algorithm will have to make one traversal per reference. 
+Experimentally we found that this was a major source of overhead in the liveness based algorithm. 
+This can be mitigated by maintaining a list of liveness automata states that a particular heap cell was 
+traversed with and ensuring that we do not repeat traversals with the same state. This requires that each 
+cell maintain a list of state which potentially might contain all the states. Hence this is not a feasible 
+solution.
+\cred{repeated traversals if sharing}.
 
 \subsection{Modified GC Algorithm}
 Since the first algorithm requires a lot of bookkeeping and is not
@@ -1547,56 +1569,50 @@ precise, we have a second version of the algorithm
 which does not use liveness for copying closures. 
 \begin{verbatim}
 procedure copy (cell)
- new_cell <-  dup_heapcell(cell)
- IF{celltype is cons}
-     IF {cell.car is live}
-        new_car        <-  copy(cell.car)
-        new_cell.car   <-  new_car
-     ENDIF
-     IF {cell.cdr is live}
-        new_cdr        <-  copy(cell.cdr)
-        new_cell.cdr   <-  new_cdr
-     ENDIF
- ELSE
-  IF {celltype is closure && cell is not copied}
-    new_cell      <-  dup_heapcell(cell)
-    new_cell.arg1 <-  copy(cell.arg1)
-    new_cell.arg2 <-  copy(cell.arg2)
+  IF{celltype is cons}
+    IF cell is live &&
+         cell is not copied using reachability
+       new_cell <-  dup_heapcell(cell) 
+       new_car        <-  copy(cell.car)
+       new_cell.car   <-  new_car
+       new_cdr        <-  copy(cell.cdr)
+       new_cell.cdr   <-  new_cdr
+    ELSE
+       cell <- NULL
+    ENDIF
+  ELSE
+    IF {celltype is closure && cell is not copied}
+       new_cell      <-  dup_heapcell(cell)
+       new_cell.arg1 <-  copy(cell.arg1)
+       new_cell.arg2 <-  copy(cell.arg2)
+    ENDIF
   ENDIF
- ENDIF
  copy_references_on_print_stack()
 \end{verbatim}
 
 In this algorithm we consult the liveness automata only if it is a cons cell, for closures we 
 assume everything under it to be live and copy everything that is reachable. Although this might 
-lead to copying more cells it is faster as there are no liveness checks. Additionally we can 
-optimize some of the processing by not traversing cells more than once. This is described in 
-sub-section[]. \comment{Once experimental results are obtained compare the two algorithms here}
+lead to copying more cells it is faster as there are no liveness checks. 
+\comment{Once experimental results are obtained compare the two algorithms here}
 Since we mix both liveness based GC and reachability the garbage collector has to be more careful 
 and ensure references marked non-live are never copied using reachability. We discuss this issue 
-and its solution in sub-section[]\comment{hanging like a sore thumb}.
+and its solution in sub-section[]\cred{hanging like a sore thumb}.
 
-\subsection{Optimization for RGC for closures}
-One of the  reasosn why reachability based GC  is faster than liveness
-based GC is  due to the fact that  in case we try to copy  a cons cell
-which is  already copied  we do  not need to  traverse it  any further.
- The  same is not true in the case  of LGC, as the set
-of  liveness paths  may not  be similar  in both  the
-traversals. \cred{Push earlier: One
-optimization is  to keep  track of all  the liveness  automaton states
-that a particular  cons cell has been visited with  and ensure that we
-do  not  traverse  it  with  the  same state  more  than  once.   This
-optimization requires extra memory  for each heap cell and potentially
-it can hold  all the automata states.  Therefore it  is not a feasible
-solution.} In case of lazy  languages since we use reachability to copy
-closures, some cons  cells might be copied using  reachability. We can
-avoid  repeated traversals of  these cons  cells without  tracking the
-states. This only requires the  knowledge of whether the cons cell was
-copied using  reachability.  Hence  we use a  flag to remember  if the
-heap cell was  copied using reachability at any time, if  it is set we
-do not traverse any further.\comment{Maybe add a diagram to make it clearer}
+\subsubsection{Optimization for RGC for closures}
+An advantage of using reachablity for closures is that it opens up 
+certain opportunities of optimization. As we saw in section[], multiple 
+traversals over the same structure was a major inefficiency in the full 
+liveness based algorithm and overcoming it required a lot of memory.
+Using reachability for closures allows us to overcome this partially 
+using limited amount of memory. Any heap cell which is part of a closure 
+is copied using reachaibilty and hence by maintaining a single flag in each 
+cell to indicate whether it was copied using reachability prevents 
+traversing the same cell multiple times. Experimental results again 
+indicate that for lazy languages this gives a substantial performance 
+improvement.
+\comment{Maybe add a diagram}
 
-\subsection{Issues with mixing LGC and RGC}
+\subsubsection{Issues with mixing LGC and RGC}
 A consequence of  copying everything under a closure  is the fact that
 we can end up trying to copy things which are not live and corrupt the
 heap. This  can happen if at some  $GC_k$ a cons cell  is copied using

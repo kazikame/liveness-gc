@@ -1669,7 +1669,7 @@ void liveness_gc()
 
 
 
-#ifndef __DEBUG__GC
+#ifdef __DEBUG__GC
 	  ofstream pre("GC" + to_string(gccount) + ".txt", ios_base::out);
 	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
 	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
@@ -1693,7 +1693,6 @@ void liveness_gc()
     	  cerr << "Looking up " << nodeName << endl;
     	  if (got != statemap.end())
     	  {
-
     		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second);
     		  vhit->ref = addr;
 
@@ -1707,6 +1706,8 @@ void liveness_gc()
   cerr << "Completed liveness GC" << endl;
   update_heap_ref_stack(pre, 1);
   clear_live_buffer(pre);
+  cerr << "Copied " << numcopied << " cells" << endl;
+  numcopied = 0;
 #ifdef __DEBUG__GC
 	pre.close();
 	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
@@ -1801,6 +1802,7 @@ cons* followpaths(cons* loc, state_index index)
   case funcApplicationExprClosure:
   case funcArgClosure:
   {
+      //What happens to arg1? Shouldn't it get updated during GC?
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
 
 	  auto liveness_state = statemap.find(liveness_string);
@@ -1809,6 +1811,15 @@ cons* followpaths(cons* loc, state_index index)
 		  cerr << "Doing GC corresponding to " << liveness_string << endl;
 		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
 		  loccopy->val.closure.arg2 = new_arg2;
+	  }
+
+	  if (loccopy->val.closure.arg1 != NULL)
+	  {
+		  //More arguments exist and have to be copied
+		  auto liveness_state = statemap.find("L/-1/c");
+		  //Using dummy state to always make it live
+		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
+		  loccopy->val.closure.arg1 = new_arg1;
 	  }
   }
   break;
