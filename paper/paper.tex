@@ -1489,6 +1489,15 @@ are  handled. The  following sub-sections  show two  different  ways of
 handling closures along with their pros and cons.
 \subsection{A simple LGC Algorithm}
 \cred{Introduce terminology}
+We introduce certain terminology that we use in our discussion of the 
+garbage collection algorithms. A reference is a field which holds the 
+address of a heap location. Root set refers to the set of all references 
+that are on the program stack during garbage collection.
+A heap cell can either contain an atomic value, a \CONS\ cell or a closure. A closure 
+has fields to identify the closure type and 2 arguments. In case of function calls 
+with more than 2 arguments we use currying (one of the argument fields will point to another
+ heap location containing the next argument and so on). By reachability we mean all heap 
+locations that are reachable traversing the argument fields of a given reference.
 % Abstract description of the GC algorithm
 \begin{verbatim}
 proceudre lgc()
@@ -1564,9 +1573,7 @@ procedure copy (cell)
     ENDIF
   ELSE
     IF {celltype is closure && cell is not copied}
-       new_cell      <-  dup_heapcell(cell)
-       new_cell.arg1 <-  copy(cell.arg1)
-       new_cell.arg2 <-  copy(cell.arg2)
+       new_cell  <- copy_and_mark_reachable_cells(cell)
     ENDIF
   ENDIF
  copy_references_on_print_stack()
