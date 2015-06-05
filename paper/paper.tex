@@ -57,6 +57,8 @@
 \newcommand{\bang}{\mbox{\sc bang}}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{lemma}[theorem]{Lemma}
 \begin{document}
 % --- Author Metadata here ---
 \conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
@@ -1054,16 +1056,14 @@ relation $\hookrightarrow$ over sets of access paths:
 &\sigma_1\bcdr\sigma_2  \hookrightarrow
   \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
   \acdr\sigma_2',~\mbox{and}\\
+&\sigma_1\cbar \sigma_2 \hookrightarrow \epsilon, \mbox{ if } \sigma \ne
+  \emptyset \\
 &\sigma_1\cbar \emptyset \hookrightarrow \emptyset
 \end{align*}
-
-
 The reflexive  transitive closure of  $\hookrightarrow$ will
 be   denoted    as   $\stackrel{*}{\hookrightarrow}$.    The
 following proposition relates  the original and the modified
 liveness rules.
-
-
 
 
 \begin{figure*}[t!]
@@ -1207,7 +1207,7 @@ symbols  in the  alphabet  $\lbrace \acar,  \acdr,\bcar, \bcdr,  \cbar
 closed form:
 \begin{eqnarray}
 \label{eq:LF:DI}
-  \Lf{f}{i}{\sigma} = \Df{f}{i}.\sigma
+  \Lf{f}{i}{\sigma} = \Df{f}{i}\sigma
 \end{eqnarray}
 where \Df{f}{i} are sets of strings over the alphabet mentioned above.
 Substituting   the   guessed   form   in   the   equation   describing
@@ -1216,9 +1216,9 @@ for  \Df{f}{i} that  is  independent of  $\sigma$.   Any solution  for
 \Df{f}{i}  yields a  solution for  \Lfonly$_{\mathit f}$.   Applied to
 \Lfonly$_{\mathit \length}$, we get:
   \begin{eqnarray*}
-&&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}.\sigma,~\mbox{and}\\
+&&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}\sigma,~\mbox{and}\\
 &&   \Df{\length}{1} = \cbar \cup \acdr\Df{\length}{1}\cbar 
-       \cup \cbar\Df{\length}{1}.{\cbar}
+       \cup \cbar\Df{\length}{1}{\cbar}
   \end{eqnarray*}
 
 Note that this equation can also be viewed as a CFG with \{\acdr,
@@ -1232,9 +1232,8 @@ To avoid analyzing the body of a function for each call, we calculated
 the liveness  for the arguments and  the variables in  a function with
 respect to a symbolic demand  $\sigma$.  To get the actual liveness we
 calculate an over-approximation of the  actual demands made by all the
-calls by a {\em summary demand} and calculate the liveness at each GC
-point \comment{have we defined what a garbage collection point
-  is?} inside the  function based on this summary  demand.  Even though
+calls by a {\em summary demand}  and calculate the liveness at each GC
+point inside the  function based on this summary  demand.  Even though
 we  lose precision  due to  this, our  experiments show  that  this is
 acceptable  \comment{Is  this  claim  true?}.   The  0-CFA-style  {\em
   summary demand}  is calculated by taking  a union of  the demands at
@@ -1245,15 +1244,16 @@ $\pi\!\!:\!(\LET~x   \leftarrow   (f\,y_1\,\ldots\,y_n)~\IN~\pi_i:e)$.
 Let the  demand on $g$  be $\sigma_g$ and,  based on this  demand, the
 liveness of  $x$ at $\pi_i$ be  $\Lanv{i}{x}$.  By the  $\LET$ rule of
 Figure~\ref{fig:live-judge},    the   call   at    $\pi$   contributes
-$\Lanv{i}{x}$ to  the demand $\sigma_f$. Let us denote the
-contribution of a call site $\pi$ in a function $g$ to the overall
-demand on the function $f$ as $\deltacall{f}{\pi}{g}$. Assuming that  there are $k$
+$\Lanv{i}{x}$ to the demand $\sigma_f$. Let us denote the contribution
+of a call  site $\pi$ in a  function $g$ to the overall  demand on the
+function $f$  as $\deltacall{f}{\pi}{g}$. Assuming that  there are $k$
 call sites to function $f$, $\pi^1$ (in function $g^1$) \ldots $\pi^k$
 (in   function  $g^k$),  the   over-approximation  of   $\sigma_f$  is
-$\deltacall{f}{\pi^1}{g^1} \cup \cdots \cup \deltacall{f}{\pi^k}{g^k}$.
-The distinguished function  \mainpgm\ is a special case.  We assume it
-is called through a  printing mechanism with demand $\sigma_\mainpgm =
-\{\acar,\acdr\}^\ast$ (denoted $\sigma_{\!all}$).
+$\deltacall{f}{\pi^1}{g^1}          \cup          \cdots          \cup
+\deltacall{f}{\pi^k}{g^k}$.  The distinguished function \mainpgm\ is a
+special case.   We assume  it is called  through a  printing mechanism
+with   demand   $\sigma_\mainpgm   =  \{\acar,\acdr\}^\ast$   (denoted
+$\sigma_{\!all}$).
 
 
 For  the  running  example,   $\length$  has  calls  from  $\main$  at
@@ -1269,10 +1269,10 @@ Filling in  the values gives:
 As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pb} in terms
 of  $\sigma_{\length}$ are:
 \begin{align*}
-\Lanv{1}{\pl} &= \cbar\sigma_{\length} \cup \acdr\Lf{\length}{1}{\cbar\sigma_{\length}}
-  \cup \cbar\Lf{\length}{1}{\cbar\sigma_{\length}}
+\Lanv{1}{\pl} &= \cbar\sigma_{\length} \cup \acdr\Df{\length}{1}\cbar\sigma_{\length}
+  \cup \cbar\Df{\length}{1}{\cbar\sigma_{\length}}
  \\
-\Lanv{9}{\pb} &= \Lf{\length}{\mbox{1}}{\sigma_{\mathit{\!all}}}
+\Lanv{9}{\pb} &= \Df{\length}{1}\sigma_{\mathit{\!all}}
 \end{align*}
 
 In summary, the equations generated during liveness analysis are:
@@ -1296,46 +1296,86 @@ a variable  $X$ occurring on  the LHS of the  equations generated
 from the analysis.  We can  think of the resulting productions as
 being associated with several  grammars, one for each non-terminal
 \var{\Lanv{i}{x}} regarded as a start symbol.  As an example, the
-grammar    for   \var{\Lanv{5}{\xl}}   comprises    the   following
+grammar    for   \var{\Lanv{1}{\xl}}   comprises    the   following
 productions:
  \begin{eqnarray*}
-\var{\Lanv{5}{\xl}}  &\rightarrow&   \var{\acdr \Lf
-  {\length}{1}{\cbar\sigma_{\length}}} \mid \cbar\sigma_{\length} \\
+\var{\Lanv{1}{\xl}}  &\rightarrow&   \cbar\sigma_{\length} \mid \acdr \var{\Df
+  {\length}{1}}{\cbar\sigma_{\length}} \mid
+  \cbar\var{\Df{\length}{1}}{\cbar\sigma_{\length}} \\
+  \var{\Df{\length}{1}} &\rightarrow& \cbar \mid
+  \acdr\var{\Df{\length}{1}}\cbar 
+       \mid \cbar\var{\Df{\length}{1}}{\cbar}\\
+\langle {\sigma_{\length}} \rangle
+&\rightarrow&
+\sigma_{\!all}  \mid \cbar\langle{\sigma_{\length}}\rangle
 \end{eqnarray*}
-\comment{Pick up a richer equation or more than one liveness equations}
-Other equations can be converted  similarly.     The  language
-generated  by  \var{\Lanv{i}{x}},
-denoted $\mathscr{L}(\var{\Lanv{i}{x}})
-$,  is the desired  solution of
-\Lanv{i}{x}.
-However, recall from  our earlier  discussion that
-the  decision problem that  we are  interested in  during garbage
-collection is:
+Other equations can be converted similarly.  The language generated by
+\var{\Lanv{i}{x}},  denoted $\mathscr{L}(\var{\Lanv{i}{x}}) $,  is the
+desired  solution of  \Lanv{i}{x}.  However,  recall from  our earlier
+discussion that the decision problem  that we are interested in during
+garbage collection at a program point $\pi_i$ is:
 \begin{quote}
-Let $x.\alpha$ be  a forward  access path  consisting  only  of   edges
-\acar\  and \acdr\  (but  not \bcar\  or  \bcdr).   Let
-$\mathscr{L}(\var{\Lanv{i}{x}})
-\stackrel{*}{\hookrightarrow} \sigma$, where  $\sigma$  consists
-of forward paths only. Then does $\alpha \in \sigma$?
+Let  $x.\alpha$ be  a forward  access  path consisting  only of  edges
+\acar\    and   \acdr\    (but    not   \bcar, \bcdr\ or \cbar).     Let
+$\mathscr{L}(\var{\Lanv{i}{x}}) \stackrel{*}{\hookrightarrow} \sigma$,
+where $\sigma$ consists  of forward paths only. Then  does $\alpha \in
+\sigma$?
 \end{quote}
-We could convert  the  rules  defining  $\hookrightarrow$  into
-productions and  add them to the grammar. However, this results
-in  an {\em  unrestricted grammar}~\cite{hopcraft90toc},  and the
-membership  problem   for  such  grammars   is
-undecidable. \comment{Rewrite it to say that this is a CFG with 3
-  unrestricted rules and the membership for even this grammar is
-undecidable}
-\comment{State the undecidability of the decision problem above.}
+
+We now model the above problem  as one of deciding the membership of a
+context-free  grammar  augmented  with  a fixed  set  of  unrestricted
+productions.
+
+\begin{definition}\label{def:specialgrammar} 
+Consider a form of  grammar $(N,T, p_1\cup p_2,S)$ in which $N$ is a set of
+non-terminals, $T = \{\acar, \acdr, \bcar, \bcdr, \cbar, \$\}$, $p_1$
+is a set of context-free production that contains the distinguished
+production $S \rightarrow \alpha\$$, $\alpha$ is a string of grammar
+symbols that does not contain $S$, and $p_2$ is the fixed set of
+unrestricted productions $\bcar\acar \rightarrow \epsilon$,
+$\bcdr\acdr \rightarrow \epsilon$, $\cbar\acar \rightarrow \cbar$,
+$\cbar\acdr \rightarrow \cbar$, and $\cbar\$ \rightarrow
+\epsilon$. 
+\end{definition}
+
+From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
+that the results of liveness analysis of any program can be modeled by
+the kind  of grammar described above. The  following proposition shows
+that the converse also holds.
+\begin{proposition}
+Given    a     grammar    $G$    of    the     form    described    in
+Definition~\ref{def:specialgrammar},  it is  possible  to construct  a
+program $p$  with program points  $\pi_i$ and variables $x$  such that
+the liveness  analysis of $p$  is same as  $G$ except for a  change in
+non-terminal names which now have the form \var{\Lanv{i}{x}}.
+\end{proposition}
+We now show that the decision problem required at garbage collection
+time is undecidable. 
+
+\begin{lemma}
+Consider a grammar $G$ of the kind  described in
+Definition~\ref{def:specialgrammar} and a forward access path $\alpha$ consisting
+of symbols \acar\ and \acdr\  only. The decision problem $\alpha \in
+\mathscr{L}(G)$ is undecidable.  
+\end{lemma}
+
+\comment{Proof:}
+
+%% We could convert the rules defining $\hookrightarrow$ into productions
+%% and  add  them  to the  grammar.  However,  this  results in  an  {\em
+%%   unrestricted   grammar}~\cite{hopcraft90toc},  and   the  membership
+%% problem for  such grammars is undecidable. \comment{Rewrite  it to say
+%%   that this is a CFG with  3 unrestricted rules and the membership for
+%%   even this grammar  is undecidable} \comment{State the undecidability
+%%   of the decision problem above.}
 
   We circumvent the problem by over-approximating the CFG generated by
-the analysis to  {\em
-  strongly  regular}  CFGs which  have   easy
-translations to non-deterministic finite state automata (NFA). The
-NFAs are then simplified on the
-basis  of  the  $\hookrightarrow$  rules to  enable  checking  of
-membership of forward access paths. The resulting NFAs are   finally
-converted to DFAs for use during garbage collection.
-\comment{Fix all comments and produce first draft}
+  the  analysis  to  {\em  strongly  regular}  CFGs  which  have  easy
+  translations to  non-deterministic finite state  automata (NFA). The
+  NFAs are then simplified on the basis of the $\hookrightarrow$ rules
+  to  enable  checking of  membership  of  forward  access paths.  The
+  resulting NFAs are finally converted  to DFAs for use during garbage
+  collection.  \comment{Fix all comments and produce first draft}
 %------------------------------------------------------------%
 \subsubsection{Approximating CFGs using NFAs.}
 \label{sec:NFA-approx}
@@ -1517,32 +1557,43 @@ procedure copy (cell)
  ENDIF
  copy_references_on_print_stack()
 \end{verbatim}
-In the simple algorithm presented we consult liveness automata for copying both \CONS cells and closures. 
-Copying \CONS cells are simple and just involve consulting the liveness automaton corresponding to them 
-and recursively copying. In case of closures, it is more complicated as they might refer to data/closures 
-which might be created in a different environment(function), all of
-which might not even exist on the program stack. To overcome this we need to carry extra information 
-with each closure, the program point at which it was evaluated and also the names of the free 
-variables contained in the closure. This gives us precise liveness information of the free variables of a 
-closure but involves run-time overhead of updating the program point correctly. To avoid this overhead we 
-go for a safer approximation by storing the creation point of the closure and using it to check liveness. 
-This is safe since the liveness at the creation point of the closure encompasses all possible uses of the 
-closure but it might be very imprecise as at run-time the actual liveness required might be way less than 
-what is found at the creation point. 
+In  the simple algorithm  presented we  consult liveness  automata for
+copying both \CONS cells and closures.  Copying \CONS cells are simple
+and just  involve consulting  the liveness automaton  corresponding to
+them  and  recursively  copying.  In  case of  closures,  it  is  more
+complicated  as  they might  refer  to  data/closures  which might  be
+created in  a different environment(function), all of  which might not
+even exist  on the program  stack. To overcome  this we need  to carry
+extra information with each closure, the program point at which it was
+evaluated and  also the names of  the free variables  contained in the
+closure.  This  gives us  precise  liveness  information  of the  free
+variables of a closure but  involves run-time overhead of updating the
+program  point correctly. To  avoid this  overhead we  go for  a safer
+approximation by storing  the creation point of the  closure and using
+it to check liveness.  This is safe since the liveness at the creation
+point of the closure encompasses  all possible uses of the closure but
+it might be very imprecise as at run-time the actual liveness required
+might be way less than what is found at the creation point.
 
-The advantage of this method is that it collects all dead cells even if they are part of a closure and hence 
-will reduce the memory requirements and the number of garbage collections. The main drawbacks of this method 
-is the fact that the algorithm might do multiple traversals over the same structure. Assume that two references 
-point to the same list, now using reachability if it is garbage collected using one reference there is no need 
-to traverse using the other reference as everything reachable from the root node would have been copied. 
-Unfortunately, this is not the case with liveness based GC as the two references might make different sections 
-of the list as live and copy them. Liveness based algorithm will have to make one traversal per reference. 
-Experimentally we found that this was a major source of overhead in the liveness based algorithm. 
-This can be mitigated by maintaining a list of liveness automata states that a particular heap cell was 
-traversed with and ensuring that we do not repeat traversals with the same state. This requires that each 
-cell maintain a list of state which potentially might contain all the states. Hence this is not a feasible 
-solution.
-\cred{repeated traversals if sharing}.
+The advantage of  this method is that it collects  all dead cells even
+if  they are  part  of a  closure  and hence  will  reduce the  memory
+requirements and the number of garbage collections. The main drawbacks
+of  this method  is  the fact  that  the algorithm  might do  multiple
+traversals over  the same structure. Assume that  two references point
+to the  same list, now using  reachability if it  is garbage collected
+using  one reference  there is  no need  to traverse  using  the other
+reference as everything  reachable from the root node  would have been
+copied.  Unfortunately, this is not the case with liveness based GC as
+the two references  might make different sections of  the list as live
+and  copy  them.  Liveness  based  algorithm will  have  to  make  one
+traversal  per reference.   Experimentally we  found that  this  was a
+major source of overhead in the liveness based algorithm.  This can be
+mitigated by  maintaining a  list of liveness  automata states  that a
+particular heap  cell was traversed with  and ensuring that  we do not
+repeat traversals  with the same  state. This requires that  each cell
+maintain  a list  of state  which  potentially might  contain all  the
+states.  Hence  this  is  not  a  feasible  solution.   \cred{repeated
+  traversals if sharing}.
 
 
 \subsection{Modified GC Algorithm}
@@ -1572,13 +1623,16 @@ procedure copy (cell)
  copy_references_on_print_stack()
 \end{verbatim}
 
-In this algorithm we consult the liveness automata only if it is a cons cell, for closures we 
-assume everything under it to be live and copy everything that is reachable. Although this might 
-lead to copying more cells it is faster as there are no liveness checks. 
-\comment{Once experimental results are obtained compare the two algorithms here}
-Since we mix both liveness based GC and reachability the garbage collector has to be more careful 
-and ensure references marked non-live are never copied using reachability. We discuss this issue 
-and its solution in sub-section[]\cred{hanging like a sore thumb}.
+In this  algorithm we consult  the liveness automata  only if it  is a
+cons cell, for  closures we assume everything under it  to be live and
+copy everything that is reachable. Although this might lead to copying
+more  cells   it  is   faster  as  there   are  no   liveness  checks.
+\comment{Once  experimental  results  are  obtained  compare  the  two
+  algorithms  here}   Since  we  mix   both  liveness  based   GC  and
+reachability the garbage  collector has to be more  careful and ensure
+references  marked non-live  are never  copied using  reachability. We
+discuss this issue and its solution in sub-section[]\cred{hanging like
+  a sore thumb}.
 
 \subsubsection{Optimization for RGC for closures}
 An advantage of using reachablity for closures is that it opens up 
@@ -2066,32 +2120,29 @@ heap during garbage collection.
 
 \section{Conclusions}
 \label{sec:conclusion}
-We have defined a notion of liveness on structured data;
-this generalizes classical liveness and strong liveness.
-We started with a general fully context-sensitive analysis which
-we proved correct with respect to a minefield semantics
-(this models the effect of garbage collection between every
-evaluation step).
+We  have  defined  a  notion  of liveness  on  structured  data;  this
+generalizes classical liveness and strong liveness.  We started with a
+general fully context-sensitive analysis  which we proved correct with
+respect to  a minefield semantics  (this models the effect  of garbage
+collection between every evaluation step).
 
-To avoid scalability issues (and to avoid performing part of
-the liveness computation at run time)
-we defined an 0-CFA version of this liveness analysis in which
-demands for function $f$ at all calling contexts are conflated into
-a single demand $\sigma_f$.
-This enabled us to treat the liveness equations symbolically obtaining
-context-free grammars for liveness at each GC point (calls to user
-functions and to $\CONS$).
-These were then converted to DFAs for run-time consultation by the
-garbage collector. Experiments confirm the precision of the analysis.
+To  avoid scalability  issues (and  to  avoid performing  part of  the
+liveness computation at run time)  we defined an 0-CFA version of this
+liveness analysis  in which  demands for function  $f$ at  all calling
+contexts are conflated into  a single demand $\sigma_f$.  This enabled
+us to treat the liveness equations symbolically obtaining context-free
+grammars for liveness at each GC point (calls to user functions and to
+$\CONS$).  These were then converted to DFAs for run-time consultation
+by  the garbage collector.  Experiments confirm  the precision  of the
+analysis.
 
 To obtain performance figures we compared a reachability-based garbage
 collector with a liveness-based  collector.  This showed a decrease in
-the  number   of  GCs,  more  garbage  collected   per  invocation.  A
-significant benefit of LGC is that programs can run in smaller memory
-when
-compared to RGC. This is potentially useful in situations where memory
-is limited---as with embedded systems. For a majority of programs, the
-garbage collection times were reduced.
+the  number  of  GCs,   more  garbage  collected  per  invocation.   A
+significant benefit of LGC is  that programs can run in smaller memory
+when compared to  RGC. This is potentially useful  in situations where
+memory  is  limited---as with  embedded  systems.  For  a majority  of
+programs, the garbage collection times were reduced.
 
 One issue we  highlighted was that while fewer  nodes were marked (and
 more garbage collected), sometimes  cons cells could be visited and
