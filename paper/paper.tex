@@ -1529,6 +1529,15 @@ are  handled. The  following sub-sections  show two  different  ways of
 handling closures along with their pros and cons.
 \subsection{A simple LGC Algorithm}
 \cred{Introduce terminology}
+We introduce certain terminology that we use in our discussion of the 
+garbage collection algorithms. A reference is a field which holds the 
+address of a heap location. Root set refers to the set of all references 
+that are on the program stack during garbage collection.
+A heap cell can either contain an atomic value, a \CONS\ cell or a closure. A closure 
+has fields to identify the closure type and 2 arguments. In case of function calls 
+with more than 2 arguments we use currying (one of the argument fields will point to another
+ heap location containing the next argument and so on). By reachability we mean all heap 
+locations that are reachable traversing the argument fields of a given reference.
 % Abstract description of the GC algorithm
 \begin{verbatim}
 proceudre lgc()
@@ -1615,38 +1624,36 @@ procedure copy (cell)
     ENDIF
   ELSE
     IF {celltype is closure && cell is not copied}
-       new_cell      <-  dup_heapcell(cell)
-       new_cell.arg1 <-  copy(cell.arg1)
-       new_cell.arg2 <-  copy(cell.arg2)
+       new_cell  <- copy_and_mark_reachable_cells(cell)
     ENDIF
   ENDIF
  copy_references_on_print_stack()
 \end{verbatim}
+
 
 In this  algorithm we consult  the liveness automata  only if it  is a
 cons cell, for  closures we assume everything under it  to be live and
 copy everything that is reachable. Although this might lead to copying
 more  cells   it  is   faster  as  there   are  no   liveness  checks.
 \comment{Once  experimental  results  are  obtained  compare  the  two
-  algorithms  here}   Since  we  mix   both  liveness  based   GC  and
-reachability the garbage  collector has to be more  careful and ensure
-references  marked non-live  are never  copied using  reachability. We
-discuss this issue and its solution in sub-section[]\cred{hanging like
-  a sore thumb}.
+  algorithms here}  Mixing liveness based GC and  reachability has its
+own set of pros and cons which we discuss further.\cred{hanging like a
+  sore thumb}.
+
 
 \subsubsection{Optimization for RGC for closures}
-An advantage of using reachablity for closures is that it opens up 
-certain opportunities of optimization. As we saw in section[], multiple 
-traversals over the same structure was a major inefficiency in the full 
-liveness based algorithm and overcoming it required a lot of memory.
-Using reachability for closures allows us to overcome this partially 
-using limited amount of memory. Any heap cell which is part of a closure 
-is copied using reachaibilty and hence by maintaining a single flag in each 
-cell to indicate whether it was copied using reachability prevents 
-traversing the same cell multiple times. Experimental results again 
-indicate that for lazy languages this gives a substantial performance 
-improvement.
-\comment{Maybe add a diagram}
+An advantage  of using  reachablity for closures  is that it  opens up
+certain  opportunities  of  optimization.  As  we  saw  in  section[],
+multiple traversals  over the same structure was  a major inefficiency
+in the full liveness based  algorithm and overcoming it required a lot
+of memory.  Using reachability for closures allows us to overcome this
+partially using limited amount of  memory. Any heap cell which is part
+of a closure  is copied using reachaibilty and  hence by maintaining a
+single  flag in  each cell  to indicate  whether it  was  copied using
+reachability    prevents   traversing    the   same    cell   multiple
+times.  Experimental results  again indicate  that for  lazy languages
+this gives a  substantial performance improvement.  \comment{Maybe add
+  a diagram}
 
 \subsubsection{Issues with mixing LGC and RGC}
 A consequence of  copying everything under a closure  is the fact that
@@ -1672,17 +1679,33 @@ to null after every GC.
 Another  difference that is  present in  GC of  lazy language  is the
 presence  of  a print  stack.  In  lazy  languages the  evaluation  of
 closures is  driven by the print  function\comment{Refer to SPJ's
-book}.  Hence, during  a GC there
-will be heap  references that will be present on  the stack which also
-have  to  copied/collected.   One  solution  is  to  assume  that  all
-references  present  on  the  print  stack are  fully  live  and  copy
-everything pointed  by them  akin to reachability.   This is  safe but
-copies heap  cells which  have already been  printed. Since  the print
-function is  not part of  the executing program its  liveness automata
-are not  considered. Therefore we  simulate the liveness of  the print
-function by using a flag in  the heap cell. The flag ensures that only
-the required parts  of a cons cell are copied.\cred{Very sketchy: Make
-  another attempt to write}
+book}.  
+Printing of atomic values is simple and does not trigger a garbage collection.
+In case of \CONS\ cells, the \CAR\ part is first printed and then the \CDR\ part.
+In a lazy language, both the \CAR\ and the \CDR\ parts could be closures, thus 
+requiring evaluation. A garbage collection might be triggered while printing 
+the \CAR\ part or the \CDR\ part. Therefore, whenever a garbage collection is 
+triggered we have to consider any references that might be on the print stack 
+and copy them. Liveness automata does not exist for the print function as it 
+is not part of the executing program. Since the print function makes everything 
+reachable from a cell live we can copy all cells reachable from the reference. 
+
+
+Consider the case where a \CONS\ cells is being printed and a garbage collection 
+is triggered when printing the \CDR\ part. In this case, since the refernce to the 
+\CONS\ cells is still on the print stack both the \CAR\ and the \CDR\ parts are 
+reachable but we know that the \CAR\ part has already been printed and can be 
+safely garbage collected. A liveness analysis of the print function would have 
+given the same information. In our implementation we mimic the behavior of 
+the liveness analysis by using a flag in every \CONS\ cell which says whether 
+the \CAR\ part has been printed or not. For any \CONS\ cell if the \CAR\ part 
+has not been printed, a reference to the \CAR\ part will also be on the stack but 
+the \CDR\ part has to be explicitly copied.  
+In case the \CAR\ part has been printed, then a reference to the \CDR\ part will 
+be on the stack and since the \CAR\ part is not required anymore we do not 
+copy anything. This optimization subsumes tail call optimization. Again, 
+experimental results show that this optimization minimizes a lot of copying. 
+\cred{Very sketchy: Make another attempt to write}
 
 %% \begin{figure}
 %% \begin{algorithm}[H]
