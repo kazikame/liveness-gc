@@ -40,6 +40,7 @@ remove:
 	rm -rf PostGC*.txt GC*.txt PreGC*.txt gc_messages.txt pre_gc_addr.txt
 
 depend: __depends
+	touch __depends
 
 __depends: *.cpp *.h
 	touch __depends
