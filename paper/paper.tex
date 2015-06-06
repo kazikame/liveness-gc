@@ -1376,6 +1376,18 @@ NFAs are converted to DFAs.
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
  approximate   a  CFG   to   a  {\em   strongly  regular\/}   grammar.
+ \cred{The grammar for the productions we considered after transformation is,
+ \begin{eqnarray*}
+   \var{\Df{\length}{1}} &\rightarrow& \cbar\var{\Df{\length}{1*}} \mid
+   \acdr\var{\Df{\length}{1}}
+   \mid \cbar\var{\Df{\length}{1}}\\
+   \var{\Df{\length}{1*}} &\rightarrow& \cbar\var{\Df{\length}{1*}} \mid \epsilon \\
+   \langle {\sigma_{\length}} \rangle
+   &\rightarrow&
+   \cred{\epsilon}  \mid \cbar\langle{\sigma_{\length}}\rangle
+ \end{eqnarray*}
+}
+
  \comment{Rewrite  this after  constructing the  example: We  show the
    grammar for ????? after  the Mohri-Nederhof transformation. We pick
    the only  production that  is affected by  the transformation---the
