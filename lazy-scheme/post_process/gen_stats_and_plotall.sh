@@ -1,8 +1,8 @@
 #!/bin/bash 
 DIR=`dirname $0`
 PROGNAME=`basename $0`
-#AllBMs="   lambda sudoku lcss small gc_bench nperm fibheap treejoin knightstour nqueens "
-AllBMs=" lambda sudoku lcss small treejoin fibheap"
+#AllBMs="   lambda sudoku lcss small test gc_bench nperm fibheap treejoin knightstour nqueens "
+AllBMs=" lambda sudoku lcss small test treejoin fibheap"
 help()
 {
     echo ""
@@ -46,6 +46,7 @@ limit["sudoku"]=1728
 limit["fft"]=3300
 limit["lcss"]=22243
 limit["small"]=17
+limit["test"]=247
 limit["gc_bench"]=131091
 limit["nperm"]=27428
 limit["fibheap"]=38200
@@ -61,6 +62,7 @@ freq["sudoku"]=2050;
 freq["fft"]=2050;
 freq["lcss"]=1000;
 freq["small"]=1;
+freq["test"]=1;
 freq["gc_bench"]=4000;
 freq["nperm"]=145;
 freq["fibheap"]=700;
@@ -75,6 +77,7 @@ xtics["sudoku"]=2050; ytics["sudoku"]=250
 xtics["fft"]=2050; ytics["fft"]=250
 xtics["lcss"]=100000; ytics["lcss"]=9000
 xtics["small"]=1; ytics["small"]=1
+xtics["test"]=25; ytics["test"]=25
 xtics["gc_bench"]=400000; ytics["gc_bench"]=20000
 xtics["nperm"]=145000; ytics["nperm"]=35000
 xtics["fibheap"]=70000; ytics["fibheap"]=30000
@@ -89,8 +92,8 @@ fi
 
 for bm in $BMs
 do
-    for opt in gc-plain gc-live
-    #for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    #for opt in gc-plain gc-live
+    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
     do 
      	echo "Processing $bm [$opt]"
      	$DIR/gen_gc_stats.sh $OPTARG \
