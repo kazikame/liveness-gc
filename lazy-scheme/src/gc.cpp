@@ -1771,7 +1771,7 @@ cons* followpaths(cons* loc, state_index index)
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
-		  cerr << "Doing GC corresponding to " << liveness_string << endl;
+	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
 	  	  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
 	  	  loccopy->val.closure.arg1 = new_arg1;
 	  }
@@ -1784,7 +1784,7 @@ cons* followpaths(cons* loc, state_index index)
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
-		  cerr << "Doing GC corresponding to " << liveness_string << endl;
+	    // cerr << "Doing GC corresponding to " << liveness_string << endl;
 		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
 		  loccopy->val.closure.arg1 = new_arg1;
 	  }
@@ -1793,7 +1793,7 @@ cons* followpaths(cons* loc, state_index index)
 	  liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
-		  cerr << "Doing GC corresponding to " << liveness_string << endl;
+	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
 		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
 		  loccopy->val.closure.arg2 = new_arg2;
 	  }
@@ -1808,7 +1808,7 @@ cons* followpaths(cons* loc, state_index index)
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
-		  cerr << "Doing GC corresponding to " << liveness_string << endl;
+	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
 		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
 		  loccopy->val.closure.arg2 = new_arg2;
 	  }
