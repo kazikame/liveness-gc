@@ -198,169 +198,57 @@ subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
 }}
 
 
-\begin{figure*}[t!]
-%%%%{\color{Myblue}
-\begin{picture}(100,130)(0,-90)
-%  \begin{center}
-    \begin{tabular}{cc}
-\begin{boxedminipage}{.42\textwidth}
-      {\sf
-	\renewcommand{\arraystretch}{1}{
-	  \begin{uprogram}
-          \UFL\
-\UNL{0} (\DEFINE\ (\length\  \pl)
-	  \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-          (\PRIM\ 1\ (\CAR\  \pl))))
-           \UNL{0}
-	   \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
-	  \UNL{1}  (\SIF~(\NULLQ \ \lista)
-	       \listb
-	  \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
-(\CDR\  \lista)
-          \listb))))
-          \UNL{0}
-          \UNL{0} (\LET\ \px\
-          $\leftarrow$\ (\CONS\ $5$
-%          \UNL{1}\hspace*{1.5cm}
-          (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
-	  \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
-	  \UNL{2}
-          (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
-          \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
-(\length\ \pz))))))
-	\end{uprogram}
-      }}
-\end{boxedminipage}
-&
-\begin{minipage}{.45\textwidth}
-
-\hspace*{1cm}{\epsfig{file=motiv-example.eps, height=4cm}}
-
-\end{minipage}
-
-\\
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%       &
-%%       \raisebox{-25mm}{\scalebox{.75}{
-%% 	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
-%%       \psset{unit=1mm}
-%%       \psset{linewidth=.3mm}
-%%       \begin{pspicture}(0,-5)(70,60)
-%% 	%\psframe(0,0)(73,60)
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{o}{origin}{13}{50}{\TwoCells{o1}{o2}}
-%% 	\putnode{a}{o}{-10}{-15}{\psframebox{3}}
-%% %
-%%      \putnode{b}{o}{10}{-15}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*->}{o1}{a}
-%%
-%\aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%%      fillstyle=solid,
-%% 	%      fillcolor=white]{$\times$}}}
-%%
-%%  \putnode{b}{o}{0}{-3}{\psframebox[linestyle=none,framesep=.5]{\scalebox
-%%{.63}{\nilfigure}}}
-%% %	\ncline[offsetB=-.5,nodesepB=.1]{*->}{o2}{b}
-%% 	%\ncline[offsetB=-.5,nodesepB=.1]{->}{o2}{b}
-%%
-%% \putnode{y}{o}{-14}{8}{\psframebox[linestyle=none,framesep=.5]{y}}
-%% 	\nccurve[nodesepB=-.2,angleA=330,angleB=120]{->}{y}{o}
-%%
-%% \aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%%fillstyle=solid,
-%% 		  fillcolor=white]{$\times$}}}
-%% 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{c}{o}{25}{0}{\TwoCells{c1}{c2}}
-%% 	\putnode{d}{c}{10}{-10}{\TwoCells{d1}{d2}}
-%% 	\putnode{e}{d}{-13}{-12}{\TwoCells{e1}{e2}}
-%% 	\putnode{f}{d}{13}{-12}{\TwoCells{f1}{f2}}
-%% 	\ncline[nodesepB=-.5]{*->}{c2}{d}
-%% 	\ncline[nodesepB=-.5,linewidth=.7]{->}{c2}{d}
-%% 	\nccurve[ncurv=1,angleA=270,angleB=330]{*->}{c1}{a}
-%%
-%% \aput[-3.5](.2){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%% fillstyle=solid,
-%% 	      fillcolor=white]{$\times$}}}
-%% 	\nccurve[nodesepB=-.5,angleA=240,angleB=70]{*->}{d1}{e}
-%%
-%% \nccurve[nodesepB=-.5,angleA=240,angleB=70,linewidth=.7]{->}{d1}{e}
-%% 	\nccurve[nodesepB=-.5,angleA=300,angleB=110]{*->}{d2}{f}
-%%
-%% \aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%% fillstyle=solid,
-%% 	      fillcolor=white]{$\times$}}}
-%%
-%% \putnode{w}{c}{-8}{8}{\psframebox[linestyle=none,framesep=.2]{w}}
-%%
-%%\putnode{ww}{c}{15}{8}{\psframebox[linestyle=none,framesep=.2]{z}}
-%%
-%%\nccurve[nodesepB=-.2,angleA=330,angleB=120,linewidth=.7]{->}{w}{c}
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{g}{e}{-8}{-12}{\psframebox{4}}
-%% 	\putnode{h}{e}{8}{-14}{\TwoCells{h1}{h2}}
-%% 	\putnode{i}{f}{-8}{-11}{\psframebox{6}}
-%% %
-%%\putnode{j}{f}{8}{-11}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*-}{e1}{e1}
-%%
-%%\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{e1}{g}
-%%         %here
-%%
-%%\putnode{j1}{f}{0}{-3}{\psframebox[linestyle=none,framesep=0]{\scalebox{.63}{\nilfigure}}}
-%%
-%%\putnode{j2}{h}{0}{-3}{\psframebox[linestyle=none,framesep=.5]{
-%%\scalebox{.63}{\nilfigure}}}
-
-%% %
-%%\aput[-3.2](.6){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,
-%%fillstyle=solid,
-%% %	      fillcolor=white]{$\times$}}} %and here
-%% 	\ncline[offsetB=-.5,nodesepB=-.3]{*-}{e2}{e2}
-%%
-%%\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{e2}{h}
-%% %
-%%\aput[-3.2](.5){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,
-%%fillstyle=solid,
-%% %	      fillcolor=white]{$\times$}}} %and here
-
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*->}{f1}{i}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*->}{f2}{j}
-%% 	\nccurve[nodesepB=-.2,angleA=270,angleB=90]{->}{ww}{d}
-%%
-%%\aput[-3.2](.4){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,fillstyle=solid,
-%% 	      fillcolor=white]{$\times$}}}
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{k}{h}{-8}{-11}{\psframebox{5}}
-%% %
-%%\putnode{l}{h}{8}{-11}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*-}{h1}{h1}
-%%
-%%\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{h1}{k}
-%% %	\ncline[offsetB=-.5,nodesepB=.1]{*->}{h2}{l}
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%
-%%       \end{pspicture}}} \\
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-      (a) Example program.&\hspace*{2cm}
-      \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
-	(b) Memory graph at $\pi$. Thick edges denote  \\
-        {\white (b) }live links. Traversal stops at edges marked\\
-        {\white (b) }$\times$  during garbage collection.
+\begin{figure}[t!]
+  %%%%{\color{Myblue}
+  \psset{unit=1mm}
+  \begin{pspicture}(80,50)(0,-50)
+    %\psframe(80,50)(0,-50)
+    %  \begin{center}
+    \begin{tabular}{@{}c@{}}
+      \begin{boxedminipage}{.42\textwidth}
+        {\sf
+	  \renewcommand{\arraystretch}{1}{
+	    \begin{uprogram}
+              \UFL\
+              \UNL{0} (\DEFINE\ (\length\  \pl)
+	      \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
+              (\PRIM\ 1\ (\CAR\  \pl))))
+              \UNL{0}
+	      \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
+	      \UNL{1}  (\SIF~(\NULLQ \ \lista)
+	      \listb
+	      \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
+              (\CDR\  \lista)
+              \listb))))
+              \UNL{0}
+              \UNL{0} (\LET\ \px\
+              $\leftarrow$\ (\CONS\ $5$
+              %          \UNL{1}\hspace*{1.5cm}
+              (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
+	      \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
+	      \UNL{2}
+              (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
+              \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
+              (\length\ \pz))))))
+	    \end{uprogram}
+        }}
+      \end{boxedminipage}
+      \\
+      (a) Example program. \\ \\
+      \begin{minipage}{.45\textwidth}
+        %\hspace*{1cm}
+                {\epsfig{file=motiv-example.eps, height=4cm}}
+      \end{minipage}
+      \\ \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
+          (b) Memory graph at $\pi$. Thick edges denote live
+          links. Traversal \\{\white (b)} stops at edges
+          marked $\times$ during garbage collection.
       \end{tabular}}
     \end{tabular}
-\end{picture}
-
-\kern -3ex
-
-\caption{Example Program and its Memory Graph.{\color{red}Amey will combine this with the figure for syntax}}\label{fig:mot-example}
-\end{figure*}
+  \end{pspicture}
+ \vspace*{-3ex}
+  \caption{Example Program and its Memory Graph}\label{fig:mot-example}
+\end{figure}
 
 In this paper,  we propose the use of liveness  analysis of heap cells
 for garbage collection in a lazy first-order functional language.  The
@@ -500,41 +388,39 @@ it
   body $e_f$  but with  its $(\SRETURN\,\,w)$ expressions  replaced by
   $(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.}
 
-\begin{figure*}[]
+\begin{figure}[t]
 \footnotesize
 \begin{eqnarray*}
    p \in \mathit{Prog} & ::= & d_1 \ldots d_n \,\, e_\mainpgm
-    \hspace{7em} \mbox{\em --- program}\\
+    \hspace{5em} \mbox{\em --- program}\\
     \mathit{df} \in Fdef & ::= & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots \,\,x_n)\,\,
     e) 
-    \hspace{2.2em} \ \ \ \ \mbox{\em --- function definition} \\
+    \hspace{0.2em} \ \ \ \ \mbox{\em --- function definition} \\
 e \in \mathit{Expr} & ::= &
-\left\{\begin{array}{ll@{\hspace{4em}}l}
+\left\{\begin{array}{@{}ll@{\hspace{2em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \!\!\!\mbox{\em --- conditional} \\
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) &&\!\!\! \mbox{\em --- let
 binding} \\
        (\SRETURN\,\, x) && \!\!\!\mbox{\em --- return from function}
     \end{array}\right. \\
 s \in \mathit{Application} & ::= &
-\left\{\begin{array}{lr@{\hspace{1em}}l}
-       k && \mbox{\em --- constant (numeric or $\NIL$)}\\
-       (\CONS\,\, x_1\,\, x_2) && \mbox{\em --- constructor} \\
-       (\CAR\,\, x) &  (\CDR\,\, x) & \mbox{\em --- selectors} \\
-       (\NULLQ\,\, x) & (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
+\left\{\begin{array}{@{}l@{\hspace{1.2em}}l}
+       k & \mbox{\em --- constant (numeric or $\NIL$)}\\
+       (\CONS\,\, x_1\,\, x_2) & \mbox{\em --- constructor} \\
+       (\CAR\,\, x) & \\ 
+       (\CDR\,\, x) & \mbox{\em --- selectors} \\
+       (\NULLQ\,\, x) & \\ 
+       (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
 and generic arithmetic} \\
-%        (\NULLQ\,\, x) && \mbox{\em ---  tester} \\
-       (\ID\,\, x) && \mbox{\em ---  identity function (for inlining)}
+       (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
 \\
-%        (\PRIM\,\, x_1\,\, x_2) && \mbox{\em --- generic arithmetic}
-\\
-       \multicolumn{2}{l}{(f\,\, x_1\,\,\ldots\,\, x_n)}
-            & \mbox{\em --- function application}
+       (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
     \end{array}\right.
 \end{eqnarray*}
   \caption{The syntax of our language}\label{fig:lang-syntax}
 \figrule
 \normalsize
-\end{figure*}
+\end{figure}
 
 
 \subsection{Semantics}
@@ -1024,19 +910,19 @@ symbolically.  We  introduce three  new  symbols.   First, \bcar\  and
  \bcar\sigma &\triangleq \{\alpha \mid 0\alpha \in \sigma\}\\
  \bcdr\sigma &\triangleq \{\alpha \mid 1\alpha \in \sigma\}
 \end{align*}
-and \cbar\ as:
+and \clazy\ as:
 \begin{align*}
- \cbar\sigma \triangleq\; & \emptyset~\mbox{if}~\sigma = \emptyset\\
+ \clazy\sigma \triangleq\; & \emptyset~\mbox{if}~\sigma = \emptyset\\
                        & \{\epsilon\} ~\mbox{otherwise}
 \end{align*}
-Note that \cbar\ is idempotent. 
+Note that \clazy\ is idempotent. 
 We can now rewrite the \CONS\ and the \CAR\ rules of $\mathit{ref}$ as:
 \begin{align*}
 &\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
 = x.\bcar\sigma \cup y.\bcdr\sigma  \label{eqn:mod-cons},~
 \mbox{and} \\
 &\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
-          =   x.\cbar\sigma \cup x.0\sigma
+          =   x.\clazy\sigma \cup x.0\sigma
 \end{align*}
 and the \Lfunonly\ rule
 for \SIF\ as:
@@ -1044,11 +930,11 @@ for \SIF\ as:
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) =
                     &\mathcal{L}(e_1,\sigma,\Lfonly)~\uplus
         \mathcal{L}(e_2,\sigma,\Lfonly)~\uplus\\
-        &[\,\mathit{ep} \mapsto  x.\cbar \sigma]
+        &[\,\mathit{ep} \mapsto  x.\clazy \sigma]
 \end{align*}
 The rules for \CDR, \PRIM\ and  \NULLQ\  are also modified in a manner
 similar to \CAR.
-The  defintions of \bcar\, \bcdr\ and \cbar\  induce   the  following
+The  defintions of \bcar\, \bcdr\ and \clazy\  induce   the  following
 relation $\hookrightarrow$ over sets of access paths:
 \begin{align*}
   &\sigma_1\bcar\sigma_2  \hookrightarrow
@@ -1056,7 +942,7 @@ relation $\hookrightarrow$ over sets of access paths:
 &\sigma_1\bcdr\sigma_2  \hookrightarrow
   \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
   \acdr\sigma_2',~\mbox{and}\\
-&\sigma_1\cbar \sigma_2 \hookrightarrow \epsilon, \mbox{ if } \sigma \ne
+&\sigma_1\clazy \sigma_2 \hookrightarrow \epsilon, \mbox{ if } \sigma \ne
   \emptyset 
 \end{align*}
 The reflexive  transitive closure of  $\hookrightarrow$ will
@@ -1112,16 +998,16 @@ $\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
         \small
 \begin{eqnarray*}
         \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
-              [\;ep_1 \mapsto \lbrace \px.\cbar \sigma,
-\xl.\cbar\sigma\rbrace ,~ep_2 \mapsto \lbrace \cred{
+              [\;ep_1 \mapsto \lbrace \px.\clazy \sigma,
+\xl.\clazy\sigma\rbrace ,~ep_2 \mapsto \lbrace \cred{
 \pv.\sigma}  \rbrace,\\
  &&          \;\;  ep_3 \mapsto \lbrace \pz.\sigma,
-                \py.\cbar\sigma,
-\pu.\Lf{\length}{\mbox{1}}{\cbar\sigma},\\
+                \py.\clazy\sigma,
+\pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
 &&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; 
-\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\cbar\sigma} \cup 
+\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup 
 %%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
-\cred{\cbar\Lf{\length}{1}{\cbar\sigma}}\}\}
+\cred{\clazy\Lf{\length}{1}{\clazy\sigma}}\}\}
              \rbrack \\
             \cal{P_{\mbox{\tiny \length}}} &=&
                 [\;\pi_1 \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace,  \
@@ -1140,7 +1026,7 @@ $\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
                                        \pc.\Lf{\length}{\mbox{1}}{\sigma},}\\
 && \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
                                         \cred{\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},}
-                                        \cred{\pa.\cbar\bcar\Lf{\length}{\mbox{1}}{\sigma}} \rbrace
+                                        \cred{\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma}} \rbrace
                                ] \\
                \cal{P_{\mbox{\tiny \main}}} &=&
                   \lbrack~ \cred{\pi_9 \mapsto \lbrace ep_4 \rbrace,  \
@@ -1192,13 +1078,13 @@ $e_{\mathit{f}}$ (assumed  to be  $\pi_1$). By the rule {\sc
   live-define}, this should be the
 same as $\Lf{f}{i}{\sigma}$. Applying this to  \length, we have:
 \begin{eqnarray*}
-&& \Lanv{1}{\xl} = \cbar\sigma \cup \acdr\Lf{\length}{1}{\cbar\sigma}
-  \cup \cbar\Lf{\length}{1}{\cbar\sigma}
+&& \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
+  \cup \clazy\Lf{\length}{1}{\clazy\sigma}
 \end{eqnarray*}
 and  the only equation defining \Lfone{\length} is:
   \begin{eqnarray*}
    && \Lf{\length}{1}{\sigma}
-    =  \cbar\sigma \cup \acdr\Lf{\length}{1}{\cbar\sigma} \cup \cbar\Lf{\length}{1}{\cbar\sigma}
+    =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup \clazy\Lf{\length}{1}{\clazy\sigma}
 \end{eqnarray*}
 
 In general, the equations for  \Lfonly\ are recursive since, as in the
@@ -1206,7 +1092,7 @@ case  of  \length,  \Lan{1}\  may   have  been  defined  in  terms  of
 \Lfone{\mathit{f}}.  However,  it is desirable  to have a  closed form
 solution for $\Lfone{\mathit{f}}$.  As mentioned in \cite{asati14lgc},
 each  of the liveness  rules modifies  a demand  by prefixing  it with
-symbols  in the  alphabet  $\lbrace \acar,  \acdr,\bcar, \bcdr,  \cbar
+symbols  in the  alphabet  $\lbrace \acar,  \acdr,\bcar, \bcdr,  \clazy
 \rbrace$, and therefore we can assume that $\Lf{f}{i}{\sigma}$ has the
 closed form:
 \begin{eqnarray}
@@ -1221,12 +1107,12 @@ for  \Df{f}{i} that  is  independent of  $\sigma$.   Any solution  for
 \Lfonly$_{\mathit \length}$, we get:
   \begin{eqnarray*}
 &&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}\sigma,~\mbox{and}\\
-&&   \Df{\length}{1} = \cbar \cup \acdr\Df{\length}{1}\cbar 
-       \cup \cbar\Df{\length}{1}{\cbar}
+&&   \Df{\length}{1} = \clazy \cup \acdr\Df{\length}{1}\clazy 
+       \cup \clazy\Df{\length}{1}{\clazy}
   \end{eqnarray*}
 
 Note that this equation can also be viewed as a CFG with \{\acdr,
-\cbar\} as terminal symbols and \Df{\length}{1} as the sole
+\clazy\} as terminal symbols and \Df{\length}{1} as the sole
 non-terminal.
 
 \subsection{Generating liveness equations \Lv\  for function bodies}
@@ -1256,8 +1142,9 @@ call sites to function $f$, $\pi^1$ (in function $g^1$) \ldots $\pi^k$
 $\deltacall{f}{\pi^1}{g^1}          \cup          \cdots          \cup
 \deltacall{f}{\pi^k}{g^k}$.  The distinguished function \mainpgm\ is a
 special case.   We assume  it is called  through a  printing mechanism
-with   demand   $\sigma_\mainpgm   =  \{\acar,\acdr\}^\ast$   (denoted
-$\sigma_{\!all}$).
+with   demand   $\sigma_\mainpgm   =  \{\acar,\acdr\}^\ast$ (denoted
+$\sigma_{\!all}$) if \mainpgm\ returns a structure and $\epsilon$ if
+it returns a base value.  
 
 
 For  the  running  example,   $\length$  has  calls  from  $\main$  at
@@ -1268,16 +1155,16 @@ So $\sigma_{\length} =
 Filling in  the values gives:
 \begin{eqnarray*}
 \sigma_{\length}    &=&
- \sigma_{\!all}  ~\cup~{\cbar\sigma_{\mathit{\length}}}
+ \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
 \end{eqnarray*}
-As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pc} in terms
+As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pa} in terms
 of  $\sigma_{\length}$ are:
 \begin{align*}
-\Lanv{1}{\pl} &= \cbar\sigma_{\length} \cup \acdr\Df{\length}{1}\cbar\sigma_{\length}
-  \cup \cbar\Df{\length}{1}{\cbar\sigma_{\length}}
+\Lanv{1}{\pl} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
+  \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
  \\
-\Lanv{9}{\pc} &= \Df{\length}{1}\sigma_{\mathit{\!all}}
-\end{align*}
+\Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\epsilon
+\end{align*} 
 
 In summary, the equations generated during liveness analysis are:
 \begin{enumerate}
@@ -1294,7 +1181,7 @@ an equation defining
 interpretation}\label{sec:grammar-formulation}
 The  equations above can now be re-interpreted as a
 context-free grammar (CFG)  on the alphabet $\lbrace\acar, \acdr,
-\bcar, \bcdr, \cbar\rbrace$.  Let  \var{$X$} denote the non-terminal
+\bcar, \bcdr, \clazy\rbrace$.  Let  \var{$X$} denote the non-terminal
 for
 a variable  $X$ occurring on  the LHS of the  equations generated
 from the analysis.  We can  think of the resulting productions as
@@ -1303,15 +1190,15 @@ being associated with several  grammars, one for each non-terminal
 grammar    for   \var{\Lanv{1}{\xl}}   comprises    the   following
 productions:
  \begin{eqnarray*}
-\var{\Lanv{1}{\xl}}  &\rightarrow&   \cbar\sigma_{\length} \mid \acdr \var{\Df
-  {\length}{1}}{\cbar\sigma_{\length}} \mid
-  \cbar\var{\Df{\length}{1}}{\cbar\sigma_{\length}} \\
-  \var{\Df{\length}{1}} &\rightarrow& \cbar \mid
-  \acdr\var{\Df{\length}{1}}\cbar 
-       \mid \cbar\var{\Df{\length}{1}}{\cbar}\\
+\var{\Lanv{1}{\xl}}  &\rightarrow&   \clazy\sigma_{\length} \mid \acdr \var{\Df
+  {\length}{1}}{\clazy\sigma_{\length}} \mid
+  \clazy\var{\Df{\length}{1}}{\clazy\sigma_{\length}} \\
+  \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
+  \acdr\var{\Df{\length}{1}}\clazy 
+       \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
 \langle {\sigma_{\length}} \rangle
 &\rightarrow&
-\cred{\epsilon}  \mid \cbar\langle{\sigma_{\length}}\rangle
+\epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle
 \end{eqnarray*}
 Other equations can be converted similarly.  The language generated by
 \var{\Lanv{i}{x}},  denoted $\mathscr{L}(\var{\Lanv{i}{x}}) $,  is the
@@ -1320,7 +1207,7 @@ discussion that the decision problem  that we are interested in during
 garbage collection at a program point $\pi_i$ is:
 \begin{quote}
 Let  $x.\alpha$ be  a forward  access  path consisting  only of  edges
-\acar\    and   \acdr\    (but    not   \bcar, \bcdr\ or \cbar).     Let
+\acar\    and   \acdr\    (but    not   \bcar, \bcdr\ or \clazy).     Let
 $\mathscr{L}(\var{\Lanv{i}{x}}) \stackrel{*}{\hookrightarrow} \sigma$,
 where $\sigma$ consists  of forward paths only. Then  does $\alpha \in
 \sigma$?
@@ -1332,13 +1219,13 @@ productions.
 
 \begin{definition}\label{def:specialgrammar} 
 Consider a form of  grammar $(N,T, p_1\cup p_2,S)$ in which $N$ is a set of
-non-terminals, $T = \{\acar, \acdr, \bcar, \bcdr, \cbar, \$\}$, $p_1$
+non-terminals, $T = \{\acar, \acdr, \bcar, \bcdr, \clazy, \$\}$, $p_1$
 is a set of context-free production that contains the distinguished
 production $S \rightarrow \alpha\$$, $\alpha$ is a string of grammar
 symbols that does not contain $S$, and $p_2$ is the fixed set of
 unrestricted productions $\bcar\acar \rightarrow \epsilon$,
-$\bcdr\acdr \rightarrow \epsilon$, $\cbar\acar \rightarrow \cbar$,
-$\cbar\acdr \rightarrow \cbar$, and $\cbar\$ \rightarrow
+$\bcdr\acdr \rightarrow \epsilon$, $\clazy\acar \rightarrow \clazy$,
+$\clazy\acdr \rightarrow \clazy$, and $\clazy\$ \rightarrow
 \epsilon$. 
 \end{definition}
 
@@ -1372,45 +1259,31 @@ simplified using the $\hookrightarrow$ rules. Finally the simplified
 NFAs are converted to DFAs.
   
 %------------------------------------------------------------%
-\subsubsection{Approximating CFGs using NFAs.}
+\subsubsection{From CFGs to GC-ready DFAs}
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
- approximate   a  CFG   to   a  {\em   strongly  regular\/}   grammar.
- \cred{The grammar for the productions we considered after transformation is,
- \begin{eqnarray*}
-   \var{\Df{\length}{1}} &\rightarrow& \cbar\var{\Df{\length}{1*}} \mid
+ approximate a CFG to a {\em strongly regular\/} grammar.  The grammar
+ fragment  that  defines  the  non-terminal  $\var{\Df{\length}{1}}$
+   after the Mohri-Nederhof transformation becomes:
+
+ \begin{eqnarray*} 
+   \var{\Df{\length}{1}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid
    \acdr\var{\Df{\length}{1}}
-   \mid \cbar\var{\Df{\length}{1}}\\
-   \var{\Df{\length}{1*}} &\rightarrow& \cbar\var{\Df{\length}{1*}} \mid \epsilon \\
+   \mid \clazy\var{\Df{\length}{1}}\\
+   \var{\Df{\length}{1'}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid \epsilon \\
    \langle {\sigma_{\length}} \rangle
    &\rightarrow&
-   \cred{\epsilon}  \mid \cbar\langle{\sigma_{\length}}\rangle
+   \epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle
  \end{eqnarray*}
-}
 
- \comment{Rewrite  this after  constructing the  example: We  show the
-   grammar for ????? after  the Mohri-Nederhof transformation. We pick
-   the only  production that  is affected by  the transformation---the
-   production    for     \Df{\append}{1}.     The    production    for
-   \Uf{\append}{1},  while recursive, is  already in  strongly regular
-   form and is therefore unaffected by the transformation.
- \begin{eqnarray*}
-  \var{\Df{\append}{1}}
-  &\rightarrow&               \acar\bcar \var{\Df{\append}{1}}'  \mid
-  \acdr\var{\Df{\append}{1}} \\
-\var{\Df{\append}{1}}'  &\rightarrow&   \bcdr\var{\Df{\append}{1}}'
-\mid \epsilon
-\end{eqnarray*}
-The  languages
-generated for  \var{\Df{\append}{1}} in  the original grammar  and the
-new       grammar      are       \acdr$^i$\acar\bcar\bcdr$^i$      and
-\acdr$^*$\acar\bcar\bcdr$^*$, showing a  loss of  precision.
- 
-Once the NFA's are created, we need to remove the transitions on
-$\cbar$. This edge is replaced by an $\epsilon$ transition and the
-$\cbar$ edge is deleted. If the original grammar had a non-null
-$\sigma$ then the NFA reaches a final state throught this path
-otherwise it does not reach a final state.}
+The grammar after the Mohri-Nederhoff transformation is converted into
+a  set of  NFAs,  one for  each  $\var{\Lanv{i}{x}}$. We  now apply  the
+$\hookrightarrow$ simplification  by repeatedly introducing $\epsilon$
+edges to  bypass a pair  of consecutive edges labelled  \bcar\acar\ or
+\bcdr\acdr  and  deriving  the  $\epsilon$-closure  of  the  resulting
+automaton.   The   process  is  continued   till  a  fixed   point  is
+reached.  Finally we  replace  the $\clazy$  edges  by $\epsilon$  and
+determinize the automaton thus formed.
 
 %------------------------------------------------------------%
 \subsubsection{Transforming NFAs to Accept Forward Paths:}
@@ -1420,7 +1293,7 @@ transformation are first converted into NFAs.  The algorithm described
 in  Figure~\ref{algo:simplify-NFA} converts  an NFA  \ntbar\ to  a NFA
 \nt\    such    that   $\lang{\ntbar}    \stackrel{*}{\hookrightarrow}
 \lang{\nt}$, where {\nt} accepts forward paths only.  \comment{Rewrite
-  the algorithm to handle \cbar  and update the example automata} Thus
+  the algorithm to handle \clazy\  and update the example automata} Thus
 \nt\ can be used to check membership of forward paths.
 
 \begin{figure*}[t]
@@ -1475,22 +1348,23 @@ of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
 is continued till  a fixed point is reached.  When  the fixed point is
 reached,   the  resulting   NFA  contains   all   possible  reductions
 corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness  of th The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
-of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
-is continued till  a fixed point is reached.  When  the fixed point is
+termination and correctness of  th The algorithm repeatedly introduces
+$\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
+\bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
+point is reached.  When the  fixed point is reached, the resulting NFA
+contains all possible reductions corresponding to all the paths in the
+original NFA.  The proofs of the termination and correctness of th The
+algorithm repeatedly  introduces $\epsilon$ edges to bypass  a pair of
+consecutive edges labelled \bcar\acar\  or \bcdr\acdr.  The process is
+continued  till a fixed  point is  reached.  When  the fixed  point is
 reached,   the  resulting   NFA  contains   all   possible  reductions
 corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness  of th The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
-of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
-is continued till  a fixed point is reached.  When  the fixed point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness  of th The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
-of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
-is continued till  a fixed point is reached.  When  the fixed point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness  of th 
+termination and correctness of  th The algorithm repeatedly introduces
+$\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
+\bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
+point is reached.  When the  fixed point is reached, the resulting NFA
+contains all possible reductions corresponding to all the paths in the
+original NFA.  The proofs of the termination and correctness of th
 
 \end{boxedminipage}
  \caption{Algorithm for transforming an NFA to  accept forward
@@ -1543,7 +1417,7 @@ execution.  The main  complexity in our algorithm is  the way closures
 are  handled. The  following sub-sections  show two  different  ways of
 handling closures along with their pros and cons.
 \subsection{A simple LGC Algorithm}
-\cred{Introduce terminology}
+\cred{Introduce representation}
 We introduce certain terminology that we use in our discussion of the 
 garbage collection algorithms. A reference is a field which holds the 
 address of a heap location. Root set refers to the set of all references 

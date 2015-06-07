@@ -79,7 +79,7 @@ mkdir -p $OUTPUT;
 LOG=$OUTPUT/runtime
 echo -n 'Start At : ' > $LOG
 date                 >> $LOG
-EXECNAME=~/livenstrict/livenstrict/lazy-scheme/src/Simulator_Stats
+EXECNAME=${HOME}/Work/LiveNStrict/lazy-scheme/src/Simulator_Stats
 STATSFILE=GC_STATS.txt
 SCMFILE=$TEST/${TESTNAME}.scm
 if [ "$PPONLY" = "false" ]; then
@@ -100,7 +100,7 @@ if [ "$PPONLY" = "true" -a ! -f $STATSFILE ]; then
     exit 1
 fi
 
-STATOUTFILES="rch use gbg" # ignore lag void for now
+STATOUTFILES="rch use gbg rgc" # ignore lag void for now
 for file in $STATOUTFILES; do
     rm -f ${file}.out
 done
