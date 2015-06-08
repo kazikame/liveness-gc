@@ -196,169 +196,57 @@ subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
 }}
 
 
-\begin{figure*}[t!]
-%%%%{\color{Myblue}
-\begin{picture}(100,130)(0,-90)
-%  \begin{center}
-    \begin{tabular}{cc}
-\begin{boxedminipage}{.42\textwidth}
-      {\sf
-	\renewcommand{\arraystretch}{1}{
-	  \begin{uprogram}
-          \UFL\
-\UNL{0} (\DEFINE\ (\length\  \pl)
-	  \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-          (\PRIM\ 1\ (\CAR\  \pl))))
-           \UNL{0}
-	   \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
-	  \UNL{1}  (\SIF~(\NULLQ \ \lista)
-	       \listb
-	  \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
-(\CDR\  \lista)
-          \listb))))
-          \UNL{0}
-          \UNL{0} (\LET\ \px\
-          $\leftarrow$\ (\CONS\ $5$
-%          \UNL{1}\hspace*{1.5cm}
-          (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
-	  \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
-	  \UNL{2}
-          (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
-          \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
-(\length\ \pz))))))
-	\end{uprogram}
-      }}
-\end{boxedminipage}
-&
-\begin{minipage}{.45\textwidth}
-
-\hspace*{1cm}{\epsfig{file=motiv-example.eps, height=4cm}}
-
-\end{minipage}
-
-\\
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%       &
-%%       \raisebox{-25mm}{\scalebox{.75}{
-%% 	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
-%%       \psset{unit=1mm}
-%%       \psset{linewidth=.3mm}
-%%       \begin{pspicture}(0,-5)(70,60)
-%% 	%\psframe(0,0)(73,60)
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{o}{origin}{13}{50}{\TwoCells{o1}{o2}}
-%% 	\putnode{a}{o}{-10}{-15}{\psframebox{3}}
-%% %
-%%      \putnode{b}{o}{10}{-15}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*->}{o1}{a}
-%%
-%\aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%%      fillstyle=solid,
-%% 	%      fillcolor=white]{$\times$}}}
-%%
-%%  \putnode{b}{o}{0}{-3}{\psframebox[linestyle=none,framesep=.5]{\scalebox
-%%{.63}{\nilfigure}}}
-%% %	\ncline[offsetB=-.5,nodesepB=.1]{*->}{o2}{b}
-%% 	%\ncline[offsetB=-.5,nodesepB=.1]{->}{o2}{b}
-%%
-%% \putnode{y}{o}{-14}{8}{\psframebox[linestyle=none,framesep=.5]{y}}
-%% 	\nccurve[nodesepB=-.2,angleA=330,angleB=120]{->}{y}{o}
-%%
-%% \aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%%fillstyle=solid,
-%% 		  fillcolor=white]{$\times$}}}
-%% 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{c}{o}{25}{0}{\TwoCells{c1}{c2}}
-%% 	\putnode{d}{c}{10}{-10}{\TwoCells{d1}{d2}}
-%% 	\putnode{e}{d}{-13}{-12}{\TwoCells{e1}{e2}}
-%% 	\putnode{f}{d}{13}{-12}{\TwoCells{f1}{f2}}
-%% 	\ncline[nodesepB=-.5]{*->}{c2}{d}
-%% 	\ncline[nodesepB=-.5,linewidth=.7]{->}{c2}{d}
-%% 	\nccurve[ncurv=1,angleA=270,angleB=330]{*->}{c1}{a}
-%%
-%% \aput[-3.5](.2){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%% fillstyle=solid,
-%% 	      fillcolor=white]{$\times$}}}
-%% 	\nccurve[nodesepB=-.5,angleA=240,angleB=70]{*->}{d1}{e}
-%%
-%% \nccurve[nodesepB=-.5,angleA=240,angleB=70,linewidth=.7]{->}{d1}{e}
-%% 	\nccurve[nodesepB=-.5,angleA=300,angleB=110]{*->}{d2}{f}
-%%
-%% \aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
-%% fillstyle=solid,
-%% 	      fillcolor=white]{$\times$}}}
-%%
-%% \putnode{w}{c}{-8}{8}{\psframebox[linestyle=none,framesep=.2]{w}}
-%%
-%%\putnode{ww}{c}{15}{8}{\psframebox[linestyle=none,framesep=.2]{z}}
-%%
-%%\nccurve[nodesepB=-.2,angleA=330,angleB=120,linewidth=.7]{->}{w}{c}
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{g}{e}{-8}{-12}{\psframebox{4}}
-%% 	\putnode{h}{e}{8}{-14}{\TwoCells{h1}{h2}}
-%% 	\putnode{i}{f}{-8}{-11}{\psframebox{6}}
-%% %
-%%\putnode{j}{f}{8}{-11}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*-}{e1}{e1}
-%%
-%%\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{e1}{g}
-%%         %here
-%%
-%%\putnode{j1}{f}{0}{-3}{\psframebox[linestyle=none,framesep=0]{\scalebox{.63}{\nilfigure}}}
-%%
-%%\putnode{j2}{h}{0}{-3}{\psframebox[linestyle=none,framesep=.5]{
-%%\scalebox{.63}{\nilfigure}}}
-
-%% %
-%%\aput[-3.2](.6){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,
-%%fillstyle=solid,
-%% %	      fillcolor=white]{$\times$}}} %and here
-%% 	\ncline[offsetB=-.5,nodesepB=-.3]{*-}{e2}{e2}
-%%
-%%\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{e2}{h}
-%% %
-%%\aput[-3.2](.5){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,
-%%fillstyle=solid,
-%% %	      fillcolor=white]{$\times$}}} %and here
-
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*->}{f1}{i}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*->}{f2}{j}
-%% 	\nccurve[nodesepB=-.2,angleA=270,angleB=90]{->}{ww}{d}
-%%
-%%\aput[-3.2](.4){\scalebox{1.2}{\psframebox[framesep=.1,linestyle=none,fillstyle=solid,
-%% 	      fillcolor=white]{$\times$}}}
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% 	\putnode{k}{h}{-8}{-11}{\psframebox{5}}
-%% %
-%%\putnode{l}{h}{8}{-11}{\psframebox[linestyle=none,framesep=.5]{\NIL}}
-%% 	\ncline[offsetB=-.5,nodesepB=.1]{*-}{h1}{h1}
-%%
-%%\ncline[linestyle=dashed,offsetB=-.5,nodesepB=.1,linewidth=.7]{->}{h1}{k}
-%% %	\ncline[offsetB=-.5,nodesepB=.1]{*->}{h2}{l}
-%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        %%
-%%       \end{pspicture}}} \\
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-      (a) Example program.&\hspace*{2cm}
-      \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
-	(b) Memory graph at $\pi$. Thick edges denote  \\
-        {\white (b) }live links. Traversal stops at edges marked\\
-        {\white (b) }$\times$  during garbage collection.
+\begin{figure}[t!]
+  %%%%{\color{Myblue}
+  \psset{unit=1mm}
+  \begin{pspicture}(80,50)(0,-50)
+    %\psframe(80,50)(0,-50)
+    %  \begin{center}
+    \begin{tabular}{@{}c@{}}
+      \begin{boxedminipage}{.42\textwidth}
+        {\sf
+	  \renewcommand{\arraystretch}{1}{
+	    \begin{uprogram}
+              \UFL\
+              \UNL{0} (\DEFINE\ (\length\  \pl)
+	      \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
+              (\PRIM\ 1\ (\CAR\  \pl))))
+              \UNL{0}
+	      \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
+	      \UNL{1}  (\SIF~(\NULLQ \ \lista)
+	      \listb
+	      \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
+              (\CDR\  \lista)
+              \listb))))
+              \UNL{0}
+              \UNL{0} (\LET\ \px\
+              $\leftarrow$\ (\CONS\ $5$
+              %          \UNL{1}\hspace*{1.5cm}
+              (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
+	      \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
+	      \UNL{2}
+              (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
+              \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
+              (\length\ \pz))))))
+	    \end{uprogram}
+        }}
+      \end{boxedminipage}
+      \\
+      (a) Example program. \\ \\
+      \begin{minipage}{.45\textwidth}
+        %\hspace*{1cm}
+                {\epsfig{file=motiv-example.eps, height=4cm}}
+      \end{minipage}
+      \\ \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
+          (b) Memory graph at $\pi$. Thick edges denote live
+          links. Traversal \\{\white (b)} stops at edges
+          marked $\times$ during garbage collection.
       \end{tabular}}
     \end{tabular}
-\end{picture}
-
-\kern -3ex
-
-\caption{Example Program and its Memory Graph.{\color{red}Amey will combine this with the figure for syntax}}\label{fig:mot-example}
-\end{figure*}
+  \end{pspicture}
+ \vspace*{-3ex}
+  \caption{Example Program and its Memory Graph}\label{fig:mot-example}
+\end{figure}
 
 In this paper,  we propose the use of liveness  analysis of heap cells
 for garbage collection in a lazy first-order functional language.  The
@@ -498,41 +386,39 @@ it
   body $e_f$  but with  its $(\SRETURN\,\,w)$ expressions  replaced by
   $(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.}
 
-\begin{figure*}[]
+\begin{figure}[t]
 \footnotesize
 \begin{eqnarray*}
    p \in \mathit{Prog} & ::= & d_1 \ldots d_n \,\, e_\mainpgm
-    \hspace{7em} \mbox{\em --- program}\\
+    \hspace{5em} \mbox{\em --- program}\\
     \mathit{df} \in Fdef & ::= & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots \,\,x_n)\,\,
     e) 
-    \hspace{2.2em} \ \ \ \ \mbox{\em --- function definition} \\
+    \hspace{0.2em} \ \ \ \ \mbox{\em --- function definition} \\
 e \in \mathit{Expr} & ::= &
-\left\{\begin{array}{ll@{\hspace{4em}}l}
+\left\{\begin{array}{@{}ll@{\hspace{2em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \!\!\!\mbox{\em --- conditional} \\
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) &&\!\!\! \mbox{\em --- let
 binding} \\
        (\SRETURN\,\, x) && \!\!\!\mbox{\em --- return from function}
     \end{array}\right. \\
 s \in \mathit{Application} & ::= &
-\left\{\begin{array}{lr@{\hspace{1em}}l}
-       k && \mbox{\em --- constant (numeric or $\NIL$)}\\
-       (\CONS\,\, x_1\,\, x_2) && \mbox{\em --- constructor} \\
-       (\CAR\,\, x) &  (\CDR\,\, x) & \mbox{\em --- selectors} \\
-       (\NULLQ\,\, x) & (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
+\left\{\begin{array}{@{}l@{\hspace{1.2em}}l}
+       k & \mbox{\em --- constant (numeric or $\NIL$)}\\
+       (\CONS\,\, x_1\,\, x_2) & \mbox{\em --- constructor} \\
+       (\CAR\,\, x) & \\ 
+       (\CDR\,\, x) & \mbox{\em --- selectors} \\
+       (\NULLQ\,\, x) & \\ 
+       (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
 and generic arithmetic} \\
-%        (\NULLQ\,\, x) && \mbox{\em ---  tester} \\
-       (\ID\,\, x) && \mbox{\em ---  identity function (for inlining)}
+       (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
 \\
-%        (\PRIM\,\, x_1\,\, x_2) && \mbox{\em --- generic arithmetic}
-\\
-       \multicolumn{2}{l}{(f\,\, x_1\,\,\ldots\,\, x_n)}
-            & \mbox{\em --- function application}
+       (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
     \end{array}\right.
 \end{eqnarray*}
   \caption{The syntax of our language}\label{fig:lang-syntax}
 \figrule
 \normalsize
-\end{figure*}
+\end{figure}
 
 
 \subsection{Semantics}
