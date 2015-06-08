@@ -25,8 +25,6 @@
 \usepackage{bcprules}
 %\usepackage{program}
 \usepackage{algorithmic}
-
-
 \input{fh_defs}
 \def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
       0pt width #2\hfill\vrule height #3 depth 0pt width #2\hfill
@@ -60,6 +58,7 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{lemma}[theorem]{Lemma}
 \begin{document}
+
 % --- Author Metadata here ---
 \conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
 %\CopyrightYear{2007} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
@@ -67,7 +66,6 @@
 % --- End of Author Metadata ---
 
 \title{Liveness-Based Garbage Collection for Lazy Languages}
-
 % You need the command \numberofauthors to handle the 'placement
 % and alignment' of the authors beneath the title.
 %
@@ -91,8 +89,8 @@
 % These 'additional authors' will be output/set for you
 % without further effort on your part as the last section in
 % the body of your article BEFORE References or any Appendices.
-\cmt{{
-\numberofauthors{3} %  in this sample file, there are a *total*
+%\cmt{{
+%\numberofauthors{3} %  in this sample file, there are a *total*
 % of EIGHT authors. SIX appear on the 'first-page' (for formatting
 % reasons) and the remaining two appear in the \additionalauthors
 section.
@@ -1013,7 +1011,7 @@ The      $\mathit{ref}$     rule      for     \CONS,      shown     in
 Figure~\ref{fig:live-judge},  requires   us  to  remove   the  leading
 \acar\ and \acdr\  from the access paths in  $\sigma$.  Similarly, the
 rules for  \CAR, \CDR, \PRIM, \NULLQ,  and \SIF\ require  us to return
-$\emptyset$, if  $\sigma$ itself $\emptyset$.  To  realize these rules
+$\emptyset$, if  $\sigma$ itself is $\emptyset$.  To  realize these rules
 $\sigma$ needs to be known. This creates difficulties since we want to
 solve the equations arising out of liveness symbolically.
 
@@ -1376,41 +1374,45 @@ NFAs are converted to DFAs.
 \subsubsection{From CFGs to GC-ready DFAs}
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
- approximate a CFG to a {\em strongly regular\/} grammar.  The grammar
- fragment  that  defines  the  non-terminal  $\var{\Df{\length}{1}}$
-   after the Mohri-Nederhof transformation becomes:
-
+ approximate a CFG to a {\em strongly regular\/} grammar.  For
+ example, the grammar
+ fragment  for  the  non-terminal  $\var{\Df{\length}{1}}$  after  the
+ Mohri-Nederhof transformation is:
  \begin{eqnarray*} 
    \var{\Df{\length}{1}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid
-   \acdr\var{\Df{\length}{1}}
+   \acdr\var{\Df{\length}{1}} 
    \mid \clazy\var{\Df{\length}{1}}\\
-   \var{\Df{\length}{1'}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid \epsilon \\
-   \langle {\sigma_{\length}} \rangle
-   &\rightarrow&
-   \epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle
- \end{eqnarray*}
+   \var{\Df{\length}{1'}} &\rightarrow& \clazy\var{\Df{\length}{1'}}
+   \mid \epsilon      
+ \end{eqnarray*}      
+  
+The strongly regular grammar is converted into a set of
+NFAs,   one  for   each  $\var{\Lanv{i}{x}}$.   The  $\hookrightarrow$
+simplification  is now  done  on the  NFAs  by repeatedly  introducing 
+$\epsilon$  edges  to  bypass  pairs  of  consecutive  edges  labelled
+\bcar\acar\ or \bcdr\acdr\  and constructing the
+$\epsilon$-closure. Since the $\epsilon$-closure step may create more
+adjacent \bcar\acar\ and \bcdr\acdr\  edges, the simplification is  
+ continued  till a  fixed point is  reached. The algorithm  for this
+appears  in~\cite{asati14lgc},   Figure[].  Finally  we   replace  the
+$\clazy$  edges  by  $\epsilon$  and determinize  the  automaton  thus
+formed. 
 
-The grammar after the Mohri-Nederhoff transformation is converted into
-a  set of  NFAs,  one for  each  $\var{\Lanv{i}{x}}$. We  now apply  the
-$\hookrightarrow$ simplification  by repeatedly introducing $\epsilon$
-edges to  bypass a pair  of consecutive edges labelled  \bcar\acar\ or
-\bcdr\acdr  and  deriving  the  $\epsilon$-closure  of  the  resulting
-automaton.   The   process  is  continued   till  a  fixed   point  is
-reached.  Finally we  replace  the $\clazy$  edges  by $\epsilon$  and
-determinize the automaton thus formed.
+\comment{A paragraph more to explain the illustration on the following lines:
+
 
 %------------------------------------------------------------%
-\subsubsection{Transforming NFAs to Accept Forward Paths:}
-%\label{sec:NFA-elim}
-The   strongly  regular   CFGs  obtained   after   the  Mohri-Nederhof
-transformation are first converted into NFAs.  The algorithm described
-in  Figure~\ref{algo:simplify-NFA} converts  an NFA  \ntbar\ to  a NFA
-\nt\    such    that   $\lang{\ntbar}    \stackrel{*}{\hookrightarrow}
-\lang{\nt}$, where {\nt} accepts forward paths only.  \comment{Rewrite
-  the algorithm to handle \clazy\  and update the example automata} Thus
-\nt\ can be used to check membership of forward paths.
+%% \subsubsection{Transforming NFAs to Accept Forward Paths:}
+%% %\label{sec:NFA-elim}
+%% The   strongly  regular   CFGs  obtained   after   the  Mohri-Nederhof
+%% transformation are first converted into NFAs.  The algorithm described
+%% in  Figure~\ref{algo:simplify-NFA} converts  an NFA  \ntbar\ to  a NFA
+%% \nt\    such    that   $\lang{\ntbar}    \stackrel{*}{\hookrightarrow}
+%% \lang{\nt}$, where {\nt} accepts forward paths only.  \comment{Rewrite
+%%   the algorithm to handle \clazy\  and update the example automata} Thus
+%% \nt\ can be used to check membership of forward paths.
 
-\begin{figure*}[t]
+%%\begin{figure*}[t]
 %% \begin{boxedminipage}{.5\textwidth}
 %% \begin{center}
 %%   \raggedright  {\bf  Input:}  NFA \ntbar\  with  underlying
@@ -1456,42 +1458,42 @@ in  Figure~\ref{algo:simplify-NFA} converts  an NFA  \ntbar\ to  a NFA
 %%  \end{algorithmic}
 %% \end{center}
 %% \end{boxedminipage}
-\begin{boxedminipage}{.5\textwidth}
-The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
-of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
-is continued till  a fixed point is reached.  When  the fixed point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness of  th The algorithm repeatedly introduces
-$\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
-\bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
-point is reached.  When the  fixed point is reached, the resulting NFA
-contains all possible reductions corresponding to all the paths in the
-original NFA.  The proofs of the termination and correctness of th The
-algorithm repeatedly  introduces $\epsilon$ edges to bypass  a pair of
-consecutive edges labelled \bcar\acar\  or \bcdr\acdr.  The process is
-continued  till a fixed  point is  reached.  When  the fixed  point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness of  th The algorithm repeatedly introduces
-$\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
-\bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
-point is reached.  When the  fixed point is reached, the resulting NFA
-contains all possible reductions corresponding to all the paths in the
-original NFA.  The proofs of the termination and correctness of th
+%% \begin{boxedminipage}{.5\textwidth}
+%% The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
+%% of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
+%% is continued till  a fixed point is reached.  When  the fixed point is
+%% reached,   the  resulting   NFA  contains   all   possible  reductions
+%% corresponding to all the paths in the original NFA.  The proofs of the
+%% termination and correctness of  th The algorithm repeatedly introduces
+%% $\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
+%% \bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
+%% point is reached.  When the  fixed point is reached, the resulting NFA
+%% contains all possible reductions corresponding to all the paths in the
+%% original NFA.  The proofs of the termination and correctness of th The
+%% algorithm repeatedly  introduces $\epsilon$ edges to bypass  a pair of
+%% consecutive edges labelled \bcar\acar\  or \bcdr\acdr.  The process is
+%% continued  till a fixed  point is  reached.  When  the fixed  point is
+%% reached,   the  resulting   NFA  contains   all   possible  reductions
+%% corresponding to all the paths in the original NFA.  The proofs of the
+%% termination and correctness of  th The algorithm repeatedly introduces
+%% $\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
+%% \bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
+%% point is reached.  When the  fixed point is reached, the resulting NFA
+%% contains all possible reductions corresponding to all the paths in the
+%% original NFA.  The proofs of the termination and correctness of th
 
-\end{boxedminipage}
- \caption{Algorithm for transforming an NFA to  accept forward
-   paths only.}\label{algo:simplify-NFA} \figrule
-\end{figure*}
+%% \end{boxedminipage}
+%%  \caption{Algorithm for transforming an NFA to  accept forward
+%%    paths only.}\label{algo:simplify-NFA} \figrule
+%% \end{figure*}
 
-The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
-of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
-is continued till  a fixed point is reached.  When  the fixed point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness  of the algorithm are given  in an earlier
-paper~\cite{karkare07liveness}.
+%% The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
+%% of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
+%% is continued till  a fixed point is reached.  When  the fixed point is
+%% reached,   the  resulting   NFA  contains   all   possible  reductions
+%% corresponding to all the paths in the original NFA.  The proofs of the
+%% termination and correctness  of the algorithm are given  in an earlier
+%% paper~\cite{karkare07liveness}.
 
 %%\input{liveness-dfa.tex}
 \comment{change according  to example} We illustrate  the algorithm in
@@ -1510,15 +1512,17 @@ forward edges  only, we  get the final  automaton shown in  (h).  This
 automaton  recognizes  $\acdr^{*}\!\mid\acdr^{*}\acar  \sigma_{\mathit
   \!all}$, showing  that the entire list \py,  including its elements,
 is live at $\pi_9$. Also note  that the language accepted by the final
-automaton satisfies the prefix-closed property.
+automaton satisfies the prefix-closed property.}
+\begin{figure}[t!]
+\hspace*{1cm}{\epsfig{file=example-automata.eps, height=2.75cm}}
+$\caption{(a) The grammar rules for $\Df{\length}{1'}$ converted into
+$  an automaton, and simplified in   (b). (c) and (d) show the automata
+$  for   \Lanv{9}{\pa}.}
+\figrule
+\end{figure}
 
 
-\hrule
-\hrule
-
-
-
-\section{Implementation}
+\section{The Garbage Collection Scheme}
 % GC assumptions
 \cred{Introduction}
 
