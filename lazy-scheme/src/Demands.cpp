@@ -446,16 +446,18 @@ void Scheme::Demands::printNFAToFile(automaton *nfa, std::string filename)
 {
 	std::ofstream outfile(filename);
 	state_transitions &trans = nfa->second;
-
+	
+	
 	for(auto s: trans)
 	{
-		for(auto sym: s.second)
+	  for(auto sym: s.second)
 		{
 			std::string symbol;
 			if (nfa->first.find(s.first) == nfa->first.end())
 				symbol = s.first + "--" + sym.first + "-->";
 			else
-				symbol = s.first + "$--" + sym.first + "-->";
+			  symbol = s.first + "$--" + sym.first + "-->";
+
 			for(auto des:sym.second)
 			{
 				if (nfa->first.find(des) == nfa->first.end())
@@ -485,6 +487,7 @@ automaton* Scheme::Demands::convertNFAtoDFA(std::unordered_set<std::string> star
 
 
 		auto new_s = epsilonClosure(st, nfa);
+
 
 		std::vector<std::unordered_set<std::string> > processed;
 		std::string s = st;
@@ -604,18 +607,31 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::ma
 	int numkeys = 1;
 	std::ofstream state_map(outdir + pgmname + "/fsmdump-" + pgmname + "-state-map");
 	std::map<std::string, int> st_map;
-	for(auto st_tuple:dfa->second)
+	for(auto st_tuple : dfa->second)
 	{
-		state_map << st_tuple.first << ":" << std::to_string(numkeys) <<";"<<std::endl;
+	  	state_map << st_tuple.first << ":" << std::to_string(numkeys) <<";"<<std::endl;
 		st_map[st_tuple.first] = numkeys;
 		auto v = splitLivenessString(st_tuple.first);
+		if (st_tuple.second.size() == 0 && 
+		    dfa->first.find(st_tuple.first) == dfa->first.end())
+		  {
+		    //If there are no transitions and it is not a final state then skip that state
+			//std::cerr << "Skipping " << st_tuple.first << std::endl;
+		    //std::cerr << st_tuple.first << std::endl;
+		    continue;
+		  }
+		//	std::cerr << "Process liveness string " << st_tuple.first << std::endl;
 		for (auto p : prog_pt_map)
 		{
+		  //	std::cerr << "p.first = " << p.first << std::endl;
+		  //	std::cerr << "p.second is " << make_key1(p.second) << " && v[1] = " << v[1] << std::endl;
+
 			if (make_key1(p.second) == v[0] &&
-					v[1].find("(") == std::string::npos)
+			    v[1].find("(") == std::string::npos
+				)
 			{
+
 				std::string state_name = "L/" + p.first + "/" + v[1];
-				//std::cout << "Mapped pg_pt to " << state_name << " with id " << numkeys << std::endl;
 				state_map << state_name << ":" << std::to_string(numkeys) <<";"<<std::endl;
 				st_map[state_name] = numkeys;
 			}
@@ -647,7 +663,7 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 	eps_closure.insert(state);
 	std::queue<std::string> state_queue;
 	state_queue.push(state);
-	//std::cout << "Finding epsilon closure for " << state << std::endl;
+
 
 	while(!state_queue.empty())
 	{
@@ -683,7 +699,6 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		}
 	if (hasfinalState)
 	{
-		//std::cout << "Marking state as final state " << state << std::endl;
 		nfa->first.insert(state);
 	}
 
@@ -713,10 +728,10 @@ void removeUnreachableStates(std::unordered_set<std::string> reachable_states,  
 
 void Scheme::Demands::printSetofStates(std::unordered_set<std::string> states)
 {
-	std::cout<<"{";
+	std::cerr<<"{";
 	for(auto state:states)
-		std::cout << state << ",";
-	std::cout<<"}"<<std::endl;
+		std::cerr << state << ",";
+	std::cerr<<"}"<<std::endl;
 }
 
 

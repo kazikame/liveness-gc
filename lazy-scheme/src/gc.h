@@ -88,7 +88,7 @@ extern clock_tick current_cons_tick;
 #endif
 extern clock_tick gc_freq_threshold;
 
-#if __DEBUG__GC
+#ifdef __DEBUG__GC
 #define DBG(stmt) stmt
 #else
 #define DBG(stmt) (void)0

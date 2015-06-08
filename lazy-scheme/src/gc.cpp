@@ -245,7 +245,7 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				if (node->forward == NULL || node->copied_using_rgc == false)
 				{
 					cons* new_loc = copy(node, out);
-					//node->copied_using_rgc = true;
+					node->copied_using_rgc = true;
 					new_loc->val.cell.car = deep_copy(node->val.cell.car, 1, out);
 					new_loc->val.cell.cdr = deep_copy(node->val.cell.cdr, 1, out);
 
@@ -266,7 +266,7 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				    (node->typecell == funcApplicationExprClosure) ||
 				    (node->typecell == funcArgClosure))
 				{
-					//node->copied_using_rgc = true;
+					node->copied_using_rgc = true;
 					new_loc->val.closure.arg1 = deep_copy(node->val.closure.arg1, 1, out);
 					new_loc->val.closure.arg2 = deep_copy(node->val.closure.arg2, 1, out);
 					GC_STAT_UPDATE_LAST_GC(new_loc);
@@ -1539,7 +1539,7 @@ void liveness_gc()
     	  DBG(pre << "Doing gc at return point " << stackit->return_point << endl);
 		  string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
     	  stateMapIter got = statemap.find(nodeName);
-
+    	  DBG(pre << "Finding liveness for " << nodeName << endl);
     	  if (got != statemap.end())
     	  {
 
