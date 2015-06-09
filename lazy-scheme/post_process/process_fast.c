@@ -51,15 +51,15 @@ int main(int argc, char* argv[])
     for(the_time = 0; the_time <= this_gc_time;  the_time++) {
         long rch = gc_reachable[the_time];
         long use = gc_used[the_time];
-	long rgc = gc_rgcied[the_time];
+        long rgc = gc_rgcied[the_time];
         fprintf(file2, "%u %ld\n", the_time, use);
         if ((the_time > 0) && (rch == 0)) /* ignore */
             continue;
         
         fprintf(file1, "%u %ld\n", the_time, rch);
         fprintf(file3, "%u %ld\n", the_time, rch-use);
-	if (rgc > 0)
-	  fprintf(file4, "%u %ld\n", the_time, rgc);
+        // if (rgc > 0) : approx use is rgc + use, else it is use.
+        fprintf(file4, "%u %ld\n", the_time, use + (rgc > 0 ? rgc : 0));
     }
     return 0;
 }
