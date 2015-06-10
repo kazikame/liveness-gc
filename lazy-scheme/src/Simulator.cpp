@@ -183,9 +183,10 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
 		Scheme::Demands::simplifyNFA(start_states, nfa);
-		Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-simplified-nfa.txt");
+		//Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-simplified-nfa.txt");
 		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
 		Scheme::Demands::printNFAToFile(dfa, outdir + pgmname + "/program-dfa.txt");
+
 
 		//While converting DFA to 2D array and writing to file, set the associations for the (prog_pt, varname) instead of e-paths
 		std::map<std::string, std::unordered_set<std::string>> label_set_map;
