@@ -1367,222 +1367,159 @@ data in its evaluated form. The absence of liveness information of
 closures presents challenges for LGC.
 
 
-\subsection{A simple LGC Algorithm}
-We shall call  a unit allocatable memory as a {\em  cell}.  A cell may
-hold  a  basic value,  or  the constructor  \CONS\,  or  (parts of)  a
-closure.  Apart from information to  identify the cell type, each cell
-has the space  for two fields. The second of the  fields may be empty,
-when, for example, the cell holds a basic value or a closure involving
-a unary operator. \cred{Should we say more about the representation}. 
+\subsection{A liveness-based garbage collection scheme}
+We shall call  a unit allocatable memory as a {\em  cell}.  A cell can
+hold  a  basic  value   ($\mathit{bas}$),  the  constructor  \CONS\  $(\mathit{cons~
+arg_1~arg_2}$) or   a closure.  The closure, in  turn, can be  one of
+($\mathit{unop~arg_1}$),  ($\mathit{ binop~arg_1~arg_2}$)  and  function  application
+($\mathit{app~arg_1~arg_2})$.  Here each $\mathit{ arg_i}$ is a reference to another heap
+cell or terminated through the function $\mathit{makenull}$. 
 
 \begin{figure*}[t!]
 \label{fig:algos}
 \hfill
-\subfigure[]{\includegraphics[width=.27\linewidth]{lgc-scheme-1}}
+\subfigure[]{\includegraphics[width=.30\linewidth]{lgc-scheme-1}}
 \hfill
-\subfigure[]{\includegraphics[width=.45\linewidth]{lgc-scheme-2}}
+\subfigure[]{\includegraphics[width=.40\linewidth]{lgc-scheme-2}}
 \hfill
-\caption{(a) LGC with closure collection based on reachability  (b)
-  LGC with liveness-based closure collection.}
-
+\caption{(a) LGC with closure collection based on liveness.  (b)
+  LGC with reachability-based closure collection.}
+    
 \end{figure*}
+ 
+  
+Figure~\ref{fig:algos}  shows   a  liveness-based  garbage  collection
+scheme.   The algorithm  assumes that  checking for  liveness involves
+traversing the  liveness-DFAs stored as  a table and does  not mention
+this explicitly.  Starting  with the root set, each  live reference is
+explored   using  $\mathit{  lgcCopy}$.    Copying  \CONS\   cells  is
+simple---it  just involves  copying  the cell  itself and  recursively
+copying the \CAR\ and  the \CDR\ fields.  Liveness-based collection of
+closures  is more  complicated since  our analysis  only  computes the
+liveness of evaluated objects and not closures.
+
+Let   us  consider   determining  the   liveness  of   a   closure  at
+runtime. Assume  that the closure  $(app~f~y)$ has a  reference from
+the root  set variable $x$. If $x$  is live,  then we  know that the
+cell $(app~f~y)$ has  to be copied. However, to find out  the
+liveness of $y$, could find out the program point which triggered the
+evaluation of $(app~f~y)$ and pick up the liveness of $y$ from this
+program point. However, this is only possible if the activation record
+of the function which created this closure is still on the activation
+stack. This does not always happen since a function could pack a
+closure in a \CONS\ cell and return the \CONS\ cell.
+
+An  alternative  could  be   to  carry  extra  information  with  each
+closure---the {\em free variables in the closure and the program point
+  at  which  it  was  evaluated}.   This  gives  us  precise  liveness
+information  of the  free  variables  of a  closure  but involves  the
+overhead of  updating the program point  information during execution.
+To avoid this  overhead we go for a safe  approximation by storing the
+{\em creation  point of the closure}  and using it  to check liveness.
+This is safe  since the liveness at the creation  point of the closure
+dominates all possible evaluation points  of the closure, but it might
+be imprecise  as the actual  liveness might be  way less than  what is
+found at the creation point.
+
+Note that  when a reachability-based  collector visits a cell  for the
+first time,  it is  marked.  Explorations starting  from the  cell are
+curtailed if the cell is  visited subsequently due to sharing. This is
+because the collector can assume  that the region of the heap starting
+from  the  cell has  already  been  explored.  Since a  liveness-based
+collector may  reach the cell each  time with a  different state, this
+curtailment cannot  be done in  the case of  LGC. This is  an inherent
+drawback  of a  liveness-based collector.   This can  be  mitigated by
+maintaining a list of liveness  automata states that a particular heap
+cell was traversed with and  ensuring that we do not repeat traversals
+if we reach the cell in one of these states.
+
+\subsection{Liveness-based collector with reachability-based closure
+  collection}  Since the first  algorithm has  significant bookkeeping
+overheads,  we have  a  second GC  scheme  that not  use liveness  for
+copying closures.  In this  scheme, the liveness automata is consulted
+only for \CONS\ cells; we assume everything under a closure to be live
+and copy everything  that is reachable. 
+ 
+A consequence of copying everything under a closure is that we can end
+up trying to copy things which are not live and corrupt the heap. This
+can happen if a \CONS\  cell copied using liveness during a collection
+subsequently  becomes   part  of  a  closure.    During  a  subsequent
+collection,  the  collector  may  try  to copy  everything  under  the
+\CONS\ cell thus copying heap  locations which might not be valid.  To
+avoid  this, we  should ensure  that any  non-live references  are not
+carried across  GC's.  We  do this  by scanning the  live part  of the
+buffer after every  GC and setting to null any  reference which is not
+live. This  is correct  because any reference  which is dead  during a
+collection will not be dereferenced any further.
 
 
-In  the simple algorithm  presented we  consult liveness  automata for
-copying both \CONS cells and closures.  Copying \CONS cells are simple
-and just  involve consulting  the liveness automaton  corresponding to
-them  and  recursively  copying.  In  case of  closures,  it  is  more
-complicated  as  they might  refer  to  data/closures  which might  be
-created in  a different environment(function), all of  which might not
-even exist  on the program  stack. To overcome  this we need  to carry
-extra information with each closure, the program point at which it was
-evaluated and  also the names of  the free variables  contained in the
-closure.  This  gives us  precise  liveness  information  of the  free
-variables of a closure but  involves run-time overhead of updating the
-program  point correctly. To  avoid this  overhead we  go for  a safer
-approximation by storing  the creation point of the  closure and using
-it to check liveness.  This is safe since the liveness at the creation
-point of the closure encompasses  all possible uses of the closure but
-it might be very imprecise as at run-time the actual liveness required
-might be way less than what is found at the creation point.
-
-The advantage of  this method is that it collects  all dead cells even
-if  they are  part  of a  closure  and hence  will  reduce the  memory
-requirements and the number of garbage collections. The main drawbacks
-of  this method  is  the fact  that  the algorithm  might do  multiple
-traversals over  the same structure. Assume that  two references point
-to the  same list, now using  reachability if it  is garbage collected
-using  one reference  there is  no need  to traverse  using  the other
-reference as everything  reachable from the root node  would have been
-copied.  Unfortunately, this is not the case with liveness based GC as
-the two references  might make different sections of  the list as live
-and  copy  them.  Liveness  based  algorithm will  have  to  make  one
-traversal  per reference.   Experimentally we  found that  this  was a
-major source of overhead in the liveness based algorithm.  This can be
-mitigated by  maintaining a  list of liveness  automata states  that a
-particular heap  cell was traversed with  and ensuring that  we do not
-repeat traversals  with the same  state. This requires that  each cell
-maintain  a list  of state  which  potentially might  contain all  the
-states.  Hence  this  is  not  a  feasible  solution.   \cred{repeated
-  traversals if sharing}.
+An advantage of  using reachablity for closures it  avoids the problem
+of  multiple  explorations  from  the  same  cell.  This  is  done  by
+maintaining  a flag in  each cell  to indicate  whether it  was copied
+using  reachability. 
 
 
-\subsection{Modified GC Algorithm}
-Since the first algorithm requires a lot of bookkeeping and is not
-precise, we have a second version of the algorithm
-which does not use liveness for copying closures.
-\begin{verbatim}
-procedure copy (cell)
-  IF{celltype is cons}
-    IF cell is live &&
-         cell is not copied using reachability
-       new_cell <-  dup_heapcell(cell)
-       new_car        <-  copy(cell.car)
-       new_cell.car   <-  new_car
-       new_cdr        <-  copy(cell.cdr)
-       new_cell.cdr   <-  new_cdr
-    ELSE
-       cell <- NULL
-    ENDIF
-  ELSE
-    IF {celltype is closure && cell is not copied}
-       new_cell  <- copy_and_mark_reachable_cells(cell)
-    ENDIF
-  ENDIF
- copy_references_on_print_stack()
-\end{verbatim}
-
-
-In this  algorithm we consult  the liveness automata  only if it  is a
-cons cell, for  closures we assume everything under it  to be live and
-copy everything that is reachable. Although this might lead to copying
-more  cells   it  is   faster  as  there   are  no   liveness  checks.
-\comment{Once  experimental  results  are  obtained  compare  the  two
-  algorithms here}  Mixing liveness based GC and  reachability has its
-own set of pros and cons which we discuss further.\cred{hanging like a
-  sore thumb}.
-
-
-\subsubsection{Optimization for RGC for closures}
-An advantage  of using  reachablity for closures  is that it  opens up
-certain  opportunities  of  optimization.  As  we  saw  in  section[],
-multiple traversals  over the same structure was  a major inefficiency
-in the full liveness based  algorithm and overcoming it required a lot
-of memory.  Using reachability for closures allows us to overcome this
-partially using limited amount of  memory. Any heap cell which is part
-of a closure  is copied using reachaibilty and  hence by maintaining a
-single  flag in  each cell  to indicate  whether it  was  copied using
-reachability    prevents   traversing    the   same    cell   multiple
-times.  Experimental results  again indicate  that for  lazy languages
-this gives a  substantial performance improvement.  \comment{Maybe add
-  a diagram}
-
-\subsubsection{Issues with mixing LGC and RGC}
-A consequence of  copying everything under a closure  is the fact that
-we can end up trying to copy things which are not live and corrupt the
-heap. This  can happen if at some  $GC_k$ a cons cell  is copied using
-liveness. At  a later stage this  cons cell becomes part  of a closure
-and  hence during $GC_{k+n}$  the algorithm  tries to  copy everything
-under the  cons cell  thus copying heap  locations which might  not be
-valid.  To avoid  this behavior we either have to choose  to do a full
-liveness based  GC for closures or  we should ensure  that any non-live
-references are  not carried across  GC's. We take the  latter approach
-and ensure that  non-live references are set to  null. After every GC,
-the live part of the buffer  is scanned and any reference which is not
-live is  set to null.  The correctness of  this follows from  the fact
-that any reference which is decalred  not live in a $GC_k$ will not be
-derefernced during later execution.
-% A reference copied using LGC could become part of a closure in a
-later GC
-% and copy wrong locations. Avoiding it by setting non-live references
-to null after every GC.
-% Proof for the correctness.
 \subsection{Garbage collection for references on print stack}
-Another  difference that is  present in  GC of  lazy language  is the
-presence  of  a print  stack.  In  lazy  languages the  evaluation  of
-closures is  driven by the print  function\comment{Refer to SPJ's
-book}.
-Printing of atomic values is simple and does not trigger a garbage
-collection.
-In case of \CONS\ cells, the \CAR\ part is first printed and then the \CDR\
-part.
-In a lazy language, both the \CAR\ and the \CDR\ parts could be closures,
-thus
-requiring evaluation. A garbage collection might be triggered while printing
-the \CAR\ part or the \CDR\ part. Therefore, whenever a garbage collection is
-triggered we have to consider any references that might be on the print stack
-and copy them. Liveness automata does not exist for the print function as it
-is not part of the executing program. Since the print function makes
-everything
-reachable from a cell live we can copy all cells reachable from the
-reference.
+In lazy  languages the evaluation of  closures is driven  by the print
+function~\cite{Jones87}.  Printing of  atomic values is
+simple  and  does  not  trigger  a garbage  collection.   In  case  of
+\CONS\ cells, the \CAR\ is first  printed followed by \CDR.  In a lazy
+language, both \CAR\ and \CDR\ could be closures requiring evaluation,
+and this  may trigger  a garbage collection.   When this  happens.  we
+have to consider  any references that might be on  the print stack and
+copy them. We extend the liveness analysis to the print function and
+use its results during garbage collection.
+
+%% Liveness automata  does not exist for  the print function  as it is
+%% not part of the executing  program.  Since the print function makes
+%% everything  reachable  from a  cell  live  we  can copy  all  cells
+%% reachable from the reference.
 
 
-Consider the case where a \CONS\ cells is being printed and a garbage
-collection
-is triggered when printing the \CDR\ part. In this case, since the refernce
-to the
-\CONS\ cells is still on the print stack both the \CAR\ and the \CDR\ parts
-are
-reachable but we know that the \CAR\ part has already been printed and can be
-safely garbage collected. A liveness analysis of the print function would
-have
-given the same information. In our implementation we mimic the behavior of
-the liveness analysis by using a flag in every \CONS\ cell which says whether
-the \CAR\ part has been printed or not. For any \CONS\ cell if the \CAR\ part
-has not been printed, a reference to the \CAR\ part will also be on the stack
-but
-the \CDR\ part has to be explicitly copied.
-In case the \CAR\ part has been printed, then a reference to the \CDR\ part
-will
-be on the stack and since the \CAR\ part is not required anymore we do not
-copy anything. This optimization subsumes tail call optimization. Again,
-experimental results show that this optimization minimizes a lot of copying.
-\cred{Very sketchy: Make another attempt to write}
-\hrule
-\comment{
-Unlike eager languages where GC happens only at \CONS~ points or at
-function calls, every \LET~ point is a potential GC point. The number
-of
-automata that needs to be stored is reduced by sharing automata along
-all
-the program points along an {\em E-path}.
+%% Consider  the case  where a  \CONS\ cells  is being  printed  and a
+%% garbage collection  is triggered when  printing the \CDR\  part. In
+%% this case, since  the refernce to the \CONS\ cells  is still on the
+%% print stack both the \CAR\ and the \CDR\ parts are reachable but we
+%% know that the \CAR\ part has already been printed and can be safely
+%% garbage collected. A liveness  analysis of the print function would
+%% have given  the same information.   In our implementation  we mimic
+%% the  behavior of the  liveness analysis  by using  a flag  in every
+%% \CONS\ cell which  says whether the \CAR\ part  has been printed or
+%% not. For any \CONS\ cell if  the \CAR\ part has not been printed, a
+%% reference  to the  \CAR\ part  will also  be on  the stack  but the
+%% \CDR\ part has to be explicitly copied.  In case the \CAR\ part has
+%% been printed,  then a reference  to the \CDR\  part will be  on the
+%% stack and  since the \CAR\ part  is not required anymore  we do not
+%% copy anything.  This  optimization subsumes tail call optimization.
+%% Again, experimental results show that this optimization minimizes a
+%% lot of copying.  \cred{Very sketchy: Make another attempt to write}
+%% \hrule
 
-By the  time the program  starts executing, the liveness  automata are
-created and stored in a file.   This is re-used every time the program
-executes.  An important difference in  GC of lazy language compared to
-an  eager language is  the point  of garbage  collection.  In  case of
-eager  languages only  \CONS~ points  and  function calls  are the  GC
-points. In  a lazy  language every \LET~  statement is a  potential GC
-point. Hence we need to store liveness automata corresponding to every
-\LET~  statement in the  program. This  leads to  an explosion  in the
-number of  automata. From our  observation that along an  {\em E-path}
-all program points have the same liveness, we can reduce the number of
-automata state required  by sharing the same automata  for all program
-points along an {\em E-path}.} In  the example program, we only need to
-create automata  for program  points \ldots, since  they are  the only
-distinct {\em E-path}s in the program.
+%% \comment{ Unlike  eager languages where  GC happens only  at \CONS~
+%%   points or at function calls,  every \LET~ point is a potential GC
+%%   point.  The number of automata that needs to be stored is reduced
+%%   by sharing  automata along all  the program points along  an {\em
+%%   E-path}.
 
-% Liveness for cons cells & reachability for closures
-
-\comment{Mention the fact that liveness at a program point indicates
-  what references will be used by the program eventually. The exact
-  point where a reference will be used cannot be determined statically
-due to the language being lazy. }
-During GC, if the heap cell being processed is a cons cell, we consult
-the  liveness automaton  corresponding to  it and  copy only  the live
-paths.  In  case  the  heap  cell  points  to  a  closure,  we  safely
-approximate the  liveness to be {\{0+1\}\*} and  copy everything under
-the closure.
-% Handling of mixture of LGC & RGC
-
-% Difference between eager and lazy GC
+%% By the time the program starts executing, the liveness automata are
+%% created  and stored  in a  file.  This  is re-used  every  time the
+%% program executes.   An important difference in GC  of lazy language
+%% compared to an  eager language is the point  of garbage collection.
+%% In case  of eager languages  only \CONS~ points and  function calls
+%% are the  GC points. In a  lazy language every \LET~  statement is a
+%% potential  GC  point. Hence  we  need  to  store liveness  automata
+%% corresponding to  every \LET~ statement in the  program. This leads
+%% to an  explosion in  the number of  automata. From  our observation
+%% that  along  an {\em  E-path}  all  program  points have  the  same
+%% liveness, we  can reduce the  number of automata state  required by
+%% sharing  the same  automata for  all program  points along  an {\em
+%% E-path}.} In the  example program, we only need  to create automata
+%% for program  points \ldots, since  they are the only  distinct {\em
+%% E-path}s in the program.
 
 
 
-% Doing GC for  references on the print stack - using  a flag to avoid
-% copying non-live  cells Optimizing  GC for closures  - use  a copied
-% using rgc flag for closures to avoid multiple traversals
+
 
 
 \section{Results}
@@ -1668,25 +1605,25 @@ our liveness analysis.  For  all programs  except  {\tt nperms} and
 manages to collect a good portion of the data that are not live.
 
 \subsection{Results}
-\begin{figure}[t]
-\centering
-\begin{boxedminipage}{.75\textwidth}
-{\bf function} $\mathsf{copy}$($\mathsf{dfa}$, $q$, $x$)\\
-\noindent \hspace*{.35cm}$y \leftarrow \mathsf{move\_to\_tospace}(x)$\\
-\noindent \hspace*{.35cm}{\bf if} $x$.{\bf tag} $\neq$ \CONS\ {\bf
-  then} {\bf skip}\\
-\noindent \hspace*{.25cm}  {\bf else} {\bf if}
-$\mathsf{dfa}(q,0)\mathsf{?}$ {\bf then}   $y.\CAR =
-\mathsf{copy}(\mathsf{dfa}, \mathsf{dfa}(q,0),x.\CAR)$\\
-\noindent \hspace*{0.95cm} {\bf if}  $\mathsf{dfa}(q, 1)\mathsf{?}$
-{\bf then}  $y.\CDR = \mathsf{copy}(\mathsf{dfa},
-\mathsf{dfa}(q,1),x.\CDR)$\\
-\noindent \hspace*{.35cm}{\bf return} $y$
-\end{boxedminipage}
-\caption{Function       for       copying       a       root       set
-  variable.}\label{algo:LGC-main-loop} \figrule
+%% \begin{figure*}[t]
+%% \centering
+%% \begin{boxedminipage}{.75\textwidth}
+%% {\bf function} $\mathsf{copy}$($\mathsf{dfa}$, $q$, $x$)\\
+%% \noindent \hspace*{.35cm}$y \leftarrow \mathsf{move\_to\_tospace}(x)$\\
+%% \noindent \hspace*{.35cm}{\bf if} $x$.{\bf tag} $\neq$ \CONS\ {\bf
+%%   then} {\bf skip}\\
+%% \noindent \hspace*{.25cm}  {\bf else} {\bf if}
+%% $\mathsf{dfa}(q,0)\mathsf{?}$ {\bf then}   $y.\CAR =
+%% \mathsf{copy}(\mathsf{dfa}, \mathsf{dfa}(q,0),x.\CAR)$\\
+%% \noindent \hspace*{0.95cm} {\bf if}  $\mathsf{dfa}(q, 1)\mathsf{?}$
+%% {\bf then}  $y.\CDR = \mathsf{copy}(\mathsf{dfa},
+%% \mathsf{dfa}(q,1),x.\CDR)$\\
+%% \noindent \hspace*{.35cm}{\bf return} $y$
+%% \end{boxedminipage}
+%% \caption{Function       for       copying       a       root       set
+%%   variable.}\label{algo:LGC-main-loop} \figrule
 
-\end{figure}
+%% \end{figure*}
 
 
 
@@ -1747,7 +1684,7 @@ explored  any   further  during  a  RGC   collection.   However,  this
 curtailment cannot happen in  LGC because of the possibility that the
 node,  re-visited in a  different liveness  state, may  mark a  set of
 cells different from the earlier visit.
-\begin{figure}[t]
+\begin{figure*}[t]
 \footnotesize
 
 \centering
@@ -1826,58 +1763,58 @@ LGC \\
   data. The average drag time is measured in allocated cons cells.}
 \label{fig:experimental-results}
 \normalsize
-\end{figure}
+\end{figure*}
 
-\section{Collecting more garbage can never slow things down}
-\label{sec:lgc-always-better}
+%% \section{Collecting more garbage can never slow things down}
+%% \label{sec:lgc-always-better}
 
 %% Since garbage collection is  effectively asynchronous to the
-allocator
+%% allocator
 %% thread, one might  worry as to how {\em  robust} our measurements
-are.
+%% are.
 %% For example,  while LGC would,  in general, collect more  garbage
-than
+%% than
 %% RGC in the same heap state,  is it possible that on some programs,
-LGC
+%% LGC
 %% might do  a larger number  of collections? We  prove a result  to
-show
+%% show
 %% that   this  cannot   happen.    This  result   applies  to
-classical
+%% classical
 %% mark-and-sweep and copying garbage  collectors and, we hypothesize,
-to
+%% to
 %% generational collectors too.
 
 %% \begin{lemma}
 %% For the  same mutator,  a liveness-based collector  can never  do
-more
+%% more
 %% garbage collections than a reachability-based collector.
 %% \end{lemma}
 
 %% \begin{proof}Assume, as before,  that time is measured in terms of
-the number of
+%% the number of
 %%   cons cells allocated. Let us run  two copies of the mutator with
-the
+%% the
 %%   two    different   collectors    but    with   synchronous
-memory
+%% memory
 %%   allocations.   The   garbage    collections,   however,   happen
 %%   asynchronously.
 
 %%   To prove the lemma, it is enough to show the truth of the
-following
+%% following
 %% statement: After
 %%  every  LGC invocation,  the count of LGC invocations   is  no
-greater
+%% greater
 %% than  RGC invocations.   The  base case  holds  since the  first
 %% invocations of both GCs happen at the same time.  Assume the
-statement
+%% statement
 %% to be true after $n$ invocations of LGC.  Since LGC copies a subset
-of
+%% of
 %% reachable cells, its heap would contain no more cells than RGC heap
-at
+%% at
 %% the end  of the $n$th invocation.   Thus either RGC  is invoked next
-before
+%% before
 %% LGC, or LGC and RGC are both invoked next at the same time.  In
-either
+%% either
 %% case, the statement holds after $n+1$ invocations of LGC.
 %% \end{proof}
 
@@ -1975,36 +1912,36 @@ of the heap and
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
-Generated by bibtex from your ~.bib file.  Run latex,
-then bibtex, then latex twice (to resolve references)
-to create the ~.bbl file.  Insert that ~.bbl file into
-the .tex source file and comment out
-the command \texttt{{\char'134}thebibliography}.
-% This next section command marks the start of
-% Appendix B, and does not continue the present hierarchy
-\section{More Help for the Hardy}
-The sig-alternate.cls file itself is chock-full of succinct
-and helpful comments.  If you consider yourself a moderately
-experienced to expert user of \LaTeX, you may find reading
-it useful but please remember not to change it.
-%\balancecolumns % GM June 2007
-% That's all folks!
+%% Generated by bibtex from your ~.bib file.  Run latex,
+%% then bibtex, then latex twice (to resolve references)
+%% to create the ~.bbl file.  Insert that ~.bbl file into
+%% the .tex source file and comment out
+%% the command \texttt{{\char'134}thebibliography}.
+%% % This next section command marks the start of
+%% % Appendix B, and does not continue the present hierarchy
+%% \section{More Help for the Hardy}
+%% The sig-alternate.cls file itself is chock-full of succinct
+%% and helpful comments.  If you consider yourself a moderately
+%% experienced to expert user of \LaTeX, you may find reading
+%% it useful but please remember not to change it.
+%% %\balancecolumns % GM June 2007
+%% % That's all folks!
 
 
 
 
 
-% {\color{red}
-%   (Note 3.\ includes $e_\mainpgm$ treated as the body of
-%   $(\DEFINE\ ({\tt main})\ e_\mainpgm)$.)
-% }
+%% % {\color{red}
+%% %   (Note 3.\ includes $e_\mainpgm$ treated as the body of
+%% %   $(\DEFINE\ ({\tt main})\ e_\mainpgm)$.)
+%% % }
 
 
 
 
-%% =======
+%% %% =======
 
-%------------------------------------------------------------%
-%\input{lazy-liveness}
+%% %------------------------------------------------------------%
+%% %\input{lazy-liveness}
 
 \end{document}
