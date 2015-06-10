@@ -1,0 +1,66 @@
+\documentclass[9pt]{article}
+
+
+\usepackage{graphicx}
+\usepackage{graphpap}
+\usepackage{tabularx}
+\usepackage{alltt}
+\usepackage{epsfig}
+\usepackage{pstricks}
+\usepackage{pst-text}
+\usepackage{pst-node}
+\usepackage{pst-tree}
+\usepackage{pst-rel-points}
+\usepackage{boxedminipage}
+\thispagestyle{empty}
+\usepackage{algorithm2e}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+\begin{function*}
+\SetStartEndCondition{ }{}{}%
+\SetKwProg{Fn}{procedure}{\string:}{}
+\SetKwFunction{Range}{range}%%
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
+\SetKwFor{While}{while}{:}{fintq}%
+\newcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
+\SetKwFunction{Lgc}{lgc}%
+\SetKwFunction{Copy}{copy}%
+\Fn{\Lgc{}}
+ {
+ \For {each reference $\mathit{ref}$ in root set}
+   {
+   \lIf {$\mathit{ref}$ is live} {copy($\mathit{ref}$)}
+   }
+}
+
+\Fn{\Copy{$\mathit{ref}$}}
+{
+     $\mathit{newRef} = $  $dupHeapCell(\mathit{ref})$\;
+     \If{cellType($\mathit{ref}$) is $cons$}
+        {
+          \If {$\mathit{ref}$.car is live} 
+               {
+                 $\mathit{newCar}  = $  copy($\mathit{ref.car})$\;
+                 $\mathit{newRef}.car   =  newCar$\;
+               }
+          \If {$\mathit{ref}$.cdr is live} 
+               {
+                 $\mathit{newCdr}$ =   copy($\mathit{ref.cdr})$\;
+                 $\mathit{newRef.cdr}   = \mathit{newCdr}$\;
+               }    
+        }
+     \If {cellType($\mathit{ref}$) is closure}
+          {
+             $\mathit{newRef.arg1}$ =  copy$\mathit{(cell.arg1)}$\;
+             $\mathit{newRef.arg2}$ =  copy$\mathit{(cell.arg2)}$\;
+          }
+   
+ $\mathit{copyReferencesOnPrintStack()}$\;
+}
+\end{function*}
+\end{document}
+\mathit{

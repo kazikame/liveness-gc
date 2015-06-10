@@ -1,0 +1,54 @@
+\documentclass[9pt]{article}
+\usepackage{graphicx}
+\usepackage{graphpap}
+\usepackage{tabularx}
+\usepackage{alltt}
+\usepackage{epsfig}
+\usepackage{pstricks}
+\usepackage{pst-text}
+\usepackage{pst-node}
+\usepackage{pst-tree}
+\usepackage{pst-rel-points}
+\usepackage{boxedminipage}
+\thispagestyle{empty}
+\usepackage{algorithm2e}
+\usepackage{amssymb}
+\usepackage{amsmath}
+
+\begin{document}
+\begin{function*}
+\SetStartEndCondition{ }{}{}%
+\SetKwProg{Fn}{procedure}{\string:}{}
+\SetKwFunction{Range}{range}%%
+\SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
+\SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
+\SetKwFor{While}{while}{:}{fintq}%
+\newcommand{\forcond}{$i$ \KwTo\Range{$n$}}
+\AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
+\SetKwFunction{Lgc}{lgc}%
+\SetKwFunction{Copy}{copy}%
+\Fn{\Copy{$\mathit{ref}$}}
+{
+  \eIf{cellType$(\mathit{ref})$ is $cons$}
+    {
+      \eIf {$\mathit{ref}$ is live and has not been copied using
+        reachability}
+       {
+         $\mathit{newRef}$ =  $dupHeapcell(\mathit{ref})$\; 
+         $\mathit{ newCar}  =$  copy$\mathit{(ref.car)}$\;
+         $\mathit{ newRef.car}   = \mathit{ newCar}$\;
+         $\mathit{ newCar}  =$  copy$\mathit{(ref.cdr)}$\;
+         $\mathit{ newRef.cdr}   = \mathit{ newCar}$\;
+        }
+       { $cell = {\mathbf{ NULL}}$ \;}}
+     {
+       \If {cellType$\mathit{(ref)}$ is closure and 
+            has not been copied}
+       {
+         $\mathit{newRef}  = \mathit{copyAndMarkReachableCells(ref)}$\;
+       }
+    }
+ $\mathit{copyReferencesOnPrintStack()}$\; 
+}
+\end{function*}
+\end{document}
