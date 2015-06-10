@@ -27,40 +27,36 @@
 \SetKwFor{While}{while}{:}{fintq}%
 \newcommand{\forcond}{$i$ \KwTo\Range{$n$}}
 \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
-\SetKwFunction{Lgc}{lgc}%
-\SetKwFunction{Copy}{copy}%
+\SetKwFunction{Lgc}{$lgc$}%
+\SetKwFunction{Copy}{$lgcCopy$}%
 \Fn{\Lgc{}}
  {
  \For {each reference $\mathit{ref}$ in root set}
-   {
-   \lIf {$\mathit{ref}$ is live} {copy($\mathit{ref}$)}
-   }
+   {\Copy($\mathit{ref}$)\;}
+  $\mathit{copyReferencesOnPrintStack()}$\;  
 }
 
 \Fn{\Copy{$\mathit{ref}$}}
 {
-     $\mathit{newRef} = $  $dupHeapCell(\mathit{ref})$\;
+     \If{$\mathit{ref}$ is live}
+       {$\mathit{newRef} = $  $\mathit{dupHeapCell(ref})$\;
      \If{cellType($\mathit{ref}$) is $cons$}
         {
-          \If {$\mathit{ref}$.car is live} 
                {
-                 $\mathit{newCar}  = $  copy($\mathit{ref.car})$\;
-                 $\mathit{newRef}.car   =  newCar$\;
+                 $\mathit{newCar}  = $  \Copy($\mathit{ref\!.car})$\;
+                 $\mathit{newRef.car}   =  newCar$\;
                }
-          \If {$\mathit{ref}$.cdr is live} 
                {
-                 $\mathit{newCdr}$ =   copy($\mathit{ref.cdr})$\;
+                 $\mathit{newCdr}$ =   \Copy($\mathit{ref.cdr})$\;
                  $\mathit{newRef.cdr}   = \mathit{newCdr}$\;
                }    
         }
      \If {cellType($\mathit{ref}$) is closure}
           {
-             $\mathit{newRef.arg1}$ =  copy$\mathit{(cell.arg1)}$\;
-             $\mathit{newRef.arg2}$ =  copy$\mathit{(cell.arg2)}$\;
+             $\mathit{newRef.arg1}$ =  \Copy$\mathit{(cell.arg1)}$\;
+             $\mathit{newRef.arg2}$ =  \Copy$\mathit{(cell.arg2)}$\;
           }
-   
- $\mathit{copyReferencesOnPrintStack()}$\;
-}
+}} 
 \end{function*}
 \end{document}
 \mathit{

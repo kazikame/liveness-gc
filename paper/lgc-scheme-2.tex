@@ -26,29 +26,36 @@
 \newcommand{\forcond}{$i$ \KwTo\Range{$n$}}
 \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
 \SetKwFunction{Lgc}{lgc}%
-\SetKwFunction{Copy}{copy}%
-\Fn{\Copy{$\mathit{ref}$}}
+\SetKwFunction{LCopy}{$lgcCopy$}%
+\SetKwFunction{RCopy}{$rgcCopy$}%
+
+\Fn{\Lgc{}}
+ {
+ \For {each reference $\mathit{ref}$ in root set}
+   {copy($\mathit{ref}$)\;}
+  $\mathit{copyReferencesOnPrintStack()}$\;  
+}
+\Fn{\LCopy{$\mathit{ref}$}}
 {
   \eIf{cellType$(\mathit{ref})$ is $cons$}
     {
       \eIf {$\mathit{ref}$ is live and has not been copied using
         reachability}
        {
-         $\mathit{newRef}$ =  $dupHeapcell(\mathit{ref})$\; 
-         $\mathit{ newCar}  =$  copy$\mathit{(ref.car)}$\;
+         $\mathit{newRef}$ =  $\mathit{dupHeapcell(ref})$\; 
+         $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.car)}$\;
          $\mathit{ newRef.car}   = \mathit{ newCar}$\;
-         $\mathit{ newCar}  =$  copy$\mathit{(ref.cdr)}$\;
-         $\mathit{ newRef.cdr}   = \mathit{ newCar}$\;
+         $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.cdr)}$\;
+         $\mathit{ newRef.cdr}   = \mathit{newCar}$\;
         }
        { $cell = {\mathbf{ NULL}}$ \;}}
      {
        \If {cellType$\mathit{(ref)}$ is closure and 
             has not been copied}
-       {
-         $\mathit{newRef}  = \mathit{copyAndMarkReachableCells(ref)}$\;
+       { 
+         $\mathit{newRef}$  = \RCopy$(\mathit{ref})$\;
        }
     }
- $\mathit{copyReferencesOnPrintStack()}$\; 
 }
 \end{function*}
 \end{document}
