@@ -146,7 +146,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	bool state_transition_file =  (stat ((outdir + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
 	filesCached = state_map_file && state_transition_file;
 
-	if (gc_type == gc_live && !filesCached)
+	if (gc_type == gc_live && !filesCached )
 	{
 		
 		//Instead of driver.process returning an integer why can't it return the grammar?

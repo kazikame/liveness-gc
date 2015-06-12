@@ -238,7 +238,10 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 		if (node != NULL)
 		{
 			if (node->typecell != consExprClosure && node->forward != NULL)
+			{
+				//DBG(cout<<"Node already copied " << endl;);
 				return static_cast<cons*>(node->forward);
+			}
 			else if (node->typecell == consExprClosure)
 			{
 
@@ -254,6 +257,7 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 				}
 				else
 				{
+					//DBG(cout<<"Node already copied " << endl;);
 					return static_cast<cons*>(node->forward);
 				}
 			}
@@ -1176,22 +1180,25 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		temp.push(heap_ref);
 		print_stack.pop();
 	}
+
 	while(!temp.empty())
 	{
 		print_stack.push(temp.top());
 		temp.pop();
 	}
+
+
 	int i = 0;
 	while(!update_heap_refs.empty())
 	{
 		cons* heap_ref = update_heap_refs.top();
-		if (!is_valid_address(heap_ref) && heap_ref->forward == NULL)
+		if (heap_ref->forward == NULL && !is_valid_address(heap_ref))
 		{
 			cout << "ERROR !!!! " << heap_ref << endl;
 			cout << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
 			assert(false);
 		}
-
+		cerr << "Updating heap ref " << heap_ref << " to " << heap_ref->forward << endl;
 		heap_ref = static_cast<cons*>(heap_ref->forward);
 		temp.push(heap_ref);
 		update_heap_refs.pop();
@@ -1589,12 +1596,9 @@ void liveness_gc()
 cons* followpaths(cons* loc, state_index index, ostream& out)
 {
 
+	DBG(out<<"Entering followpaths"<<endl);
 	if (NULL == loc)
 		return loc;
-
-	cons* loccopy = copy(loc, out);
-
-    DBG(out << "Copying cell from " << loc << " with type " << loc->typecell << endl);
 
 #ifdef ENABLE_SHARING_STATS
   if (loccopy)
@@ -1602,20 +1606,31 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 #endif
   //Can we add a check here too to find out if a cons cell has been copied using reachability?
   //That might improve the efficiency
+  cons* loccopy = NULL;
   if (loc->typecell == consExprClosure && loc->copied_using_rgc == false)
   {
+	  loccopy = copy(loc, out);
+
+	  DBG(out << "Copying cell from " << loc << " with type " << loc->typecell << endl);
+	  DBG(out << "state index is " << index << endl);
+
 	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
 	  if (a0 > 0)
 	  {
+		  DBG(out<<"Copying car part"<<endl);
 		  cons* newloc = getCar(loc, 1);
-		  cons* addr = followpaths(newloc, a0);
+		  cons* addr = followpaths(newloc, a0, out);
+		  DBG(out<<"copied " << newloc << "-->"<<addr<<endl);
 		  set_car(loccopy, addr);
 	  }
 	  state_index a1 = state_transition_table[index][1];//get_target_dfastate(index, 1);
 	  if (a1 > 0)
 	  {
+
 		  cons* newloc = getCdr(loc, 1);
-		  cons* addr = followpaths(newloc, a1);
+		  DBG(out<<"Copying cdr part with type "<<newloc->typecell<<endl);
+		  cons* addr = followpaths(newloc, a1, out);
+		  DBG(out<<"copied " << newloc << "-->"<<addr<<endl);
 		  set_cdr(loccopy, addr);
 	  }
 
@@ -1625,14 +1640,19 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  loc->typecell == binaryprimopExprClosure ||
 		  loc->typecell == funcArgClosure)
   {
-	  DBG(out << "Copying cell with index " << (loc - getbufferlive()) << endl);
-	  if (loc == loccopy)
+	  DBG(out<<"loc->forward = " << loc->forward<<endl);
+	  if (loc->forward != NULL)
 	  {
 		  DBG(out << "returning already copied pointer"<<endl);
 		  return static_cast<cons*>(loc->forward);
 	  }
 	  else
 	  {
+		  loccopy = copy(loc, out);
+
+		  DBG(out << "Copiedcell from " << loc << " with type " << loc->typecell << " to "<< loccopy << endl);
+		  DBG(out << "state index is " << index << endl);
+		  DBG(out << "Copying cell with index " << (loc - getbufferlive()) << endl);
 
 		  DBG(out << "arg1 --> " << loc->val.closure.arg1 << " with index = " <<(loc->val.closure.arg1 - (cons*)buffer_dead) << endl);
 		  cons* oldarg1 = loc->val.closure.arg1;
@@ -1650,6 +1670,12 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  GC_STAT_UPDATE_LAST_GC(loccopy);
 	  }
 
+  }
+  else
+  {
+	  DBG(out<<"Copying atomic value which is live"<<endl);
+	  if (index > 0)
+		  loccopy = copy(loc, out);
   }
 
   return loccopy;
@@ -2647,10 +2673,13 @@ int is_valid_address(void* addr)
 {
 
 	bool is_valid = ((addr >= buffer_live) && (addr < boundary_live));
+	if (addr == NULL)
+		is_valid = true;
+	else
 	if (!is_valid)
 	{
-		;//cout << "Invalid address " << addr  << " at index " << ((cons*)addr - (cons*)buffer_live) << endl;
-		//assert(is_valid);
+		cout << "Invalid address " << addr  << " at index " << ((cons*)addr - (cons*)buffer_live) << endl;
+		assert(is_valid);
 
 	}
 	return is_valid;

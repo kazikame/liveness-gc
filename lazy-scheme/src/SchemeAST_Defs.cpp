@@ -517,7 +517,7 @@ LetExprNode * LetExprNode::clone() const
 cons* LetExprNode::evaluate()
 {
 	curr_return_addr = getLabel();
-//	cout << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl;
+	cerr << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl;
 //	cout << "Pointing to " << static_cast<cons*>(getfree()) << endl;
 #ifdef __MYDEBUG 
 //	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
@@ -704,12 +704,13 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 {
 
 	cons* heap_cell = update_heap_refs.top();
-
+	cerr << "Evaluating car expression for " << heap_cell << endl;
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
 	{
 		update_heap_refs.push(heap_cell->val.closure.arg1);
+		cerr << "Evaluating argument 1 for " << heap_cell->val.closure.arg1 << endl;
 		cons* temp = reduceParamToWHNF(heap_cell->val.closure.arg1);
 
 		assert(temp->inWHNF);
@@ -788,6 +789,7 @@ cons* UnaryPrimExprNode::evaluateCdrExpr()
 // that the expression is representing
 cons* UnaryPrimExprNode::evaluateNullqExpr()
 {
+	cerr << "Evaluating nullq expression"<<endl;
 	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 		return heap_cell;
