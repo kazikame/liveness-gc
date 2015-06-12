@@ -23,8 +23,10 @@
 \usepackage{pst-tree}
 \usepackage{pst-rel-points}
 \usepackage{bcprules}
+\usepackage{subfigure}
 %\usepackage{program}
-\usepackage{algorithmic}
+%\usepackage{algorithmic}
+\usepackage[boxed]{algorithm2e}
 
 
 \input{fh_defs}
@@ -40,8 +42,6 @@
 \definecolor{Myblue}{rgb}{.2,0,1}
 \newcommand{\comment}[1]{{\color{Myblue}{(#1)}}}
 \newcommand{\cred}[1]{{\color{red}{#1}}}
-\newcommand{\alan}[1]{{\color{red}{\medskip \hrule\medskip
-    #1 \medskip \hrule \medskip}}}
 \newcommand{\blankout}[1]{}
 
 
@@ -51,9 +51,9 @@
 \newcommand{\scmpair}{\mbox{\sf\em pair?}}
 \newcommand{\scmprim}{\ensuremath{\mathsf{+}}}
 \newcommand{\sh}[1]{{\colorbox{gray!20}{\framebox{$#1$}}}}
-\def\myvec{\mathaccent"017E } % wretched springer mode redefines \vec as bold!
-\newcommand{\stk}{\mbox{S}}       % stack
-\newcommand{\ID}{\mbox{$\mathbf{ id}$}} % identity function
+\def\myvec{\mathaccent"017E } 
+\newcommand{\stk}{\mbox{S}}   
+\newcommand{\ID}{\mbox{$\mathbf{ id}$}}
 \newcommand{\bang}{\mbox{\sc bang}}
 \newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
@@ -62,8 +62,10 @@
 \begin{document}
 % --- Author Metadata here ---
 \conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
-%\CopyrightYear{2007} % Allows default copyright year (20XX) to be over-ridden - IF NEED BE.
-%\crdata{0-12345-67-8/90/01}  % Allows default copyright data (0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+%\CopyrightYear{2007} % Allows default copyright year (20XX) to be
+%over-ridden - IF NEED BE.
+%\crdata{0-12345-67-8/90/01}  % Allows default copyright data
+%(0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
 % --- End of Author Metadata ---
 
 \title{Liveness-Based Garbage Collection for Lazy Languages}
@@ -173,11 +175,11 @@ closures to  be carried  from the  point of creation  to the  point of
 evaluation.
 
 While  the runtime  system  of most  functional  languages includes  a
-garbage collector to efficiently  reclaim memory, empirical studies on
-Scheme~\cite{karkare06effectiveness}   and,   more   importantly,   on
-Haskell~\cite{rojemo96lag}
+garbage  collector  (GC)  to  efficiently  reclaim  memory,  empirical
+studies on Scheme~\cite{karkare06effectiveness} and, more importantly,
+on Haskell~\cite{rojemo96lag}
 %and Java~\cite{shaham02estimating}
-programs have shown that  garbage collectors leave uncollected a large
+programs have shown that  GCs leave uncollected a large
 number of  memory objects that are  reachable but not  live (here {\em
   live} means the  object can potentially be used by  the program at a
 later stage).  This results in unnecessary memory retention.
@@ -185,18 +187,17 @@ later stage).  This results in unnecessary memory retention.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
 %%% MOTIVATING EXAMPLE
-\newcommand{\nilfigure}
-{\scalebox{0.75}{
-\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,0)(1,1)
-%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,
-subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
-\putnode{start}{origin}{0}{0}{}
-\putnode{stop}{origin}{10}{10}{}
-\ncline[offsetB=0,nodesepB=0,linewidth=.7]{-}{start}{stop} %here
-\end{pspicture}
-}}
-
+%% \newcommand{\nilfigure}
+%% {\scalebox{0.75}{
+%% \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+%% \begin{pspicture}(0,0)(1,1)
+%% %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,
+%% subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
+%% \putnode{start}{origin}{0}{0}{}
+%% \putnode{stop}{origin}{10}{10}{}
+%% \ncline[offsetB=0,nodesepB=0,linewidth=.7]{-}{start}{stop} %here
+%% \end{pspicture}
+%% }}
 
 \begin{figure}[t!]
   %%%%{\color{Myblue}
@@ -237,7 +238,7 @@ subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
       (a) Example program. \\ \\
       \begin{minipage}{.45\textwidth}
         %\hspace*{1cm}
-                {\epsfig{file=motiv-example.eps, height=4cm}}
+                {\includegraphics[width=1\textwidth]{motiv-example}}
       \end{minipage}
       \\ \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
           (b) Memory graph at $\pi$. Thick edges denote live
@@ -264,7 +265,7 @@ the  demands on  all the  calls to  the function.   The result  of the
 analysis  is the annotation  of each  program point  with finite-state
 automata capturing  the liveness of variables at  the point. Depending
 on the program point where  garbage collection has been triggered, the
-garbage-collector consults  a set of automata  to curtail reachability
+GC consults  a set of automata  to curtail reachability
 during marking.  This results in  an increase in the garbage reclaimed
 and consequently in fewer garbage collections.
 
@@ -310,14 +311,15 @@ the \SIF\ expression.
 
 
 The edges shown by thick arrows  are those which are live at $\pi$.  A
-cell is marked and preserved  during garbage collection only if it is
+cell is marked  and preserved during garbage collection  only if it is
 reachable from the  root set through a path of  live edges.  All other
 cells can be  reclaimed.  Thus if a garbage  collection takes place at
-$\pi$ with the heap shown in Figure~\ref{fig:mot-example}(b), only the
-cells referenced by $\pz$,  $(\CDR~ \pz)$ and (the cells constituting)
-the closure  referenced by $(\CDR~(\CDR~\pz))$  need to be  marked and
-preserved.  In  contrast, a  reachability-based  collector would  have
-preserved all cells.
+$\pi$  with  the  heap  shown  in  Figure~\ref{fig:mot-example}(b),  a
+liveness-based collector (LGC) will  collect only the cells referenced
+by  $\pz$, $(\CDR~  \pz)$  and (the  cells  constituting) the  closure
+referenced by $(\CDR~(\CDR~\pz))$ need to be marked and preserved.  In
+contrast,  a reachability-based collector  (RGC) would  have preserved
+all cells.
 
 {\color {Myblue}Rewrite at the end: The  specific contributions of the
 paper
@@ -393,8 +395,9 @@ it
 \begin{eqnarray*}
    p \in \mathit{Prog} & ::= & d_1 \ldots d_n \,\, e_\mainpgm
     \hspace{5em} \mbox{\em --- program}\\
-    \mathit{df} \in Fdef & ::= & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots \,\,x_n)\,\,
-    e) 
+    \mathit{df} \in Fdef & ::= & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots
+\,\,x_n)\,\,
+    e)
     \hspace{0.2em} \ \ \ \ \mbox{\em --- function definition} \\
 e \in \mathit{Expr} & ::= &
 \left\{\begin{array}{@{}ll@{\hspace{2em}}l}
@@ -407,9 +410,9 @@ s \in \mathit{Application} & ::= &
 \left\{\begin{array}{@{}l@{\hspace{1.2em}}l}
        k & \mbox{\em --- constant (numeric or $\NIL$)}\\
        (\CONS\,\, x_1\,\, x_2) & \mbox{\em --- constructor} \\
-       (\CAR\,\, x) & \\ 
+       (\CAR\,\, x) & \\
        (\CDR\,\, x) & \mbox{\em --- selectors} \\
-       (\NULLQ\,\, x) & \\ 
+       (\NULLQ\,\, x) & \\
        (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
 and generic arithmetic} \\
        (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
@@ -439,7 +442,7 @@ d: & \mathit{Data} &=&\mathit{Val} + \mathit{Clo} & \mbox{-- Values \&
 \heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow Data & \mbox{--
 Heap}
 \end{array}
-\] 
+\]
 
 Here  $\mathit{Loc}$ is  a countable  set  of locations  in the  heap.
 Since all data objects are boxed, we model an environment as a mapping
@@ -451,7 +454,8 @@ constituents) or  a {\em  closure}.  A closure  is a pair  $\langle s,
 values of its free variables is given by $\rho$.
 
 The  semantics  of   expressions  (and  applications\footnote{In  most
-  contexts, we  shall use  the term 'expression' and the notation $e$  for both  expressions and
+  contexts, we  shall use  the term 'expression' and the notation $e$  for
+both  expressions and
   applications.}) are  given by transitions  of the form  $\rho, \stk,
 \heap, e \rightarrow \rho', \stk', \heap', e'$.  Here \stk\ is a stack
 of  continuation  frames.  Each  continuation  frame  is  of the  form
@@ -491,7 +495,8 @@ As  a sample,  consider  the  rules  for  $(+~x~y)$, an  application
 involving a binary operator strict in both arguments.   When
 both $x$  and $y$ are already  in WHNF ({\sc prim-whnf}),  the heap is
 updated with the  sum of the arguments and  the next expression to be
-evaluated is picked from the continuation on the stack. If either of the arguments is not in
+evaluated is picked from the continuation on the stack. If either of the
+arguments is not in
 WHNF  ({\sc  prim-1-clo}  and   {\sc  prim-2-clo}),  it  is  sent  for
 evaluation, and a continuation  marks that the evaluation of $(+~x~y)$
 has to be resumed after the argument is evaluated.
@@ -514,11 +519,12 @@ $  $\rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e$}     &  \sc{cons} \\
 \hline
 $H(\rho(x)) \mbox{ is } (d_1, d_2)$ & $\rho, (\rho', z, e)\!:\!S, H,
 (\CAR~x)  \rightsquigarrow \rho', S, H[\rho(z) := d_1], e$      &
-\sc{car-whnf} \\ 
+\sc{car-whnf} \\
 \hline
 $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S, H, (\CAR~x)
 \rightsquigarrow
-{\color {red}\rho\oplus\rho'}, (\rho, x, (\CAR~x))\!:\!S, H, s$      &  \sc{car-clo}
+{\color {red}\rho\oplus\rho'}, (\rho, x, (\CAR~x))\!:\!S, H, s$      &
+\sc{car-clo}
 \\
 \hline
 $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
@@ -557,7 +563,8 @@ $H(\rho(x)) = 0$ & $\rho, S, H, (\SIF~x~e_1~e_2)   \rightsquigarrow
 \hline
 $H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho, S, H,
   (\SIF~x~e_1~e_2)   \rightsquigarrow
-{\color {red} \rho \oplus \rho'}, (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  s$} &
+{\color {red} \rho \oplus \rho'}, (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  s$}
+&
 \sc{if-clo} \\
 \hline
 {$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& $\rho, (\rho', z,
@@ -605,7 +612,7 @@ represents access using $x$ itself and $x \mapsto \{\}$ indicates that
 $x$ is dead.  We  associate liveness environments with program points.
 The liveness at $\pi:e$ is the liveness just before executing $e$.
 
- 
+
 A  notion  related  to  liveness  is  {\em  demand}.   While  liveness
 represents the future use of variables, a demand represents the future
 use of the value of an  expression. The demand on an expression $e$ is
@@ -873,7 +880,7 @@ $\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
 analysis) can be safely approximated by a {\em procedure summary}. for
 each function.   The summary  is in the  form of a  demand transformer
 that maps a demand on a call to the function to demands on each of its
-arguments.  
+arguments.
 
 {\color{red} Proof of correctness of the liveness analysis...}
 
@@ -899,24 +906,43 @@ The      $\mathit{ref}$     rule      for     \CONS,      shown     in
 Figure~\ref{fig:live-judge},  requires   us  to  remove   the  leading
 \acar\ and \acdr\  from the access paths in  $\sigma$.  Similarly, the
 rules for  \CAR, \CDR, \PRIM, \NULLQ,  and \SIF\ require  us to return
-$\emptyset$, if  $\sigma$ itself $\emptyset$.  To  realize these rules
+$\emptyset$, if  $\sigma$ itself is $\emptyset$ and
+$\lbrace\epsilon\rbrace$ otherwise.  To  realize these rules
 $\sigma$ needs to be known. This creates difficulties since we want to
 solve the equations arising out of liveness symbolically.
 
 The  solution  is  to   also  treat  the  operations  mentioned  above
-symbolically.  We  introduce three  new  symbols.   First, \bcar\  and
-\bcdr\ are defined as:
+symbolically.   We  introduce three  new  symbols.  These symbols  are
+defined as a relation  $\hookrightarrow$ between sets of access paths.
+First, \bcar\ and \bcdr\ are defined as:
+
 \begin{align*}
- \bcar\sigma &\triangleq \{\alpha \mid 0\alpha \in \sigma\}\\
- \bcdr\sigma &\triangleq \{\alpha \mid 1\alpha \in \sigma\}
+  &\sigma_1\bcar\sigma_2  \hookrightarrow
+  \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
+&\sigma_1\bcdr\sigma_2  \hookrightarrow
+  \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
+  \acdr\sigma_2'
 \end{align*}
-and \clazy\ as:
+Thus \bcar, for example, removes the leading \acar\ from $\sigma_2$.
+Similarly, the symbol \clazy\ reduces the string following it to an
+$\epsilon$. \clazy\  is defined by addition to
+$\hookrightarrow$ the rule:
 \begin{align*}
- \clazy\sigma \triangleq\; & \emptyset~\mbox{if}~\sigma = \emptyset\\
-                       & \{\epsilon\} ~\mbox{otherwise}
+  &\sigma_1\clazy\sigma_2  \hookrightarrow
+  \sigma_1 \mbox{ if } \sigma_2 \subseteq  \{\acar,\acdr\}^\ast
 \end{align*}
-Note that \clazy\ is idempotent. 
-We can now rewrite the \CONS\ and the \CAR\ rules of $\mathit{ref}$ as:
+%% \begin{align*}
+%%  \bcar\sigma &\triangleq \{\alpha \mid 0\alpha \in \sigma\}\\
+%%  \bcdr\sigma &\triangleq \{\alpha \mid 1\alpha \in \sigma\}
+%% \end{align*}
+%% and \clazy\ as:
+%% \begin{align*}
+%%  \clazy\sigma \triangleq\; & \emptyset~\mbox{if}~\sigma = \emptyset\\
+%%                        & \{\epsilon\} ~\mbox{otherwise}
+%% \end{align*}
+%% Note that \clazy\ is idempotent.
+We can  now rewrite the \CONS\  and the \CAR\  rules of $\mathit{ref}$
+as:
 \begin{align*}
 &\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
 = x.\bcar\sigma \cup y.\bcdr\sigma  \label{eqn:mod-cons},~
@@ -932,24 +958,23 @@ for \SIF\ as:
         \mathcal{L}(e_2,\sigma,\Lfonly)~\uplus\\
         &[\,\mathit{ep} \mapsto  x.\clazy \sigma]
 \end{align*}
-The rules for \CDR, \PRIM\ and  \NULLQ\  are also modified in a manner
-similar to \CAR.
-The  defintions of \bcar\, \bcdr\ and \clazy\  induce   the  following
-relation $\hookrightarrow$ over sets of access paths:
-\begin{align*}
-  &\sigma_1\bcar\sigma_2  \hookrightarrow
-  \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
-&\sigma_1\bcdr\sigma_2  \hookrightarrow
-  \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
-  \acdr\sigma_2',~\mbox{and}\\
-&\sigma_1\clazy \sigma_2 \hookrightarrow \epsilon, \mbox{ if } \sigma \ne
-  \emptyset 
-\end{align*}
+The rules for  \CDR, \PRIM\ and \NULLQ\ are also  modified in a manner
+similar to \CAR.  %% The definitions  of \bcar\, \bcdr\ and \clazy\ induce
+%% the following relation $\hookrightarrow$ over sets of access paths:
+%% \begin{align*}
+%%   &\sigma_1\bcar\sigma_2  \hookrightarrow
+%%   \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
+%% &\sigma_1\bcdr\sigma_2  \hookrightarrow
+%%   \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
+%%   \acdr\sigma_2',~\mbox{and}\\
+%% &\sigma_1\clazy \sigma_2 \hookrightarrow \sigma_1, \mbox{ if }
+%% \sigma_2 \ne
+%%   \emptyset
+%% \end{align*}
 The reflexive  transitive closure of  $\hookrightarrow$ will
 be   denoted    as   $\stackrel{*}{\hookrightarrow}$.    The
 following proposition relates  the original and the modified
 liveness rules.
-
 
 \begin{figure*}[t!]
   \begin{tabular}{cc}
@@ -977,9 +1002,11 @@ $\leftarrow$  (\length~\pu)  \IN
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
-	  \UNL{1} $(\DEFINE\ (\main)$ 
-           \UNL{2} \!\!$\pi_9\!\!:\, \cred{(\LET\  \pa\  \leftarrow (\abigfunction\ \acdr)}$ \IN
-          \UNL{3} \!\!$\pi_{10}\!\!:\, \cred{(\LET\  \pb\  \leftarrow (}$\cred{+}$\cred{\ \pa\ \acdr)}$
+	  \UNL{1} $(\DEFINE\ (\main)$
+           \UNL{2} \!\!$\pi_9\!\!:\, \cred{(\LET\  \pa\  \leftarrow
+(\abigfunction\ \acdr)}$ \IN
+          \UNL{3} \!\!$\pi_{10}\!\!:\, \cred{(\LET\  \pb\  \leftarrow
+(}$\cred{+}$\cred{\ \pa\ \acdr)}$
 \IN
 	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ \cred{(\LET\ \pc}\
 $\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
@@ -1004,8 +1031,8 @@ $\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
  &&          \;\;  ep_3 \mapsto \lbrace \pz.\sigma,
                 \py.\clazy\sigma,
 \pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
-&&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; 
-\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup 
+&&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
+\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup
 %%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
 \cred{\clazy\Lf{\length}{1}{\clazy\sigma}}\}\}
              \rbrack \\
@@ -1025,14 +1052,15 @@ $\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
                   ep_4 \mapsto \lbrace \cred {\pw.\sigma,
                                        \pc.\Lf{\length}{\mbox{1}}{\sigma},}\\
 && \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-                                        \cred{\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},}
-                                        \cred{\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma}} \rbrace
+\cred{\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},}
+\cred{\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma}} \rbrace
                                ] \\
                \cal{P_{\mbox{\tiny \main}}} &=&
                   \lbrack~ \cred{\pi_9 \mapsto \lbrace ep_4 \rbrace,  \
                     \pi_{10} \mapsto \lbrace ep_4 \rbrace,  \
                    \pi_{11} \mapsto \lbrace ep_4 \rbrace,} \\
-                   && \;\; \cred{\pi_{12} \mapsto \lbrace ep_4 \rbrace, \pi_{13} \mapsto \lbrace ep_4 \rbrace}~\rbrack
+                   && \;\; \cred{\pi_{12} \mapsto \lbrace ep_4 \rbrace,
+\pi_{13} \mapsto \lbrace ep_4 \rbrace}~\rbrack
 \end{eqnarray*}
     \end{minipage} \\
 (a)&
@@ -1060,7 +1088,7 @@ For  an explanation  of why  the  proposition holds  for the  modified
 \CONS\  rule,   we  refer   the  reader  to   \cite{asati14lgc}.   The
 proposition also holds for other modified rules for similar reasons.
 
-%Thick red line 
+%Thick red line
 %{\color{red} \medskip \hrule \hrule \hrule  \medskip }
 
 \newcommand{\emm}[2]{\ensuremath{\mathcal{#1}_{#2}}}
@@ -1084,7 +1112,8 @@ same as $\Lf{f}{i}{\sigma}$. Applying this to  \length, we have:
 and  the only equation defining \Lfone{\length} is:
   \begin{eqnarray*}
    && \Lf{\length}{1}{\sigma}
-    =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup \clazy\Lf{\length}{1}{\clazy\sigma}
+    =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup
+\clazy\Lf{\length}{1}{\clazy\sigma}
 \end{eqnarray*}
 
 In general, the equations for  \Lfonly\ are recursive since, as in the
@@ -1107,7 +1136,7 @@ for  \Df{f}{i} that  is  independent of  $\sigma$.   Any solution  for
 \Lfonly$_{\mathit \length}$, we get:
   \begin{eqnarray*}
 &&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}\sigma,~\mbox{and}\\
-&&   \Df{\length}{1} = \clazy \cup \acdr\Df{\length}{1}\clazy 
+&&   \Df{\length}{1} = \clazy \cup \acdr\Df{\length}{1}\clazy
        \cup \clazy\Df{\length}{1}{\clazy}
   \end{eqnarray*}
 
@@ -1144,13 +1173,13 @@ $\deltacall{f}{\pi^1}{g^1}          \cup          \cdots          \cup
 special case.   We assume  it is called  through a  printing mechanism
 with   demand   $\sigma_\mainpgm   =  \{\acar,\acdr\}^\ast$ (denoted
 $\sigma_{\!all}$) if \mainpgm\ returns a structure and $\epsilon$ if
-it returns a base value.  
+it returns a base value.
 
 
 For  the  running  example,   $\length$  has  calls  from  $\main$  at
 $\pi_{12}$ and a recursive call at $\pi_6$.
 So $\sigma_{\length} =
-     \deltacall{\length}{\pi_{12}}{\main}  \cup 
+     \deltacall{\length}{\pi_{12}}{\main}  \cup
 \deltacall{\length}{\pi_6}{\length}$.
 Filling in  the values gives:
 \begin{eqnarray*}
@@ -1164,7 +1193,7 @@ of  $\sigma_{\length}$ are:
   \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
  \\
 \Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\epsilon
-\end{align*} 
+\end{align*}
 
 In summary, the equations generated during liveness analysis are:
 \begin{enumerate}
@@ -1173,7 +1202,7 @@ In summary, the equations generated during liveness analysis are:
 \item  For  each   function  $\mathit{f}$, an  equation  defining
 the summary demand  $\sigma_{\mathit f}$ on $e_f$.
 \item For each function $\mathit{f}$ (including $\mainpgm$ for
-  $e_\mainpgm$) 
+  $e_\mainpgm$)
 an equation defining
   liveness at each GC point of $e_{\mathit f}$.
 \end{enumerate}
@@ -1190,11 +1219,12 @@ being associated with several  grammars, one for each non-terminal
 grammar    for   \var{\Lanv{1}{\xl}}   comprises    the   following
 productions:
  \begin{eqnarray*}
-\var{\Lanv{1}{\xl}}  &\rightarrow&   \clazy\sigma_{\length} \mid \acdr \var{\Df
+\var{\Lanv{1}{\xl}}  &\rightarrow&   \clazy\sigma_{\length} \mid \acdr
+\var{\Df
   {\length}{1}}{\clazy\sigma_{\length}} \mid
   \clazy\var{\Df{\length}{1}}{\clazy\sigma_{\length}} \\
   \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
-  \acdr\var{\Df{\length}{1}}\clazy 
+  \acdr\var{\Df{\length}{1}}\clazy
        \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
 \langle {\sigma_{\length}} \rangle
 &\rightarrow&
@@ -1217,7 +1247,7 @@ We now model the above problem  as one of deciding the membership of a
 context-free  grammar  augmented  with  a fixed  set  of  unrestricted
 productions.
 
-\begin{definition}\label{def:specialgrammar} 
+\begin{definition}\label{def:specialgrammar}
 Consider a form of  grammar $(N,T, p_1\cup p_2,S)$ in which $N$ is a set of
 non-terminals, $T = \{\acar, \acdr, \bcar, \bcdr, \clazy, \$\}$, $p_1$
 is a set of context-free production that contains the distinguished
@@ -1226,7 +1256,7 @@ symbols that does not contain $S$, and $p_2$ is the fixed set of
 unrestricted productions $\bcar\acar \rightarrow \epsilon$,
 $\bcdr\acdr \rightarrow \epsilon$, $\clazy\acar \rightarrow \clazy$,
 $\clazy\acdr \rightarrow \clazy$, and $\clazy\$ \rightarrow
-\epsilon$. 
+\epsilon$.
 \end{definition}
 
 From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
@@ -1241,13 +1271,14 @@ the liveness  analysis of $p$  is same as  $G$ except for a  change in
 non-terminal names which now have the form \var{\Lanv{i}{x}}.
 \end{proposition}
 We now show that the decision problem required at garbage collection
-time is undecidable. 
+time is undecidable.
 
 \begin{lemma}
 Consider a grammar $G$ of the kind  described in
-Definition~\ref{def:specialgrammar} and a forward access path $\alpha$ consisting
+Definition~\ref{def:specialgrammar} and a forward access path $\alpha$
+consisting
 of symbols \acar\ and \acdr\  only. The decision problem $\alpha \in
-\mathscr{L}(G)$ is undecidable.  
+\mathscr{L}(G)$ is undecidable.
 \end{lemma}
 
 \comment{Proof:}
@@ -1257,441 +1288,238 @@ We circumvent  the problem by over-approximating the  CFG  by
 non-deterministic finite state automata (NFA). The NFA are then
 simplified using the $\hookrightarrow$ rules. Finally the simplified
 NFAs are converted to DFAs.
-  
+
 %------------------------------------------------------------%
 \subsubsection{From CFGs to GC-ready DFAs}
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
- approximate a CFG to a {\em strongly regular\/} grammar.  The grammar
- fragment  that  defines  the  non-terminal  $\var{\Df{\length}{1}}$
-   after the Mohri-Nederhof transformation becomes:
-
- \begin{eqnarray*} 
+ approximate a CFG to a {\em strongly regular\/} grammar.  For
+ example, the grammar
+ fragment  for  the  non-terminal  $\var{\Df{\length}{1}}$  after  the
+ Mohri-Nederhof transformation is:
+ \begin{eqnarray*}
    \var{\Df{\length}{1}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid
    \acdr\var{\Df{\length}{1}}
    \mid \clazy\var{\Df{\length}{1}}\\
-   \var{\Df{\length}{1'}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid \epsilon \\
-   \langle {\sigma_{\length}} \rangle
-   &\rightarrow&
-   \epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle
+   \var{\Df{\length}{1'}} &\rightarrow& \clazy\var{\Df{\length}{1'}}
+   \mid \epsilon
  \end{eqnarray*}
 
-The grammar after the Mohri-Nederhoff transformation is converted into
-a  set of  NFAs,  one for  each  $\var{\Lanv{i}{x}}$. We  now apply  the
-$\hookrightarrow$ simplification  by repeatedly introducing $\epsilon$
-edges to  bypass a pair  of consecutive edges labelled  \bcar\acar\ or
-\bcdr\acdr  and  deriving  the  $\epsilon$-closure  of  the  resulting
-automaton.   The   process  is  continued   till  a  fixed   point  is
-reached.  Finally we  replace  the $\clazy$  edges  by $\epsilon$  and
-determinize the automaton thus formed.
+The strongly regular grammar is converted into a set of
+NFAs,   one  for   each  $\var{\Lanv{i}{x}}$.   The  $\hookrightarrow$
+simplification  is now  done  on the  NFAs  by repeatedly  introducing
+$\epsilon$  edges  to  bypass  pairs  of  consecutive  edges  labelled
+\bcar\acar\ or \bcdr\acdr\  and constructing the
+$\epsilon$-closure. Since the $\epsilon$-closure step may create more
+adjacent \bcar\acar\ and \bcdr\acdr\  edges, the simplification is
+ continued  till a  fixed point is  reached. The algorithm  for this
+appears  in~\cite{asati14lgc},   Figure[].  Finally  we   replace  the
+$\clazy$  edges  by  $\epsilon$  and determinize  the  automaton  thus
+formed.
 
-%------------------------------------------------------------%
-\subsubsection{Transforming NFAs to Accept Forward Paths:}
-%\label{sec:NFA-elim}
-The   strongly  regular   CFGs  obtained   after   the  Mohri-Nederhof
-transformation are first converted into NFAs.  The algorithm described
-in  Figure~\ref{algo:simplify-NFA} converts  an NFA  \ntbar\ to  a NFA
-\nt\    such    that   $\lang{\ntbar}    \stackrel{*}{\hookrightarrow}
-\lang{\nt}$, where {\nt} accepts forward paths only.  \comment{Rewrite
-  the algorithm to handle \clazy\  and update the example automata} Thus
-\nt\ can be used to check membership of forward paths.
+Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
+from the  grammar for  \var{\Df{\length}{1'}}.  The  NFA is
+simplified by replacing the edges labeled \clazy\ by $\epsilon$. While
+checking for liveness during GC, a forward access-path traversing such
+an edge  will be accepted  only if it  can reach a final  state.  This
+effectively implements  the $\hookrightarrow$ simplification  rule for
+\clazy for forward paths. The resulting automaton, made deterministic,
+is shown in Figure~\ref{fig:example-automata}(b). This expectedly says
+that  given  a demand  $\epsilon$  on  \length,  the liveness  of  its
+argument             is             $\acdr^{*}$.            Similarly,
+Figure~\ref{fig:example-automata}(c)    shows   the    automaton   for
+\var{\Lanv{9}{\pa}}. The simplified automaton, shown in
+Figure~\ref{fig:example-automata}(d) does not accept any forward
+paths. This reflects the lazy nature of our language. \length\  does not
+evaluate its elements and thus \pa\ is dead at $\pi_9$.
 
-\begin{figure*}[t]
-%% \begin{boxedminipage}{.5\textwidth}
-%% \begin{center}
-%%   \raggedright  {\bf  Input:}  NFA \ntbar\  with  underlying
-%%   alphabet $\lbrace \acar, \acdr, \bcar, \bcdr\rbrace$ \\
-%% %
-%%   \raggedright{\bf Output:} NFA  \nt\ with  underlying
-%%   alphabet $\lbrace \acar, \acdr \rbrace$ such that
-%%   $\lang{\ntbar} \stackrel{*}{\hookrightarrow} \lang{\nt}$.
-%%   \\
-
-%%   \raggedright{\bf Steps:}
-%%  \begin{algorithmic}
-%%    \STATE $i \leftarrow 0$
-%%    \STATE $\nt_0 \leftarrow$ Equivalent NFA of \ntbar\
-%%    without $\epsilon$-moves \cite{hopcraft90toc}
-
-%%    \REPEAT
-%%    \STATE $\nt'_{i+1} \leftarrow \nt_i$
-%%    \FORALL{states $q$ in $\nt_i$ such that $q$ has an incoming
-%%      edge from $q'$ with label $\bcar$ and
-%%      outgoing edge to $q''$ with label $\acar$}
-%%    \STATE add an edge in $\nt'_{i+1}$ from $q'$ to $q''$ with
-%%    label $\epsilon$.
-%%    \COMMENT{bypass  $\bcar\acar$ using $\epsilon$}
-%%    \ENDFOR
-
-%%    \FORALL{states $q$ in $\nt_i$ such that $q$ has an incoming
-%%      edge from $q'$ with label $\bcdr$ and outgoing edge to
-%%      $q''$ with label $\acdr$}
-%%    \STATE add an edge in $\nt'_{i+1}$ from $q'$ to $q''$ with
-%%      label $\epsilon$.
-%%    \COMMENT{bypass  $\bcdr\acdr$ using $\epsilon$}
-%%    \ENDFOR
-
-%%    \STATE   $\nt_{i+1}    \leftarrow$   Equivalent   NFA   of
-%%    $\nt'_{i+1}$ without $\epsilon$-moves
-
-%%    \STATE $i \leftarrow i+1$
-%%    \UNTIL ($\nt_{i} = \nt_{i-1}$)
-
-%%    \STATE $\nt \leftarrow \nt_i$
-%%   \STATE delete all edges with label \bcar\ or \bcdr\ in \nt.
-%%  \end{algorithmic}
-%% \end{center}
-%% \end{boxedminipage}
-\begin{boxedminipage}{.5\textwidth}
-The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
-of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
-is continued till  a fixed point is reached.  When  the fixed point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness of  th The algorithm repeatedly introduces
-$\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
-\bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
-point is reached.  When the  fixed point is reached, the resulting NFA
-contains all possible reductions corresponding to all the paths in the
-original NFA.  The proofs of the termination and correctness of th The
-algorithm repeatedly  introduces $\epsilon$ edges to bypass  a pair of
-consecutive edges labelled \bcar\acar\  or \bcdr\acdr.  The process is
-continued  till a fixed  point is  reached.  When  the fixed  point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness of  th The algorithm repeatedly introduces
-$\epsilon$  edges  to bypass  a  pair  of  consecutive edges  labelled
-\bcar\acar\  or \bcdr\acdr.   The process  is continued  till  a fixed
-point is reached.  When the  fixed point is reached, the resulting NFA
-contains all possible reductions corresponding to all the paths in the
-original NFA.  The proofs of the termination and correctness of th
-
-\end{boxedminipage}
- \caption{Algorithm for transforming an NFA to  accept forward
-   paths only.}\label{algo:simplify-NFA} \figrule
-\end{figure*}
-
-The algorithm repeatedly introduces  $\epsilon$ edges to bypass a pair
-of consecutive edges labelled  \bcar\acar\ or \bcdr\acdr.  The process
-is continued till  a fixed point is reached.  When  the fixed point is
-reached,   the  resulting   NFA  contains   all   possible  reductions
-corresponding to all the paths in the original NFA.  The proofs of the
-termination and correctness  of the algorithm are given  in an earlier
-paper~\cite{karkare07liveness}.
-
-%%\input{liveness-dfa.tex}
-\comment{change according  to example} We illustrate  the algorithm in
-Figure~\ref{algo:simplify-NFA}  by   constructing  the  automaton  for
-\var{\Lanv{9}{y}}.   Figure~\ref{fig:automata-construction}  (c) shows
-the  automaton  for  \var{\Lanv{9}{y}}  constructed by  composing  the
-automata   for    \var{\Uf{\append}{1}},   \var{\Df{\append}{1}}   and
-$(\epsilon \mid \acdr \mid \acdr\acar\sigma_{\mathit{\!all}})$.  After
-$\epsilon$ removal we get (d). We add an $\epsilon$ edge from $q_2$ to
-$q_3$ bypassing the  \bcdr\acdr\ pair from $q_2$ to  $q_2$ and then to
-$q_3$. This  is shown in (e).   The $\epsilon$ edge is  removed in (f)
-and  a second  $\epsilon$  is  added to  the  automaton bypassing  the
-\bcar\acar\ pair  from $q_1$ to $q_2$.  Removing  this $\epsilon$ edge
-gives  the automaton  shown  in (g).   Restricting  this automaton  to
-forward edges  only, we  get the final  automaton shown in  (h).  This
-automaton  recognizes  $\acdr^{*}\!\mid\acdr^{*}\acar  \sigma_{\mathit
-  \!all}$, showing  that the entire list \py,  including its elements,
-is live at $\pi_9$. Also note  that the language accepted by the final
-automaton satisfies the prefix-closed property.
+\begin{figure}[t!]
+\hspace*{1cm}{\epsfig{file=example-automata.eps, height=2.75cm}}
+\caption{(a) The grammar rules for $\langle \Df{\length}{1'}\rangle$
+converted into
+  an automaton, and simplified in   (b). (c) and (d) show the automata
+  for   \Lanv{9}{\pa}.}\label{fig:example-automata}
+\figrule
+\end{figure}
 
 
-\hrule
-\hrule
-
-
-
-\section{Implementation}
+\section{The Garbage Collection Scheme}
 % GC assumptions
 \cred{Introduction}
 
-In this  section we describe in  detail the process  of liveness based
-garbage collection.  During  the execution of a program  if it runs of
-out  of memory,  execution is  stopped  and the  garbage collector  is
-invoked. At this point all the references on the stack are checked for
-liveness and only live references are copied and the program continues
-execution.  The main  complexity in our algorithm is  the way closures
-are  handled. The  following sub-sections  show two  different  ways of
-handling closures along with their pros and cons.
-\subsection{A simple LGC Algorithm}
-\cred{Introduce representation}
-We introduce certain terminology that we use in our discussion of the 
-garbage collection algorithms. A reference is a field which holds the 
-address of a heap location. Root set refers to the set of all references 
-that are on the program stack during garbage collection.
-A heap cell can either contain an atomic value, a \CONS\ cell or a closure. A closure 
-has fields to identify the closure type and 2 arguments. In case of function calls 
-with more than 2 arguments we use currying (one of the argument fields will point to another
- heap location containing the next argument and so on). By reachability we mean all heap 
-locations that are reachable traversing the argument fields of a given reference.
-% Abstract description of the GC algorithm
-\begin{verbatim}
-proceudre lgc()
- FOREACH reference in root set
- DO
-   IF reference is live
-     copy(cell)
-   ENDIF
- DONE
+Our experimental setup consists of  an interpreter for our language, a
+liveness  analyzer, and  a single  generation copying  collector.  The
+garbage collector  can be  easily configured to  work on the  basis of
+reachability (RGC  mode) or use  the liveness DFAs (LGC  mode).  While
+exploring the  activation record of a  function, LGC uses  the DFAs at
+the latest program  point traversed in the function's  body.  Thus, if
+LGC is invoked  at the program point $\pi$, it  would use the liveness
+DFAs  at  $\pi$ itself  for  exploring the  root  set  of the  current
+activation record. For  any other activation record in  the stack, say
+for a function ${\mathit f}$  calling ${\mathit g}$ in the call-chain,
+the evaluation  point in ${\mathit f}$  which resulted in  the call to
+${\mathit g}$ would be used.
 
-procedure copy (cell)
- IF {cell is live}
-   new_cell <-  dup_heapcell(cell)
-   IF{celltype is cons}
-        new_car        <-  copy(cell.car)
-        new_cell.car   <-  new_car
-      
-        new_cdr        <-  copy(cell.cdr)
-        new_cell.cdr   <-  new_cdr
-   ENDIF
- ELSE
-   IF {celltype is closure}
-       new_cell.arg1 <-  copy(cell.arg1)
-       new_cell.arg2 <-  copy(cell.arg2)
-   ENDIF
- ENDIF
- copy_references_on_print_stack()
-\end{verbatim}
-In  the simple algorithm  presented we  consult liveness  automata for
-copying both \CONS cells and closures.  Copying \CONS cells are simple
-and just  involve consulting  the liveness automaton  corresponding to
-them  and  recursively  copying.  In  case of  closures,  it  is  more
-complicated  as  they might  refer  to  data/closures  which might  be
-created in  a different environment(function), all of  which might not
-even exist  on the program  stack. To overcome  this we need  to carry
-extra information with each closure, the program point at which it was
-evaluated and  also the names of  the free variables  contained in the
-closure.  This  gives us  precise  liveness  information  of the  free
-variables of a closure but  involves run-time overhead of updating the
-program  point correctly. To  avoid this  overhead we  go for  a safer
-approximation by storing  the creation point of the  closure and using
-it to check liveness.  This is safe since the liveness at the creation
-point of the closure encompasses  all possible uses of the closure but
-it might be very imprecise as at run-time the actual liveness required
-might be way less than what is found at the creation point.
-
-The advantage of  this method is that it collects  all dead cells even
-if  they are  part  of a  closure  and hence  will  reduce the  memory
-requirements and the number of garbage collections. The main drawbacks
-of  this method  is  the fact  that  the algorithm  might do  multiple
-traversals over  the same structure. Assume that  two references point
-to the  same list, now using  reachability if it  is garbage collected
-using  one reference  there is  no need  to traverse  using  the other
-reference as everything  reachable from the root node  would have been
-copied.  Unfortunately, this is not the case with liveness based GC as
-the two references  might make different sections of  the list as live
-and  copy  them.  Liveness  based  algorithm will  have  to  make  one
-traversal  per reference.   Experimentally we  found that  this  was a
-major source of overhead in the liveness based algorithm.  This can be
-mitigated by  maintaining a  list of liveness  automata states  that a
-particular heap  cell was traversed with  and ensuring that  we do not
-repeat traversals  with the same  state. This requires that  each cell
-maintain  a list  of state  which  potentially might  contain all  the
-states.  Hence  this  is  not  a  feasible  solution.   \cred{repeated
-  traversals if sharing}.
+While exploring the heap, the  GC may encounter closures. In RGC mode,
+the  closure will  be explored  as  usual. However,  \cred{  as
+  mentioned earlier}, our liveness analysis predicts the liveness of
+data in its evaluated form. The absence of liveness information of
+closures presents challenges for LGC.
 
 
-\subsection{Modified GC Algorithm}
-Since the first algorithm requires a lot of bookkeeping and is not
-precise, we have a second version of the algorithm 
-which does not use liveness for copying closures. 
-\begin{verbatim}
-procedure copy (cell)
-  IF{celltype is cons}
-    IF cell is live &&
-         cell is not copied using reachability
-       new_cell <-  dup_heapcell(cell) 
-       new_car        <-  copy(cell.car)
-       new_cell.car   <-  new_car
-       new_cdr        <-  copy(cell.cdr)
-       new_cell.cdr   <-  new_cdr
-    ELSE
-       cell <- NULL
-    ENDIF
-  ELSE
-    IF {celltype is closure && cell is not copied}
-       new_cell  <- copy_and_mark_reachable_cells(cell)
-    ENDIF
-  ENDIF
- copy_references_on_print_stack()
-\end{verbatim}
+\subsection{A liveness-based garbage collection scheme}
+We shall call  a unit allocatable memory as a {\em  cell}.  A cell can
+hold  a  basic  value   ($\mathit{bas}$),  the  constructor  \CONS\  $(\mathit{cons~
+arg_1~arg_2}$) or   a closure.  The closure, in  turn, can be  one of
+($\mathit{unop~arg_1}$),  ($\mathit{ binop~arg_1~arg_2}$)  and  function  application
+($\mathit{app~arg_1~arg_2})$.  Here each $\mathit{ arg_i}$ is a reference to another heap
+cell or terminated through the function $\mathit{makenull}$. 
+
+\begin{figure*}[t!]
+\label{fig:algos}
+\hfill
+\subfigure[]{\includegraphics[width=.30\linewidth]{lgc-scheme-1}}
+\hfill
+\subfigure[]{\includegraphics[width=.40\linewidth]{lgc-scheme-2}}
+\hfill
+\caption{(a) LGC with closure collection based on liveness.  (b)
+  LGC with reachability-based closure collection.}
+    
+\end{figure*}
+ 
+  
+Figure~\ref{fig:algos}  shows   a  liveness-based  garbage  collection
+scheme.   The algorithm  assumes that  checking for  liveness involves
+traversing the  liveness-DFAs stored as  a table and does  not mention
+this explicitly.  Starting  with the root set, each  live reference is
+explored   using  $\mathit{  lgcCopy}$.    Copying  \CONS\   cells  is
+simple---it  just involves  copying  the cell  itself and  recursively
+copying the \CAR\ and  the \CDR\ fields.  Liveness-based collection of
+closures  is more  complicated since  our analysis  only  computes the
+liveness of evaluated objects and not closures.
+
+Let   us  consider   determining  the   liveness  of   a   closure  at
+runtime. Assume  that the closure  $(app~f~y)$ has a  reference from
+the root  set variable $x$. If $x$  is live,  then we  know that the
+cell $(app~f~y)$ has  to be copied. However, to find out  the
+liveness of $y$, could find out the program point which triggered the
+evaluation of $(app~f~y)$ and pick up the liveness of $y$ from this
+program point. However, this is only possible if the activation record
+of the function which created this closure is still on the activation
+stack. This does not always happen since a function could pack a
+closure in a \CONS\ cell and return the \CONS\ cell.
+
+An  alternative  could  be   to  carry  extra  information  with  each
+closure---the {\em free variables in the closure and the program point
+  at  which  it  was  evaluated}.   This  gives  us  precise  liveness
+information  of the  free  variables  of a  closure  but involves  the
+overhead of  updating the program point  information during execution.
+To avoid this  overhead we go for a safe  approximation by storing the
+{\em creation  point of the closure}  and using it  to check liveness.
+This is safe  since the liveness at the creation  point of the closure
+dominates all possible evaluation points  of the closure, but it might
+be imprecise  as the actual  liveness might be  way less than  what is
+found at the creation point.
+
+Note that  when a reachability-based  collector visits a cell  for the
+first time,  it is  marked.  Explorations starting  from the  cell are
+curtailed if the cell is  visited subsequently due to sharing. This is
+because the collector can assume  that the region of the heap starting
+from  the  cell has  already  been  explored.  Since a  liveness-based
+collector may  reach the cell each  time with a  different state, this
+curtailment cannot  be done in  the case of  LGC. This is  an inherent
+drawback  of a  liveness-based collector.   This can  be  mitigated by
+maintaining a list of liveness  automata states that a particular heap
+cell was traversed with and  ensuring that we do not repeat traversals
+if we reach the cell in one of these states.
+
+\subsection{Liveness-based collector with reachability-based closure
+  collection}  Since the first  algorithm has  significant bookkeeping
+overheads,  we have  a  second GC  scheme  that not  use liveness  for
+copying closures.  In this  scheme, the liveness automata is consulted
+only for \CONS\ cells; we assume everything under a closure to be live
+and copy everything  that is reachable. 
+ 
+A consequence of copying everything under a closure is that we can end
+up trying to copy things which are not live and corrupt the heap. This
+can happen if a \CONS\  cell copied using liveness during a collection
+subsequently  becomes   part  of  a  closure.    During  a  subsequent
+collection,  the  collector  may  try  to copy  everything  under  the
+\CONS\ cell thus copying heap  locations which might not be valid.  To
+avoid  this, we  should ensure  that any  non-live references  are not
+carried across  GC's.  We  do this  by scanning the  live part  of the
+buffer after every  GC and setting to null any  reference which is not
+live. This  is correct  because any reference  which is dead  during a
+collection will not be dereferenced any further.
 
 
-In this  algorithm we consult  the liveness automata  only if it  is a
-cons cell, for  closures we assume everything under it  to be live and
-copy everything that is reachable. Although this might lead to copying
-more  cells   it  is   faster  as  there   are  no   liveness  checks.
-\comment{Once  experimental  results  are  obtained  compare  the  two
-  algorithms here}  Mixing liveness based GC and  reachability has its
-own set of pros and cons which we discuss further.\cred{hanging like a
-  sore thumb}.
+An advantage of  using reachablity for closures it  avoids the problem
+of  multiple  explorations  from  the  same  cell.  This  is  done  by
+maintaining  a flag in  each cell  to indicate  whether it  was copied
+using  reachability. 
 
 
-\subsubsection{Optimization for RGC for closures}
-An advantage  of using  reachablity for closures  is that it  opens up
-certain  opportunities  of  optimization.  As  we  saw  in  section[],
-multiple traversals  over the same structure was  a major inefficiency
-in the full liveness based  algorithm and overcoming it required a lot
-of memory.  Using reachability for closures allows us to overcome this
-partially using limited amount of  memory. Any heap cell which is part
-of a closure  is copied using reachaibilty and  hence by maintaining a
-single  flag in  each cell  to indicate  whether it  was  copied using
-reachability    prevents   traversing    the   same    cell   multiple
-times.  Experimental results  again indicate  that for  lazy languages
-this gives a  substantial performance improvement.  \comment{Maybe add
-  a diagram}
-
-\subsubsection{Issues with mixing LGC and RGC}
-A consequence of  copying everything under a closure  is the fact that
-we can end up trying to copy things which are not live and corrupt the
-heap. This  can happen if at some  $GC_k$ a cons cell  is copied using
-liveness. At  a later stage this  cons cell becomes part  of a closure
-and  hence during $GC_{k+n}$  the algorithm  tries to  copy everything
-under the  cons cell  thus copying heap  locations which might  not be
-valid.  To avoid  this behavior we either have to choose  to do a full
-liveness based  GC for closures or  we should ensure  that any non-live
-references are  not carried across  GC's. We take the  latter approach
-and ensure that  non-live references are set to  null. After every GC,
-the live part of the buffer  is scanned and any reference which is not
-live is  set to null.  The correctness of  this follows from  the fact
-that any reference which is decalred  not live in a $GC_k$ will not be
-derefernced during later execution.
-% A reference copied using LGC could become part of a closure in a
-later GC
-% and copy wrong locations. Avoiding it by setting non-live references
-to null after every GC.
-% Proof for the correctness.
 \subsection{Garbage collection for references on print stack}
-Another  difference that is  present in  GC of  lazy language  is the
-presence  of  a print  stack.  In  lazy  languages the  evaluation  of
-closures is  driven by the print  function\comment{Refer to SPJ's
-book}.  
-Printing of atomic values is simple and does not trigger a garbage collection.
-In case of \CONS\ cells, the \CAR\ part is first printed and then the \CDR\ part.
-In a lazy language, both the \CAR\ and the \CDR\ parts could be closures, thus 
-requiring evaluation. A garbage collection might be triggered while printing 
-the \CAR\ part or the \CDR\ part. Therefore, whenever a garbage collection is 
-triggered we have to consider any references that might be on the print stack 
-and copy them. Liveness automata does not exist for the print function as it 
-is not part of the executing program. Since the print function makes everything 
-reachable from a cell live we can copy all cells reachable from the reference. 
+In lazy  languages the evaluation of  closures is driven  by the print
+function~\cite{Jones87}.  Printing of  atomic values is
+simple  and  does  not  trigger  a garbage  collection.   In  case  of
+\CONS\ cells, the \CAR\ is first  printed followed by \CDR.  In a lazy
+language, both \CAR\ and \CDR\ could be closures requiring evaluation,
+and this  may trigger  a garbage collection.   When this  happens.  we
+have to consider  any references that might be on  the print stack and
+copy them. We extend the liveness analysis to the print function and
+use its results during garbage collection.
+
+%% Liveness automata  does not exist for  the print function  as it is
+%% not part of the executing  program.  Since the print function makes
+%% everything  reachable  from a  cell  live  we  can copy  all  cells
+%% reachable from the reference.
 
 
-Consider the case where a \CONS\ cells is being printed and a garbage collection 
-is triggered when printing the \CDR\ part. In this case, since the refernce to the 
-\CONS\ cells is still on the print stack both the \CAR\ and the \CDR\ parts are 
-reachable but we know that the \CAR\ part has already been printed and can be 
-safely garbage collected. A liveness analysis of the print function would have 
-given the same information. In our implementation we mimic the behavior of 
-the liveness analysis by using a flag in every \CONS\ cell which says whether 
-the \CAR\ part has been printed or not. For any \CONS\ cell if the \CAR\ part 
-has not been printed, a reference to the \CAR\ part will also be on the stack but 
-the \CDR\ part has to be explicitly copied.  
-In case the \CAR\ part has been printed, then a reference to the \CDR\ part will 
-be on the stack and since the \CAR\ part is not required anymore we do not 
-copy anything. This optimization subsumes tail call optimization. Again, 
-experimental results show that this optimization minimizes a lot of copying. 
-\cred{Very sketchy: Make another attempt to write}
+%% Consider  the case  where a  \CONS\ cells  is being  printed  and a
+%% garbage collection  is triggered when  printing the \CDR\  part. In
+%% this case, since  the refernce to the \CONS\ cells  is still on the
+%% print stack both the \CAR\ and the \CDR\ parts are reachable but we
+%% know that the \CAR\ part has already been printed and can be safely
+%% garbage collected. A liveness  analysis of the print function would
+%% have given  the same information.   In our implementation  we mimic
+%% the  behavior of the  liveness analysis  by using  a flag  in every
+%% \CONS\ cell which  says whether the \CAR\ part  has been printed or
+%% not. For any \CONS\ cell if  the \CAR\ part has not been printed, a
+%% reference  to the  \CAR\ part  will also  be on  the stack  but the
+%% \CDR\ part has to be explicitly copied.  In case the \CAR\ part has
+%% been printed,  then a reference  to the \CDR\  part will be  on the
+%% stack and  since the \CAR\ part  is not required anymore  we do not
+%% copy anything.  This  optimization subsumes tail call optimization.
+%% Again, experimental results show that this optimization minimizes a
+%% lot of copying.  \cred{Very sketchy: Make another attempt to write}
+%% \hrule
 
-%% \begin{figure}
-%% \begin{algorithm}[H]
-%%  \KwData{this text}
-%%  \KwResult{how to write algorithm with \LaTeX2e }
-%%  initialization\;
-%%  \While{not at end of this document}{
-%%   read current\;
-%%   \eIf{understand}{
-%%    go to next section\;
-%%    current section becomes this one\;
-%%    }{
-%%    go back to the beginning of current section\;
-%%   }
-%%  }
-%%  \caption{How to write algorithms}
-%% \end{algorithm}
-%% \label{algo:LGC-Algo} \figrule
-%% \end{figure}
-%% We   provide   an   intuition    about   the   correctness   of   this
-%% algorithm Figure~\ref{algo:LGC-Algo}. Consider the following facts
-%% about the print stack during a
-%% GC,
+%% \comment{ Unlike  eager languages where  GC happens only  at \CONS~
+%%   points or at function calls,  every \LET~ point is a potential GC
+%%   point.  The number of automata that needs to be stored is reduced
+%%   by sharing  automata along all  the program points along  an {\em
+%%   E-path}.
 
-%% \begin{enumerate}
-%% \item The top of the stack always contains a reference to a closure.
-%% \item All other references on the print stack point to atomic values or
-%% cons cells, it can never contain a
-%% reference to a closure. The components of the cons cell can contain
-%% reference to closures.
-%% \item If a reference on the print stack is a cons cell, either its car
-%% part or its cdr part will also be
-%% present on the stack.
-%% \end{enumerate}
-%% %Needs to be formatted and re-written
-%% Sketch of the proof
-%% Since all closures are copied fully and atomic values are copied, only
-%% cons cells need to be handled.
-%% Consider the following cases,
-%% \begin{enumerate}
-%% \item the car part of the cons  cell is on the print stack. This means
-%%   that the GC happened while the car part was being processed. The cdr
-%%   part is yet to be processed and the reference to the cdr part is not
-%%   on the print stack. Hence it is sufficient to copy only the cdr part
-%%   of the  cons cell. Any  references necessary for processing  the car
-%%   part will be copied due to references on the print stack.
-%% \item the cdr part of the cons  cell is on the print stack. This means
-%%   that GC  happened while the cdr  part was being  processed.  The car
-%%   part has already been processed and printed, hence we do not need to
-%%   copy the car  part. Additionally any references that  are needed for
-%%   printing the cdr  part will also be copied due  to the references on
-%%   the print stack and hence nothing needs to be copied in this case.
-%% \end{enumerate}
-\hrule
-\comment{
-Unlike eager languages where GC happens only at \CONS~ points or at
-function calls, every \LET~ point is a potential GC point. The number
-of
-automata that needs to be stored is reduced by sharing automata along
-all
-the program points along an {\em E-path}.
-
-By the  time the program  starts executing, the liveness  automata are
-created and stored in a file.   This is re-used every time the program
-executes.  An important difference in  GC of lazy language compared to
-an  eager language is  the point  of garbage  collection.  In  case of
-eager  languages only  \CONS~ points  and  function calls  are the  GC
-points. In  a lazy  language every \LET~  statement is a  potential GC
-point. Hence we need to store liveness automata corresponding to every
-\LET~  statement in the  program. This  leads to  an explosion  in the
-number of  automata. From our  observation that along an  {\em E-path}
-all program points have the same liveness, we can reduce the number of
-automata state required  by sharing the same automata  for all program
-points along an {\em E-path}.} In  the example program, we only need to
-create automata  for program  points \ldots, since  they are  the only
-distinct {\em E-path}s in the program.
-
-% Liveness for cons cells & reachability for closures
-
-\comment{Mention the fact that liveness at a program point indicates
-  what references will be used by the program eventually. The exact
-  point where a reference will be used cannot be determined statically
-due to the language being lazy. }
-During GC, if the heap cell being processed is a cons cell, we consult
-the  liveness automaton  corresponding to  it and  copy only  the live
-paths.  In  case  the  heap  cell  points  to  a  closure,  we  safely
-approximate the  liveness to be {\{0+1\}\*} and  copy everything under
-the closure.
-% Handling of mixture of LGC & RGC
-
-% Difference between eager and lazy GC
+%% By the time the program starts executing, the liveness automata are
+%% created  and stored  in a  file.  This  is re-used  every  time the
+%% program executes.   An important difference in GC  of lazy language
+%% compared to an  eager language is the point  of garbage collection.
+%% In case  of eager languages  only \CONS~ points and  function calls
+%% are the  GC points. In a  lazy language every \LET~  statement is a
+%% potential  GC  point. Hence  we  need  to  store liveness  automata
+%% corresponding to  every \LET~ statement in the  program. This leads
+%% to an  explosion in  the number of  automata. From  our observation
+%% that  along  an {\em  E-path}  all  program  points have  the  same
+%% liveness, we  can reduce the  number of automata state  required by
+%% sharing  the same  automata for  all program  points along  an {\em
+%% E-path}.} In the  example program, we only need  to create automata
+%% for program  points \ldots, since  they are the only  distinct {\em
+%% E-path}s in the program.
 
 
 
-% Doing GC for  references on the print stack - using  a flag to avoid
-% copying non-live  cells Optimizing  GC for closures  - use  a copied
-% using rgc flag for closures to avoid multiple traversals
+
 
 
 \section{Results}
@@ -1777,25 +1605,25 @@ our liveness analysis.  For  all programs  except  {\tt nperms} and
 manages to collect a good portion of the data that are not live.
 
 \subsection{Results}
-\begin{figure}[t]
-\centering
-\begin{boxedminipage}{.75\textwidth}
-{\bf function} $\mathsf{copy}$($\mathsf{dfa}$, $q$, $x$)\\
-\noindent \hspace*{.35cm}$y \leftarrow \mathsf{move\_to\_tospace}(x)$\\
-\noindent \hspace*{.35cm}{\bf if} $x$.{\bf tag} $\neq$ \CONS\ {\bf
-  then} {\bf skip}\\
-\noindent \hspace*{.25cm}  {\bf else} {\bf if}
-$\mathsf{dfa}(q,0)\mathsf{?}$ {\bf then}   $y.\CAR =
-\mathsf{copy}(\mathsf{dfa}, \mathsf{dfa}(q,0),x.\CAR)$\\
-\noindent \hspace*{0.95cm} {\bf if}  $\mathsf{dfa}(q, 1)\mathsf{?}$
-{\bf then}  $y.\CDR = \mathsf{copy}(\mathsf{dfa},
-\mathsf{dfa}(q,1),x.\CDR)$\\
-\noindent \hspace*{.35cm}{\bf return} $y$
-\end{boxedminipage}
-\caption{Function       for       copying       a       root       set
-  variable.}\label{algo:LGC-main-loop} \figrule
+%% \begin{figure*}[t]
+%% \centering
+%% \begin{boxedminipage}{.75\textwidth}
+%% {\bf function} $\mathsf{copy}$($\mathsf{dfa}$, $q$, $x$)\\
+%% \noindent \hspace*{.35cm}$y \leftarrow \mathsf{move\_to\_tospace}(x)$\\
+%% \noindent \hspace*{.35cm}{\bf if} $x$.{\bf tag} $\neq$ \CONS\ {\bf
+%%   then} {\bf skip}\\
+%% \noindent \hspace*{.25cm}  {\bf else} {\bf if}
+%% $\mathsf{dfa}(q,0)\mathsf{?}$ {\bf then}   $y.\CAR =
+%% \mathsf{copy}(\mathsf{dfa}, \mathsf{dfa}(q,0),x.\CAR)$\\
+%% \noindent \hspace*{0.95cm} {\bf if}  $\mathsf{dfa}(q, 1)\mathsf{?}$
+%% {\bf then}  $y.\CDR = \mathsf{copy}(\mathsf{dfa},
+%% \mathsf{dfa}(q,1),x.\CDR)$\\
+%% \noindent \hspace*{.35cm}{\bf return} $y$
+%% \end{boxedminipage}
+%% \caption{Function       for       copying       a       root       set
+%%   variable.}\label{algo:LGC-main-loop} \figrule
 
-\end{figure}
+%% \end{figure*}
 
 
 
@@ -1856,7 +1684,7 @@ explored  any   further  during  a  RGC   collection.   However,  this
 curtailment cannot happen in  LGC because of the possibility that the
 node,  re-visited in a  different liveness  state, may  mark a  set of
 cells different from the earlier visit.
-\begin{figure}[t]
+\begin{figure*}[t]
 \footnotesize
 
 \centering
@@ -1935,58 +1763,58 @@ LGC \\
   data. The average drag time is measured in allocated cons cells.}
 \label{fig:experimental-results}
 \normalsize
-\end{figure}
+\end{figure*}
 
-\section{Collecting more garbage can never slow things down}
-\label{sec:lgc-always-better}
+%% \section{Collecting more garbage can never slow things down}
+%% \label{sec:lgc-always-better}
 
 %% Since garbage collection is  effectively asynchronous to the
-allocator
+%% allocator
 %% thread, one might  worry as to how {\em  robust} our measurements
-are.
+%% are.
 %% For example,  while LGC would,  in general, collect more  garbage
-than
+%% than
 %% RGC in the same heap state,  is it possible that on some programs,
-LGC
+%% LGC
 %% might do  a larger number  of collections? We  prove a result  to
-show
+%% show
 %% that   this  cannot   happen.    This  result   applies  to
-classical
+%% classical
 %% mark-and-sweep and copying garbage  collectors and, we hypothesize,
-to
+%% to
 %% generational collectors too.
 
 %% \begin{lemma}
 %% For the  same mutator,  a liveness-based collector  can never  do
-more
+%% more
 %% garbage collections than a reachability-based collector.
 %% \end{lemma}
 
 %% \begin{proof}Assume, as before,  that time is measured in terms of
-the number of
+%% the number of
 %%   cons cells allocated. Let us run  two copies of the mutator with
-the
+%% the
 %%   two    different   collectors    but    with   synchronous
-memory
+%% memory
 %%   allocations.   The   garbage    collections,   however,   happen
 %%   asynchronously.
 
 %%   To prove the lemma, it is enough to show the truth of the
-following
+%% following
 %% statement: After
 %%  every  LGC invocation,  the count of LGC invocations   is  no
-greater
+%% greater
 %% than  RGC invocations.   The  base case  holds  since the  first
 %% invocations of both GCs happen at the same time.  Assume the
-statement
+%% statement
 %% to be true after $n$ invocations of LGC.  Since LGC copies a subset
-of
+%% of
 %% reachable cells, its heap would contain no more cells than RGC heap
-at
+%% at
 %% the end  of the $n$th invocation.   Thus either RGC  is invoked next
-before
+%% before
 %% LGC, or LGC and RGC are both invoked next at the same time.  In
-either
+%% either
 %% case, the statement holds after $n+1$ invocations of LGC.
 %% \end{proof}
 
@@ -2021,7 +1849,7 @@ nullification,  done   at  compile  time,   requires  sharing  (alias)
 analysis.  Our  method, in contrast, does not  require sharing because
 of the availability of the heap  itself at runtime.  To the best of our
 knowledge, this is the first  attempt at liveness-based marking of the
-heap during garbage collection.  
+heap during garbage collection.
 
 %% \begin{figure}[t]
 %% \centerline{\epsfig{file=lambda.eps, height=4cm, width=7cm}}
@@ -2084,36 +1912,36 @@ of the heap and
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
-Generated by bibtex from your ~.bib file.  Run latex,
-then bibtex, then latex twice (to resolve references)
-to create the ~.bbl file.  Insert that ~.bbl file into
-the .tex source file and comment out
-the command \texttt{{\char'134}thebibliography}.
-% This next section command marks the start of
-% Appendix B, and does not continue the present hierarchy
-\section{More Help for the Hardy}
-The sig-alternate.cls file itself is chock-full of succinct
-and helpful comments.  If you consider yourself a moderately
-experienced to expert user of \LaTeX, you may find reading
-it useful but please remember not to change it.
-%\balancecolumns % GM June 2007
-% That's all folks!
+%% Generated by bibtex from your ~.bib file.  Run latex,
+%% then bibtex, then latex twice (to resolve references)
+%% to create the ~.bbl file.  Insert that ~.bbl file into
+%% the .tex source file and comment out
+%% the command \texttt{{\char'134}thebibliography}.
+%% % This next section command marks the start of
+%% % Appendix B, and does not continue the present hierarchy
+%% \section{More Help for the Hardy}
+%% The sig-alternate.cls file itself is chock-full of succinct
+%% and helpful comments.  If you consider yourself a moderately
+%% experienced to expert user of \LaTeX, you may find reading
+%% it useful but please remember not to change it.
+%% %\balancecolumns % GM June 2007
+%% % That's all folks!
 
 
 
 
 
-% {\color{red}
-%   (Note 3.\ includes $e_\mainpgm$ treated as the body of
-%   $(\DEFINE\ ({\tt main})\ e_\mainpgm)$.)
-% }
+%% % {\color{red}
+%% %   (Note 3.\ includes $e_\mainpgm$ treated as the body of
+%% %   $(\DEFINE\ ({\tt main})\ e_\mainpgm)$.)
+%% % }
 
 
 
 
-%% =======
+%% %% =======
 
-%------------------------------------------------------------%
-%\input{lazy-liveness}
+%% %------------------------------------------------------------%
+%% %\input{lazy-liveness}
 
 \end{document}
