@@ -1194,11 +1194,11 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		cons* heap_ref = update_heap_refs.top();
 		if (heap_ref->forward == NULL && !is_valid_address(heap_ref))
 		{
-			cout << "ERROR !!!! " << heap_ref << endl;
-			cout << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
+			cerr << "ERROR !!!! " << heap_ref << endl;
+			cerr << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
 			assert(false);
 		}
-		cerr << "Updating heap ref " << heap_ref << " to " << heap_ref->forward << endl;
+		DBG(cerr << "Updating heap ref " << heap_ref << " to " << heap_ref->forward << endl);
 		heap_ref = static_cast<cons*>(heap_ref->forward);
 		temp.push(heap_ref);
 		update_heap_refs.pop();
@@ -2678,8 +2678,8 @@ int is_valid_address(void* addr)
 	else
 	if (!is_valid)
 	{
-		cout << "Invalid address " << addr  << " at index " << ((cons*)addr - (cons*)buffer_live) << endl;
-		assert(is_valid);
+		DBG(cout << "Invalid address " << addr  << " at index " << ((cons*)addr - (cons*)buffer_live) << endl);
+		DBG(assert(is_valid));
 
 	}
 	return is_valid;

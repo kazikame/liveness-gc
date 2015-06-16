@@ -14,6 +14,13 @@ namespace Scheme {
 
 namespace Demands {
 
+
+#ifdef __DEBUG__GC
+#define DBG(stmt) stmt
+#else
+#define DBG(stmt) (void)0
+#endif
+
 typedef std::list<std::string> path;
 typedef boost::unordered_set<path> rule;
 typedef std::unordered_map<std::string, rule> demand_grammar;

@@ -388,7 +388,7 @@ void removeXbEdgesFrom(automaton * nfa)
 		//Currently add an epsilon edge unconditionally, and make the current state a final state
 		  if(Xb_transition != non_terminal.second.end())
 		  {
-			  std::cerr << "Replacing Xb by epsilon edge for " << non_terminal.first << std::endl;
+			  DBG(std::cerr << "Replacing Xb by epsilon edge for " << non_terminal.first << std::endl);
 			  auto dest_states = Xb_transition->second;
 			  (non_terminal.second[E]).insert(dest_states.begin(), dest_states.end());
 			  non_terminal.second.erase(TXb);
@@ -902,7 +902,7 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 			{
 				if (nfa->second.find(s) != nfa->second.end())
 				{
-					out << "Processing epsilon edge for " << s << std::endl;
+					DBG(out << "Processing epsilon edge for " << s << std::endl);
 					bool changed1 = addTransitionsToNode(curr_state, s, nfa);
 					changed = changed1 || changed;
 				}
@@ -958,8 +958,8 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
 		bool changed1 = removeEpsilonEdges(start_states, nfa);
 		bool changed2 = barEdgeSimplification(nfa);
 
-		std::cout << "Things changed in baredgesimplification "<<changed2<<std::endl;
-		std::cout << "Things changed in epsilonedgeremoval "<<changed1<<std::endl;
+		DBG(std::cerr << "Things changed in baredgesimplification "<<changed2<<std::endl);
+		DBG(std::cerr << "Things changed in epsilonedgeremoval "<<changed1<<std::endl);
 	        changed = changed1 || changed2;
 		std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
 	}
