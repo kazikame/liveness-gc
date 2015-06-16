@@ -202,11 +202,13 @@ void combineEpsilonEdgesFrom(const std::string & start, automaton * nfa)
 
 void markStatesNotReachingFinalFrom(const std::string & start, automaton * nfa,
                                     std::unordered_set<std::string> & marked,
-                                    std::unordered_set<std::string> & visited) {
+                                    std::unordered_set<std::string> & visited)
+{
 
 }
 
-void removeDeadStatesFrom(const std::string & start, automaton * nfa) {
+void removeDeadStatesFrom(const std::string & start, automaton * nfa)
+{
     std::unordered_map<std::string, std::unordered_set<std::string>> reverseEdges;
     for(auto & state : nfa->first)
         reverseEdges[state];
@@ -271,7 +273,8 @@ void removeDeadStatesFrom(const std::string & start, automaton * nfa) {
         else ++iter;
 }
 
-void expand_eps_closure(std::unordered_set<std::string> & eps_closure, const automaton * nfa) {
+void expand_eps_closure(std::unordered_set<std::string> & eps_closure, const automaton * nfa)
+{
     std::unordered_set<std::string> visited;
     std::list<std::string> check_list;
 
@@ -452,12 +455,8 @@ automaton* Scheme::Demands::getNFAsFromRegularGrammar(const demand_grammar* gram
 
 					trans[current_state];
 					trans.at(current_state)[previousSymbol].insert(sym);
-					//if the transition loops back to the same state then add the next transition from the current state itself
-					//if (current_state != sym)
-					{
-						trans[sym + "_f"];
-						current_state = sym + "_f";
-					}
+					trans[sym + "_f"];
+					current_state = sym + "_f";
 					ispreviousSymbolTerminal=false;
 					previousSymbol=E;
 				}
@@ -735,7 +734,8 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		eps_closure.insert(nexts.begin(), nexts.end());
 	}
 
-
+	//If a final state is part of an epsilon closure, then all states in the
+	//epsilon closure path should be marked final state
 	bool hasfinalState = false;
 	for(auto st:eps_closure)
 		if(nfa->first.find(st) != nfa->first.end())
@@ -772,12 +772,12 @@ void removeUnreachableStates(std::unordered_set<std::string> reachable_states,  
 
 
 
-void Scheme::Demands::printSetofStates(std::unordered_set<std::string> states)
+void Scheme::Demands::printSetofStates(std::unordered_set<std::string> states, std::ostream& out)
 {
-	std::cerr<<"{";
+	out<<"{";
 	for(auto state:states)
-		std::cerr << state << ",";
-	std::cerr<<"}"<<std::endl;
+		out << state << ",";
+	out<<"}"<<std::endl;
 }
 
 
@@ -810,41 +810,48 @@ bool replaceEdgesWithEpsilonEdge(automaton* nfa, std::pair<std::string, transiti
 	bool changed = false;
 	auto &src = ts.first;
 	auto &tmap = ts.second;
-	if (tmap.find(sym1) != tmap.end())
+
+	if (tmap.find(sym1) == tmap.end() || tmap[sym1].empty())
+		return changed;
+
+	std::unordered_set<std::string> next = tmap[sym1];
+	for(auto s:next)
 	{
-		std::unordered_set<std::string> next = tmap[sym1];
-		if(!next.empty())
+		if (!(trans.find(s) != trans.end() && trans.at(s).find(sym2) != trans.at(s).end()))
+			continue;
+
+		std::unordered_set<std::string> des = trans.at(s)[sym2];
+		for(auto d:des)
 		{
-			for(auto s:next)
+			if(trans.at(src)[E].find(d) != trans.at(src)[E].end())
+				continue;
+
+			//Add only if the edge is not present
+			trans.at(src)[E].insert(d);
+			//							std::cerr << "Adding an epsilon edge between " << src << " & " << d << std::endl;
+
+			//TODO: SHOULD I REMOVE THIS CODE TO ADD src TO FINAL STATE LIST
+			if (nfa->first.find(d) != nfa->first.end() &&
+					nfa->first.find(src) == nfa->first.end())
 			{
-				if (trans.find(s) != trans.end() && trans.at(s).find(sym2) != trans.at(s).end())
-				{
-					std::unordered_set<std::string> des = trans.at(s)[sym2];
-					for(auto d:des)
-					{
-						if(trans.at(src)[E].find(d) == trans.at(src)[E].end())
-						{
-							//Add only if the edge is not present
-							trans.at(src)[E].insert(d);
-//							std::cerr << "Adding an epsilon edge between " << src << " & " << d << std::endl;
-							if (nfa->first.find(d) != nfa->first.end() &&
-									nfa->first.find(src) == nfa->first.end())
-							{
-								//Insert the src as a final state if d is a final state.
-//								std::cerr << "Adding as final state " << src << std::endl;
-								nfa->first.insert(src);
-							}
-							std::cout << "Processed bar edge for " << src << std::endl;
-							changed = true;
-							nfa_changed[src] = true;
-						}
-					}
-				}
+				//Insert the src as a final state if d is a final state.
+				//								std::cerr << "Adding as final state " << src << std::endl;
+				nfa->first.insert(src);
 			}
+			//std::cout << "Processed bar edge for " << src << std::endl;
+			changed = true;
+			//This is not correct. It should be the start state of the automaton being processed
+			//nfa_changed[src] = true;
+
 		}
+
 	}
+
+
 	return changed;
 }
+
+
 
 bool barEdgeSimplification(automaton *nfa)
 {
@@ -854,7 +861,7 @@ bool barEdgeSimplification(automaton *nfa)
 	for(auto ts : trans)
 	{
 //		std::cerr << "Processing " << ts.first << std::endl;
-		if (nfa_changed[ts.first])
+//		if (nfa_changed[ts.first])
 		{
 //			std::cerr << "Simplifying " << ts.first << std::endl;
 			bool t1 = replaceEdgesWithEpsilonEdge(nfa, ts, trans, T0b, T0);
@@ -879,7 +886,7 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 		std::stack<std::string> states;
 		std::unordered_set<std::string> processed;
 		states.push(non_terminal);
-
+		std::ostream &out = std::cerr;
 		//std::cerr << "Processing non_terminal " << non_terminal << std::endl;
 
 		while(!states.empty())
@@ -895,14 +902,17 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 			{
 				if (nfa->second.find(s) != nfa->second.end())
 				{
+					out << "Processing epsilon edge for " << s << std::endl;
 					bool changed1 = addTransitionsToNode(curr_state, s, nfa);
 					changed = changed1 || changed;
 				}
 				//If any of the states in the epsilon closure is a final state. Set the current state also as a final state
-				if (nfa->first.find(s) != nfa->first.end())
+				if (nfa->first.find(s) != nfa->first.end() &&
+						nfa->first.find(curr_state) == nfa->first.end())
 				{
 					//std::cerr << "Setting " << curr_state << " as final" <<std::endl;
 					nfa->first.insert(curr_state);
+					changed = true;
 				}
 			}
 			//remove all epsilon transitions from the non_terminal
@@ -950,7 +960,7 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
 
 		std::cout << "Things changed in baredgesimplification "<<changed2<<std::endl;
 		std::cout << "Things changed in epsilonedgeremoval "<<changed1<<std::endl;
-	    changed = changed1 || changed2;
+	        changed = changed1 || changed2;
 		std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
 	}
 	return nfa;

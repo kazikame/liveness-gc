@@ -144,7 +144,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
     mkdir((outdir+pgmname).c_str(), 0755);
 	bool state_map_file =  (stat ((outdir + pgmname + "/fsmdump-" + pgmname + "-state-map").c_str(), &buffer) == 0);
 	bool state_transition_file =  (stat ((outdir + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
-	filesCached = state_map_file && state_transition_file;
+	filesCached = state_map_file && state_transition_file && false;
 
 	if (gc_type == gc_live && !filesCached )
 	{
@@ -183,7 +183,8 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
 		Scheme::Demands::simplifyNFA(start_states, nfa);
-		//Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-simplified-nfa.txt");
+		Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-simplified-nfa.txt");
+
 		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
 		Scheme::Demands::printNFAToFile(dfa, outdir + pgmname + "/program-dfa.txt");
 
