@@ -10,6 +10,7 @@
 //#include <boost/filesystem.hpp>
 
 #include "Demands.h"
+#include "OptDemands.h"
 
 using namespace Scheme::Demands;
 
@@ -946,24 +947,138 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 	return changed;
 }
 
+static std::unordered_map<std::string, int> st2idx;
+static std::vector<std::string> idx2st;
+int getLabel(std::string slbl) 
+{
+    if (slbl == E  ) return Scheme::OptDemands::E;
+    if (slbl == T0 ) return Scheme::OptDemands::T0;
+    if (slbl == T1 ) return Scheme::OptDemands::T1;
+    if (slbl == T0b) return Scheme::OptDemands::T0b;
+    if (slbl == T1b) return Scheme::OptDemands::T1b;
+    if (slbl == TXb) return Scheme::OptDemands::TXb;
+
+    return -1; // error
+}
+std::string getLabelStr(int lbl) 
+{
+    if (lbl == Scheme::OptDemands::E  ) return E;
+    if (lbl == Scheme::OptDemands::T0 ) return T0;
+    if (lbl == Scheme::OptDemands::T1 ) return T1;
+    if (lbl == Scheme::OptDemands::T0b) return T0b;
+    if (lbl == Scheme::OptDemands::T1b) return T1b;
+    if (lbl == Scheme::OptDemands::TXb) return TXb;
+
+    return "???"; // error
+}
+
+Scheme::OptDemands::automaton* toINFA(const automaton *nfa,
+                                      const std::unordered_set<std::string> &start_states,
+                                      std::unordered_set<int>& istart_states) 
+{
+    std::cerr << "In to INFA\n";
+    int cstate = 0; // current state
+    
+    for(auto xs:nfa->second)
+	{
+        auto s = xs.first;
+		if (st2idx.find(s) != st2idx.end())
+            continue;
+        idx2st.push_back(s);
+        st2idx[s] = cstate++;
+	}
+    
+	for(auto s:start_states) {
+		if (st2idx.find(s) != st2idx.end())
+            continue;
+        idx2st.push_back(s);
+        st2idx[s] = cstate++;
+        
+        istart_states.insert(st2idx.at(s));
+    }
+    
+    std::unordered_set<int> final_states;
+	for(auto s:nfa->first) {
+		if (st2idx.find(s) != st2idx.end())
+            continue;
+        idx2st.push_back(s);
+        st2idx[s] = cstate++;
+        
+        final_states.insert(st2idx.at(s));
+    }
+    
+    Scheme::OptDemands::state_transitions strans;
+    for (auto xs:nfa->second)
+	{
+        Scheme::OptDemands::transitions itx;
+        std::unordered_set<int> idst;
+        for (auto tx:xs.second) {
+            auto label = getLabel(tx.first);
+            for(auto dst:tx.second)
+                idst.insert(st2idx.at(dst));
+            itx[label] = idst;
+        }
+        auto s = st2idx.at(xs.first);
+        strans[s] = itx;
+    }
+    
+	Scheme::OptDemands::automaton* infa= new Scheme::OptDemands::automaton(final_states, strans);
+    return infa;
+}
+
+automaton *fromINFA(Scheme::OptDemands::automaton* infa)
+{
+    std::cerr << "In from INFA\n";
+    
+    std::unordered_set<std::string> final_states;
+	for(auto s:infa->first)
+        final_states.insert(idx2st[s]);
+
+    state_transitions strans;
+    for (auto xs:infa->second)
+	{
+        transitions itx;
+        std::unordered_set<std::string> idst;
+        for (auto tx:xs.second) {
+            auto label = getLabelStr(tx.first);
+            for(auto dst:tx.second)
+                idst.insert(idx2st[dst]);
+            itx[label] = idst;
+        }
+        auto s = idx2st[xs.first];
+        strans[s] = itx;
+    }
+    
+	automaton* nfa= new automaton(final_states, strans);
+    return nfa;
+}
+
 automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_states, automaton *nfa)
 {
 	bool changed = true;
 	int i = 1;
+#define TRYNEW 0
+#if TRYNEW
+    std::unordered_set<int> istart_states;
+    Scheme::OptDemands::automaton* infa = toINFA(nfa, start_states, istart_states);
+    infa = Scheme::OptDemands::simplifyNFA(istart_states, infa);
+    return fromINFA(infa);
+#else
 	while(changed)
 	{
-		changed = true;
-		std::cerr<< "Starting " << i <<"th round of simplification"<<std::endl;
-
-		bool changed1 = removeEpsilonEdges(start_states, nfa);
-		bool changed2 = barEdgeSimplification(nfa);
-
-		DBG(std::cerr << "Things changed in baredgesimplification "<<changed2<<std::endl);
-		DBG(std::cerr << "Things changed in epsilonedgeremoval "<<changed1<<std::endl);
-	        changed = changed1 || changed2;
-		std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
-	}
+        changed = true;
+        std::cerr<< "Starting " << i <<"th round of simplification"<<std::endl;
+        
+        bool changed1 = removeEpsilonEdges(start_states, nfa);
+        bool changed2 = barEdgeSimplification(nfa);
+        
+        DBG(std::cerr << "Things changed in baredgesimplification "<<changed2<<std::endl);
+        DBG(std::cerr << "Things changed in epsilonedgeremoval "<<changed1<<std::endl);
+        changed = changed1 || changed2;
+        std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
+    }
 	return nfa;
+#endif
 }
 
 

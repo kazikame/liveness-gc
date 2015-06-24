@@ -21,8 +21,8 @@ using namespace Scheme::AST;
 
 
 #ifndef __DEBUG__GC
-#define __DEBUG__GC
 #undef __DEBUG__GC
+#define __DEBUG__GC
 #endif
 
 //#define REACHABILITY_BFS
@@ -89,6 +89,7 @@ extern clock_tick current_cons_tick;
 extern clock_tick gc_freq_threshold;
 
 #ifdef __DEBUG__GC
+#undef DBG
 #define DBG(stmt) stmt
 #else
 #define DBG(stmt) (void)0

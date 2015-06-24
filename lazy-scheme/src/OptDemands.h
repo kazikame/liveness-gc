@@ -14,8 +14,8 @@ namespace Scheme {
 
 namespace OptDemands {
 
-#define __DEBUG__GC
-#undef DBG
+//#define __DEBUG__GC
+//#undef DBG
 #ifdef __DEBUG__GC
 #define DBG(stmt) stmt
 #else
