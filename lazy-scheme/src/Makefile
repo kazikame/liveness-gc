@@ -1,7 +1,6 @@
 CPP= g++
-
 export CPATH=/usr/inlcude/c++/4.8.4
-EXTRA_FLAGS= -Wno-reorder -Wno-unused -Werror
+EXTRA_FLAGS= -Wno-sign-compare -Wno-reorder -Wno-unused -Werror
 OBJ_FLAGS=-c
 DBG_FLAGS=-g
 PROD_FLAGS= -g
@@ -17,7 +16,7 @@ OBJS = gc.o  parser.o lexer.o \
 	SchemeAST_Demands.o SchemeAST_Defs.o Output.o Demands.o
 
 $(TARGET): $(OBJS) $(TARGET).o 
-	$(CPP) -o $(TARGET) $(CFLAGS) $(TARGET).o $(OBJS)
+	$(CPP) -o $(TARGET) $(CPPFLAGS) $(TARGET).o $(OBJS)
 
 scheme.tab.h: 
 parser.cpp: scheme.y 

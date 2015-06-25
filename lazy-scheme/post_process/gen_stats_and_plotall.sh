@@ -2,7 +2,7 @@
 DIR=`dirname $0`
 PROGNAME=`basename $0`
 #AllBMs="   lambda sudoku lcss small test testsmall gc_bench nperm fibheap treejoin knightstour nqueens "
-AllBMs=" lambda sudoku lcss small testsmall test treejoin fibheap"
+AllBMs=" nperm small testsmall test treejoin fibheap lambda sudoku lcss "
 help()
 {
     echo ""
@@ -95,8 +95,8 @@ fi
 
 for bm in $BMs
 do
-    for opt in gc-plain gc-live
-    #for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    #for opt in gc-plain gc-live
+    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
     do 
      	echo "Processing $bm [$opt]"
      	$DIR/gen_gc_stats.sh $OPTARG \
