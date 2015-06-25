@@ -7,6 +7,7 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/strong_components.hpp>
 #include<boost/tokenizer.hpp>
+#include <ctime>
 //#include <boost/filesystem.hpp>
 
 #include "Demands.h"
@@ -14,12 +15,21 @@
 using namespace Scheme::Demands;
 
 
+//#define __DEBUG__GC
+#undef __DEBUG__GC
+#ifdef __DEBUG__GC
+#define DBG(stmt) stmt
+#else
+#define DBG(stmt) (void)0
+#endif
+
 extern demand_grammar gLivenessData;
 extern std::string outdir;
 
 static unsigned long state_counter = 0;
 
 std::map<std::string, bool> nfa_changed;
+std::map<std::string, std::unordered_set<std::string> > eps_closure_map;
 
 static std::unordered_set<std::string> marked_states;
 static std::unordered_map<std::string, automaton> nfa_map;
@@ -703,6 +713,15 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::ma
 
 std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa)
 {
+	if (eps_closure_map.find(state) != eps_closure_map.end())
+	{
+		//std::cout << "Returning cached value for "<< state << std::endl;
+		return eps_closure_map[state];
+	}
+
+	clock_t start, end;
+	double cpuTime;
+	start = clock();
 
 	std::unordered_set<std::string> eps_closure;
 	eps_closure.insert(state);
@@ -748,6 +767,10 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		nfa->first.insert(state);
 	}
 
+	eps_closure_map[state] = eps_closure;
+	end = clock();
+	cpuTime= (end - start) / (CLOCKS_PER_SEC);
+	DBG(std::cout << "Time taken to calculate epsilon closure for state " << state << " is " << cpuTime << std::endl);
 	//std::cout << "Finished epsilon closure for " << state << std::endl;
 	return eps_closure;
 }
@@ -840,8 +863,9 @@ bool replaceEdgesWithEpsilonEdge(automaton* nfa, std::pair<std::string, transiti
 			}
 			//std::cout << "Processed bar edge for " << src << std::endl;
 			changed = true;
+
 			//This is not correct. It should be the start state of the automaton being processed
-			//nfa_changed[src] = true;
+			nfa_changed[src] = true;
 
 		}
 
@@ -863,7 +887,7 @@ bool barEdgeSimplification(automaton *nfa)
 //		std::cerr << "Processing " << ts.first << std::endl;
 //		if (nfa_changed[ts.first])
 		{
-//			std::cerr << "Simplifying " << ts.first << std::endl;
+			DBG(std::cerr << "Simplifying " << ts.first << std::endl);
 			bool t1 = replaceEdgesWithEpsilonEdge(nfa, ts, trans, T0b, T0);
 			bool t2 = replaceEdgesWithEpsilonEdge(nfa, ts, trans, T1b, T1);
 			changed = t1 || t2 || changed;
@@ -875,14 +899,23 @@ bool barEdgeSimplification(automaton *nfa)
 
 bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton *nfa)
 {
+
 	bool changed = false;
 	std::unordered_set<std::string> reachable_states;
 	int i = 0;
 	std::cout << "starting removal of epsilon edges" << std::endl;
+	std::cout << "Number of states to process " << start_states.size() << std::endl;
+	eps_closure_map.clear();
+
 	for(auto non_terminal: start_states)
 	{
+		clock_t start, end;
+		double cpuTime;
+		start = clock();
+
 		++i;
-		//std::cout << "Processing non terminal " << non_terminal << std::endl;
+		DBG(std::cout << "Processing non terminal " << non_terminal << std::endl);
+		DBG(std::cout << "Processing terminal#" << i << std::endl);
 		std::stack<std::string> states;
 		std::unordered_set<std::string> processed;
 		states.push(non_terminal);
@@ -935,13 +968,18 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 				}
 			}
 		}
-		//std::cout << "Completed epsilon removal for " << non_terminal << std::endl;
+		end = clock();
+	    cpuTime= (end - start) / (CLOCKS_PER_SEC);
+	    DBG(std::cout << "Time taken for epsilon removal of terminal " << non_terminal << " is " << cpuTime << std::endl);
+		DBG(std::cout << "Completed epsilon removal for " << non_terminal << std::endl);
 		//std::cerr << "The set of reachable states from " << non_terminal << std::endl;
 		//printSetofStates(reachable_states);
 	}
 	std::cout << "Completed processing all non_terminals" << std::endl;
 	removeUnreachableStates(reachable_states, nfa);
 	std::cout << "Removed unreachable states" << std::endl;
+
+
 
 	return changed;
 }
@@ -955,8 +993,9 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
 		changed = true;
 		std::cerr<< "Starting " << i <<"th round of simplification"<<std::endl;
 
-		bool changed1 = removeEpsilonEdges(start_states, nfa);
+
 		bool changed2 = barEdgeSimplification(nfa);
+		bool changed1 = removeEpsilonEdges(start_states, nfa);
 
 		DBG(std::cerr << "Things changed in baredgesimplification "<<changed2<<std::endl);
 		DBG(std::cerr << "Things changed in epsilonedgeremoval "<<changed1<<std::endl);

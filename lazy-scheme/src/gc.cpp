@@ -402,13 +402,13 @@ cons* deep_copy(cons* node, int gc_type, ostream& out)
 		//This should always return D/all
 		assert(got != statemap.end());
 		cerr << "Doing LGC with state D/all for node " << node << " state = " << got->second << endl;
-		return followpaths(node, got->second);
+		return followpaths(node, got->second, out);
 	}
 	return NULL;
 }
 
 
-cons* copy(cons* node)
+cons* copy(cons* node, ostream& out)
 {
 	void *addr;
 	if(node == NULL)
@@ -1135,86 +1135,8 @@ void end_GC_dump()
 	 //gcout.close();
 	++gccount;
 }
-//gc_type : 0 --> gc-plain
-//          1 --> gc-live
-void update_heap_ref_stack(ostream& out, int gc_type)
-{
-	stack<cons*> temp;
-
-	while(!print_stack.empty())
-	{
-		cons* heap_ref = print_stack.top();
-		if (gc_type == 0)
-		{
-			followpaths_reachability(heap_ref);
-			heap_ref = static_cast<cons*>(heap_ref->forward);
-		}
-		else if (heap_ref)
-		{
-			if (heap_ref->forward == NULL)
-			{
-				cons* new_ref;
-				if (gc_type == 1 && (heap_ref->typecell == consExprClosure))
-				{
-
-					if (heap_ref->val.cell.can_delete_car == false)
-					{
-						//If it is liveness based GC and we are copying a cons cell then check for can_delete_car flag
-						//whether to copy the cdr part or not
-
-						new_ref = copy(heap_ref);
-						GC_STAT_UPDATE_LAST_GC(new_ref);
-						//Should we count this during garbage collection?
-
-						cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type, out);
-						new_ref->val.cell.cdr = static_cast<cons*>(cdr_ref);
-					}
-				}
-				else
-				{
-					new_ref = deep_copy(heap_ref, gc_type, out);
-				}
-			}
-			heap_ref = static_cast<cons*>(heap_ref->forward);
-		}
-		temp.push(heap_ref);
-		print_stack.pop();
-	}
-
-	while(!temp.empty())
-	{
-		print_stack.push(temp.top());
-		temp.pop();
-	}
-
-
-	int i = 0;
-	while(!update_heap_refs.empty())
-	{
-		cons* heap_ref = update_heap_refs.top();
-		if (heap_ref->forward == NULL && !is_valid_address(heap_ref))
-		{
-			cerr << "ERROR !!!! " << heap_ref << endl;
-			cerr << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
-			assert(false);
-		}
-		DBG(cerr << "Updating heap ref " << heap_ref << " to " << heap_ref->forward << endl);
-		heap_ref = static_cast<cons*>(heap_ref->forward);
-		temp.push(heap_ref);
-		update_heap_refs.pop();
-		++i;
-	}
-	while(!temp.empty())
-	{
-		update_heap_refs.push(temp.top());
-		temp.pop();
-	}
-
-}
 
 //garbage collector functions
-
-
 
 int copy_scan_children_lgc(cons* node)
 {
@@ -1507,11 +1429,91 @@ void print_sharing_stats()
 
 #ifdef LIVENESS_DFS
 #ifdef _OPT_TIME
+//Reachability for closures
+//gc_type : 0 --> gc-plain
+//          1 --> gc-live
+void update_heap_ref_stack(ostream& out, int gc_type)
+{
+	stack<cons*> temp;
+
+	while(!print_stack.empty())
+	{
+		cons* heap_ref = print_stack.top();
+		if (gc_type == 0)
+		{
+			followpaths_reachability(heap_ref);
+			heap_ref = static_cast<cons*>(heap_ref->forward);
+		}
+		else if (heap_ref)
+		{
+			if (heap_ref->forward == NULL)
+			{
+				cons* new_ref;
+				if (gc_type == 1 && (heap_ref->typecell == consExprClosure))
+				{
+
+					if (heap_ref->val.cell.can_delete_car == false)
+					{
+						//If it is liveness based GC and we are copying a cons cell then check for can_delete_car flag
+						//whether to copy the cdr part or not
+
+						new_ref = copy(heap_ref);
+						GC_STAT_UPDATE_LAST_GC(new_ref);
+						//Should we count this during garbage collection?
+
+						cons* cdr_ref = deep_copy(heap_ref->val.cell.cdr, gc_type, out);
+						new_ref->val.cell.cdr = static_cast<cons*>(cdr_ref);
+					}
+				}
+				else
+				{
+					new_ref = deep_copy(heap_ref, gc_type, out);
+				}
+			}
+			heap_ref = static_cast<cons*>(heap_ref->forward);
+		}
+		temp.push(heap_ref);
+		print_stack.pop();
+	}
+
+	while(!temp.empty())
+	{
+		print_stack.push(temp.top());
+		temp.pop();
+	}
+
+
+	int i = 0;
+	while(!update_heap_refs.empty())
+	{
+		cons* heap_ref = update_heap_refs.top();
+		if (heap_ref->forward == NULL && !is_valid_address(heap_ref))
+		{
+			cerr << "ERROR !!!! " << heap_ref << endl;
+			cerr << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
+			assert(false);
+		}
+		DBG(out << "Updating heap ref " << heap_ref << " to " << heap_ref->forward << endl);
+		heap_ref = static_cast<cons*>(heap_ref->forward);
+		temp.push(heap_ref);
+		update_heap_refs.pop();
+		++i;
+	}
+	while(!temp.empty())
+	{
+		update_heap_refs.push(temp.top());
+		temp.pop();
+	}
+
+}
+
+
+
 void liveness_gc()
 {
 	clock_t pstart = clock();
 	 ++gccount;
-//	 cerr << "Starting LGC#"<<gccount<<endl;
+	 cerr << "Starting LGC#"<<gccount<<endl;
 #ifdef ENABLE_SHARING_STATS
 	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
 			  ((cons*)i)->visited = 0;
@@ -1523,9 +1525,9 @@ void liveness_gc()
 #ifdef __DEBUG__GC
 	  ofstream pre("GC" + to_string(gccount) + ".txt", ios_base::out);
 	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
-	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
-	  create_heap_bft(pregc);
-	  pregc.close();
+//	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
+//	  create_heap_bft(pregc);
+//	  pregc.close();
 	  print_activation_record_stack(pre);
 #else
 	  ostream &pre = null_stream;
@@ -1554,7 +1556,7 @@ void liveness_gc()
     		  DBG(pre << "Index is " << ((cons*)vhit->ref - (cons*)buffer_dead) << endl);
     		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second, pre);
     		  vhit->ref = addr;
-
+    		  DBG(pre << "Copied " << ((cons*)freept - (cons*)buffer_live) << " cells"<<endl);
 
 #ifdef ENABLE_SHARING_STATS
     		  if (vhit->ref)
@@ -1572,12 +1574,13 @@ void liveness_gc()
   DBG(pre << "Completed liveness GC" << endl);
   update_heap_ref_stack(pre, 1);
   DBG(pre << "Number of cells copied " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
+  cerr << "Number of cells copied " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl;
   clear_live_buffer(pre);
 #ifdef __DEBUG__GC
 	pre.close();
-	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
-	create_heap_bft(postgc);
-	postgc.close();
+//	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
+//	create_heap_bft(postgc);
+//	postgc.close();
 #endif
 #ifdef ENABLE_SHARING_STATS
   print_sharing_stats();
@@ -1596,7 +1599,7 @@ void liveness_gc()
 cons* followpaths(cons* loc, state_index index, ostream& out)
 {
 
-	DBG(out<<"Entering followpaths"<<endl);
+//	DBG(out<<"Entering followpaths"<<endl);
 	if (NULL == loc)
 		return loc;
 
@@ -1650,7 +1653,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 	  {
 		  loccopy = copy(loc, out);
 
-		  DBG(out << "Copiedcell from " << loc << " with type " << loc->typecell << " to "<< loccopy << endl);
+		  DBG(out << "Copied cell from " << loc << " with type " << loc->typecell << " to "<< loccopy << endl);
 		  DBG(out << "state index is " << index << endl);
 		  DBG(out << "Copying cell with index " << (loc - getbufferlive()) << endl);
 
@@ -1682,6 +1685,79 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 }
 #else
 //Liveness GC with liveness for closures
+
+////For LGC for closures////////////////////
+
+//gc_type : 0 --> gc-plain
+//          1 --> gc-live
+void update_heap_ref_stack(ostream& out, int gc_type)
+{
+	stack<cons*> temp;
+
+	while(!print_stack.empty())
+	{
+		cons* heap_ref = print_stack.top();
+		if (gc_type == 0)
+		{
+			followpaths_reachability(heap_ref);
+			heap_ref = static_cast<cons*>(heap_ref->forward);
+		}
+		else if (heap_ref)
+		{
+			//Copy heap_ref using liveness of closures. Maybe we can re-use the followpaths function
+			//Make everything live
+			DBG(out << "Processing heap_ref " <<heap_ref<< " with type "<< heap_ref->typecell <<endl);
+			if (heap_ref->typecell != consExprClosure)
+			{
+				auto liveness_state = statemap.find("L/-1/c");
+				cons* new_ref = followpaths(heap_ref, liveness_state->second, out);
+				heap_ref = static_cast<cons*>(heap_ref->forward);
+			}
+			else if (heap_ref->val.cell.can_delete_car == false)
+			{
+				cons* new_ref = copy(heap_ref);
+				auto liveness_state = statemap.find("L/-1/c");
+				cons* new_cdr = followpaths(heap_ref->val.cell.cdr, liveness_state->second, out);
+				new_ref->val.cell.cdr = new_cdr;
+				heap_ref = static_cast<cons*>(heap_ref->forward);
+			}
+
+		}
+		temp.push(heap_ref);
+		print_stack.pop();
+	}
+
+	while(!temp.empty())
+	{
+		print_stack.push(temp.top());
+		temp.pop();
+	}
+
+
+	int i = 0;
+	while(!update_heap_refs.empty())
+	{
+		cons* heap_ref = update_heap_refs.top();
+		if (heap_ref->forward == NULL && !is_valid_address(heap_ref))
+		{
+			cerr << "ERROR !!!! " << heap_ref << endl;
+			cerr << "In heap ref stack copying " << (heap_ref - (cons*)buffer_dead) << " with index " << i << endl;
+			assert(false);
+		}
+		DBG(out << "Updating heap ref " << heap_ref << " to " << heap_ref->forward << endl);
+		heap_ref = static_cast<cons*>(heap_ref->forward);
+		temp.push(heap_ref);
+		update_heap_refs.pop();
+		++i;
+	}
+	while(!temp.empty())
+	{
+		update_heap_refs.push(temp.top());
+		temp.pop();
+	}
+
+}
+
 void liveness_gc()
 {
 	clock_t pstart = clock();
@@ -1698,9 +1774,9 @@ void liveness_gc()
 #ifdef __DEBUG__GC
 	  ofstream pre("GC" + to_string(gccount) + ".txt", ios_base::out);
 	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
-	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
-	  create_heap_bft(pregc);
-	  pregc.close();
+//	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
+//	  create_heap_bft(pregc);
+//	  pregc.close();
 	  print_activation_record_stack(pre);
 #else
 	  ostream &pre = null_stream;
@@ -1710,17 +1786,20 @@ void liveness_gc()
 
   for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
     {
-	  cerr << "Processing function " << stackit->funcname << endl;
+//	  DBG(cerr << "Processing function " << stackit->funcname << endl);
 	  for(vector<var_heap>::iterator vhit = stackit->heapRefs.begin(); vhit != stackit->heapRefs.end(); ++vhit)
       {
-    	  cerr << "Doing gc at return point " << stackit->return_point << endl;
+		  DBG(pre << "Doing gc at return point " << stackit->return_point << endl);
 		  string nodeName = "L/" + stackit->return_point + "/" + vhit->varname;
     	  stateMapIter got = statemap.find(nodeName);
-    	  cerr << "Looking up " << nodeName << endl;
+    	  DBG(pre << "Looking up " << nodeName << endl);
     	  if (got != statemap.end())
     	  {
-    		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second);
+    		  DBG(pre << "Processing var " << vhit->varname << endl);
+    		  DBG(pre << "Index is " << ((cons*)vhit->ref - (cons*)buffer_dead) << endl);
+    		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second, pre);
     		  vhit->ref = addr;
+    		  DBG(pre << "Copied " << ((cons*)freept - (cons*)buffer_live) << " cells"<<endl);
 
 #ifdef ENABLE_SHARING_STATS
     		  if (vhit->ref)
@@ -1729,16 +1808,16 @@ void liveness_gc()
     	  }
       }
     }
-  cerr << "Completed liveness GC" << endl;
+  DBG(pre << "Completed liveness GC" << endl);
   update_heap_ref_stack(pre, 1);
   clear_live_buffer(pre);
-  cerr << "Copied " << numcopied << " cells" << endl;
+  DBG(pre << "Copied " << numcopied << " cells" << endl);
   numcopied = 0;
 #ifdef __DEBUG__GC
 	pre.close();
-	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
-	create_heap_bft(postgc);
-	postgc.close();
+//	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
+//	create_heap_bft(postgc);
+//	postgc.close();
 #endif
 #ifdef ENABLE_SHARING_STATS
   print_sharing_stats();
@@ -1751,9 +1830,11 @@ void liveness_gc()
   return;
 }
 
-cons* followpaths(cons* loc, state_index index)
+cons* followpaths(cons* loc, state_index index, ostream& out)
 {
-  cons* loccopy = copy(loc);
+
+  cons* loccopy = copy(loc, out);
+//  DBG(out << "Copied " << loc << "-->"<<loccopy<<endl);
 #ifdef ENABLE_SHARING_STATS
   if (loccopy)
 	  ++(((cons*)loccopy)->visited);
@@ -1766,11 +1847,15 @@ cons* followpaths(cons* loc, state_index index)
   {
   case consExprClosure :
   {
+	  DBG(out << "Copying cell from " << loc << " with type " << loc->typecell << endl);
+ 	  DBG(out << "state index is " << index << endl);
+
 	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
 	  if (a0 > 0)
 	  {
+		  DBG(out<<"Copying car part"<<endl);
 		  cons* newloc = getCar(loc, 1);
-		  cons* addr = followpaths(newloc, a0);
+		  cons* addr = followpaths(newloc, a0, out);
 		  set_car(loccopy, addr);
 	  }
 
@@ -1778,8 +1863,9 @@ cons* followpaths(cons* loc, state_index index)
 	  state_index a1 = state_transition_table[index][1];//get_target_dfastate(index, 1);
 	  if (a1 > 0)
 	  {
+		  DBG(out<<"Copying cdr part"<<endl);
 		  cons* newloc = getCdr(loc, 1);
-		  cons* addr = followpaths(newloc, a1);
+		  cons* addr = followpaths(newloc, a1, out);
 		  set_cdr(loccopy, addr);
 	  }
   }
@@ -1798,8 +1884,9 @@ cons* followpaths(cons* loc, state_index index)
 	  if (liveness_state != statemap.end())
 	  {
 	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
-	  	  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
+	  	  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second, out);
 	  	  loccopy->val.closure.arg1 = new_arg1;
+	  	  DBG(out << "Copied arg1 from " << loccopy->val.closure.arg1 << " to " << new_arg1 <<endl);
 	  }
   }
   break;
@@ -1811,8 +1898,9 @@ cons* followpaths(cons* loc, state_index index)
 	  if (liveness_state != statemap.end())
 	  {
 	    // cerr << "Doing GC corresponding to " << liveness_string << endl;
-		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
+		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second, out);
 		  loccopy->val.closure.arg1 = new_arg1;
+		  DBG(out << "Copied arg1 from " << loccopy->val.closure.arg1 << " to " << new_arg1 <<endl);
 	  }
 	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
 
@@ -1820,8 +1908,9 @@ cons* followpaths(cons* loc, state_index index)
 	  if (liveness_state != statemap.end())
 	  {
 	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
-		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
+		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second, out);
 		  loccopy->val.closure.arg2 = new_arg2;
+		  DBG(out << "Copied arg2 from " << loccopy->val.closure.arg2 << " to " << new_arg2 <<endl);
 	  }
   }
   break;
@@ -1835,8 +1924,9 @@ cons* followpaths(cons* loc, state_index index)
 	  if (liveness_state != statemap.end())
 	  {
 	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
-		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second);
+		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second, out);
 		  loccopy->val.closure.arg2 = new_arg2;
+		  DBG(out << "Copied arg2 from " << loccopy->val.closure.arg2 << " to " << new_arg2 <<endl);
 	  }
 
 	  if (loccopy->val.closure.arg1 != NULL)
@@ -1844,8 +1934,9 @@ cons* followpaths(cons* loc, state_index index)
 		  //More arguments exist and have to be copied
 		  auto liveness_state = statemap.find("L/-1/c");
 		  //Using dummy state to always make it live
-		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second);
+		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second, out);
 		  loccopy->val.closure.arg1 = new_arg1;
+		  DBG(out << "Copied arg1 from " << loccopy->val.closure.arg1 << " to " << new_arg1 <<endl);
 	  }
   }
   break;
@@ -2675,13 +2766,7 @@ int is_valid_address(void* addr)
 	bool is_valid = ((addr >= buffer_live) && (addr < boundary_live));
 	if (addr == NULL)
 		is_valid = true;
-	else
-	if (!is_valid)
-	{
-		DBG(cout << "Invalid address " << addr  << " at index " << ((cons*)addr - (cons*)buffer_live) << endl);
-		DBG(assert(is_valid));
 
-	}
 	return is_valid;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////

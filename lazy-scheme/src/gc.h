@@ -165,10 +165,10 @@ typedef struct activationRecord
  void print_gc_move(cons* from, cons* to, ostream& out = null_stream);
  void clear_live_buffer(ostream& out = null_stream);
 #else
- cons* copy(cons* node);
+ cons* copy(cons* node, ostream& out = null_stream);
  cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
  cons* followpaths_reachability(cons* loc);
- cons* followpaths(cons* loc, state_index index);
+ cons* followpaths(cons* loc, state_index index, ostream& out = null_stream);
  void print_gc_move(cons* from, cons* to);
 #endif
 
