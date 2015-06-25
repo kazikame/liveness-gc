@@ -13,7 +13,7 @@ all : depend scheme.tab.h $(TARGET)
 
 OBJS = gc.o  parser.o lexer.o \
 	SchemeDriver.o SchemeAST_Print.o SchemeAST_ANFs.o \
-	SchemeAST_Demands.o SchemeAST_Defs.o Output.o Demands.o
+	SchemeAST_Demands.o SchemeAST_Defs.o Output.o Demands.o OptDemands.o
 
 $(TARGET): $(OBJS) $(TARGET).o 
 	$(CPP) -o $(TARGET) $(CPPFLAGS) $(TARGET).o $(OBJS)
@@ -29,11 +29,12 @@ lexer.cpp: scheme.l parser.o SchemeScanner.hpp
 format:
 	astyle -A14Ck2M56nNSQW2xC96 *.cpp *.h *.hpp
 
+.PHONY: clean remove
 clean: remove
-	rm -rf $(TARGET) 
+	rm -rf $(TARGET) $(TARGET)_Stats
 
 remove:
-	rm -rf *~ *.ghc
+	rm -rf *~ *.ghc 
 	rm -rf *.o scheme_lexer.cc parser.cpp
 	rm -rf location.hh position.hh stack.hh
 	rm -rf scheme.tab.h scheme.tab.c scheme.output
