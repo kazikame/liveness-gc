@@ -907,6 +907,9 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 	std::cout << "starting removal of epsilon edges" << std::endl;
 	std::cout << "Number of states to process " << start_states.size() << std::endl;
 	eps_closure_map.clear();
+	//Moved processed list one level higher to avoid recalculating the
+	//the epsilon closures
+	std::unordered_set<std::string> processed;
 
 	for(auto non_terminal: start_states)
 	{
@@ -918,7 +921,7 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 		DBG(std::cout << "Processing non terminal " << non_terminal << std::endl);
 		DBG(std::cout << "Processing terminal#" << i << std::endl);
 		std::stack<std::string> states;
-		std::unordered_set<std::string> processed;
+//		std::unordered_set<std::string> processed;
 		states.push(non_terminal);
 		std::ostream &out = std::cerr;
 		//std::cerr << "Processing non_terminal " << non_terminal << std::endl;
