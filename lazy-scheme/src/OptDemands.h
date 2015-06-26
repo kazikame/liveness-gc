@@ -13,15 +13,6 @@
 namespace Scheme {
 
 namespace OptDemands {
-
-//#define __DEBUG__GC
-//#undef DBG
-#ifdef __DEBUG__GC
-#define DBG(stmt) stmt
-#else
-#define DBG(stmt) (void)0
-#endif
-
 typedef std::unordered_map<int, std::unordered_set<int>> transitions;
 typedef std::unordered_map<int, transitions> state_transitions;
 typedef std::pair<

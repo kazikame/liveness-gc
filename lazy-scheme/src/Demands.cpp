@@ -989,21 +989,19 @@ Scheme::OptDemands::automaton* toINFA(const automaton *nfa,
 	}
     
 	for(auto s:start_states) {
-		if (st2idx.find(s) != st2idx.end())
-            continue;
-        idx2st.push_back(s);
-        st2idx[s] = cstate++;
-        
+		if (st2idx.find(s) == st2idx.end()) {
+            idx2st.push_back(s);
+            st2idx[s] = cstate++;
+        }
         istart_states.insert(st2idx.at(s));
     }
     
     std::unordered_set<int> final_states;
 	for(auto s:nfa->first) {
-		if (st2idx.find(s) != st2idx.end())
-            continue;
-        idx2st.push_back(s);
-        st2idx[s] = cstate++;
-        
+		if (st2idx.find(s) == st2idx.end()) {
+            idx2st.push_back(s);
+            st2idx[s] = cstate++;
+        }
         final_states.insert(st2idx.at(s));
     }
     
@@ -1062,7 +1060,7 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
     std::unordered_set<int> istart_states;
     Scheme::OptDemands::automaton* infa = toINFA(nfa, start_states, istart_states);
     infa = Scheme::OptDemands::simplifyNFA(istart_states, infa);
-    return fromINFA(infa);
+    nfa = fromINFA(infa);
 #else
 	while(changed)
 	{
@@ -1077,8 +1075,8 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
         changed = changed1 || changed2;
         std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
     }
-	return nfa;
 #endif
+	return nfa;
 }
 
 
