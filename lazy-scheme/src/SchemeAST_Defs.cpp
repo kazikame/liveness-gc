@@ -517,7 +517,7 @@ LetExprNode * LetExprNode::clone() const
 cons* LetExprNode::evaluate()
 {
 	curr_return_addr = getLabel();
-	DBG(cerr << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl);
+//	DBG(cerr << "Processing let variable " << this->pID->getIDStr() << " at label" << getLabel() <<  endl);
 //	cout << "Pointing to " << static_cast<cons*>(getfree()) << endl;
 #ifdef __MYDEBUG 
 //	cout << "Processing let variable " << this->pID->getIDStr() << " at label " << getLabel() <<  endl;
@@ -704,13 +704,13 @@ cons* UnaryPrimExprNode::evaluateCarExpr()
 {
 
 	cons* heap_cell = update_heap_refs.top();
-	DBG(cerr << "Evaluating car expression for " << heap_cell << endl);
+//	DBG(cerr << "Evaluating car expression for " << heap_cell << endl);
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	else
 	{
 		update_heap_refs.push(heap_cell->val.closure.arg1);
-		DBG(cerr << "Evaluating argument 1 for " << heap_cell->val.closure.arg1 << endl);
+//		DBG(cerr << "Evaluating argument 1 for " << heap_cell->val.closure.arg1 << endl);
 		cons* temp = reduceParamToWHNF(heap_cell->val.closure.arg1);
 
 		assert(temp->inWHNF);
@@ -789,7 +789,7 @@ cons* UnaryPrimExprNode::evaluateCdrExpr()
 // that the expression is representing
 cons* UnaryPrimExprNode::evaluateNullqExpr()
 {
-	DBG(cerr << "Evaluating nullq expression"<<endl);
+//	DBG(cerr << "Evaluating nullq expression"<<endl);
 	cons* heap_cell = update_heap_refs.top();
 	if (heap_cell->inWHNF)
 		return heap_cell;
@@ -882,6 +882,7 @@ BinaryPrimExprNode::BinaryPrimExprNode(const std::string name, ExprNode * arg1, 
 	else if (strcmp(primop, "<") == 0) this->type = ltExpr;
 	else if (strcmp(primop, ">") == 0) this->type = gtExpr;
 	else if ((strcmp(primop, "=") == 0) || (strcmp(primop, "eq?") == 0)) this->type = eqExpr;
+	//else if (strcmp(primop, "cons") == 0) this->type = consExpr;
 	else if (strcmp(primop, "cons") == 0) this->type = consExpr;
 }
 
@@ -923,15 +924,26 @@ cons* BinaryPrimExprNode::make_closure()
 {
 	cons* retval = (cons*) allocate_cons();
 
-	retval->val.closure.arg1 = pArg1->make_closure();
-	retval->val.closure.arg2 = pArg2->make_closure();
-	retval->val.closure.expr = this;
-	retval->typecell = binaryprimopExprClosure;
-	retval->inWHNF = false;
-	retval->val.closure.arg1_name = new string((static_cast<IdExprNode*>(this->pArg1))->getIDStr());
-	retval->val.closure.arg2_name = new string((static_cast<IdExprNode*>(this->pArg2))->getIDStr());
-	retval->val.closure.prog_pt = new string(curr_return_addr);
-	retval->closure_id = ++closure_count;
+	if (type != consExpr)
+	{
+		retval->val.closure.arg1 = pArg1->make_closure();
+		retval->val.closure.arg2 = pArg2->make_closure();
+		retval->val.closure.expr = this;
+		retval->typecell = binaryprimopExprClosure;
+		retval->inWHNF = false;
+		retval->val.closure.arg1_name = new string((static_cast<IdExprNode*>(this->pArg1))->getIDStr());
+		retval->val.closure.arg2_name = new string((static_cast<IdExprNode*>(this->pArg2))->getIDStr());
+		retval->val.closure.prog_pt = new string(curr_return_addr);
+		retval->closure_id = ++closure_count;
+	}
+	else
+	{
+		retval->val.cell.car = pArg1->make_closure();
+		retval->val.cell.cdr = pArg2->make_closure();
+		retval->typecell = consExprClosure;
+		retval->inWHNF = true;
+		retval->closure_id = ++closure_count;
+	}
 
 	return retval;
 }
@@ -944,7 +956,7 @@ cons* BinaryPrimExprNode::evaluateCons()
 	if (heap_cell->inWHNF)
 		return heap_cell;
 
-	assert(is_valid_address(heap_cell->val.closure.arg1) && is_valid_address(heap_cell->val.closure.arg2));
+	//assert(is_valid_address(heap_cell->val.closure.arg1) && is_valid_address(heap_cell->val.closure.arg2));
 	heap_cell->inWHNF = true;
 	heap_cell->typecell = consExprClosure;
 	heap_cell->val.cell.car = heap_cell->val.closure.arg1;

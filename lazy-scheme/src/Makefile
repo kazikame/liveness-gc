@@ -1,5 +1,5 @@
 CPP= g++
-
+export CPATH=/usr/inlcude/c++/4.8.4
 EXTRA_FLAGS= -Wno-sign-compare -Wno-reorder -Wno-unused -Werror
 OBJ_FLAGS=-c
 DBG_FLAGS=-g
