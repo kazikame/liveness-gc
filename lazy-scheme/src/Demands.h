@@ -14,6 +14,9 @@ namespace Scheme {
 
 namespace Demands {
 
+
+
+
 typedef std::list<std::string> path;
 typedef boost::unordered_set<path> rule;
 typedef std::unordered_map<std::string, rule> demand_grammar;
@@ -64,7 +67,7 @@ automaton* getNFAsFromRegularGrammar(const demand_grammar* gram, const std::stri
 automaton * getNFAsFromRegCFG(const regular_demand_grammar *); //This does not share the automatons created
 void printNFAToFile(automaton *nfa, std::string filename);
 automaton* simplifyNFA(std::unordered_set<std::string> start_states, automaton *nfa);
-void printSetofStates(std::unordered_set<std::string> states);
+void printSetofStates(std::unordered_set<std::string> states, std::ostream& out=std::cerr);
 automaton* convertNFAtoDFA(std::unordered_set<std::string> start_states, automaton* nfa, const std::string);
 int writeDFAToFile(std::string pgmname, automaton* dfa, std::map<std::string, std::unordered_set<std::string>>);
 

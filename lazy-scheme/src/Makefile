@@ -1,6 +1,6 @@
 CPP= g++
-
-EXTRA_FLAGS= -Wno-reorder -Wno-unused -Werror
+export CPATH=/usr/inlcude/c++/4.8.4
+EXTRA_FLAGS= -Wno-sign-compare -Wno-reorder -Wno-unused -Werror
 OBJ_FLAGS=-c
 DBG_FLAGS=-g
 PROD_FLAGS= -g
@@ -13,10 +13,10 @@ all : depend scheme.tab.h $(TARGET)
 
 OBJS = gc.o  parser.o lexer.o \
 	SchemeDriver.o SchemeAST_Print.o SchemeAST_ANFs.o \
-	SchemeAST_Demands.o SchemeAST_Defs.o Output.o Demands.o
+	SchemeAST_Demands.o SchemeAST_Defs.o Output.o Demands.o OptDemands.o
 
 $(TARGET): $(OBJS) $(TARGET).o 
-	$(CPP) -o $(TARGET) $(CFLAGS) $(TARGET).o $(OBJS)
+	$(CPP) -o $(TARGET) $(CPPFLAGS) $(TARGET).o $(OBJS)
 
 scheme.tab.h: 
 parser.cpp: scheme.y 
@@ -29,11 +29,12 @@ lexer.cpp: scheme.l parser.o SchemeScanner.hpp
 format:
 	astyle -A14Ck2M56nNSQW2xC96 *.cpp *.h *.hpp
 
+.PHONY: clean remove
 clean: remove
-	rm -rf $(TARGET) 
+	rm -rf $(TARGET) $(TARGET)_Stats
 
 remove:
-	rm -rf *~ *.ghc
+	rm -rf *~ *.ghc 
 	rm -rf *.o scheme_lexer.cc parser.cpp
 	rm -rf location.hh position.hh stack.hh
 	rm -rf scheme.tab.h scheme.tab.c scheme.output

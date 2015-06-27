@@ -21,8 +21,8 @@ using namespace Scheme::AST;
 
 
 #ifndef __DEBUG__GC
-#define __DEBUG__GC
 #undef __DEBUG__GC
+#define __DEBUG__GC
 #endif
 
 //#define REACHABILITY_BFS
@@ -89,6 +89,7 @@ extern clock_tick current_cons_tick;
 extern clock_tick gc_freq_threshold;
 
 #ifdef __DEBUG__GC
+#undef DBG
 #define DBG(stmt) stmt
 #else
 #define DBG(stmt) (void)0
@@ -165,10 +166,10 @@ typedef struct activationRecord
  void print_gc_move(cons* from, cons* to, ostream& out = null_stream);
  void clear_live_buffer(ostream& out = null_stream);
 #else
- cons* copy(cons* node);
+ cons* copy(cons* node, ostream& out = null_stream);
  cons* deep_copy(cons* node, int gc_type = 0, ostream& out = null_stream);
  cons* followpaths_reachability(cons* loc);
- cons* followpaths(cons* loc, state_index index);
+ cons* followpaths(cons* loc, state_index index, ostream& out = null_stream);
  void print_gc_move(cons* from, cons* to);
 #endif
 

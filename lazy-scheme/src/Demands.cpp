@@ -7,12 +7,22 @@
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/strong_components.hpp>
 #include<boost/tokenizer.hpp>
+#include <ctime>
 //#include <boost/filesystem.hpp>
 
 #include "Demands.h"
+#include "OptDemands.h"
 
 using namespace Scheme::Demands;
 
+
+//#define __DEBUG__GC
+#undef __DEBUG__GC
+#ifdef __DEBUG__GC
+#define DBG(stmt) stmt
+#else
+#define DBG(stmt) (void)0
+#endif
 
 extern demand_grammar gLivenessData;
 extern std::string outdir;
@@ -20,6 +30,7 @@ extern std::string outdir;
 static unsigned long state_counter = 0;
 
 std::map<std::string, bool> nfa_changed;
+std::map<std::string, std::unordered_set<std::string> > eps_closure_map;
 
 static std::unordered_set<std::string> marked_states;
 static std::unordered_map<std::string, automaton> nfa_map;
@@ -150,7 +161,8 @@ void make_fa(const std::string & start,
     }
 }
 
-void combineEpsilonEdgesFrom(const std::string & start, automaton * nfa) {
+void combineEpsilonEdgesFrom(const std::string & start, automaton * nfa)
+{
     if(marked_states.find(start) != marked_states.end())    return;
     marked_states.insert(start);
 
@@ -201,11 +213,13 @@ void combineEpsilonEdgesFrom(const std::string & start, automaton * nfa) {
 
 void markStatesNotReachingFinalFrom(const std::string & start, automaton * nfa,
                                     std::unordered_set<std::string> & marked,
-                                    std::unordered_set<std::string> & visited) {
+                                    std::unordered_set<std::string> & visited)
+{
 
 }
 
-void removeDeadStatesFrom(const std::string & start, automaton * nfa) {
+void removeDeadStatesFrom(const std::string & start, automaton * nfa)
+{
     std::unordered_map<std::string, std::unordered_set<std::string>> reverseEdges;
     for(auto & state : nfa->first)
         reverseEdges[state];
@@ -270,7 +284,8 @@ void removeDeadStatesFrom(const std::string & start, automaton * nfa) {
         else ++iter;
 }
 
-void expand_eps_closure(std::unordered_set<std::string> & eps_closure, const automaton * nfa) {
+void expand_eps_closure(std::unordered_set<std::string> & eps_closure, const automaton * nfa)
+{
     std::unordered_set<std::string> visited;
     std::list<std::string> check_list;
 
@@ -354,12 +369,44 @@ void simplifyWithoutEpsilonEdges(const std::string & start, automaton * nfa) {
 
 void removeXbEdgesFrom(automaton * nfa)
 {
-    for(auto & non_terminal : nfa->second) {
-        if(non_terminal.second.find(TXb) != non_terminal.second.end()) {
-            non_terminal.second.erase(TXb);
-            nfa->first.insert(non_terminal.first);
-        }
+
+	//This is not correct. Need to re-write.
+	std::string prev_nt = E;
+	for(auto & non_terminal : nfa->second)
+    {
+		auto Xb_transition = non_terminal.second.find(TXb);
+//
+//        if(Xb_transition != non_terminal.second.end())
+//        {
+//        	//This should handle cases like 0b2 or 1b2 is encountered.
+//        	//In such cases there can be no path hence do not add an epsilon edge
+//            if (prev_nt == T0b || prev_nt == T1b)
+//            {
+//            	non_terminal.second.erase(TXb);
+//            }
+//            else
+//            {
+//            	//For all other cases add an epsilon edge instead of the the 2 edge
+//
+//            	auto dest_states = Xb_transition->second;
+//            	non_terminal.second.erase(TXb);
+//            	(non_terminal.second[E]).insert(dest_states.begin(), dest_states.end());
+//            	//If the epsilon edge takes it to a final state, mark the current state as final
+//            	nfa->first.insert(non_terminal.first);
+//            }
+//
+//        }
+		//Currently add an epsilon edge unconditionally, and make the current state a final state
+		  if(Xb_transition != non_terminal.second.end())
+		  {
+			  DBG(std::cerr << "Replacing Xb by epsilon edge for " << non_terminal.first << std::endl);
+			  auto dest_states = Xb_transition->second;
+			  (non_terminal.second[E]).insert(dest_states.begin(), dest_states.end());
+			  non_terminal.second.erase(TXb);
+			  nfa->first.insert(non_terminal.first);
+		  }
     }
+
 }
 
 bool isTerminal(std::string sym)
@@ -419,12 +466,8 @@ automaton* Scheme::Demands::getNFAsFromRegularGrammar(const demand_grammar* gram
 
 					trans[current_state];
 					trans.at(current_state)[previousSymbol].insert(sym);
-					//if the transition loops back to the same state then add the next transition from the current state itself
-					//if (current_state != sym)
-					{
-						trans[sym + "_f"];
-						current_state = sym + "_f";
-					}
+					trans[sym + "_f"];
+					current_state = sym + "_f";
 					ispreviousSymbolTerminal=false;
 					previousSymbol=E;
 				}
@@ -450,13 +493,20 @@ void Scheme::Demands::printNFAToFile(automaton *nfa, std::string filename)
 	
 	for(auto s: trans)
 	{
+		std::string sym1;
+		if (nfa->first.find(s.first) == nfa->first.end())
+			sym1 = s.first + "--";
+		else
+			sym1 = s.first + "$--";
 	  for(auto sym: s.second)
 		{
-			std::string symbol;
-			if (nfa->first.find(s.first) == nfa->first.end())
-				symbol = s.first + "--" + sym.first + "-->";
-			else
-			  symbol = s.first + "$--" + sym.first + "-->";
+		  auto symbol = sym1;
+		  symbol = symbol + sym.first + "-->";
+//		  std::string symbol;
+//		  if (nfa->first.find(s.first) == nfa->first.end())
+//			  symbol = s.first + "--" + sym.first + "-->";
+//		  else
+//			  symbol = s.first + "$--" + sym.first + "-->";
 
 			for(auto des:sym.second)
 			{
@@ -609,17 +659,21 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::ma
 	std::map<std::string, int> st_map;
 	for(auto st_tuple : dfa->second)
 	{
-	  	state_map << st_tuple.first << ":" << std::to_string(numkeys) <<";"<<std::endl;
+	  	//std::cerr << "Adding " << st_tuple.first << " to state map" << std::endl;
+		state_map << st_tuple.first << ":" << std::to_string(numkeys) <<";"<<std::endl;
 		st_map[st_tuple.first] = numkeys;
 		auto v = splitLivenessString(st_tuple.first);
-		if (st_tuple.second.size() == 0 && 
-		    dfa->first.find(st_tuple.first) == dfa->first.end())
-		  {
-		    //If there are no transitions and it is not a final state then skip that state
-			//std::cerr << "Skipping " << st_tuple.first << std::endl;
-		    //std::cerr << st_tuple.first << std::endl;
-		    continue;
-		  }
+
+
+		if (st_tuple.second.size() == 0 &&
+			dfa->first.find(st_tuple.first) == dfa->first.end())
+		{
+			//If there are no transitions and it is not a final state then skip that state
+//			std::cerr << "Skipping " << st_tuple.first << std::endl;
+			//std::cerr << st_tuple.first << std::endl;
+			continue;
+		}
+
 		//	std::cerr << "Process liveness string " << st_tuple.first << std::endl;
 		for (auto p : prog_pt_map)
 		{
@@ -627,18 +681,20 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::ma
 		  //	std::cerr << "p.second is " << make_key1(p.second) << " && v[1] = " << v[1] << std::endl;
 
 			if (make_key1(p.second) == v[0] &&
-			    v[1].find("(") == std::string::npos
-				)
+			    v[1].find("(") == std::string::npos)
 			{
 
 				std::string state_name = "L/" + p.first + "/" + v[1];
 				state_map << state_name << ":" << std::to_string(numkeys) <<";"<<std::endl;
+//				std::cerr << "Adding " << state_name << " to state map" << std::endl;
 				st_map[state_name] = numkeys;
 			}
 		}
 		++numkeys;
 	}
 	state_map.close();
+
+
 	std::ofstream transition_table(outdir + pgmname + "/fsmdump-" + pgmname + "-state-transition-table");
 	for(auto st_tuple:dfa->second)
 	{
@@ -658,6 +714,15 @@ int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::ma
 
 std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa)
 {
+	if (eps_closure_map.find(state) != eps_closure_map.end())
+	{
+		//std::cout << "Returning cached value for "<< state << std::endl;
+		return eps_closure_map[state];
+	}
+
+	clock_t start, end;
+	double cpuTime;
+	start = clock();
 
 	std::unordered_set<std::string> eps_closure;
 	eps_closure.insert(state);
@@ -689,7 +754,8 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		eps_closure.insert(nexts.begin(), nexts.end());
 	}
 
-
+	//If a final state is part of an epsilon closure, then all states in the
+	//epsilon closure path should be marked final state
 	bool hasfinalState = false;
 	for(auto st:eps_closure)
 		if(nfa->first.find(st) != nfa->first.end())
@@ -702,6 +768,10 @@ std::unordered_set<std::string> epsilonClosure(std::string state, automaton *nfa
 		nfa->first.insert(state);
 	}
 
+	eps_closure_map[state] = eps_closure;
+	end = clock();
+	cpuTime= (end - start) / (CLOCKS_PER_SEC);
+	DBG(std::cout << "Time taken to calculate epsilon closure for state " << state << " is " << cpuTime << std::endl);
 	//std::cout << "Finished epsilon closure for " << state << std::endl;
 	return eps_closure;
 }
@@ -726,12 +796,12 @@ void removeUnreachableStates(std::unordered_set<std::string> reachable_states,  
 
 
 
-void Scheme::Demands::printSetofStates(std::unordered_set<std::string> states)
+void Scheme::Demands::printSetofStates(std::unordered_set<std::string> states, std::ostream& out)
 {
-	std::cerr<<"{";
+	out<<"{";
 	for(auto state:states)
-		std::cerr << state << ",";
-	std::cerr<<"}"<<std::endl;
+		out << state << ",";
+	out<<"}"<<std::endl;
 }
 
 
@@ -759,37 +829,54 @@ bool addTransitionsToNode(std::string src, std::string des, automaton *nfa)
 }
 
 
-bool replaceEdgesWithEpsilonEdge(std::pair<std::string, transitions> ts, state_transitions &trans, const std::string sym1, const std::string sym2)
+bool replaceEdgesWithEpsilonEdge(automaton* nfa, std::pair<std::string, transitions> ts, state_transitions &trans, const std::string sym1, const std::string sym2)
 {
 	bool changed = false;
 	auto &src = ts.first;
 	auto &tmap = ts.second;
-	if (tmap.find(sym1) != tmap.end())
+
+	if (tmap.find(sym1) == tmap.end() || tmap[sym1].empty())
+		return changed;
+
+	std::unordered_set<std::string> next = tmap[sym1];
+	for(auto s:next)
 	{
-		std::unordered_set<std::string> next = tmap[sym1];
-		if(!next.empty())
+		if (!(trans.find(s) != trans.end() && trans.at(s).find(sym2) != trans.at(s).end()))
+			continue;
+
+		std::unordered_set<std::string> des = trans.at(s)[sym2];
+		for(auto d:des)
 		{
-			for(auto s:next)
+			if(trans.at(src)[E].find(d) != trans.at(src)[E].end())
+				continue;
+
+			//Add only if the edge is not present
+			trans.at(src)[E].insert(d);
+			//							std::cerr << "Adding an epsilon edge between " << src << " & " << d << std::endl;
+
+			//TODO: SHOULD I REMOVE THIS CODE TO ADD src TO FINAL STATE LIST
+			if (nfa->first.find(d) != nfa->first.end() &&
+					nfa->first.find(src) == nfa->first.end())
 			{
-				if (trans.find(s) != trans.end() && trans.at(s).find(sym2) != trans.at(s).end())
-				{
-					std::unordered_set<std::string> des = trans.at(s)[sym2];
-					for(auto d:des)
-					{
-						if(trans.at(src)[E].find(d) == trans.at(src)[E].end())
-						{
-							//Add only if the edge is not present
-							trans.at(src)[E].insert(d);
-							changed = true;
-							nfa_changed[src] = true;
-						}
-					}
-				}
+				//Insert the src as a final state if d is a final state.
+				//								std::cerr << "Adding as final state " << src << std::endl;
+				nfa->first.insert(src);
 			}
+			//std::cout << "Processed bar edge for " << src << std::endl;
+			changed = true;
+
+			//This is not correct. It should be the start state of the automaton being processed
+			nfa_changed[src] = true;
+
 		}
+
 	}
+
+
 	return changed;
 }
+
+
 
 bool barEdgeSimplification(automaton *nfa)
 {
@@ -798,11 +885,12 @@ bool barEdgeSimplification(automaton *nfa)
 	std::cout << "Bar edge simplification started"<< std::endl;
 	for(auto ts : trans)
 	{
-		if (nfa_changed[ts.first])
+//		std::cerr << "Processing " << ts.first << std::endl;
+//		if (nfa_changed[ts.first])
 		{
-			std::cout << "Simplifying " << ts.first << std::endl;
-			bool t1 = replaceEdgesWithEpsilonEdge(ts, trans, T0b, T0);
-			bool t2 = replaceEdgesWithEpsilonEdge(ts, trans, T1b, T1);
+			DBG(std::cerr << "Simplifying " << ts.first << std::endl);
+			bool t1 = replaceEdgesWithEpsilonEdge(nfa, ts, trans, T0b, T0);
+			bool t2 = replaceEdgesWithEpsilonEdge(nfa, ts, trans, T1b, T1);
 			changed = t1 || t2 || changed;
 		}
 	}
@@ -812,17 +900,31 @@ bool barEdgeSimplification(automaton *nfa)
 
 bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton *nfa)
 {
+
 	bool changed = false;
 	std::unordered_set<std::string> reachable_states;
 	int i = 0;
 	std::cout << "starting removal of epsilon edges" << std::endl;
+	std::cout << "Number of states to process " << start_states.size() << std::endl;
+	eps_closure_map.clear();
+	//Moved processed list one level higher to avoid recalculating the
+	//the epsilon closures
+	std::unordered_set<std::string> processed;
+
 	for(auto non_terminal: start_states)
 	{
+		clock_t start, end;
+		double cpuTime;
+		start = clock();
+
 		++i;
-		//std::cout << "Processing non terminal " << non_terminal << std::endl;
+		DBG(std::cout << "Processing non terminal " << non_terminal << std::endl);
+		DBG(std::cout << "Processing terminal#" << i << std::endl);
 		std::stack<std::string> states;
-		std::unordered_set<std::string> processed;
+//		std::unordered_set<std::string> processed;
 		states.push(non_terminal);
+		std::ostream &out = std::cerr;
+		//std::cerr << "Processing non_terminal " << non_terminal << std::endl;
 
 		while(!states.empty())
 		{
@@ -836,10 +938,19 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 			for (auto s:eps_closure)
 			{
 				if (nfa->second.find(s) != nfa->second.end())
-					changed = addTransitionsToNode(curr_state, s, nfa) || changed;
+				{
+					DBG(out << "Processing epsilon edge for " << s << std::endl);
+					bool changed1 = addTransitionsToNode(curr_state, s, nfa);
+					changed = changed1 || changed;
+				}
 				//If any of the states in the epsilon closure is a final state. Set the current state also as a final state
-				if (nfa->first.find(s) != nfa->first.end())
+				if (nfa->first.find(s) != nfa->first.end() &&
+						nfa->first.find(curr_state) == nfa->first.end())
+				{
+					//std::cerr << "Setting " << curr_state << " as final" <<std::endl;
 					nfa->first.insert(curr_state);
+					changed = true;
+				}
 			}
 			//remove all epsilon transitions from the non_terminal
 			//This check is required to see if the current state has any transitions otherwise there won't be an entry in the map.
@@ -847,7 +958,8 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 			if (nfa->second.find(curr_state) != nfa->second.end())
 			{
 				auto &t = nfa->second.at(curr_state);
-				t.erase(E);
+
+				//t.erase(E); //DO NOT ERASE THE epsilon EDGE AS THE BAR EDGE REMOVAL CODE WILL KEEP ADDING IT BACK
 				for(auto ts:nfa->second.at(curr_state))
 				{
 					if(ts.first != E)
@@ -860,28 +972,155 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 				}
 			}
 		}
-		//std::cout << "Completed epsilon removal for " << non_terminal << std::endl;
+		end = clock();
+	    cpuTime= (end - start) / (CLOCKS_PER_SEC);
+	    DBG(std::cout << "Time taken for epsilon removal of terminal " << non_terminal << " is " << cpuTime << std::endl);
+		DBG(std::cout << "Completed epsilon removal for " << non_terminal << std::endl);
+		//std::cerr << "The set of reachable states from " << non_terminal << std::endl;
+		//printSetofStates(reachable_states);
 	}
 	std::cout << "Completed processing all non_terminals" << std::endl;
 	removeUnreachableStates(reachable_states, nfa);
 	std::cout << "Removed unreachable states" << std::endl;
 
+
+
 	return changed;
+}
+
+static std::unordered_map<std::string, int> st2idx;
+static std::vector<std::string> idx2st;
+int getLabel(std::string slbl) 
+{
+    if (slbl == E  ) return Scheme::OptDemands::E;
+    if (slbl == T0 ) return Scheme::OptDemands::T0;
+    if (slbl == T1 ) return Scheme::OptDemands::T1;
+    if (slbl == T0b) return Scheme::OptDemands::T0b;
+    if (slbl == T1b) return Scheme::OptDemands::T1b;
+    if (slbl == TXb) return Scheme::OptDemands::TXb;
+
+    return -1; // error
+}
+std::string getLabelStr(int lbl) 
+{
+    if (lbl == Scheme::OptDemands::E  ) return E;
+    if (lbl == Scheme::OptDemands::T0 ) return T0;
+    if (lbl == Scheme::OptDemands::T1 ) return T1;
+    if (lbl == Scheme::OptDemands::T0b) return T0b;
+    if (lbl == Scheme::OptDemands::T1b) return T1b;
+    if (lbl == Scheme::OptDemands::TXb) return TXb;
+
+    return "???"; // error
+}
+
+Scheme::OptDemands::automaton* toINFA(const automaton *nfa,
+                                      const std::unordered_set<std::string> &start_states,
+                                      std::unordered_set<int>& istart_states) 
+{
+    std::cerr << "In to INFA\n";
+    int cstate = 0; // current state
+    
+    for(auto xs:nfa->second)
+	{
+        auto s = xs.first;
+		if (st2idx.find(s) != st2idx.end())
+            continue;
+        idx2st.push_back(s);
+        st2idx[s] = cstate++;
+	}
+    
+	for(auto s:start_states) {
+		if (st2idx.find(s) != st2idx.end())
+            continue;
+        idx2st.push_back(s);
+        st2idx[s] = cstate++;
+        
+        istart_states.insert(st2idx.at(s));
+    }
+    
+    std::unordered_set<int> final_states;
+	for(auto s:nfa->first) {
+		if (st2idx.find(s) != st2idx.end())
+            continue;
+        idx2st.push_back(s);
+        st2idx[s] = cstate++;
+        
+        final_states.insert(st2idx.at(s));
+    }
+    
+    Scheme::OptDemands::state_transitions strans;
+    for (auto xs:nfa->second)
+	{
+        Scheme::OptDemands::transitions itx;
+        std::unordered_set<int> idst;
+        for (auto tx:xs.second) {
+            auto label = getLabel(tx.first);
+            for(auto dst:tx.second)
+                idst.insert(st2idx.at(dst));
+            itx[label] = idst;
+        }
+        auto s = st2idx.at(xs.first);
+        strans[s] = itx;
+    }
+    
+	Scheme::OptDemands::automaton* infa= new Scheme::OptDemands::automaton(final_states, strans);
+    return infa;
+}
+
+automaton *fromINFA(Scheme::OptDemands::automaton* infa)
+{
+    std::cerr << "In from INFA\n";
+    
+    std::unordered_set<std::string> final_states;
+	for(auto s:infa->first)
+        final_states.insert(idx2st[s]);
+
+    state_transitions strans;
+    for (auto xs:infa->second)
+	{
+        transitions itx;
+        std::unordered_set<std::string> idst;
+        for (auto tx:xs.second) {
+            auto label = getLabelStr(tx.first);
+            for(auto dst:tx.second)
+                idst.insert(idx2st[dst]);
+            itx[label] = idst;
+        }
+        auto s = idx2st[xs.first];
+        strans[s] = itx;
+    }
+    
+	automaton* nfa= new automaton(final_states, strans);
+    return nfa;
 }
 
 automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_states, automaton *nfa)
 {
 	bool changed = true;
 	int i = 1;
+#define TRYNEW 0
+#if TRYNEW
+    std::unordered_set<int> istart_states;
+    Scheme::OptDemands::automaton* infa = toINFA(nfa, start_states, istart_states);
+    infa = Scheme::OptDemands::simplifyNFA(istart_states, infa);
+    return fromINFA(infa);
+#else
 	while(changed)
 	{
-
-		std::cout<< "Starting " << i <<"th round of simplification"<<std::endl;
-		changed = removeEpsilonEdges(start_states, nfa) &&
-				  barEdgeSimplification(nfa);
-		std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
+	  changed = true;
+	  std::cerr<< "Starting " << i <<"th round of simplification"<<std::endl;
+        
+	  bool changed1 = removeEpsilonEdges(start_states, nfa);
+	  bool changed2 = barEdgeSimplification(nfa);
+        
+	  DBG(std::cerr << "Things changed in baredgesimplification "<<changed2<<std::endl);
+	  DBG(std::cerr << "Things changed in epsilonedgeremoval "<<changed1<<std::endl);
+	  changed = changed1 || changed2;
+	  std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
 	}
+
 	return nfa;
+#endif
 }
 
 
@@ -1256,24 +1495,31 @@ std::pair<rule,rule> Scheme::Demands::solveLF(std::string lf, rule demands)
 
 
 
-demand_grammar * Scheme::Demands::sanitize(demand_grammar * gram) {
+demand_grammar * Scheme::Demands::sanitize(demand_grammar * gram)
+{
     std::unordered_set<std::string> empty_non_terminals;
 
     // Fixed point iteration -- removal of all empty_non_terminals
-    do {
+    do
+    {
         std::unordered_set<std::string> new_empty_non_terminals;
 
-        for(auto non_terminal = gram->begin(); non_terminal != gram->end(); ) {
+        for(auto non_terminal = gram->begin(); non_terminal != gram->end(); )
+        {
             // For the remaining nts, remove paths which contain empty-marked nts.
-            for(auto i = non_terminal->second.begin(); i != non_terminal->second.end(); ) {
+            for(auto i = non_terminal->second.begin(); i != non_terminal->second.end(); )
+            {
                 auto flag = false;
                 for(auto & token : *i)
-                    if(empty_non_terminals.find(token) != empty_non_terminals.end()) {
+                    if(empty_non_terminals.find(token) != empty_non_terminals.end())
+                    {
                         flag = true;
                         break;
-                    } else if(token != "D/all"
+                    }
+                    else if(token != "D/all"
                               && Terminals.find(token) == Terminals.end()
-                              && gram->find(token) == gram->end()) {
+                              && gram->find(token) == gram->end())
+                    {
                         flag = true;
                         break;
                     }
@@ -1285,10 +1531,14 @@ demand_grammar * Scheme::Demands::sanitize(demand_grammar * gram) {
             }
 
             // If a non-marked nt becomes empty, mark it.
-            if(!non_terminal->second.size()) {
+            if(!non_terminal->second.size())
+            {
                 new_empty_non_terminals.insert(non_terminal->first);
+//                std::cerr << "Erasing " << non_terminal->first << std::endl;
                 gram->erase(non_terminal++);
-            } else ++non_terminal;
+            }
+            else
+            	++non_terminal;
         }
 
         // Continue iteration with the new set of marked nts.
