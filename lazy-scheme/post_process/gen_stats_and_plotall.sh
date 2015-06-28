@@ -1,8 +1,9 @@
 #!/bin/bash 
 DIR=`dirname $0`
 PROGNAME=`basename $0`
-#AllBMs="   lambda sudoku lcss small test testsmall gc_bench nperm fibheap treejoin knightstour nqueens "
-AllBMs=" nperm small testsmall test treejoin fibheap lambda sudoku lcss "
+TestBMs="  test testsmall small"
+SmallBMs=" nperm fibheap lambda sudoku lcss nqueens gc_bench "
+AllBMs="   treejoin knightstour "
 help()
 {
     echo ""
