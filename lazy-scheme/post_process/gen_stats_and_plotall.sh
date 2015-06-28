@@ -4,7 +4,7 @@ PROGNAME=`basename $0`
 TestBMs="  test testsmall small"
 SmallBMs=" nperm fibheap lambda sudoku lcss nqueens gc_bench "
 LargeBMs=" treejoin knightstour "
-AllBMs= $SMALLBMs $LargeBMs
+AllBMs="$SMALLBMs $LargeBMs"
 help()
 {
     echo ""
