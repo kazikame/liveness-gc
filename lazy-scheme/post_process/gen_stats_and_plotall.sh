@@ -3,7 +3,8 @@ DIR=`dirname $0`
 PROGNAME=`basename $0`
 TestBMs="  test testsmall small"
 SmallBMs=" nperm fibheap lambda sudoku lcss nqueens gc_bench "
-AllBMs="   treejoin knightstour "
+LargeBMs=" treejoin knightstour "
+AllBMs= $SMALLBMs $LargeBMs
 help()
 {
     echo ""
