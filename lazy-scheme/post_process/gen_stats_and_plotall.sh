@@ -1,3 +1,4 @@
+
 #!/bin/bash 
 DIR=`dirname $0`
 PROGNAME=`basename $0`
@@ -41,21 +42,19 @@ done
 
 declare -A limit
 
-#limit["sudoku"]=28940
-limit["sudoku"]=1728
-limit["fft"]=3300
+limit["nqueens"]=22729
+limit["nperm"]=27429
+limit["fibheap"]=38001
+limit["treejoin"]=1616535
+limit["sudoku"]=4075
 limit["lcss"]=22243
+limit["lambda"]=20466
+limit["gc_bench"]=204850
+limit["fft"]=3300
 limit["small"]=17
 limit["test"]=247
 limit["testsmall"]=267
-limit["gc_bench"]=131091
-limit["nperm"]=27428
-limit["fibheap"]=38200
 limit["knightstour"]=508245
-limit["treejoin"]=1800000
-limit["nqueens"]=25000
-#imit["lambda"]=20466
-limit["lambda"]=100000
 
 declare -A freq
 
