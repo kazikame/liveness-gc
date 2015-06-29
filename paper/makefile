@@ -1,5 +1,5 @@
 all: 
-	yes X | pdflatex  paper.tex; scp paper.tex as@surya:livenstrict/paper/.
+	yes X | pdflatex  paper.tex; 
 
 rel:
 	pslatex paper && bibtex paper && pslatex paper && pslatex paper && \
