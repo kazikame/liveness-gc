@@ -182,7 +182,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		std::unordered_set<std::string> start_states;
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
-		Scheme::Demands::simplifyNFA(start_states, nfa);
+		nfa = Scheme::Demands::simplifyNFA(start_states, nfa);
 		Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-simplified-nfa.txt");
 
 		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);

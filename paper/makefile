@@ -2,7 +2,7 @@ all:
 	yes X | pdflatex  paper.tex; 
 
 rel:
-	pslatex paper && bibtex paper && pslatex paper && pslatex paper && \
-                     dvips -q paper.dvi -o paper.ps && ps2pdf paper.ps
+	pdflatex paper && bibtex paper && pdflatex paper && pdflatex paper 
+
 PHONY:
 	rm paper.log paper.aux
