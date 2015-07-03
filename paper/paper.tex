@@ -383,20 +383,20 @@ it
 \begin{figure}[t]
 \footnotesize
 \begin{eqnarray*}
-   p \in \mathit{Prog} & ::= & d_1 \ldots d_n \,\, e_\mainpgm
+   p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\, e_\mainpgm
     \hspace{5em} \mbox{\em --- program}\\
-    \mathit{df} \in Fdef & ::= & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots
+    \mathit{df} \in Fdef & \!\!\!::=\!\!\! & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots
 \,\,x_n)\,\,
     e)
     \hspace{0.2em} \ \ \ \ \mbox{\em --- function definition} \\
-e \in \mathit{Expr} & ::= &
+e \in \mathit{Expr} & \!\!\!::=\!\!\! &
 \left\{\begin{array}{@{}ll@{\hspace{2em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \!\!\!\mbox{\em --- conditional} \\
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) &&\!\!\! \mbox{\em --- let
 binding} \\
        (\SRETURN\,\, x) && \!\!\!\mbox{\em --- return from function}
     \end{array}\right. \\
-s \in \mathit{Application} & ::= &
+s \in \mathit{App} & \!\!\!::=\!\!\!  &
 \left\{\begin{array}{@{}l@{\hspace{1.2em}}l}
        k & \mbox{\em --- constant (numeric or $\NIL$)}\\
        (\CONS\,\, x_1\,\, x_2) & \mbox{\em --- constructor} \\
@@ -406,7 +406,6 @@ s \in \mathit{Application} & ::= &
        (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
 and generic arithmetic} \\
        (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
-\\
        (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
     \end{array}\right.
 \end{eqnarray*}
