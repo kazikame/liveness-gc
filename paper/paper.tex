@@ -61,7 +61,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \begin{document}
 % --- Author Metadata here ---
-\conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
+%\conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
 %\CopyrightYear{2007} % Allows default copyright year (20XX) to be
 %over-ridden - IF NEED BE.
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data
@@ -151,19 +151,14 @@ decrease of  up to  y\% in  the number  of collections,  and up  to x\%
 decrease in overall garbage collection time.
 \end{abstract}
 
-% A category with the (minimum) three required fields
-\category{H.4}{Information Systems Applications}{Miscellaneous}
-%A category including the fourth, optional field follows...
-\category{D.2.8}{Software  Engineering}{Metrics}[complexity  measures,
-  performance measures]
+\category{D.3.4}{Programming Languages}{Processors}[Memory Management
+  (Garbage Collection), Optimizations]
+\category{F.3.2}{Logic and Meanings Of Programs}{Semantics of
+  Programming Languages}[Program Analysis]
 
-\terms{Theory}
+\terms{Algorithms, Languages, Theory}
 
-\keywords{ACM proceedings, \LaTeX, text tagging}
-
-By Friday, February 27 2015, 23:59 (UTC-11), submit a full paper of at
-most  12 pages (6  pages for  an Experience  Report), in  standard ACM
-conference format, including bibliography, figures, and appendices.
+\keywords{Heap Analysis, Memory Management, Garbage Collection}
 
 \section{Introduction}
 \label{sec:intro}
@@ -179,7 +174,6 @@ While  the runtime  system  of most  functional  languages includes  a
 garbage  collector  (GC)  to  efficiently  reclaim  memory,  empirical
 studies on Scheme~\cite{karkare06effectiveness} and, more importantly,
 on Haskell~\cite{rojemo96lag}
-%and Java~\cite{shaham02estimating}
 programs have shown that  GCs leave uncollected a large
 number of  memory objects that are  reachable but not  live (here {\em
   live} means the  object can potentially be used by  the program at a
@@ -201,54 +195,48 @@ later stage).  This results in unnecessary memory retention.
 %% }}
 
 \begin{figure}[t!]
-  %%%%{\color{Myblue}
   \psset{unit=1mm}
-  \begin{pspicture}(80,50)(0,-50)
-    %\psframe(80,50)(0,-50)
-    %  \begin{center}
+  \begin{pspicture}(90,48)(0,-48)
+    %\psframe(90,48)(0,-48)
     \begin{tabular}{@{}c@{}}
-      \begin{boxedminipage}{.42\textwidth}
-        {\sf
-	  \renewcommand{\arraystretch}{1}{
-	    \begin{uprogram}
-              \UFL\
-              \UNL{0} (\DEFINE\ (\length\  \pl)
-	      \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-              (\PRIM\ 1\ (\CAR\  \pl))))
-              \UNL{0}
-	      \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
-	      \UNL{1}  (\SIF~(\NULLQ \ \lista)
-	      \listb
-	      \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
-              (\CDR\  \lista)
-              \listb))))
-              \UNL{0}
-              \UNL{0} (\LET\ \px\
-              $\leftarrow$\ (\CONS\ $5$
-              %          \UNL{1}\hspace*{1.5cm}
-              (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
-	      \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
-	      \UNL{2}
-              (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
-              \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
-              (\length\ \pz))))))
-	    \end{uprogram}
-        }}
-      \end{boxedminipage}
-      \\
-      (a) Example program. \\ \\
-      \begin{minipage}{.45\textwidth}
-        %\hspace*{1cm}
-                {\includegraphics[width=1\textwidth]{motiv-example}}
-      \end{minipage}
-      \\ \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
-          (b) Memory graph at $\pi$. Thick edges denote live
-          links. Traversal \\{\white (b)} stops at edges
-          marked $\times$ during garbage collection.
-      \end{tabular}}
-    \end{tabular}
+      \psframebox{\sf
+	\renewcommand{\arraystretch}{1}{
+	  \begin{uprogram}
+            \UFL\
+            \UNL{0} (\DEFINE\ (\length\  \pl)
+	    \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
+            (\PRIM\ 1\ (\CAR\  \pl))))
+            \UNL{0}
+	    \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
+	    \UNL{1}  (\SIF~(\NULLQ \ \lista)
+	    \listb
+	    \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
+            (\CDR\  \lista)
+            \listb))))
+            \UNL{0}
+            \UNL{0} (\LET\ \px\
+            $\leftarrow$\ (\CONS\ $5$
+            (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
+	    \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
+	    \UNL{2}
+            (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
+            \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
+            (\length\ \pz))))))
+	  \end{uprogram}
+      }}
+      \\ 
+      (a) Example program. \\  \\
+%      \includegraphics[width=.45\textwidth]{motiv-example}
+      \input{mem-graph} \\ 
+      \renewcommand{\arraystretch}{.9}
+      \begin{tabular}[t]{l}
+        (b) Memory graph at $\pi$. Thick edges denote live
+        links. Traversal \\{\white (b)} stops at edges
+        marked $\times$ during garbage collection.
+      \end{tabular}
+    \end{tabular} 
   \end{pspicture}
- \vspace*{-3ex}
+  \vspace*{-3ex}
   \caption{Example Program and its Memory Graph}\label{fig:mot-example}
 \end{figure}
 
