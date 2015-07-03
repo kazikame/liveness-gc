@@ -1,8 +1,8 @@
 all: 
-	yes X | pdflatex  paper.tex; 
+	yes X | xelatex  paper.tex; 
 
 rel:
-	pdflatex paper && bibtex paper && pdflatex paper && pdflatex paper 
+	xelatex paper && bibtex paper && xelatex paper && xelatex paper 
 
 PHONY:
 	rm paper.log paper.aux
