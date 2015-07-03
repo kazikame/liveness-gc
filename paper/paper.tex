@@ -104,7 +104,7 @@ section.
 \alignauthor K. Prasanna Kumar \\
        \affaddr{IIT Bombay,}\\
        \affaddr{Mumbai 400076, India}
-       \email{prasanna@cse.iitb.ac.in}
+       \email{prasannak@cse.iitb.ac.in}
 % 2nd. author
 \alignauthor Amey Karkare\\
        \affaddr{IIT Kanpur}\\
@@ -123,31 +123,32 @@ section.
 
 
 \begin{abstract}
-We consider  the problem of reducing  the memory required  to run lazy
-first-order functional programs.  To  do this, we analyze programs for
-liveness of heap  allocated data, i.e. data that  can possibly be used
-in the future.  The accompanying garbage collector is  modified to use
-the result of the analysis to preserve only {\em live} data---a subset
-of {\em reachable data}---during  garbage collection.  This results in
-an  increase in  the garbage  reclaimed and  consequently  reduces the
-memory footprints of programs.   While this technique has already been
-shown to yield benefits  for eager first-order languages, the presence
-of  closures   at  run-time  poses  additional   challenges  for  lazy
-languages.   Closures require  changes  both in  the earlier  liveness
+We consider  the problem of reducing  the memory required to  run lazy
+first-order functional programs.  To do  this, we analyze programs for
+{\em liveness} of heap allocated data, i.e.  data that can possibly be
+used in the future.  The accompanying garbage collector is modified to
+use the  result of the analysis  to preserve only {\em  live} data---a
+subset  of {\em  reachable  data}---during  garbage collection.   This
+results  in an  increase  in the  garbage  reclaimed and  consequently
+reduces the memory  footprints of programs.  While  this technique has
+already been shown to yield  benefits for eager first-order languages,
+the presence of  closures at run-time poses  additional challenges for
+lazy languages.  Closures require changes both in the earlier liveness
 analysis for heap allocated memory  and also in the garbage collection
 scheme required to reclaim memory that is not live.
 
-We  formulate  a context-sensitive  liveness  analysis  and using  the
-results annotate each potential allocation point in the program with a
-set     of    deterministic    finite-state     automata(DFA).     The
-garbage-collector  inspects  the DFA  to  curtail reachability  during
-marking.  As a result, fewer  objects are marked (with a possibly more
-expensive  marker)  and  preserved  by the  copy  phase.   Experiments
-confirm  that  liveness-based  collection  results in  a  increase  in
-garbage  reclaimed  and  a   consequent  decrease  in  the  number  of
-collections. On  our benchmark programs, we obtain  a decrease between
-x\% and y\% in the memory size required to run programs, when compared
-to reachability-based garbage collection.
+Our  analysis  is a  context-sensitive  analysis  that annotates  each
+potential  garbage collection  point  in  the program  with  a set  of
+deterministic finite-state  automata (DFA) describing the  liveness at
+that  point.   We  also  present a  practical  implementation  of  our
+analysis in  a garbage collector.   The collector, when  invoked, uses
+the DFA set to preserve live  objects.  As a result, fewer objects are
+marked and preserved when compared  to a reachability based marking.
+Our experiments  confirm that liveness-based collection  increases the
+garbage reclaimed,  consequently decreasing the number  of collections
+on many  practical programs.  On  our benchmark programs, we  obtain a
+decrease of  up to  y\% in  the number  of collections,  and up  to x\%
+decrease in overall garbage collection time.
 \end{abstract}
 
 % A category with the (minimum) three required fields
