@@ -38,3 +38,4 @@ lazy-scheme/src/test_assert.scm
 lazy-scheme/src/test_list.scm
 lazy-scheme/src/__depends
 lazy-scheme/src/run.gnu
+paper/example-automata-eps-converted-to.pdf
