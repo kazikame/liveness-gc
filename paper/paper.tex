@@ -523,7 +523,7 @@ $H(\rho(x)) \mbox{ is } (d_1, d_2)$ & $\rho, (\rho', z, e)\!:\!S, H,
 \hline
 $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S, H, (\CAR~x)
 \rightsquigarrow
-{\color {red}\rho\oplus\rho'}, (\rho, x, (\CAR~x))\!:\!S, H, s$      &
+\rho', (\rho, x, (\CAR~x))\!:\!S, H, s$      &
 \sc{car-clo}
 \\
 \hline
@@ -534,12 +534,12 @@ $\rho', S, H[\rho(z) \mapsto H(\rho(x)) + H(\rho(y))], e$}      &
 \hline
 $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S, H, (+~x~y)
 \rightsquigarrow
-{\color {red}\rho\oplus\rho'}, (\rho, x, (+~x~y))\!:\!S, H, s$      &
+\rho', (\rho, x, (+~x~y))\!:\!S, H, s$      &
 \sc{prim-1-clo} \\
 \hline
 $H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & $\rho, S, H, (+~x~y)
 \rightsquigarrow
-{\color {red}\rho\oplus\rho'}, (\rho, x, (+~x~y))\!:\!S, H, s$      &
+\rho', (\rho, y, (+~x~y))\!:\!S, H, s$      &
 \sc{prim-2-clo} \\
 \hline
 {$\mathit{f}~\mbox{defined as}$
@@ -551,7 +551,7 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho, S, H,
 $\ell$ is a new location& {$\rho, S, H, (\LET~x\leftarrow s~\IN~e)
   \rightsquigarrow$
 $\rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s,
-    \lfloor\rho\rfloor_{FV(s){\color {red}\setminus\{x\}}}  \oplus [x \mapsto
+    \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
   \ell]\rangle], e$} &
 \sc{let} \\
 \hline
@@ -563,7 +563,7 @@ $H(\rho(x)) = 0$ & $\rho, S, H, (\SIF~x~e_1~e_2)   \rightsquigarrow
 \hline
 $H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho, S, H,
   (\SIF~x~e_1~e_2)   \rightsquigarrow
-{\color {red} \rho \oplus \rho'}, (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  s$}
+\rho', (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  s$}
 &
 \sc{if-clo} \\
 \hline
@@ -574,14 +574,11 @@ e)\!:\!S, H,
 \hline
 $H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho, S, H, (\SRETURN~x)
   \rightsquigarrow$
-${\color {red}\rho\oplus\rho'},~ (\rho, x, (\SRETURN~x))\!:\!S, H,  s$} &
+$\rho',~ (\rho, x, (\SRETURN~x))\!:\!S, H,  s$} &
 \sc{return-clo} \\
 \hline
 \end{tabular}
-\caption{A small-step semantics for the language. {\color {red} Can we
-    replace  $\rho   \oplus  \rho'$  by  $\rho'$?  Can   we  drop  the
-    $\setminus\{x\}$         in          the         {\sc         let}
-    rule?}\label{fig:lang-semantics}}
+\caption{A small-step semantics for the language. \label{fig:lang-semantics}}
 \end{center}
 \end{figure*}
 
@@ -774,20 +771,20 @@ $\NIL$}\\
 \mapsto
 x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
   new e-path terminating with $\psi$}\\
-\mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) &=&
-        \begin{array}{l l}
+\mathcal{L}((\SIF~\psi:x~e_1~e_2),\sigma,\Lfonly) &=&
+\begin{array}{l l}
                     \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
         \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
         \lbrack\lbrace \mathit{ep} \mapsto
 \{x.\epsilon\}\rbrace\rbrack,  & \mbox{if}~\sigma \ne \emptyset\\
-        \emptyset_{\cal{M}?}  & \mbox{otherwise}
+        \emptyset_{\cal{M}}  & \mbox{otherwise}
                  \end{array} \\
 &&\mbox{where $\mathit{ep}$ is a new e-path
   terminating with $\psi$}\\
 \mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-        \lambda\;\mathit{ep}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
+        \lambda\mathit{ep}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
 \mbox{where}~\mathcal{M} =
-\mathcal{L}(e,\sigma,\Lfonly),~\Lv \in
+\mathcal{L}(e,\sigma,\Lfonly),~\Lv =
 \mathcal{M}(ep),~\mbox{and}~f~\mbox{is the new function}\\
 && \makebox[0mm]{\hspace*{7cm}
  $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
@@ -808,8 +805,6 @@ x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
 \end{minipage}
   \caption{Liveness equations and judgement rule}\label{fig:live-judge}
 \end{figure*}
-
-
 
 Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
 analysis  computes  two   maps:  $\mathcal{L}(e_f,  \sigma,  \Lfonly)$
@@ -882,8 +877,42 @@ each function.   The summary  is in the  form of a  demand transformer
 that maps a demand on a call to the function to demands on each of its
 arguments.
 
-{\color{red} Proof of correctness of the liveness analysis...}
+\subsection{Correctness of liveness analysis}  
+ 
+We shall now  outline a proof of correctness  of the liveness analysis
+described earlier.   This requires  a significant modification  to the
+technique  used  in  \cite{asati14lgc}.   We shall  first  modify  the
+standard semantics. This semantics, which we shall call {\em minefield
+  semantics}, will  model a liveness based garbage  collection at each
+transition. This is done by starting from the root-set and inserting a
+special value  $\bot$ at each reference  location in the  heap that is
+reachable but not live by  our analysis.  Attempts to dereference such
+locations  during the  transition will  result in  entering  a special
+state denoted  \bang.  We shall then  show that no  program enters the
+\bang\ state.
+ 
+To set up the minefield semantics, we follow these steps:
+\begin{enumerate}
+\item Given an  demand transformer \Lfonly\  we enrich  the abstract machine
+  state  $\rho, S,  H, e$  to $\rho,  S, H,  e, \sigma,  \Sigma$. Here
+  $\sigma$ is  the demand on  the currently active function,  thus the
+  liveness $\Lv$   at $e$ is $\mathcal{L}(e_f, \sigma, \Lfonly)$, and
+  $\Sigma$ is a stack of  demands---one for each function frame pushed
+  in $S$.   Second, we  augment $Val$ with  a value $\bot$.   To model
+  strong  liveness  $\bot$ may  be  copied  freely,  including into  a
+  \CONS\ cell, but explodes  when used computationally (in a primitive
+  operation other  than a copy). Additionally we  define $GC (\Lv,
+  \Sigma) : (\rho, H, S) \rightarrow (\rho , H , S )$ which determines
+  live-reachability using $\rho$  and the $\rho$'s in $S$  as the root
+  set  and  following  links  in   $H$  only  as  far  as  allowed  by
+  \Lv\  and  $\Sigma$.   Hence  $GC  (\Lv,  \Sigma)$  replaces
+  live-unreachable  values---in  $\rho$,  in  $H$ and  the  $\rho$'s  in
+  $S$---with  $\bot$.  For  example,  if $x.\epsilon  \in \Lv$  then
+  $\rho (x) = \bot$.  Only $GC (\cdots )$ introduces $\bot$. 
+\end{enumerate}  
 
+
+ 
 
 \section{Computing liveness and its encoding as DFA}\label{sec:computing}
 Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis
@@ -900,7 +929,7 @@ arising out of $\mathit{ref}$  and $\mathcal{L}$ as the rules of a
 grammar.   But first  we modify  the rules  themselves to  a different
 form.
 
-\subsection{Modifying the liveness rules.}
+\subsection{Modifying liveness rules}
 
 The      $\mathit{ref}$     rule      for     \CONS,      shown     in
 Figure~\ref{fig:live-judge},  requires   us  to  remove   the  leading
