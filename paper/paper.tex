@@ -123,32 +123,34 @@ section.
 
 
 \begin{abstract}
-We consider  the problem of reducing  the memory required to  run lazy
-first-order functional programs.  To do  this, we analyze programs for
-{\em liveness} of heap allocated data, i.e.  data that can possibly be
-used in the future.  The accompanying garbage collector is modified to
-use the  result of the analysis  to preserve only {\em  live} data---a
-subset  of {\em  reachable  data}---during  garbage collection.   This
+We consider  the problem of reducing  the memory required  to run lazy
+first-order functional  programs. To do this, we  analyze programs for
+liveness of  heap-allocated data.  The  accompanying garbage collector
+is modified  to use the result  of the analysis to  preserve only live
+data---a subset  of reachable data---during  garbage collection.  This
 results  in an  increase  in the  garbage  reclaimed and  consequently
-reduces the memory  footprints of programs.  While  this technique has
-already been shown to yield  benefits for eager first-order languages,
-the presence of  closures at run-time poses  additional challenges for
-lazy languages.  Closures require changes both in the earlier liveness
-analysis for heap allocated memory  and also in the garbage collection
-scheme required to reclaim memory that is not live.
+reduces  the memory footprint  of programs.  While this  technique has
+already been shown to  yield benefits for eager first-order languages,
+the lack of a statically determinable execution order and the presence
+of  closures   at  run-time  poses  additional   challenges  for  lazy
+languages.   This  requires  changes  both  in  the  earlier  liveness
+analysis and also in the garbage collection scheme required to reclaim
+memory that is not live.
 
-Our  analysis  is a  context-sensitive  analysis  that annotates  each
-potential  garbage collection  point  in  the program  with  a set  of
-deterministic finite-state  automata (DFA) describing the  liveness at
-that  point.   We  also  present a  practical  implementation  of  our
-analysis in  a garbage collector.   The collector, when  invoked, uses
-the DFA set to preserve live  objects.  As a result, fewer objects are
-marked and preserved when compared  to a reachability based marking.
-Our experiments  confirm that liveness-based collection  increases the
-garbage reclaimed,  consequently decreasing the number  of collections
-on many  practical programs.  On  our benchmark programs, we  obtain a
-decrease of  up to  y\% in  the number  of collections,  and up  to x\%
-decrease in overall garbage collection time.
+The implementation  of our  analysis annotates each  potential garbage
+collection  point   in  the  program  with  a   set  of  deterministic
+finite-state automata (DFA) describing  the liveness at that point. We
+also implement a copying collector  that uses the DFA to preserve live
+objects.   Our  experiments  confirm  that  liveness-based  collection
+always  increases the garbage  reclaimed, consequently  decreasing the
+number of collections.  In addition,  it reduces the execution time of
+several programs.  Experiments also reveal  that the best  results are
+obtained  for   a  mixed  garbage   collection  scheme  that   does  a
+liveness-based    collection   for    fully    evaluated   data    and
+reachability-based   collection  for   closures.   On   our  benchmark
+programs,  we  obtain a  decrease  of  up to  50\%  in  the number  of
+collections, and up to 70\% decrease in overall program execution time
+when compared to reachability based collectors.
 \end{abstract}
 
 \category{D.3.4}{Programming Languages}{Processors}[Memory Management
@@ -1974,6 +1976,73 @@ of the heap and
 \subsection{References}
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
+
+
+
+\begin{figure*}[t!]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Premise & Transition & Rule name \\
+\hline
+\hline
+          &\makecell{ $\rho, (\rho', x, e)\!:\!S, H, \kappa$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) := \kappa], e$ }    &  \sc{const}
+\\
+\hline
+          & \makecell{$\rho, (\rho', z, e)\!:\!S, H, (\CONS~x~y)$ \\ $\rightsquigarrow  \rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e$}     &  \sc{cons} \\
+\hline
+$H(\rho(x)) \mbox{ is } (d_1, d_2)$ & \makecell{$\rho, (\rho', z, e)\!:\!S, H, (\CAR~x)$ \\ $ \rightsquigarrow \rho', S, H[\rho(z) := d_1], e$}      &
+\sc{car-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S, H, (\CAR~x)$ \\ $\rightsquigarrow \rho', (\rho, x, (\CAR~x))\!:\!S, H, s$}      &
+\sc{car-clo}
+\\
+\hline
+$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
+ & \makecell{$\rho, (\rho', z, e)\!:\!S, H, (+~x~y)$ \\  $\rightsquigarrow \rho', S, H[\rho(z) \mapsto H(\rho(x)) + H(\rho(y))], e$}      &
+\sc{prim-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S, H, (+~x~y)$ \\ $\rightsquigarrow \rho', (\rho, x, (+~x~y))\!:\!S, H, s$}      &
+\sc{prim-1-clo} \\
+\hline
+$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho, S, H, (+~x~y)$ \\ $\rightsquigarrow \rho', (\rho, x, (+~x~y))\!:\!S, H, s$}      &
+\sc{prim-2-clo} \\
+\hline
+{$\mathit{f}~\mbox{defined as}$
+$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell{$\rho, S, H, (f~\myvec{x})$ \\ $\rightsquigarrow [\myvec{y} \mapsto \rho(\myvec{x})], S, H, e_{\mathit{f}}$}      &
+\sc{funcall} \\
+\hline
+$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow s~\IN~e)$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+  \ell]\rangle], e$} &
+\sc{let} \\
+\hline
+$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\SIF~x~e_1~e_2), ep, \sigma$ \\ $\rightsquigarrow \rho, S, H,  e_1, ep, \sigma$} & \sc{if-true} \\
+\hline
+$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\SIF~x~e_1~e_2), ep, \sigma$ \\   $\rightsquigarrow
+\rho, S, H,  e_2, ep, \sigma$} & \sc{if-false} \\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,  (\SIF~x~e_1~e_2), ep , \sigma$ \\ $\rightsquigarrow
+\rho', (\rho, x, (\SIF~x~e_1~e_2), ep, \sigma)\!:\!S, H,  s, ep_{if}, \sigma$}
+&
+\sc{if-clo} \\
+\hline
+{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho, (\rho', z, e, ep, \sigma)\!:\!S, H, (\SRETURN~x), ep_{return}, \sigma$ \\ $\rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e, ep, \sigma$} &
+\sc{return-whnf}\\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H, (\SRETURN~x), ep, \sigma$ \\ $
+  \rightsquigarrow$
+$\rho',~ (\rho, x, (\SRETURN~x), ep, \sigma)\!:\!S, H,  s, ep_{return}, \sigma$} &
+\sc{return-clo} \\
+\hline
+\end{tabular}
+\caption{Minefield semantics for the language.\label{fig:minefield-semantics}}
+\end{center}
+\end{figure*}
+
+
+
+
+
 
 %% Generated by bibtex from your ~.bib file.  Run latex,
 %% then bibtex, then latex twice (to resolve references)
