@@ -2,10 +2,10 @@ CPP= g++
 export CPATH=/usr/inlcude/c++/4.8.4
 EXTRA_FLAGS= -Wno-sign-compare -Wno-reorder -Wno-unused -Werror
 OBJ_FLAGS=-c
-DBG_FLAGS=-g
-PROD_FLAGS= -g
+DBG_FLAGS= -g
+PROD_FLAGS= -O4
 
-CPPFLAGS = -g -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive 
+CPPFLAGS = -O4 -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive 
 
 TARGET = Simulator
 

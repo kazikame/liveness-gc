@@ -1,8 +1,8 @@
 all: 
-	yes X | pdflatex  paper.tex; scp paper.tex as@surya:livenstrict/paper/.
+	yes X | xelatex  paper.tex; 
 
 rel:
-	pslatex paper && bibtex paper && pslatex paper && pslatex paper && \
-                     dvips -q paper.dvi -o paper.ps && ps2pdf paper.ps
+	xelatex paper && bibtex paper && xelatex paper && xelatex paper 
+
 PHONY:
 	rm paper.log paper.aux

@@ -1513,7 +1513,7 @@ void liveness_gc()
 {
 	clock_t pstart = clock();
 	 ++gccount;
-	 cerr << "Starting LGC#"<<gccount<<endl;
+	 DBG(cerr << "Starting LGC#"<<gccount<<endl);
 #ifdef ENABLE_SHARING_STATS
 	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
 			  ((cons*)i)->visited = 0;
@@ -1574,7 +1574,6 @@ void liveness_gc()
   DBG(pre << "Completed liveness GC" << endl);
   update_heap_ref_stack(pre, 1);
   DBG(pre << "Number of cells copied " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
-  cerr << "Number of cells copied " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl;
   clear_live_buffer(pre);
 #ifdef __DEBUG__GC
 	pre.close();
@@ -1762,7 +1761,7 @@ void liveness_gc()
 {
 	clock_t pstart = clock();
 	 ++gccount;
-	 cerr << "Starting LGC#"<<gccount<<endl;
+	 DBG(cerr << "Starting LGC#"<<gccount<<endl);
 #ifdef ENABLE_SHARING_STATS
 	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
 			  ((cons*)i)->visited = 0;
@@ -1781,7 +1780,7 @@ void liveness_gc()
 #else
 	  ostream &pre = null_stream;
 #endif
-	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
+	  DBG(pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl);
 	  swap_buffer();
 
   for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)

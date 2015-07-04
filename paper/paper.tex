@@ -61,7 +61,7 @@
 \newtheorem{lemma}[theorem]{Lemma}
 \begin{document}
 % --- Author Metadata here ---
-\conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
+%\conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
 %\CopyrightYear{2007} % Allows default copyright year (20XX) to be
 %over-ridden - IF NEED BE.
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data
@@ -104,7 +104,7 @@ section.
 \alignauthor K. Prasanna Kumar \\
        \affaddr{IIT Bombay,}\\
        \affaddr{Mumbai 400076, India}
-       \email{prasanna@cse.iitb.ac.in}
+       \email{prasannak@cse.iitb.ac.in}
 % 2nd. author
 \alignauthor Amey Karkare\\
        \affaddr{IIT Kanpur}\\
@@ -123,46 +123,42 @@ section.
 
 
 \begin{abstract}
-We consider  the problem of reducing  the memory required  to run lazy
-first-order functional programs.  To  do this, we analyze programs for
-liveness of heap  allocated data, i.e. data that  can possibly be used
-in the future.  The accompanying garbage collector is  modified to use
-the result of the analysis to preserve only {\em live} data---a subset
-of {\em reachable data}---during  garbage collection.  This results in
-an  increase in  the garbage  reclaimed and  consequently  reduces the
-memory footprints of programs.   While this technique has already been
-shown to yield benefits  for eager first-order languages, the presence
-of  closures   at  run-time  poses  additional   challenges  for  lazy
-languages.   Closures require  changes  both in  the earlier  liveness
+We consider  the problem of reducing  the memory required to  run lazy
+first-order functional programs.  To do  this, we analyze programs for
+{\em liveness} of heap allocated data, i.e.  data that can possibly be
+used in the future.  The accompanying garbage collector is modified to
+use the  result of the analysis  to preserve only {\em  live} data---a
+subset  of {\em  reachable  data}---during  garbage collection.   This
+results  in an  increase  in the  garbage  reclaimed and  consequently
+reduces the memory  footprints of programs.  While  this technique has
+already been shown to yield  benefits for eager first-order languages,
+the presence of  closures at run-time poses  additional challenges for
+lazy languages.  Closures require changes both in the earlier liveness
 analysis for heap allocated memory  and also in the garbage collection
 scheme required to reclaim memory that is not live.
 
-We  formulate  a context-sensitive  liveness  analysis  and using  the
-results annotate each potential allocation point in the program with a
-set     of    deterministic    finite-state     automata(DFA).     The
-garbage-collector  inspects  the DFA  to  curtail reachability  during
-marking.  As a result, fewer  objects are marked (with a possibly more
-expensive  marker)  and  preserved  by the  copy  phase.   Experiments
-confirm  that  liveness-based  collection  results in  a  increase  in
-garbage  reclaimed  and  a   consequent  decrease  in  the  number  of
-collections. On  our benchmark programs, we obtain  a decrease between
-x\% and y\% in the memory size required to run programs, when compared
-to reachability-based garbage collection.
+Our  analysis  is a  context-sensitive  analysis  that annotates  each
+potential  garbage collection  point  in  the program  with  a set  of
+deterministic finite-state  automata (DFA) describing the  liveness at
+that  point.   We  also  present a  practical  implementation  of  our
+analysis in  a garbage collector.   The collector, when  invoked, uses
+the DFA set to preserve live  objects.  As a result, fewer objects are
+marked and preserved when compared  to a reachability based marking.
+Our experiments  confirm that liveness-based collection  increases the
+garbage reclaimed,  consequently decreasing the number  of collections
+on many  practical programs.  On  our benchmark programs, we  obtain a
+decrease of  up to  y\% in  the number  of collections,  and up  to x\%
+decrease in overall garbage collection time.
 \end{abstract}
 
-% A category with the (minimum) three required fields
-\category{H.4}{Information Systems Applications}{Miscellaneous}
-%A category including the fourth, optional field follows...
-\category{D.2.8}{Software  Engineering}{Metrics}[complexity  measures,
-  performance measures]
+\category{D.3.4}{Programming Languages}{Processors}[Memory Management
+  (Garbage Collection), Optimizations]
+\category{F.3.2}{Logic and Meanings Of Programs}{Semantics of
+  Programming Languages}[Program Analysis]
 
-\terms{Theory}
+\terms{Algorithms, Languages, Theory}
 
-\keywords{ACM proceedings, \LaTeX, text tagging}
-
-By Friday, February 27 2015, 23:59 (UTC-11), submit a full paper of at
-most  12 pages (6  pages for  an Experience  Report), in  standard ACM
-conference format, including bibliography, figures, and appendices.
+\keywords{Heap Analysis, Memory Management, Garbage Collection}
 
 \section{Introduction}
 \label{sec:intro}
@@ -178,7 +174,6 @@ While  the runtime  system  of most  functional  languages includes  a
 garbage  collector  (GC)  to  efficiently  reclaim  memory,  empirical
 studies on Scheme~\cite{karkare06effectiveness} and, more importantly,
 on Haskell~\cite{rojemo96lag}
-%and Java~\cite{shaham02estimating}
 programs have shown that  GCs leave uncollected a large
 number of  memory objects that are  reachable but not  live (here {\em
   live} means the  object can potentially be used by  the program at a
@@ -200,54 +195,49 @@ later stage).  This results in unnecessary memory retention.
 %% }}
 
 \begin{figure}[t!]
-  %%%%{\color{Myblue}
   \psset{unit=1mm}
-  \begin{pspicture}(80,50)(0,-50)
-    %\psframe(80,50)(0,-50)
-    %  \begin{center}
+  \begin{pspicture}(90,48)(0,-48)
+    %\psframe(90,48)(0,-48)
     \begin{tabular}{@{}c@{}}
-      \begin{boxedminipage}{.42\textwidth}
-        {\sf
-	  \renewcommand{\arraystretch}{1}{
-	    \begin{uprogram}
-              \UFL\
-              \UNL{0} (\DEFINE\ (\length\  \pl)
-	      \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-              (\PRIM\ 1\ (\CAR\  \pl))))
-              \UNL{0}
-	      \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
-	      \UNL{1}  (\SIF~(\NULLQ \ \lista)
-	      \listb
-	      \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
-              (\CDR\  \lista)
-              \listb))))
-              \UNL{0}
-              \UNL{0} (\LET\ \px\
-              $\leftarrow$\ (\CONS\ $5$
-              %          \UNL{1}\hspace*{1.5cm}
-              (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
-	      \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
-	      \UNL{2}
-              (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
-              \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
-              (\length\ \pz))))))
-	    \end{uprogram}
-        }}
-      \end{boxedminipage}
-      \\
-      (a) Example program. \\ \\
-      \begin{minipage}{.45\textwidth}
-        %\hspace*{1cm}
-                {\includegraphics[width=1\textwidth]{motiv-example}}
-      \end{minipage}
-      \\ \renewcommand{\arraystretch}{.9}{\begin{tabular}[t]{ll}
-          (b) Memory graph at $\pi$. Thick edges denote live
-          links. Traversal \\{\white (b)} stops at edges
-          marked $\times$ during garbage collection.
-      \end{tabular}}
-    \end{tabular}
+      %\psframebox
+          {\sf
+	\renewcommand{\arraystretch}{1}{
+	  \begin{uprogram}
+            \UFL\
+            \UNL{0} (\DEFINE\ (\length\  \pl)
+	    \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
+            (\PRIM\ 1\ (\CAR\  \pl))))
+            \UNL{0}
+	    \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
+	    \UNL{1}  (\SIF~(\NULLQ \ \lista)
+	    \listb
+	    \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
+            (\CDR\  \lista)
+            \listb))))
+            \UNL{0}
+            \UNL{0} (\LET\ \px\
+            $\leftarrow$\ (\CONS\ $5$
+            (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
+	    \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
+	    \UNL{2}
+            (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
+            \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
+            (\length\ \pz))))))
+	  \end{uprogram}
+      }}
+      \\ 
+      (a) Example program. \\  \\
+%      \includegraphics[width=.45\textwidth]{motiv-example}
+      \input{mem-graph} \\ 
+      \renewcommand{\arraystretch}{.9}
+      \begin{tabular}[t]{l}
+        (b) Memory graph at $\pi$. Thick edges denote live
+        links. Traversal \\{\white (b)} stops at edges
+        marked $\times$ during garbage collection.
+      \end{tabular}
+    \end{tabular} 
   \end{pspicture}
- \vspace*{-3ex}
+  \vspace*{-3ex}
   \caption{Example Program and its Memory Graph}\label{fig:mot-example}
 \end{figure}
 
@@ -393,20 +383,20 @@ it
 \begin{figure}[t]
 \footnotesize
 \begin{eqnarray*}
-   p \in \mathit{Prog} & ::= & d_1 \ldots d_n \,\, e_\mainpgm
+   p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\, e_\mainpgm
     \hspace{5em} \mbox{\em --- program}\\
-    \mathit{df} \in Fdef & ::= & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots
+    \mathit{df} \in Fdef & \!\!\!::=\!\!\! & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots
 \,\,x_n)\,\,
     e)
     \hspace{0.2em} \ \ \ \ \mbox{\em --- function definition} \\
-e \in \mathit{Expr} & ::= &
+e \in \mathit{Expr} & \!\!\!::=\!\!\! &
 \left\{\begin{array}{@{}ll@{\hspace{2em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \!\!\!\mbox{\em --- conditional} \\
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) &&\!\!\! \mbox{\em --- let
 binding} \\
        (\SRETURN\,\, x) && \!\!\!\mbox{\em --- return from function}
     \end{array}\right. \\
-s \in \mathit{Application} & ::= &
+s \in \mathit{App} & \!\!\!::=\!\!\!  &
 \left\{\begin{array}{@{}l@{\hspace{1.2em}}l}
        k & \mbox{\em --- constant (numeric or $\NIL$)}\\
        (\CONS\,\, x_1\,\, x_2) & \mbox{\em --- constructor} \\
@@ -416,7 +406,6 @@ s \in \mathit{Application} & ::= &
        (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
 and generic arithmetic} \\
        (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
-\\
        (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
     \end{array}\right.
 \end{eqnarray*}
@@ -430,17 +419,12 @@ and generic arithmetic} \\
 We now give  a small-step semantics for our  language.
 We first specify the domains used by the semantics:
 \[
-\begin{array}{rlcl@{\hspace{0.5em}}l}
-\rho: & \mathit{Env} &=&\mathit{Var} \rightarrow \mathit{Loc} &
-\mbox{-- Environment} \\
-v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Data \times
-  Data}& \mbox{-- Values}\\
-c:   & \mathit{Clo} &=& \mathit{(Exp \times Env)}& \mbox{--
-  Closures}\\
-d: & \mathit{Data} &=&\mathit{Val} + \mathit{Clo} & \mbox{-- Values \&
-  Closures} \\
-\heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow Data & \mbox{--
-Heap}
+\begin{array}{@{}r@{\ }l@{\ \ }c@{\ \ }l@{\hspace{0.5em}}l}
+\rho: & \mathit{Env} &=&\mathit{Var} \rightarrow \mathit{Loc} & \mbox{-- Environment} \\
+v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Data \times Data}& \mbox{-- Values}\\
+c:   & \mathit{Clo} &=& \mathit{(Exp \times Env)}& \mbox{-- Closures}\\
+d: & \mathit{Data} &=&\mathit{Val} + \mathit{Clo} & \mbox{-- Values \& Closures} \\
+\heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow Data & \mbox{-- Heap}
 \end{array}
 \]
 
@@ -1552,86 +1536,115 @@ use its results during garbage collection.
 
 
 \section{Results}
-To demonstrate the effectiveness of liveness-based garbage collection,
-we  have  built a  prototype  consisting  of  an interpreter  for  our
-language,  a  liveness  analyzer  and  a copying  collector  that  can
-optionally use the results of liveness analysis for marking instead of
-reachability. When the collector uses liveness for marking, we call it
-a  {\em liveness-based  collector} (LGC),  else we  use the  term {\em
-  reachability-based  collector}  (RGC).   The  copying  collector  is
-neither incremental nor generational.  As a consequence, any cell that
-becomes unreachable or  dead is assuredly collected in  the next round
-of garbage collection.
+%% \comment{To demonstrate the effectiveness of liveness-based garbage collection,
+%% we  have  built a  prototype  consisting  of  an interpreter  for  our
+%% language,  a  liveness  analyzer  and  a copying  collector  that  can
+%% optionally use the results of liveness analysis for marking instead of
+%% reachability. When the collector uses liveness for marking, we call it
+%% a  {\em liveness-based  collector} (LGC),  else we  use the  term {\em
+%%   reachability-based  collector}  (RGC).   The  copying  collector  is
+%% neither incremental nor generational.  As a consequence, any cell that
+%% becomes unreachable or  dead is assuredly collected in  the next round
+%% of garbage collection.}
 
-While exploring the activation record of a function, LGC uses the DFAs
-at  the latest  program  point traversed  in the function's body.
-Thus, if  LGC
-is invoked  at the program point   $\pi$,  it would  use  the
-liveness  DFAs at  $\pi$ itself for exploring the root set of the
-current activation record. For any other activation record in the
-stack, say for a function ${\mathit f}$ calling ${\mathit g}$ in the
-call-chain,
-the DFAs at the point of call to  ${\mathit g}$ would be used.
+To test the utility of our method we have implemented a garbage-collector 
+for a simple scheme-like first order language. It consists of an interpreter, 
+liveness analyzer and a garbage-collector that can optionally use use reachability or liveness. 
+Our benchmark consists of programs from nofib suite and some external programs manually converted to ANF. 
+
+%% \comment{
+%% While exploring the activation record of a function, LGC uses the DFAs
+%% at  the latest  program  point traversed  in the function's body.
+%% Thus, if  LGC
+%% is invoked  at the program point   $\pi$,  it would  use  the
+%% liveness  DFAs at  $\pi$ itself for exploring the root set of the
+%% current activation record. For any other activation record in the
+%% stack, say for a function ${\mathit f}$ calling ${\mathit g}$ in the
+%% call-chain,
+%% the DFAs at the point of call to  ${\mathit g}$ would be used.}
+
+The process of liveness-based garbage collection involves going through 
+each activation record on the stack and exploring each variable in the 
+current activation record (root set). The liveness of each variable is 
+determined using the program point and the variable name. The liveness 
+of all variables are stored as DFAs. These DFAs are then encoded as a 
+table. A variable is live only if an entry is found in this table.
+All cells that are live are copied to the live semi-space. In case of 
+\CONS\ cells the \CAR\ and \CDR\ pointers are chased and if they are 
+live the copied \CONS\ cell will get the updated addresses of its 
+\CAR\ and \CDR\ fields.
 
 
+%% \comment{
+%% Let $\dfa{\pi}{x}$  denote the DFA  for the variable  and program
+%% point  pair ($x$,  $\pi$).  We  assume that  there is  a function
+%% $\mathsf{initial}(\dfa{\pi}{x})$  returning the initial  state of
+%% $\dfa{\pi}{x}$.
+%% Considering   a   DFA   as   a   table,
+%% $\dfa{\pi}{x}\mathit{(q,sym)}$  returns the  next  state for  the
+%% state $q$ and the  symbol $\mathit{sym}$, where $\mathit{sym}$ is
+%% \acar\      or     \acdr.       We      shall     also      write
+%% $\dfa{\pi}{x}\mathit{(q,sym)\mathsf{?}}$    for    a    predicate
+%% indicating  whether there  is a  transition from  $q$ on
+%% $\mathit{sym}$.  The LGC action to chase the root variable $x$ at
+%% $\pi$ can be described as  follows: If $\mathscr{L}(\dfa{\pi}{x})$ is
+%% empty,  then  nothing  needs  to  be  done.   Otherwise  we  call
+%% $\mathsf{copy}(\dfa{\pi}{x},\mathsf{initial}(\dfa{\pi}{x}),    x)$
+%% in   Figure~\ref{algo:LGC-main-loop}  and  assign   the  returned
+%% pointer to $x$.
+%% The function $\mathsf{move\_to\_tospace}(x)$  copies the value of
+%% $x$  in the  other semi-space  and returns  the new  address.  It
+%% hides  details such as  returning the  forwarding pointer  if the
+%% value  of $x$  is  already copied,  and  creating the  forwarding
+%% pointer otherwise.}
 
-Let $\dfa{\pi}{x}$  denote the DFA  for the variable  and program
-point  pair ($x$,  $\pi$).  We  assume that  there is  a function
-$\mathsf{initial}(\dfa{\pi}{x})$  returning the initial  state of
-$\dfa{\pi}{x}$.
-Considering   a   DFA   as   a   table,
-$\dfa{\pi}{x}\mathit{(q,sym)}$  returns the  next  state for  the
-state $q$ and the  symbol $\mathit{sym}$, where $\mathit{sym}$ is
-\acar\      or     \acdr.       We      shall     also      write
-$\dfa{\pi}{x}\mathit{(q,sym)\mathsf{?}}$    for    a    predicate
-indicating  whether there  is a  transition from  $q$ on
-$\mathit{sym}$.  The LGC action to chase the root variable $x$ at
-$\pi$ can be described as  follows: If $\mathscr{L}(\dfa{\pi}{x})$ is
-empty,  then  nothing  needs  to  be  done.   Otherwise  we  call
-$\mathsf{copy}(\dfa{\pi}{x},\mathsf{initial}(\dfa{\pi}{x}),    x)$
-in   Figure~\ref{algo:LGC-main-loop}  and  assign   the  returned
-pointer to $x$.
-The function $\mathsf{move\_to\_tospace}(x)$  copies the value of
-$x$  in the  other semi-space  and returns  the new  address.  It
-hides  details such as  returning the  forwarding pointer  if the
-value  of $x$  is  already copied,  and  creating the  forwarding
-pointer otherwise.
+\subsection{Copying closure using liveness vs Copying closures using reachability}
+To compare the effect of using reachability to copy closures instead of liveness we take a couple of programs from our benchmark suite and execute them with 
+both. As shown in figure-add-figure-here, the number of garbage collections 
+in both cases are same but the time taken varies largely. Both these observations can be explained as follows, since we approximate the liveness of closure to 
+the liveness at its creation point, the liveness we get is usually grossly over approximated. 
+Using this liveness may not give too much of a benefit compared to reachability as nearly everything would be live at its point of creation. 
+As mentioned in section-ref, using liveness for closures may entail multiple traversals over the same structure consuming more time. 
+Therefore we believe that using reachability for closures is a sweet spot in terms of performance for liveness based garbage collectors. 
+%%
+%% \comment{
+%% The graphs  in Figure~\ref{fig:memory-usage} show the  number of cells
+%% in the heap over time for RGC and LGC---here time is measured in terms
+%% of the number of cons cells allocated. In addition, they also show the
+%% number of  reachable cells and the  number of cells  that are actually
+%% live\footnote{This   is  statically   approximated  by   our  liveness
+%%   analysis}.  Since  the programs have  different memory requirements,
+%% we have tuned the size of heap for each program to ensure a reasonable
+%% number of  collections. An invocation  of RGC decreases the  number of
+%% cells  in heap  till  it touches  the  curve of  reachable cells.   An
+%% invocation of LGC decreases the number  of heap cells to no lower than
+%% the curve of live cells.
 
-The graphs  in Figure~\ref{fig:memory-usage} show the  number of cells
-in the heap over time for RGC and LGC---here time is measured in terms
-of the number of cons cells allocated. In addition, they also show the
-number of  reachable cells and the  number of cells  that are actually
-live\footnote{This   is  statically   approximated  by   our  liveness
-  analysis}.  Since  the programs have  different memory requirements,
-we have tuned the size of heap for each program to ensure a reasonable
-number of  collections. An invocation  of RGC decreases the  number of
-cells  in heap  till  it touches  the  curve of  reachable cells.   An
-invocation of LGC decreases the number  of heap cells to no lower than
-the curve of live cells.
+%% To construct the  reachable and live curves, we  record for every cell
+%% its creation time (\CreateTime), its last use time (\UseTime), and the
+%% earliest time  when the  cell becomes unreachable  and can  be garbage
+%% collected (\CollTime).  For accurate recording of  \CollTime, we force
+%% frequent invocations  of a reachability based collector  in a separate
+%% run.     A    cell   is    live    at    time   \mbox{\exectime}    if
+%% \mbox{$\mbox{\CreateTime}       \leq       \mbox{\exectime}       \leq
+%%   \mbox{\UseTime}$}.       If      \mbox{$\mbox{\CreateTime}      \leq
+%%   \mbox{\exectime} \leq \mbox{\CollTime}$}, it is reachable.
 
-To construct the  reachable and live curves, we  record for every cell
-its creation time (\CreateTime), its last use time (\UseTime), and the
-earliest time  when the  cell becomes unreachable  and can  be garbage
-collected (\CollTime).  For accurate recording of  \CollTime, we force
-frequent invocations  of a reachability based collector  in a separate
-run.     A    cell   is    live    at    time   \mbox{\exectime}    if
-\mbox{$\mbox{\CreateTime}       \leq       \mbox{\exectime}       \leq
-  \mbox{\UseTime}$}.       If      \mbox{$\mbox{\CreateTime}      \leq
-  \mbox{\exectime} \leq \mbox{\CollTime}$}, it is reachable.
+%% The benchmark programs are drawn from the {\tt no-fib} suite and other
+%% sources and have been  manually converted to  ANF.  All  graphs  except
+%%  {\tt  fibheap}  show  fewer  garbage
+%% collector  invocations for  LGC. The  number  of reachable  cells in
+%% {\tt
+%%   fibheap} increases  initially, comes  down before the  heap becomes
+%% gets
+%% full and then  continues to remains low.  This results in  a single
+%% garbage
+%% collection in both RGC and LGC.  The graphs also show the precision of
+%% our liveness analysis.  For  all programs  except  {\tt nperms} and
+%% {\tt lambda} (Figure~\ref{fig:memory-usage-lambda}),  LGC
+%% manages to collect a good portion of the data that are not live.}
+%%
 
-The benchmark programs are drawn from the {\tt no-fib} suite and other
-sources and have been  manually converted to  ANF.  All  graphs  except
- {\tt  fibheap}  show  fewer  garbage
-collector  invocations for  LGC. The  number  of reachable  cells in
-{\tt
-  fibheap} increases  initially, comes  down before the  heap becomes
-gets
-full and then  continues to remains low.  This results in  a single
-garbage
-collection in both RGC and LGC.  The graphs also show the precision of
-our liveness analysis.  For  all programs  except  {\tt nperms} and
-{\tt lambda} (Figure~\ref{fig:memory-usage-lambda}),  LGC
-manages to collect a good portion of the data that are not live.
 
 \subsection{Results}
 %% \begin{figure*}[t]
@@ -1684,35 +1697,56 @@ manages to collect a good portion of the data that are not live.
 %%   allocated. y-axis is the number of cons-cells.}
 %% \label{fig:memory-usage} \figrule
 %% \end{figure}
-The  increased effectiveness  of LGC  over RGC  is also  shown  in the
-tables  in  Figure~\ref{fig:experimental-results}.   The  first  table
-provides  statistics  regarding the  analysis  itself.  The number  of
-states and the analysis times  are within tolerable limits. Precision
-of analysis refers to the percentage of dead cells that is collected by
-LGC, averaged over all invocations.
-The second table shows garbage  collection statistics for RGC and LGC.
-LGC  collects larger garbage  per invocation,  drags cells  for lesser
-time and requires a smaller heap size ({\em MinHeap}) for program to
-run
-in comparison with  RGC.
+The table in Figure~\ref{fig:experimental-results} shows that LGC improves the 
+garbage collection time and efficiency for most of the programs. 
+Even for programs where the time taken is more it is very competitive. 
+As the number of garbage collections tend to be very large our graphs show only 
+a window which is representative of the behavior for that particular benchmark. 
+In all the programs we can see that the curve corresponding to liveness regularly 
+dips below the reachability curve. 
 
-There are a couple of  issues of concern.  The garbage collection time
-is larger in the case of LGC for some programs. The reason is that the
-cost of consulting the liveness DFA may outweigh the combined benefits
-of  fewer   garbage  collections   and  fewer  markings   per  garbage
-collection.   The  other issue  is  illustrated  by  the program  {\tt
-  lambda}    (memory   usage  shown   separately    in
-Figure~\ref{fig:memory-usage-lambda}).  As can be seen from the table
-in Figure~\ref{fig:experimental-results}, the  number of
-touched cells\footnote{These  are the  cells which are  visited during
-  marking phase, often  more than once due to  sharing.} in this
-example is much higher for
-LGC.  This  increase is due to  excessive sharing among  heap nodes in
-this program.  Note  that a node re-visited because  of sharing is not
-explored  any   further  during  a  RGC   collection.   However,  this
-curtailment cannot happen in  LGC because of the possibility that the
-node,  re-visited in a  different liveness  state, may  mark a  set of
-cells different from the earlier visit.
+One area of concern is the huge gap between the actual liveness and the 
+liveness percieved by our collector. In case of LGC for eager languages the 
+gap was very narrow and almost touched the actual liveness curve. 
+In case of lazy languages, due to using reachability for copying we end up copying 
+more cells. Any data which is part of closure irrespective of whether it is live 
+or not gets copied. Thus many non-live cells get copied during garbage collection 
+increasing the drag time.
+Our experiments have shown that unless we use the exact execution point for 
+closures bringing down the number of non-live cells copied in closures cannot be reduced.
+Using the approximated liveness (liveness at the creation point) does not give benefits in terms of non-live
+ cells inside closures as everything would be live at the point of creation.
+%% \comment{
+%% The  increased effectiveness  of LGC  over RGC  is also  shown  in the
+%% tables  in  Figure~\ref{fig:experimental-results}.   The  first  table
+%% provides  statistics  regarding the  analysis  itself.  The number  of
+%% states and the analysis times  are within tolerable limits. Precision
+%% of analysis refers to the percentage of dead cells that is collected by
+%% LGC, averaged over all invocations.
+%% The second table shows garbage  collection statistics for RGC and LGC.
+%% LGC  collects larger garbage  per invocation,  drags cells  for lesser
+%% time and requires a smaller heap size ({\em MinHeap}) for program to
+%% run
+%% in comparison with  RGC.
+
+%% There are a couple of  issues of concern.  The garbage collection time
+%% is larger in the case of LGC for some programs. The reason is that the
+%% cost of consulting the liveness DFA may outweigh the combined benefits
+%% of  fewer   garbage  collections   and  fewer  markings   per  garbage
+%% collection.   The  other issue  is  illustrated  by  the program  {\tt
+%%   lambda}    (memory   usage  shown   separately    in
+%% Figure~\ref{fig:memory-usage-lambda}).  As can be seen from the table
+%% in Figure~\ref{fig:experimental-results}, the  number of
+%% touched cells\footnote{These  are the  cells which are  visited during
+%%   marking phase, often  more than once due to  sharing.} in this
+%% example is much higher for
+%% LGC.  This  increase is due to  excessive sharing among  heap nodes in
+%% this program.  Note  that a node re-visited because  of sharing is not
+%% explored  any   further  during  a  RGC   collection.   However,  this
+%% curtailment cannot happen in  LGC because of the possibility that the
+%% node,  re-visited in a  different liveness  state, may  mark a  set of
+%% cells different from the earlier visit.
+%% }
 \begin{figure*}[t]
 \footnotesize
 

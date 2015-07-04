@@ -10,6 +10,13 @@
 //#include <boost/filesystem.hpp>
 
 #include "OptDemands.h"
+//#define __DEBUG__GC
+#undef __DEBUG__GC
+#ifdef __DEBUG__GC
+#define DBG(stmt) stmt
+#else
+#define DBG(stmt) (void)0
+#endif
 
 using namespace Scheme::OptDemands;
 
