@@ -44,6 +44,7 @@
 \definecolor{Myblue}{rgb}{.2,0,1}
 \newcommand{\comment}[1]{{\color{Myblue}{(#1)}}}
 \newcommand{\cred}[1]{{\color{red}{#1}}}
+\newcommand{\cblue}[1]{{\color{blue}{#1}}}
 \newcommand{\blankout}[1]{}
 
 
@@ -1291,7 +1292,7 @@ We now show that the decision problem required at garbage collection
 time is undecidable.
 \newcommand{\state}{\ensuremath{\mathsf{S}}}
 \newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}
-
+\cblue{
 \begin{lemma}
 Consider    a    grammar    $G$    of   the    kind    described    in
 Definition~\ref{def:specialgrammar} and a forward access path $\alpha$
@@ -1371,7 +1372,7 @@ the left of the head and $\nont{\mathit{final}}{c} \rightarrow
 \nont{\mathit{final}}{c}\bcdr$ for cleaning up \acar\ and \acdr\ on the
 right of the tape head. This completes the reduction.  
 \end{proof}
-
+}%end of cblue
 We circumvent the problem  of undecidability by over- approximating the
 CFG by non-deterministic finite state automata (NFA). The NFA are then
 simplified using  the $\hookrightarrow$ rules.  Finally the simplified
