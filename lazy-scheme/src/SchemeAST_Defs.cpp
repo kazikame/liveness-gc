@@ -586,7 +586,7 @@ cons* LetExprNode::evaluate()
 
 
 	//Create an entry for the variable where it will be allocated on the heap
-	make_reference_addr(this->getVar().c_str(), getfree());
+	make_reference_addr(this->getVar().c_str(), getfree(), false);
 	//ensure that the pointer does not get forwarded unnecessarily.
 	cons* temp = static_cast<cons*>(getfree());
 	temp->forward=NULL;
@@ -1388,7 +1388,7 @@ cons* FuncExprNode::evaluate()
 	while(num_args > 0)
 	{
 		//cerr << "Creating ref for argument " << (funcDef->getArgs()[num_args-1]).c_str() << " with type " << curr->val.closure.arg2->typecell << endl;
-		make_reference_addr((funcDef->getArgs()[num_args-1]).c_str(), curr->val.closure.arg2);
+		make_reference_addr((funcDef->getArgs()[num_args-1]).c_str(), curr->val.closure.arg2, true);
 		--num_args;
 		if (curr->val.closure.arg1 != NULL)
 		{

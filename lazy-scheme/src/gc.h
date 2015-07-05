@@ -111,6 +111,7 @@ typedef struct Var_Heap
 {
     string varname;
     void* ref;
+    bool is_param;
 }var_heap;
 
 typedef struct Var_Stack
@@ -152,7 +153,7 @@ typedef struct activationRecord
  void set_return_point(int pt);
  int set_reference(var_heap bind, const char *var, void* newref);
  void delete_environment();
- void make_reference_addr(const char *var, void* addr);
+ void make_reference_addr(const char *var, void* addr, bool isParam);
  void make_reference_value(const char *var, void* val, const char type);
  char locate_var(const char *var);
  cons* lookup_addr(const char *var);
@@ -191,7 +192,7 @@ typedef struct activationRecord
  cons* void_to_cons(void* val);
  long void_to_long(void* val);
  void* long_to_void(long val);
-
+ bool isClosure(cons*);
 
  void* getscan();
  void* getfree();
