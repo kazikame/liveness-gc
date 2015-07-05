@@ -27,6 +27,7 @@
 %\usepackage{program}
 %\usepackage{algorithmic}
 \usepackage[boxed]{algorithm2e}
+\usepackage{makecell}
 
 
 \input{fh_defs}
@@ -1986,7 +1987,7 @@ of the heap and
 Premise & Transition & Rule name \\
 \hline
 \hline
-          &\makecell{ $\rho, (\rho', x, e)\!:\!S, H, \kappa$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) := \kappa], e$ }    &  \sc{const}
+          &\makecell{ $\rho, (\rho', x, e)\!:\!S, H, \kappa$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) := \kappa], e$ }   &  \sc{const}
 \\
 \hline
           & \makecell{$\rho, (\rho', z, e)\!:\!S, H, (\CONS~x~y)$ \\ $\rightsquigarrow  \rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e$}     &  \sc{cons} \\

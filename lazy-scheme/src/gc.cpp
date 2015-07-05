@@ -121,7 +121,18 @@ void gen_graphviz_code(Scheme::AST::cons* conscell, ostream& out);
 std::string getNodeLabel(Scheme::AST::cons* conscell, size_t idx);
 void depthfirstpaths(Scheme::AST::cons* loc, Scheme::AST::state_index index);
 
-
+bool isClosure(cons* cell)
+{
+	switch(cell->typecell)
+	{
+	case nilExprClosure:
+	case constIntExprClosure:
+	case constBoolExprClosure:
+	case consExprClosure:
+	case constStringExprClosure: return false;
+	default : return true;
+	}
+}
 
 
 #define FIND_REACHABLE
@@ -806,22 +817,26 @@ int is_end_of_non_ref_vector()
 }
 
 //!!!!!caution update it to check for already existing variable in same environment
-void make_reference_addr(const char *var, void* addr)
+void make_reference_addr(const char *var, void* addr, bool isParam)
 {
 	int found=0;
 	vector<var_heap>& vh=actRecStack.front().heapRefs;
 	vector<var_heap>::iterator it = vh.begin();
-	while(it != vh.end()) {
+	while(it != vh.end())
+	{
 
 		if (strcmp(it->varname.c_str(),var)==0)
 		{
 			it->ref=addr;
+			it->is_param = isParam;
 			found=1;
 			break;
 		}
 		++it;
 	}
-	if(found==0){
+
+	if(found==0)
+	{
 		var_heap newref;
 		newref.varname=var;
 		newref.ref=addr;
@@ -1565,6 +1580,50 @@ void liveness_gc()
     	  }
     	  else
     	  {
+    		  if (vhit->ref == NULL)
+    			  continue;
+
+    		  cerr << "Processing non-live root variable " << vhit->varname << endl;
+    		  for(auto ref : stackit->heapRefs)
+    		  {
+    			  auto cell = static_cast<cons*>(vhit->ref);
+    			  cerr << "Processing "<<ref.varname << " with type " << cell->typecell << endl;
+    			  if (ref.varname == vhit->varname || !isClosure(cell))
+    				  continue;
+
+    			  auto clo = cell->val.closure;
+    			  if (cell->typecell != funcApplicationExprClosure)
+    			  {
+    				  cerr<<"Checking arg1 " << *(clo.arg1_name) << endl;
+    				  if (clo.arg1 && *(clo.arg1_name) == vhit->varname)
+    				  {
+    					  cerr<<"Setting arg1 to NULL for " << *(clo.arg1_name) << endl;
+    					  clo.arg1 = NULL;
+    				  }
+    				  cerr<<"Checking arg2 " << *(clo.arg2_name) << endl;
+    				  if (clo.arg2 && *(clo.arg2_name) == vhit->varname)
+    				  {
+    					  cerr<<"Setting arg2 to NULL for " << *(clo.arg2_name) << endl;
+    					  clo.arg2 = NULL;
+    				  }
+    			  }
+    			  else
+    			  {
+    				  do
+    				  {
+    					  clo = cell->val.closure;
+    					  cerr<<"Checking arg " << *(clo.arg2_name) << endl;
+    					  if (clo.arg2 && *(clo.arg2_name) == vhit->varname)
+    					  {
+    						  cerr<<"Setting arg2 to NULL for " << *(clo.arg2_name) << endl;
+    						  clo.arg2 = NULL;
+    					  }
+    					  cell = clo.arg1;
+
+    				  }while(cell != NULL);
+    			  }
+
+    		  }
     		  //The root variable is not live, set it to NULL as it might later become part of a closure and cause problems
     		  //during GC.
     		  vhit->ref = NULL;
