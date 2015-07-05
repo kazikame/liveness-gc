@@ -1288,16 +1288,72 @@ non-terminal names which now have the form \var{\Lanv{i}{x}}.
 \end{proposition}
 We now show that the decision problem required at garbage collection
 time is undecidable.
+\newcommand{\state}{\ensuremath{\mathsf{S}}}
+\newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}
 
 \begin{lemma}
-Consider a grammar $G$ of the kind  described in
+Consider    a    grammar    $G$    of   the    kind    described    in
 Definition~\ref{def:specialgrammar} and a forward access path $\alpha$
-consisting
-of symbols \acar\ and \acdr\  only. The decision problem $\alpha \in
-\mathscr{L}(G)$ is undecidable.
-\end{lemma}
+consisting  of symbols \acar\  and \acdr\  only. The  decision problem
+$\alpha \in \mathscr{L}(G)$ is undecidable.
+\end{lemma} 
 
-\comment{Proof:}
+{\em Proof:}  Given a Turing machine  $TM$ and an input  $w$, we shall
+construct an unrestricted  grammar $G$ of the kind  described above, so
+that $TM$ will halt on $w$ if and only if $\epsilon \in \mathscr{L}(G)$.
+
+We  shall  represent  the  configuration  of  $TM$  at  any  point  as
+$w_L(\state,c)w_R$, where $w_L$ is the string on the left of the head,
+$w_R$ is the string on the right  of the head, $c$ is the symbol under
+the head and \state\ is the current state of the machine. For each
+$(\state,c)$ combination of state and symbol, the grammar
+will contain a nonterminal \nont{}{c}. Each step of the machine will
+correspond to step of derivation based on the grammar.  In addition, we shall maintain
+the following invariant between the configuration of $TM$ and the
+current sentential form:
+
+\begin{quote}
+  If the configuration of the machine is $w_L(\state,c)w_R$, then the
+  sentential form will be $\overline{w}_L\nont{}{c}\,w_R$, where
+  $\overline{w}_L$ is the same as $w_L$ but with each symbol $d$
+  replaced with $\overline{d}$.
+\end{quote}
+
+Assume that the TM starts in a state $S_{init}$ with a tape $cw$ and the
+head is positioned on the symbol $c$. Then the start non-terminal  of the
+grammar $\nont{}{}$ is associated with the production $\nont{}{} \rightarrow \nont{init}{c}w$ and the
+sentential form corresponding to the initial configuration is
+$\nont{init}{c}w$. Further each transition of the turing machine is modeled by
+productions as follows:
+
+\begin{enumerate}
+\item A transition $(S_i, c) \rightarrow (S_j,c',L)$ by two productions
+  $\nont{i}{c} \rightarrow \acar \nont{j}{\acar}c'$ and $\nont{i}{c}
+  \rightarrow \acdr \nont{j}{\acdr}c'$. 
+\item A transition $(S_i, c) \rightarrow (S_j,c',R)$ by two productions
+  $\nont{i}{c} \rightarrow c \nont{j}{\acar}\bcar$ and $\nont{i}{c}
+  \rightarrow c \nont{j}{\acdr}\bcdr$. 
+\end{enumerate}
+The idea behind these productions is as follows: Assume that the
+current sentential form is
+\ldots\bcar\bcdr\nont{i}{\acar}\acar\acar\ldots and Starting from $(S_i,
+c)$ if the head writes $c'$ and moves to the left, then the symbol
+$c'$ is exposed to the right of the tape head. However, we do not know
+which symbol that is under the head after the movement. Therefore we
+generate two productions assuming that the symbols are \acar\ and
+\bcar. If the guess is right, then to remove the symbol to the left in
+the sentential form   
+
+
+
+
+
+
+
+
+
+
+
 
 
 We circumvent  the problem by over-approximating the  CFG  by
@@ -1360,8 +1416,6 @@ converted into
 
 
 \section{The Garbage Collection Scheme}
-% GC assumptions
-\cred{Introduction}
 
 Our experimental setup consists of  an interpreter for our language, a
 liveness  analyzer, and  a single  generation copying  collector.  The
