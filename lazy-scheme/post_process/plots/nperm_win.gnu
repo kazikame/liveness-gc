@@ -1,6 +1,4 @@
 
-cat > /tmp/run.gnu <<EOF
-
 
 # for colored graphs, uncomment next line
 set terminal postscript dashed color portrait "Helvetica" 16
@@ -10,12 +8,13 @@ set terminal postscript dashed color portrait "Helvetica" 16
 
 set size ratio 0 1, .25
 
-set xlabel "$1"
+set xlabel "(x 100000)"
+set ylabel "(x 1000)"
 set border 3 lw 0
 
-set output "$1.eps"
-set xtics nomirror $2
-set ytics nomirror $3
+set output "nperm_win.eps"
+set xtics nomirror ("5" 5e5, "6" 6e5, "7" 7e5, "8" 8e5, "9" 9e5)
+set ytics nomirror ("12" 12e3, "16" 16e3, "20" 20e3, "24" 24e3, "28" 28e3)
 set autoscale
 set grid noxtics
 
@@ -31,13 +30,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot "output/$1_gc-live_output/rch.sort"  w l ls 2 notitle, \
-    "output/$1_gc-plain_output/rch.sort" w l ls 1 notitle, \
-    "output/$1_gc-freq_output/rch.sort"  w l ls 3 notitle,  \
-    "output/$1_gc-live_output/rgc.sort"  w l ls 5 notitle,  \
-    "output/$1_gc-live_output/use.sort"  w l ls 4 notitle
+plot [5e5:9e5] [12e3:28e3] "output/nperm_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/nperm_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/nperm_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/nperm_gc-live_output/rgc.sort"  w l ls 5 notitle,      "output/nperm_gc-live_output/use.sort"  w l ls 4 notitle
 
 #    EOF
-EOF
-
-gnuplot /tmp/run.gnu
