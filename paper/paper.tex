@@ -638,7 +638,7 @@ elaborate explanation of these notions appear in \cite{asati14lgc}
 
 
 \subsection{Liveness Analysis for lazy languages}
-
+\label{sec:liveness-analysis}
 Figure~\ref{fig:live-judge}  describes  our  analysis  which  has  two
 parts. The function $\mathit{ref}$,  takes  an application $s$ and
 a demand $\sigma$, and returns  the incremental liveness generated for the
@@ -869,35 +869,48 @@ arguments.
 \subsection{Correctness of liveness analysis}  
  
 We shall now  outline a proof of correctness  of the liveness analysis
-described earlier.   This requires  a significant modification  to the
-technique  used  in  \cite{asati14lgc}.   We shall  first  modify  the
-standard semantics. This semantics, which we shall call {\em minefield
-  semantics}, will  model a liveness based garbage  collection at each
-transition. This is done by starting from the root-set and inserting a
-special value  $\bot$ at each reference  location in the  heap that is
-reachable but not live by  our analysis.  Attempts to dereference such
-locations  during the  transition will  result in  entering  a special
-state denoted  \bang.  We shall then  show that no  program enters the
-\bang\ state.
+presented  in  Section~\ref{sec:liveness-analysis}.   This requires  a
+significant modification  to the technique  used in \cite{asati14lgc}.
+We shall first modify the standard semantics. This semantics, which we
+shall  call {\em  minefield semantics},  will model  a  liveness based
+garbage collection at  each transition. This is done  by starting from
+the root-set  and inserting a  special value $\bot$ at  each reference
+location in the  heap that is reachable but not  live by our analysis.
+Attempts  to dereference  such  locations during  the transition  will
+result in entering a special  state denoted \bang.  We shall then show
+that no program enters the \bang\ state.
  
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
-\item Given an  demand transformer \Lfonly\  we enrich  the abstract machine
-  state  $\rho, S,  H, e$  to $\rho,  S, H,  e, \sigma,  \Sigma$. Here
-  $\sigma$ is  the demand on  the currently active function,  thus the
-  liveness $\Lv$   at $e$ is $\mathcal{L}(e_f, \sigma, \Lfonly)$, and
-  $\Sigma$ is a stack of  demands---one for each function frame pushed
-  in $S$.   Second, we  augment $Val$ with  a value $\bot$.   To model
-  strong  liveness  $\bot$ may  be  copied  freely,  including into  a
-  \CONS\ cell, but explodes  when used computationally (in a primitive
-  operation other  than a copy). Additionally we  define $GC (\Lv,
-  \Sigma) : (\rho, H, S) \rightarrow (\rho , H , S )$ which determines
-  live-reachability using $\rho$  and the $\rho$'s in $S$  as the root
-  set  and  following  links  in   $H$  only  as  far  as  allowed  by
-  \Lv\  and  $\Sigma$.   Hence  $GC  (\Lv,  \Sigma)$  replaces
-  live-unreachable  values---in  $\rho$,  in  $H$ and  the  $\rho$'s  in
-  $S$---with  $\bot$.  For  example,  if $x.\epsilon  \in \Lv$  then
-  $\rho (x) = \bot$.  Only $GC (\cdots )$ introduces $\bot$. 
+\item  Given an  demand transformer  \Lfonly\ we  enrich  the abstract
+  machine state $\rho, S, H, e$  to $\rho, S, H, e, \sigma$.  $\sigma$
+  is the  demand on the  currently active function. As  a consequence,
+  the liveness $\Lv$ at $e$ is $\mathcal{L}(e, \sigma, \Lfonly)$. Each
+  entry  in   the  stack  $S$   of  suspended  evaluations,   is  also
+  augmented---it is  now $(\rho, x,  e, eps, \sigma)$. The $\sigma$  in the
+  stack entry  represents the demand  on the  function where  the evaluation
+  \ldots.  And $eps$ is \ldots.
+\item We introduce a function $GC$ that takes the 4-tuple $(\rho, H, S,
+  \sigma)$ and  inserts $\bot$ in all locations in the current
+  environment $\rho$, the heap $H$ and the environments in the stack
+  $S$ that are dead. More formally:
+
+
+
+
+
+and $\Sigma$ is a  stack of demands---one for each function
+  frame pushed in $S$.  Second,  we augment $Val$ with a value $\bot$.
+  To model strong liveness $\bot$ may be copied freely, including into
+  a  \CONS\  cell,  but  explodes  when  used  computationally  (in  a
+  primitive operation  other than a copy). Additionally  we define $GC
+  (\Lv, \Sigma)  : (\rho,  H, S) \rightarrow  (\rho ,  H , S  )$ which
+  determines live-reachability using $\rho$ and the $\rho$'s in $S$ as
+  the root  set and following links in  $H$ only as far  as allowed by
+  \Lv\   and   $\Sigma$.     Hence   $GC   (\Lv,   \Sigma)$   replaces
+  live-unreachable  values---in $\rho$,  in  $H$ and  the $\rho$'s  in
+  $S$---with $\bot$.  For example,  if $x.\epsilon \in \Lv$ then $\rho
+  (x) = \bot$.  Only $GC (\cdots )$ introduces $\bot$.
 \end{enumerate}  
 
 
@@ -1288,11 +1301,10 @@ program $p$  with program points  $\pi_i$ and variables $x$  such that
 the liveness  analysis of $p$  is same as  $G$ except for a  change in
 non-terminal names which now have the form \var{\Lanv{i}{x}}.
 \end{proposition}
-We now show that the decision problem required at garbage collection
-time is undecidable.
+We now show that the decision  problem that is required to be answered
+at       garbage      collection       time       is      undecidable.
 \newcommand{\state}{\ensuremath{\mathsf{S}}}
-\newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}
-\cblue{
+\newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}  
 \begin{lemma}
 Consider    a    grammar    $G$    of   the    kind    described    in
 Definition~\ref{def:specialgrammar} and a forward access path $\alpha$
@@ -1368,11 +1380,11 @@ productions $\nont{\mathit{final}}{c} \rightarrow \acar
 \nont{\mathit{final}}{c}$ and $\nont{\mathit{final}}{c} \rightarrow \acdr
 \nont{\mathit{final}}{c}$ for cleaning up the \bcar\ and \bcdr\ symbols on
 the left of the head and $\nont{\mathit{final}}{c} \rightarrow 
-\nont{\mathit{final}}{c}\bcar$ and $\nont{\mathit{final}}{c} \rightarrow \acdr
+\nont{\mathit{final}}{c}\bcar$ and $\nont{\mathit{final}}{c} \rightarrow 
 \nont{\mathit{final}}{c}\bcdr$ for cleaning up \acar\ and \acdr\ on the
-right of the tape head. This completes the reduction.  
+right of the tape head. This completes the reduction.
 \end{proof}
-}%end of cblue
+
 We circumvent the problem  of undecidability by over- approximating the
 CFG by non-deterministic finite state automata (NFA). The NFA are then
 simplified using  the $\hookrightarrow$ rules.  Finally the simplified
@@ -2051,7 +2063,7 @@ of the heap and
 
 
 
-\begin{figure*}[t!]
+\begin{figure*}[h!]
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
@@ -2110,10 +2122,39 @@ $\rho',~ (\rho, x, (\SRETURN~x), \{\psi\}, \sigma)\!:\!S, H,  s, \mmap{}{\psi}{x
 \caption{Minefield semantics for the language.\label{fig:minefield-semantics}}
 \end{center}
 \end{figure*}
+ 
+\bigskip
 
+\begin{itemize}
+\item State of the operational semantics will be $\rho, S, H, e,
+  \sigma$.
+\item Stack content will be $\rho, x, e, \sigma, eps$.
+\item Liveness environment calculation:
+  \begin{enumerate}
+  \item Of the   current expression being
+  evaluated:\\  
+  $ \Lv = \bigcup_{ep \in \mathcal{P}(e)} \mathcal{M}_\sigma(ep)$, where $
+  \mathcal{M}_\sigma = \mathcal{L}(e, \sigma, \Lfonly)$
+\item Liveness environment of a stacked computation\\
+  $ \Lv = \bigcup_{ep \in eps} \mathcal{M}_\sigma(ep), \text{where }
+  \mathcal{M}_\sigma = \mathcal{L}(e, \sigma, \Lfonly)$ 
+  \end{enumerate}
+\item $GC$ models a liveness based garbage collection:
+$GC(\rho, S, H, L, SL) = (\rho', S', H')$ 
+  \begin{enumerate}
+  \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
+    \notin \Lv$.
+\item For each $x \in domain(\rho)$ where $(\rho,\_,\_,\_,\_,\_)$ is a
+  stack entry  with \Lv\ as the  liveness environment, $\rho'(x)=\bot$
+  iff $x.\epsilon \notin \Lv$.
+\item for each location $\ell$, $H'(\ell) = \bot$, iff  there is no
+  $x$ in either the current environment or one of the stacked
+  environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
+  \ell$  and $x.\alpha \notin \Lv$, .
 
-
-
+  \end{enumerate}
+\end{itemize}
+ 
 
 
 %% Generated by bibtex from your ~.bib file.  Run latex,
