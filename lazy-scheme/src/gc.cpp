@@ -515,7 +515,7 @@ void clear_live_buffer(ostream& out)
 {
 	cons* start_ptr = static_cast<cons*>(buffer_live);
 	cons* end_ptr = static_cast<cons*>(freept);
-
+	DBG(out<<"Clearing any dead pointers"<<endl);
 	while(start_ptr < freept)
 	{
 		switch(start_ptr->typecell)
@@ -523,28 +523,46 @@ void clear_live_buffer(ostream& out)
 		case consExprClosure:
 			if (!is_valid_address(start_ptr->val.cell.car))
 			{
-				out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl;
+				DBG(out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl);
 				start_ptr->val.cell.car = NULL;
 			}
 			if (!is_valid_address(start_ptr->val.cell.cdr))
+			{
+				DBG(out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl);
 				start_ptr->val.cell.cdr = NULL;
+			}
 			break;
 		case unaryprimopExprClosure:
 			if (!is_valid_address(start_ptr->val.closure.arg1))
+			{
+				DBG(out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl);
 				start_ptr->val.closure.arg1 = NULL;
+			}
 			break;
 		case binaryprimopExprClosure:
 			if (!is_valid_address(start_ptr->val.closure.arg1))
+			{
+				DBG(out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl);
 				start_ptr->val.closure.arg1 = NULL;
+			}
 			if (!is_valid_address(start_ptr->val.closure.arg1))
+			{
+				DBG(out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl);
 				start_ptr->val.closure.arg1 = NULL;
+			}
 			break;
 		case funcArgClosure:
 		case funcApplicationExprClosure:
 			if (!is_valid_address(start_ptr->val.closure.arg1))
+			{
+				DBG(out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl);
 				start_ptr->val.closure.arg1 = NULL;
+			}
 			if (!is_valid_address(start_ptr->val.closure.arg1))
+			{
+				DBG(out << "Setting car part to null for cell with index " << (start_ptr - getbufferlive()) << endl);
 				start_ptr->val.closure.arg1 = NULL;
+			}
 			break;
 		default : break;
 		}
@@ -1450,10 +1468,13 @@ void print_sharing_stats()
 void update_heap_ref_stack(ostream& out, int gc_type)
 {
 	stack<cons*> temp;
-
+	DBG(cerr<<"Number of elements on print stack "<<print_stack.size()<<endl);
+	cons* prev_freept = (cons*)freept;
+	int j = 0;
 	while(!print_stack.empty())
 	{
 		cons* heap_ref = print_stack.top();
+		DBG(out << "Processing heap_ref " << heap_ref<< endl);
 		if (gc_type == 0)
 		{
 			followpaths_reachability(heap_ref);
@@ -1489,6 +1510,12 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		}
 		temp.push(heap_ref);
 		print_stack.pop();
+		if (prev_freept != freept)
+		{
+			DBG(cerr<<"Copied " << ((cons*)freept-prev_freept)<< " for " << j << "th element on print stack"<<endl);
+			prev_freept = (cons*)freept;
+		}
+		++j;
 	}
 
 	while(!temp.empty())
@@ -1580,12 +1607,14 @@ void liveness_gc()
     	  }
     	  else
     	  {
+#if 0
     		  if (vhit->ref == NULL)
     			  continue;
 
     		  cerr << "Processing non-live root variable " << vhit->varname << endl;
     		  for(auto ref : stackit->heapRefs)
     		  {
+
     			  auto cell = static_cast<cons*>(vhit->ref);
     			  cerr << "Processing "<<ref.varname << " with type " << cell->typecell << endl;
     			  if (ref.varname == vhit->varname || !isClosure(cell))
@@ -1624,6 +1653,7 @@ void liveness_gc()
     			  }
 
     		  }
+#endif
     		  //The root variable is not live, set it to NULL as it might later become part of a closure and cause problems
     		  //during GC.
     		  vhit->ref = NULL;
@@ -1631,8 +1661,9 @@ void liveness_gc()
       }
     }
   DBG(pre << "Completed liveness GC" << endl);
+  DBG(pre << "Number of cells copied before print buffer processing " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
   update_heap_ref_stack(pre, 1);
-  DBG(pre << "Number of cells copied " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
+  DBG(pre << "Number of cells copied after print buffer processing " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
   clear_live_buffer(pre);
 #ifdef __DEBUG__GC
 	pre.close();
@@ -1751,10 +1782,13 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 void update_heap_ref_stack(ostream& out, int gc_type)
 {
 	stack<cons*> temp;
-
+	DBG(cerr<<"Number of elements on print stack "<<print_stack.size()<<endl);
+	int j = 0;
+	cons* prev_freept = (cons*)freept;
 	while(!print_stack.empty())
 	{
 		cons* heap_ref = print_stack.top();
+		DBG(out << "Processing heap_ref " << heap_ref<< endl);
 		if (gc_type == 0)
 		{
 			followpaths_reachability(heap_ref);
@@ -1764,12 +1798,12 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		{
 			//Copy heap_ref using liveness of closures. Maybe we can re-use the followpaths function
 			//Make everything live
-			DBG(out << "Processing heap_ref " <<heap_ref<< " with type "<< heap_ref->typecell <<endl);
+
 			if (heap_ref->typecell != consExprClosure)
 			{
 				auto liveness_state = statemap.find("L/-1/c");
 				cons* new_ref = followpaths(heap_ref, liveness_state->second, out);
-				heap_ref = static_cast<cons*>(heap_ref->forward);
+
 			}
 			else if (heap_ref->val.cell.can_delete_car == false)
 			{
@@ -1777,12 +1811,19 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 				auto liveness_state = statemap.find("L/-1/c");
 				cons* new_cdr = followpaths(heap_ref->val.cell.cdr, liveness_state->second, out);
 				new_ref->val.cell.cdr = new_cdr;
-				heap_ref = static_cast<cons*>(heap_ref->forward);
+
 			}
+			heap_ref = static_cast<cons*>(heap_ref->forward);
 
 		}
 		temp.push(heap_ref);
 		print_stack.pop();
+		if (prev_freept != freept)
+		{
+			DBG(cerr<<"Copied " << ((cons*)freept-prev_freept)<< " for " << j << "th element on print stack"<<endl);
+			prev_freept = (cons*)freept;
+		}
+		++j;
 	}
 
 	while(!temp.empty())
@@ -1864,12 +1905,17 @@ void liveness_gc()
     			  ++(((cons*)vhit->ref)->visited);
 #endif
     	  }
+    	  else
+    	  {
+    		  vhit->ref = NULL;
+    	  }
       }
     }
   DBG(pre << "Completed liveness GC" << endl);
+  DBG(pre << "Number of cells copied before print buffer processing " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
   update_heap_ref_stack(pre, 1);
   clear_live_buffer(pre);
-  DBG(pre << "Copied " << numcopied << " cells" << endl);
+  DBG(pre << "Number of cells copied after print buffer processing " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
   numcopied = 0;
 #ifdef __DEBUG__GC
 	pre.close();
@@ -1891,7 +1937,7 @@ void liveness_gc()
 cons* followpaths(cons* loc, state_index index, ostream& out)
 {
 
-  cons* loccopy = copy(loc, out);
+
 //  DBG(out << "Copied " << loc << "-->"<<loccopy<<endl);
 #ifdef ENABLE_SHARING_STATS
   if (loccopy)
@@ -1901,13 +1947,15 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   if (NULL == loc)
 	  return loc;
 
+  //cons* loccopy = copy(loc, out);
+  cons* loccopy = NULL;
   switch(loc->typecell)
   {
   case consExprClosure :
   {
 	  DBG(out << "Copying cell from " << loc << " with type " << loc->typecell << endl);
  	  DBG(out << "state index is " << index << endl);
-
+ 	  loccopy = copy(loc, out);
 	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
 	  if (a0 > 0)
 	  {
@@ -1932,10 +1980,14 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   case nilExprClosure:
   case constIntExprClosure:
   case constBoolExprClosure:
-  case constStringExprClosure: return loccopy;
-  break;
-  case unaryprimopExprClosure :
+  case constStringExprClosure: {
+	  	  	  	  	  	  	  	  if (index > 0)
+	  	  	  	  	  	  	  		  loccopy = copy(loc, out);
+	  	  	  	  	  	  	  	  break;
+  	  	  	  	  	  	  	  	 }
+    case unaryprimopExprClosure :
   {
+	  loccopy = copy(loc, out);
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
 
 	  auto liveness_state = statemap.find(liveness_string);
@@ -1950,6 +2002,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   break;
   case binaryprimopExprClosure:
   {
+	  loccopy = copy(loc, out);
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
 
 	  auto liveness_state = statemap.find(liveness_string);
@@ -1975,7 +2028,8 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   case funcApplicationExprClosure:
   case funcArgClosure:
   {
-      //What happens to arg1? Shouldn't it get updated during GC?
+	  loccopy = copy(loc, out);
+	  //What happens to arg1? Shouldn't it get updated during GC?
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
 
 	  auto liveness_state = statemap.find(liveness_string);

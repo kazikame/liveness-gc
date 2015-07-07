@@ -1337,12 +1337,12 @@ relation between the machine configuration and the  sentential form:
   replaced by $\overline{d}$.
 \end{quote}
 
-Assume that  the TM  starts in a  state $S_\mathit{init}$ with  a tape
-$cw$  and the  head   positioned on  the symbol  $c$. Then  the the
-sentential  form   corresponding  to  the   initial  configuration  is
-$\nont{\mathit{init}}{c}w$ (we can assume  that there is a production
-$\nont{}{}  \rightarrow \nont{\mathit{init}}{c}w$, where  \nont{}{} is
-the start symbol of  the grammar). Further correspondences between the
+Assume that  the TM starts  in a  state $S_\mathit{init}$ with  a tape
+$cw$ and  the head positioned on  the symbol $c$. Then  the sentential
+form    corresponding     to    the    initial     configuration    is
+$\nont{\mathit{init}}{c}w$ (we  can assume that there  is a production
+$\nont{}{} \rightarrow  \nont{\mathit{init}}{c}w$, where  \nont{}{} is
+the start symbol of the  grammar). Further correspondences between the
 Turing machine moves and the grammar productions are as follows:
 
 \begin{enumerate}
@@ -1755,53 +1755,56 @@ Therefore we believe that using reachability for closures is a sweet spot in ter
 
 
 
-%% \begin{figure}[p]
-%% \begin{tabular}{@{}c@{}c@{}}
-%% \hskip -4mm{\epsfig{file=sudoku.eps, height=4cm, width=6.10cm}}
-%% &
-%% {\epsfig{file=lcss.eps, height=4cm, width=6.10cm}}
-%% \\
-%% \hskip -4mm{\epsfig{file=gc_bench.eps, height=4cm, width=6.10cm}}
-%%  &
-%% {\epsfig{file=nperm.eps, height=4cm, width=6.10cm}}
-%% \\
-%% \hskip -4mm{\epsfig{file=fibheap.eps, height=4cm, width=6.10cm}}
-%% &
-%% {\epsfig{file=knightstour.eps, height=4cm, width=6.10cm}}
-%% \\
-%% \hskip -4mm{\epsfig{file=nqueens.eps, height=4cm, width=6.10cm}}
-%% &
-%% {\epsfig{file=treejoin.eps, height=4cm, width=6.10cm}}
-%% \end{tabular}
-%%  \caption{Memory  usage of  programs. The blue and the red curves
-%%   indicate the number of cons cells in the active semi-space for RGC
-%% and
-%%   LGC respectively. The black curve represents the number of reachable
-%%   cells and the grey curve represents the number of cells that are
-%%   actually live (of which liveness analysis does  a static
-%%   approximation). x-axis is the time measured in number of cons-cells
-%%   allocated. y-axis is the number of cons-cells.}
-%% \label{fig:memory-usage} \figrule
-%% \end{figure}
-The table in Figure~\ref{fig:experimental-results} shows that LGC improves the 
-garbage collection time and efficiency for most of the programs. 
-Even for programs where the time taken is more it is very competitive. 
-As the number of garbage collections tend to be very large our graphs show only 
-a window which is representative of the behavior for that particular benchmark. 
-In all the programs we can see that the curve corresponding to liveness regularly 
-dips below the reachability curve. 
+\begin{figure}[p]
+\begin{tabular}{@{}c@{}c@{}}
+\hskip -4mm{\epsfig{file=sudoku.eps, height=4cm, width=4.10cm}}
+&
+{\epsfig{file=lcss.eps, height=4cm, width=4.10cm}}
+\\
+\hskip -4mm{\epsfig{file=gc_bench.eps, height=4cm, width=4.10cm}}
+ &
+{\epsfig{file=nperm.eps, height=4cm, width=4.10cm}}
+\\
+\hskip -4mm{\epsfig{file=fibheap.eps, height=4cm, width=4.10cm}}
+&
+{\epsfig{file=fibheap.eps, height=4cm, width=4.10cm}}%%Add knightstour.eps
+\\
+\hskip -4mm{\epsfig{file=nqueens.eps, height=4cm, width=4.10cm}}
+&
+{\epsfig{file=treejoin.eps, height=4cm, width=4.10cm}}
+\end{tabular}
+ \caption{Memory  usage  of programs.  The  blue  and the  red  curves
+   indicate the number of cons cells  in the active semi-space for LGC
+   and  RGC respectively.  The black  curve represents  the number  of
+   reachable cells and  the grey curve represents the  number of cells
+   that are  actually live (of  which liveness analysis does  a static
+   approximation). x-axis is the time measured in number of cons-cells
+   allocated. y-axis is the number of cons-cells.}
+\label{fig:memory-usage} \figrule
+\end{figure}
+The  table  in  Figure~\ref{fig:experimental-results} shows  that  LGC
+improves the  garbage collection time  and efficiency for most  of the
+programs.  Even for  programs where the time taken is  more it is very
+competitive.  Memory usage  graphs are shown for  select benchmarks in
+Figure~\ref{fig:memory-usage}.  As  the number of  garbage collections
+tend  to  be  very large  our  graphs  show  only  a window  which  is
+representative of the behavior for  that particular benchmark.  In all
+the programs we can see that  the curve corresponding to LGC regularly
+dips below the RGC curve.
 
-One area of concern is the huge gap between the actual liveness and the 
-liveness percieved by our collector. In case of LGC for eager languages the 
-gap was very narrow and almost touched the actual liveness curve. 
-In case of lazy languages, due to using reachability for copying we end up copying 
-more cells. Any data which is part of closure irrespective of whether it is live 
-or not gets copied. Thus many non-live cells get copied during garbage collection 
-increasing the drag time.
-Our experiments have shown that unless we use the exact execution point for 
-closures bringing down the number of non-live cells copied in closures cannot be reduced.
-Using the approximated liveness (liveness at the creation point) does not give benefits in terms of non-live
- cells inside closures as everything would be live at the point of creation.
+One area  of concern is the  huge gap between the  actual liveness and
+the liveness  percieved by  our collector.  In case  of LGC  for eager
+languages  the gap  was  very  narrow and  almost  touched the  actual
+liveness curve.  In case of  lazy languages, due to using reachability
+for copying we  end up copying more  cells. Any data which  is part of
+closure irrespective  of whether it is  live or not gets  copied. Thus
+many non-live  cells get  copied during garbage  collection increasing
+the drag  time.  Our  experiments have  shown that  unless we  use the
+exact  execution  point  for  closures bringing  down  the  number  of
+non-live  cells  copied in  closures  cannot  be reduced.   Using  the
+approximated liveness (liveness  at the creation point)  does not give
+benefits  in terms  of non-live  cells inside  closures as  everything
+would be live at the point of creation.
 %% \comment{
 %% The  increased effectiveness  of LGC  over RGC  is also  shown  in the
 %% tables  in  Figure~\ref{fig:experimental-results}.   The  first  table
@@ -1879,24 +1882,24 @@ RGC & LGC & RGC & LGC  & RGC & LGC  &   RGC & LGC & RGC & LGC & RGC &
 LGC \\
 \hline
 \hline
-    {\sf   sudoku}  &381 &1107 &1268 &281 &8 &3 & 1346  &338 &527 &5
-&.007 & .034 \\
-    {\sf  lcss } & 46522 &51101 &6216 &1363&8&7& 52301  &1701 &5147
-&588 &.045 & .144 \\
-    {\sf   gc\_bench}  &129179 &131067 &1894 &4&9&9& 131071   &6 &16970
- &4 &.086 & .075 \\
-     {\sf  nperm}  & 47586  &174478 &201585 &60882&14&4& 202597  &37507
-&171878 &76618 &1.406 & .9  \\
-    {\sf  fibheap} &249502  &251525 &5555 &2997&1&1& 254520  &13558
-&78720 &0 &.006 & .014  \\
+    {\sf   sudoku}  &381 &1107 &1268 &281 &169 &159 & 1346  &338 &527 &5
+&.008 & .026 \\
+    {\sf  lcss } & 46522 &51101 &6216 &1363&30&24& 52301  &1701 &5147
+&588 &.007 & .008 \\
+    {\sf   gc\_bench}  &129179 &131067 &1894 &4&34&4& 131071   &6 &16970
+ &4 &.13 & .0002 \\
+     {\sf  nperm}  & 47586  &174478 &201585 &60882&710&386& 202597  &37507
+&171878 &76618 &0.250 & .154  \\
+    {\sf  fibheap} &249502  &251525 &5555 &2997&1002&975& 254520  &13558
+&78720 &0 &1.185 & 5.457  \\
     {\sf  knightstour}  &2593 &314564 &907502 &319299&1161&10&508225
 &307092 &206729 &82112 &464.902 & 14.124  \\
-    {\sf  treejoin} & 288666  &519943 &297570 &5547&2&1& 525488  &7150
-&212653 &1954 &.356 & .217 \\
+    {\sf  treejoin} & 288666  &519943 &297570 &5547&116&81& 525488  &7150
+&212653 &1954 &4.335 & 4.4 \\
     {\sf   nqueens} & 283822 &1423226 &2133001 &584143&46&9& 1819579
 &501093 &521826 &39465 &70.314 & 24.811 \\
-    {\sf   lambda}  &205 & 556 &2072&90345 &23 &8&966 & 721  &303 &95
-&.093 &2.49  \\
+    {\sf   lambda}  &205 & 556 &2072&90345 &775 &750&966 & 721  &303 &95
+&.179 &1.01  \\
 %    {\sf   fft }& &  & & &&&& ???? &???? &????? &????? &???? & ????
 \\
 %    {\sf  nboyer} & &  & &   & &  & & &  \\
@@ -1906,7 +1909,7 @@ LGC \\
 
 
 \centerline{(b)}
-\vskip -2mm
+\vskip -0.75mm
 \caption{Experimental results comparing RGC and LGC. Table (a) gives
   data related to liveness analysis, and (b) gives garbage collection
   data. The average drag time is measured in allocated cons cells.}
