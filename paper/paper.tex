@@ -2064,61 +2064,154 @@ of the heap and
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
+\pagebreak
 
+\pagebreak
+\section{Appendix}
+
+We shall now  outline a proof of correctness  of the liveness analysis
+presented  in  Section~\ref{sec:liveness-analysis}.   This requires  a
+significant modification  to the technique  used in \cite{asati14lgc}.
+\cblue{Good points to  make in the main text, right  in the small step
+  semantics  section: Note  that the  state of  the  transition system
+  consists of the current evaluation context, given by $\rho$ and $e$,
+  and  the suspended evaluation  contexts recorded  in the  stack $S$.
+  The heap $H$  is common to all contexts.}
+
+The idea behind the proof is  as follows: We shall modify the standard
+semantics to a semantics  called {\em minefield semantics} that models
+a liveness based garbage collection  at each transition.  The state of
+the  transition system  is augmented  to carry  enough  information to
+calculate the liveness environment  at the current evaluation context,
+and  each   of  the   suspended  evaluation  contexts.    Before  each
+transition,  we start  from the  root-set and  insert a  special value
+$\bot$ at each  location in the heap that contains  a reference and is
+reachable but  not live by  our analysis.  Any attempt  to dereference
+such locations during the transition will result in entering a special
+state denoted \bang.  The main proof is to show that no program enters
+the \bang\ state in the minefield semantics.
+ 
+To set up the minefield semantics, we follow these steps:
+\begin{enumerate}
+\item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
+  $\rho,$ $S,$ $H,$  $e,$ $\sigma,$ $e_f$.  $\sigma$ is  the demand on
+  the expression and $e_f$ is the  body of the function.  The body and
+  the demand are both needed to calculate the liveness environment for
+  expressions.  The evaluation of  an expression may make variables in
+  the scope live because of closures that are created outside it.  The
+  information  in a  suspended  evaluation context  is also  similarly
+  augmented with the demand on it and the function body of which the
+  suspended evaluation is a part.  Thus a stacked entry now takes the
+  form $(\rho, x, e, \sigma, e_f)$. A modification of the small step
+  semantics which carries the extra information is shown in Figure[].
+\item Given the current evaluation context $\rho, S, H, e, \sigma,
+  e_f$ and $LF$, we can construct a liveness environment as follows:
+  \begin{enumerate}
+  \item If $e$ is an expression, then:  
+  $$ \Lv = \bigcup_{\psi \in \mathcal{P}(e)} \mathcal{M}(\psi),
+    \text{where }
+  \mathcal{M} = \mathcal{L}(e_f, \sigma, \Lfonly)$$
+\item If $e$ is an application, then:  
+  $$ \Lv = ref(e, \sigma, \Lfonly)$$
+  \end{enumerate}
+We can define in the same way the liveness environment for each of the
+suspended  evaluation contexts in  $S$  giving  a  stack of  liveness
+environments that we shall denote $\mathsf{SL}$.
+\item $GC$ models a liveness based garbage collection:
+$GC(\rho,$ $ S,$ $ H,$ $ L,$ $ SL) = (\rho', S', H')$ 
+  \begin{enumerate}
+  \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
+    \notin \Lv$.
+\item For each stack entry $(\rho,\_,\_,\_,\_)$ in $S$ with $\Lv'$ as
+  the corresponding liveness environment in $\mathsf{SL}$,  and for each $x
+  \in domain(\rho)$,  $\rho'(x)=\bot$
+  iff $x.\epsilon \notin \Lv'$.
+\item For each location $\ell$, $H'(\ell) = \bot$, iff  there is no
+  $x$ in either the current environment or one of the stacked
+  environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
+  \ell$  and $x.\alpha \in \Lv$, .
+  \end{enumerate}
+\end{enumerate}
 
 \begin{figure*}[h!]
 \begin{center}
 \begin{tabular}{|c|c|c|}
 \hline
-Premise & Transition & Rule name \\
+Premise & Transition & Rule name \\ 
 \hline
 \hline
-          &\makecell{ $\rho, (\rho', x, e, \{\psi_{i}\}, \sigma')\!:\!S, H, \kappa, \sigma$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) := \kappa], e, \sigma'$ }   &  \sc{const}
+          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma', e_f'})\!:\!S,
+  H, \kappa, \sigma, e_f$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
+    \kappa], e, \sigma', e_f'$ }   &  \sc{const}
 \\
 \hline
-          & \makecell{$\rho, (\rho', z, e, \{\psi_{i}\}, \sigma')\!:\!S, H, (\CONS~x~y), \sigma$ \\ $\rightsquigarrow  \rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e, \sigma'$}     &  \sc{cons} \\
+          & \makecell{$\rho, (\rho', z, e, \cred{\sigma',
+    e_f'})\!:\!S, H, (\CONS~x~y), \sigma, e_f$ \\ $\rightsquigarrow
+  \rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e, \sigma', e_f'$}     &  \sc{cons} \\
 \hline
-$H(\rho(x)) \mbox{ is } (d_1, d_2)$ & \makecell{$\rho, (\rho', z, e, \{\psi_{i}\}, \sigma' )\!:\!S, H, (\CAR~x), \sigma$ \\ $ \rightsquigarrow \rho', S, H[\rho(z) := d_1], e, \sigma'$}      &
+$H(\rho(x)) \mbox{ is } (d_1, d_2)$ & \makecell{$\rho, (\rho', z, e,
+  \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \sigma, e_f$ \\ $
+  \rightsquigarrow \rho', S, H[\rho(z) := d_1], e, \sigma', e_f'$}      &
 \sc{car-whnf} \\
 \hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S, H, (\CAR~x), \sigma$ \\ $\rightsquigarrow \rho', (\rho, x, (\CAR~x), \{\psi_{i}\}, \sigma)\!:\!S, H, s,\bigcup_{\psi \in \{\psi_{i}\}}\mmap{}{\psi}{x} $}      &
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+  H, (\CAR~x), \sigma, e_f$ \\ $\rightsquigarrow \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, (\clazy \cup \acar)\sigma , \_ $}      &
 \sc{car-clo}
 \\
 \hline
 $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
- & \makecell{$\rho, (\rho', z, e, \{\psi_{i}\}, \sigma')\!:\!S, H, (+~x~y), \sigma$ \\  $\rightsquigarrow \rho', S, H[\rho(z) \mapsto H(\rho(x)) + H(\rho(y))], e, \sigma'$}      &
+ & \makecell{$\rho, (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H,
+  (+~x~y), \sigma, e_f$ \\  $\rightsquigarrow \rho', S, H[\rho(z)
+    \mapsto H(\rho(x)) + H(\rho(y))], e, \sigma', e_f'$}      &
 \sc{prim-whnf} \\
 \hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S, H, (+~x~y), \sigma$ \\ $\rightsquigarrow \rho', (\rho, x, (+~x~y), \{\psi_{i}\}, \sigma)\!:\!S, H, s, \bigcup_{\psi \in \{\psi_{i}\}}\mmap{}{\psi}{x}$}      &
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+  H, (+~x~y), \sigma, e_f$ \\ $\rightsquigarrow \rho', (\rho, x,
+  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \clazy\sigma, \_$}      &
 \sc{prim-1-clo} \\
 \hline
-$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho, S, H, (+~x~y), \sigma$ \\ $\rightsquigarrow \rho', (\rho, y, (+~x~y), \{\psi_{i}\}, \sigma)\!:\!S, H, s, \bigcup_{\psi \in \{\psi_{i}\}}\mmap{}{\psi}{y} $}      &
+$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+  S, H, (+~x~y), \sigma, e_f$ \\ $\rightsquigarrow \rho', (\rho, y,
+  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \clazy\sigma, \_ $}      &
 \sc{prim-2-clo} \\
 \hline
-{$\mathit{f}~\mbox{defined as}$
-$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell{$\rho, S, H, (f~\myvec{x}), \sigma$ \\ $\rightsquigarrow [\myvec{y} \mapsto \rho(\myvec{x})], S, H, e_{\mathit{f}}, \sigma$}      &
+{$\mathit{g}~\mbox{defined as}$
+$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
+  (g~\myvec{x}), \sigma, e_f$ \\ $\rightsquigarrow [\myvec{y} \mapsto
+    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \sigma, e_g$}      &
 \sc{funcall} \\
 \hline
-$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow s~\IN~e)$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-  \ell]\rangle], e$} &
+$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
+  s~\IN~e), \sigma, e_f$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+  \ell]\rangle], e, \sigma, e_f$} &
 \sc{let} \\
 \hline
-$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2), ep, \sigma$ \\ $\rightsquigarrow \rho, S, H,  e_1, ep, \sigma$} & \sc{if-true} \\
+$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \sigma, e_f$ \\ $\rightsquigarrow \rho, S, H,  e_1, \sigma, e_f$} & \sc{if-true} \\
 \hline
-$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2), ep, \sigma$ \\   $\rightsquigarrow
-\rho, S, H,  e_2, ep, \sigma$} & \sc{if-false} \\
+$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \sigma, e_f$ \\   $\rightsquigarrow
+\rho, S, H,  e_2, \sigma, e_f$} & \sc{if-false} \\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,  (\pi:\SIF~\psi:x~e_1~e_2), \sigma$ \\ $\rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2),  \pmap{}(\pi), \sigma)\!:\!S, H,  s, \mmap{}{\psi}{x}$}
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\pi:\SIF~\psi:x~e_1~e_2), \sigma, e_f$ \\ $\rightsquigarrow
+\rho', (\rho, x, (\SIF~x~e_1~e_2),  \sigma, e_f)\!:\!S, H, s,
+\clazy\sigma, e_f$}
 &
 \sc{if-clo} \\
 \hline
-{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho, (\rho', z, e, ep, \sigma')\!:\!S, H, (\SRETURN~x), \sigma$ \\ $\rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e, \sigma'$} &
+{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
+  (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \sigma,
+  e_f$ \\ $\rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e,
+  \sigma', e_f'$} &
 \sc{return-whnf}\\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H, (\psi:\SRETURN~x), \sigma$ \\ $
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\psi:\SRETURN~x), \sigma, e_f$ \\ $
   \rightsquigarrow$
-$\rho',~ (\rho, x, (\SRETURN~x), \{\psi\}, \sigma)\!:\!S, H,  s, \mmap{}{\psi}{x}$} &
+$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
+  \sigma, e_f$} &
 \sc{return-clo} \\
 \hline
 \end{tabular}
@@ -2126,38 +2219,9 @@ $\rho',~ (\rho, x, (\SRETURN~x), \{\psi\}, \sigma)\!:\!S, H,  s, \mmap{}{\psi}{x
 \end{center}
 \end{figure*}
  
-\bigskip
 
-\begin{itemize}
-\item State of the operational semantics will be $\rho, S, H, e,
-  \sigma$.
-\item Stack content will be $\rho, x, e, \sigma, eps$.
-\item Liveness environment calculation:
-  \begin{enumerate}
-  \item Of the   current expression being
-  evaluated:\\  
-  $ \Lv = \bigcup_{ep \in \mathcal{P}(e)} \mathcal{M}_\sigma(ep)$, where $
-  \mathcal{M}_\sigma = \mathcal{L}(e, \sigma, \Lfonly)$
-\item Liveness environment of a stacked computation\\
-  $ \Lv = \bigcup_{ep \in eps} \mathcal{M}_\sigma(ep), \text{where }
-  \mathcal{M}_\sigma = \mathcal{L}(e, \sigma, \Lfonly)$ 
-  \end{enumerate}
-\item $GC$ models a liveness based garbage collection:
-$GC(\rho, S, H, L, SL) = (\rho', S', H')$ 
-  \begin{enumerate}
-  \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
-    \notin \Lv$.
-\item For each $x \in domain(\rho)$ where $(\rho,\_,\_,\_,\_,\_)$ is a
-  stack entry  with \Lv\ as the  liveness environment, $\rho'(x)=\bot$
-  iff $x.\epsilon \notin \Lv$.
-\item for each location $\ell$, $H'(\ell) = \bot$, iff  there is no
-  $x$ in either the current environment or one of the stacked
-  environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
-  \ell$  and $x.\alpha \notin \Lv$, .
 
-  \end{enumerate}
-\end{itemize}
- 
+
 
 
 %% Generated by bibtex from your ~.bib file.  Run latex,
