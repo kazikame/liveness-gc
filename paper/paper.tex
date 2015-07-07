@@ -1742,24 +1742,24 @@ Therefore we believe that using reachability for closures is a sweet spot in ter
 %% \end{figure*}
 
 
-
-\begin{figure}[p]
+\newcommand{\hgt}{3cm}
+\begin{figure*}[t]
 \begin{tabular}{@{}c@{}c@{}}
-\hskip -4mm{\epsfig{file=sudoku.eps, height=4cm, width=4.10cm}}
+\hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}%, width=4.10cm}}
 &
-{\epsfig{file=lcss.eps, height=4cm, width=4.10cm}}
+{\epsfig{file=lcss.eps, height=\hgt}}%, width=4.10cm}}
 \\
-\hskip -4mm{\epsfig{file=gc_bench.eps, height=4cm, width=4.10cm}}
+\hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}%
  &
-{\epsfig{file=nperm.eps, height=4cm, width=4.10cm}}
+{\epsfig{file=nperm.eps, height=\hgt}}%
 \\
-\hskip -4mm{\epsfig{file=fibheap.eps, height=4cm, width=4.10cm}}
+\hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}%
 &
-{\epsfig{file=fibheap.eps, height=4cm, width=4.10cm}}%%Add knightstour.eps
+{\epsfig{file=fibheap.eps, height=\hgt}}%%%Add knightstour.eps
 \\
-\hskip -4mm{\epsfig{file=nqueens.eps, height=4cm, width=4.10cm}}
+\hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}%
 &
-{\epsfig{file=treejoin.eps, height=4cm, width=4.10cm}}
+{\epsfig{file=treejoin.eps, height=\hgt}}%
 \end{tabular}
  \caption{Memory  usage  of programs.  The  blue  and the  red  curves
    indicate the number of cons cells  in the active semi-space for LGC
@@ -1769,7 +1769,7 @@ Therefore we believe that using reachability for closures is a sweet spot in ter
    approximation). x-axis is the time measured in number of cons-cells
    allocated. y-axis is the number of cons-cells.}
 \label{fig:memory-usage} \figrule
-\end{figure}
+\end{figure*}
 The  table  in  Figure~\ref{fig:experimental-results} shows  that  LGC
 improves the  garbage collection time  and efficiency for most  of the
 programs.  Even for  programs where the time taken is  more it is very
