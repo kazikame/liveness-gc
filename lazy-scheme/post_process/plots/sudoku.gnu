@@ -8,8 +8,7 @@ set terminal postscript dashed color portrait "Helvetica" 16
 
 set size ratio 0 1, .25
 
-set xlabel "(x 100000)"
-set ylabel "(x 1000)"
+set xlabel "sudoku"
 set border 3 lw 0
 
 set output "sudoku.eps"
