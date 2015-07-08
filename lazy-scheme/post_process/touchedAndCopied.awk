@@ -3,6 +3,7 @@ BEGIN {
     touched=0
     coll=0
     numgc=0
+    batch=1 # for generating table
 }
 {
     numgc++;
@@ -19,8 +20,14 @@ END{
     touched -= lasttouched
     coll -= lastcoll
 
-    print "Number of GC: ", numgc
-    print "Copied Cells (Avg) : ", copied, copied/numgc
-    print "Touched Cells (Avg) : ", touched, touched/numgc
-    print "Collected Cells (Avg) : ", coll, coll/numgc
+    if (batch == 0) {
+        print "Number of GC: ", numgc
+        print "Copied Cells (Avg) : ", copied, copied/numgc
+        print "Touched Cells (Avg) : ", touched, touched/numgc
+        print "Collected Cells (Avg) : ", coll, coll/numgc
+    }
+    else {
+        # print only avg of collected and touched and num
+        print coll/numgc, touched/numgc, numgc
+    }
 }
