@@ -127,8 +127,9 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 {
 	//Do any per program initialization here.
 	Scheme::SchemeDriver driver;
-	cout << "Parsing " << pgmFilePath << endl;
+//	cout << "Parsing " << pgmFilePath << endl;
 	std::pair<bool, long> parseResult = driver.parse(pgmFilePath.c_str());
+	double dfa_gen_time = 0;
 	if(!parseResult.first)
 	{
 		cout << "Error while parsing " << parseResult.second<<endl;
@@ -148,6 +149,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 
 	if (gc_type == gc_live && !filesCached )
 	{
+		clock_t dfa_gen_start = clock();
 		
 		//Instead of driver.process returning an integer why can't it return the grammar?
 		int resint = driver.process();
@@ -168,12 +170,12 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/simplified-program-cfg.txt");
 		//Convert CFG to strongly regular grammar
 		regular_demand_grammar *reg = regularize(&gLivenessData);
-		cout << "Converted CFG into strongly regular grammar" << endl;
+//		cout << "Converted CFG into strongly regular grammar" << endl;
 		gLivenessData.clear(); //clear the original grammar
 		gLivenessData.swap(*(reg->first));
 		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/program-reg.txt");
 		Scheme::Demands::sanitize(&gLivenessData); //Remove empty productions
-		std::cout << "Sanitized the regular grammar"<<std::endl;
+//		std::cout << "Sanitized the regular grammar"<<std::endl;
 
 
 		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
@@ -197,6 +199,8 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		}
 		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa, label_set_map);
 
+		dfa_gen_time = (double(clock() - dfa_gen_start)/CLOCKS_PER_SEC);
+
 		//Scheme::Demands::minimizeDFA(dfa, start_states);
 	}
 	else if (gc_type == gc_live) //TODO : Make it compile conditionally only when we are dumping graphviz files
@@ -205,7 +209,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		driver.get_anf_prog()->print(file, 0, true, true, Scheme::output::SCHEME);
 		file.close();
 
-		cout <<"Reading data from cached files "<<endl;
+//		cout <<"Reading data from cached files "<<endl;
 		const int SZ = 1024 * 1024;
 		std::vector<char> buff(SZ, '\0');
 		ifstream ifs( outdir + pgmname + "/fsmdump-" + pgmname + "-state-map" );
@@ -217,7 +221,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		numkeys = n + 1;
 	}
 ///////////////////////////////////////////////////////////////////////
-	cout << "Num of states " << numkeys << endl;
+//	cout << "Num of states " << numkeys << endl;
 	//Do the initialization of the dfa state map and transition table
 	//initialize(pgmFilePath, numkeys, gc_type);
 	clock_t pstart = clock();
@@ -249,7 +253,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	outfile << endl;
 
 
-	cout << "Completed program evaluation" << endl;
+//	cout << "Completed program evaluation" << endl;
 	clock_t pend = clock();
 	if (gc_type != gc_disable)
 		finish_gc_stats();
@@ -260,6 +264,8 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		cleanup(numkeys-1);
 
 	cout << "GC Invocations="<<gccount<<" GC Time="<<gctime<<endl;
+	cout << "DFA Gen Time="<<dfa_gen_time<<endl;
+	cout << "Num of DFA states="<<numkeys<<endl;
 	cout << "Program Execution Time="<<((double(pend - pstart)/CLOCKS_PER_SEC) - gctime)<<" seconds"<<endl;
 
 	return *this;
@@ -305,7 +311,7 @@ int main(int argc, char ** argv)
 	string filepath = argv[1];
 	long heapsize = stol(argv[2]);
 	GCStatus gctype = getGCType(argv[3]);
-	cout << "Calling " << prog_name << " with " << filepath << " " << heapsize << " " << gctype;
+//	cout << "Calling " << prog_name << " with " << filepath << " " << heapsize << " " << gctype;
     if (gctype == gc_freq) cout << "=" << gc_freq_threshold;
     cout << endl;
 

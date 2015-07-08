@@ -5,8 +5,9 @@ import time
 import datetime
 from collections import namedtuple
 
-prog_size = {'nqueens':22729, 'nperm':27429, 'fibheap':38001, 'treejoin':1616535, 'sudoku':4075, 'lcss':22243, 'lambda':20466, 'knightstour':677800 ,'gc_bench':204850}
-gc_info = namedtuple("gc_info", "heap_total heap_left heap_used gc_invocations gc_time exec_time")
+#'knightstour':677800
+prog_size = {'nqueens':22729, 'nperm':27429, 'fibheap':38001, 'treejoin':1616535, 'sudoku':4075, 'lcss':22243, 'lambda':20466, 'gc_bench':204850}
+gc_info = namedtuple("gc_info", "heap_total heap_left heap_used gc_invocations gc_time dfa_time num_states exec_time")
 gc_stat = namedtuple("gc_stat", "prog_name reachability liveness")
 gc_stat_list = []
 
@@ -30,14 +31,18 @@ def collect_gc_results(filename, prog_dir_path, gc_type):
     heap_used_cmd = grep_cmd + " \"Heap used=[0-9]*\"   " +  result_file_name  + int_grep
     gc_invocations_cmd = grep_cmd + " \"GC Invocations=[0-9]*\"   " +  result_file_name  + int_grep
     gc_time_cmd = grep_cmd + " \"GC Time=(([0-9][0-9]*\.?[0-9]*)|(\.[0-9]+))([Ee][+-]?[0-9]+)?\"   " +  result_file_name  + float_grep
+    dfa_time_cmd = grep_cmd + " \"DFA Gen Time=(([0-9][0-9]*\.?[0-9]*)|(\.[0-9]+))([Ee][+-]?[0-9]+)?\"   " +  result_file_name  + float_grep
+    dfa_states_cmd = grep_cmd + " \"Num of DFA states=(([0-9][0-9]*\.?[0-9]*)|(\.[0-9]+))([Ee][+-]?[0-9]+)?\"   " +  result_file_name  + int_grep
     prog_execution_time_cmd = grep_cmd + " \"Program Execution Time=[0-9]*(\.[0-9]*)?\"   " +  result_file_name  + float_grep
     heap_total = os.popen(heap_total_cmd).read()
     heap_left = os.popen(heap_left_cmd).read()
     heap_used = os.popen(heap_used_cmd).read()
     gc_invocations = os.popen(gc_invocations_cmd).read()
+    dfa_time = os.popen(dfa_time_cmd).read()
+    num_states = os.popen(dfa_states_cmd).read()
     gc_time = os.popen(gc_time_cmd).read()
     prog_execution_time = os.popen(prog_execution_time_cmd).read()
-    return gc_info(int(heap_total), int(heap_left), int(heap_used), int(gc_invocations), float(gc_time), float(prog_execution_time))
+    return gc_info(int(heap_total), int(heap_left), int(heap_used), int(gc_invocations), float(gc_time), float(dfa_time), int(num_states), float(prog_execution_time))
     #return gc_info(0, 0, 0, int(gc_invocations), float(gc_time), float(prog_execution_time))
 
 
@@ -52,8 +57,8 @@ def main():
         if (prog_dir in prog_size.keys()):
             i = i + 1
             subprocess.call('mkdir -p ' + prog_dir_path + '/results', shell=True)
-            gc_plain_info = gc_info(0,0,0,0,0,0)
-            gc_live_info = gc_info(0,0,0,0,0,0)
+            gc_plain_info = gc_info(0,0,0,0,0,0,0,0)
+            gc_live_info = gc_info(0,0,0,0,0,0,0,0)
 
             for _ in xrange(numTimes):
                 run_program(prog_dir, prog_dir_path, "gc-plain")
