@@ -1562,7 +1562,7 @@ ProgramNode * ProgramNode::clone() const {
 
 cons* ProgramNode::evaluate()
 {
-	std::cout << "Evaluating main expression " << std::endl;
+//	std::cout << "Evaluating main expression " << std::endl;
 	return this->pExpr->evaluate();
 }
 

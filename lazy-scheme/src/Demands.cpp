@@ -477,7 +477,7 @@ automaton* Scheme::Demands::getNFAsFromRegularGrammar(const demand_grammar* gram
 		}
 	}
 
-    std::cout << "Completed creating NFAs"<<std::endl;
+    DBG(std::cout << "Completed creating NFAs"<<std::endl);
     removeXbEdgesFrom(nfa);
 
 	return nfa;
@@ -882,7 +882,7 @@ bool barEdgeSimplification(automaton *nfa)
 {
 	bool changed = false;
 	state_transitions &trans = nfa->second;
-	std::cout << "Bar edge simplification started"<< std::endl;
+	DBG(std::cout << "Bar edge simplification started"<< std::endl);
 	for(auto ts : trans)
 	{
 //		std::cerr << "Processing " << ts.first << std::endl;
@@ -894,7 +894,7 @@ bool barEdgeSimplification(automaton *nfa)
 			changed = t1 || t2 || changed;
 		}
 	}
-	std::cout << "Bar edge simplification completed"<< std::endl;
+	DBG(std::cout << "Bar edge simplification completed"<< std::endl);
 	return changed;
 }
 
@@ -904,8 +904,8 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 	bool changed = false;
 	std::unordered_set<std::string> reachable_states;
 	int i = 0;
-	std::cout << "starting removal of epsilon edges" << std::endl;
-	std::cout << "Number of states to process " << start_states.size() << std::endl;
+	DBG(std::cout << "starting removal of epsilon edges" << std::endl);
+	DBG(std::cout << "Number of states to process " << start_states.size() << std::endl);
 	eps_closure_map.clear();
 	//Moved processed list one level higher to avoid recalculating the
 	//the epsilon closures
@@ -979,9 +979,9 @@ bool removeEpsilonEdges(std::unordered_set<std::string> start_states, automaton 
 		//std::cerr << "The set of reachable states from " << non_terminal << std::endl;
 		//printSetofStates(reachable_states);
 	}
-	std::cout << "Completed processing all non_terminals" << std::endl;
+	DBG(std::cout << "Completed processing all non_terminals" << std::endl);
 	removeUnreachableStates(reachable_states, nfa);
-	std::cout << "Removed unreachable states" << std::endl;
+	DBG(std::cout << "Removed unreachable states" << std::endl);
 
 
 
@@ -1106,7 +1106,7 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
 	while(changed)
 	{
 	  changed = true;
-	  std::cerr<< "Starting " << i <<"th round of simplification"<<std::endl;
+	  DBG(std::cerr<< "Starting " << i <<"th round of simplification"<<std::endl);
         
 	  bool changed1 = removeEpsilonEdges(start_states, nfa);
 	  bool changed2 = barEdgeSimplification(nfa);
@@ -1114,7 +1114,7 @@ automaton* Scheme::Demands::simplifyNFA(std::unordered_set<std::string> start_st
 	  DBG(std::cerr << "Things changed in baredgesimplification "<<changed2<<std::endl);
 	  DBG(std::cerr << "Things changed in epsilonedgeremoval "<<changed1<<std::endl);
 	  changed = changed1 || changed2;
-	  std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl;
+	  DBG(std::cout << "Completed " << i++ << " rounds of simplification" <<std::endl);
 	}
 
 #endif

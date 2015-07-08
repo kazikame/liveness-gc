@@ -2144,77 +2144,77 @@ Premise & Transition & Rule name \\
 \hline
 \hline
           &\makecell{ $\rho, (\rho', x, e, \cred{\sigma', e_f'})\!:\!S,
-  H, \kappa, \sigma, e_f$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
-    \kappa], e, \sigma', e_f'$ }   &  \sc{const}
+  H, \kappa, \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
+    \kappa], e, \cred{\sigma', e_f'}$ }   &  \sc{const}
 \\
 \hline
           & \makecell{$\rho, (\rho', z, e, \cred{\sigma',
-    e_f'})\!:\!S, H, (\CONS~x~y), \sigma, e_f$ \\ $\rightsquigarrow
-  \rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e, \sigma', e_f'$}     &  \sc{cons} \\
+    e_f'})\!:\!S, H, (\CONS~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
+  \rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e, \cred{\sigma', e_f'}$}     &  \sc{cons} \\
 \hline
 $H(\rho(x)) \mbox{ is } (d_1, d_2)$ & \makecell{$\rho, (\rho', z, e,
-  \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \sigma, e_f$ \\ $
-  \rightsquigarrow \rho', S, H[\rho(z) := d_1], e, \sigma', e_f'$}      &
+  \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \cred{\sigma, e_f}$ \\ $
+  \rightsquigarrow \rho', S, H[\rho(z) := d_1], e, \cred{\sigma', e_f'}$}      &
 \sc{car-whnf} \\
 \hline
 $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-  H, (\CAR~x), \sigma, e_f$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, (\clazy \cup \acar)\sigma , \_ $}      &
+  H, (\CAR~x), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma , \_ }$}      &
 \sc{car-clo}
 \\
 \hline
 $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
  & \makecell{$\rho, (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H,
-  (+~x~y), \sigma, e_f$ \\  $\rightsquigarrow \rho', S, H[\rho(z)
-    \mapsto H(\rho(x)) + H(\rho(y))], e, \sigma', e_f'$}      &
+  (+~x~y), \cred{\sigma, e_f}$ \\  $\rightsquigarrow \rho', S, H[\rho(z)
+    \mapsto H(\rho(x)) + H(\rho(y))], e, \cred{\sigma', e_f'}$}      &
 \sc{prim-whnf} \\
 \hline
 $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-  H, (+~x~y), \sigma, e_f$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \clazy\sigma, \_$}      &
+  H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
+  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_}$}      &
 \sc{prim-1-clo} \\
 \hline
 $H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-  S, H, (+~x~y), \sigma, e_f$ \\ $\rightsquigarrow \rho', (\rho, y,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \clazy\sigma, \_ $}      &
+  S, H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, y,
+  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_ }$}      &
 \sc{prim-2-clo} \\
 \hline
 {$\mathit{g}~\mbox{defined as}$
 $~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
-  (g~\myvec{x}), \sigma, e_f$ \\ $\rightsquigarrow [\myvec{y} \mapsto
-    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \sigma, e_g$}      &
+  (g~\myvec{x}), \cred{\sigma, e_f}$ \\ $\rightsquigarrow [\myvec{y} \mapsto
+    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma, e_g}$}      &
 \sc{funcall} \\
 \hline
 $\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
-  s~\IN~e), \sigma, e_f$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-  \ell]\rangle], e, \sigma, e_f$} &
+  s~\IN~e), \cred{\sigma, e_f}$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+  \ell]\rangle], e, \cred{\sigma, e_f}$} &
 \sc{let} \\
 \hline
 $H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \sigma, e_f$ \\ $\rightsquigarrow \rho, S, H,  e_1, \sigma, e_f$} & \sc{if-true} \\
+  \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma, e_f}$} & \sc{if-true} \\
 \hline
 $H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \sigma, e_f$ \\   $\rightsquigarrow
-\rho, S, H,  e_2, \sigma, e_f$} & \sc{if-false} \\
+  \cred{\sigma, e_f}$ \\   $\rightsquigarrow
+\rho, S, H,  e_2, \cred{\sigma, e_f}$} & \sc{if-false} \\
 \hline
 $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\pi:\SIF~\psi:x~e_1~e_2), \sigma, e_f$ \\ $\rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2),  \sigma, e_f)\!:\!S, H, s,
-\clazy\sigma, e_f$}
+  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
+\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma, e_f})\!:\!S, H, s,
+\cred{\clazy\sigma, e_f}$}
 &
 \sc{if-clo} \\
 \hline
 {$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
-  (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \sigma,
-  e_f$ \\ $\rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e,
-  \sigma', e_f'$} &
+  (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \cred{\sigma,
+  e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho(z) \mapsto v], e,
+  \cred{\sigma', e_f'}$} &
 \sc{return-whnf}\\
 \hline
 $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\psi:\SRETURN~x), \sigma, e_f$ \\ $
+  (\psi:\SRETURN~x), \cred{\sigma, e_f}$ \\ $
   \rightsquigarrow$
 $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
-  \sigma, e_f$} &
+  \cred{\sigma, e_f}$} &
 \sc{return-clo} \\
 \hline
 \end{tabular}
