@@ -4,7 +4,7 @@
 BEGIN {
     FS="|";
     delta = 1; # interval to plot
-    high_factor = 100000;
+    high_factor = 1; #100000;
     
     cumulative_lag = cumulative_lag_high = 0;
     cumulative_drag =cumulative_drag_high = 0;
@@ -44,7 +44,7 @@ BEGIN {
     create_time = $3 + 0;
     first_use   = $4 + 0;
     last_use    = $5 + 0;
-    obj_count   = $7 + 0;
+    obj_count   = 1; #$7 + 0;
     
     #-- Total in-memory Time 
     stay_time = (gc_time - create_time);
@@ -84,7 +84,7 @@ BEGIN {
     {
         #-- Lag Time 
         lag_time = (first_use - create_time);
-	tot_lag_time = obj*count*lag_time;
+        tot_lag_time = obj*count*lag_time;
         lag_interval = int(lag_time / delta);
         lag_table[lag_interval] += obj_count;
         # update cumulative_lag
@@ -122,7 +122,7 @@ END {
     printf "# Total In-Memory Time      : %u%05u\n",
         cumulative_stay_high, cumulative_stay;
     
-    printf "# Total Drag Time           : %u%05u\n",
+    printf "# Total Drag Time           : %u %05u\n",
         cumulative_drag_high, cumulative_drag;
     
     file2 = "lag.out";
