@@ -226,7 +226,7 @@ later stage).  This results in unnecessary memory retention.
 	    \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
 	    \UNL{2}
             (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
-            \UNL{3} (\SIF~(\NULLQ~(\CAR~(\CDR~\pz)))~$0$~$\pi$:\
+            \UNL{3} (\SIF~(\NULLQ~(\CAR~\pz))~$0$~$\pi$:\
             (\length\ \pz))))))
 	  \end{uprogram}
       }}
