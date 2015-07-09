@@ -52,11 +52,12 @@ limit["sudoku"]=4075
 limit["lcss"]=22243
 limit["lambda"]=20466
 limit["gc_bench"]=204850
+limit["knightstour"]=6778000
+## UNUSED BMs
 limit["fft"]=3300
 limit["small"]=17
 limit["test"]=247
 limit["testsmall"]=267
-limit["knightstour"]=6778000
 
 declare -A freq
 
