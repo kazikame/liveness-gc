@@ -120,7 +120,7 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 	//all the program points which share the same liveness set.
 
 
-	cout << "Number of program points " << prog_pts.size() << endl;
+//	cout << "Number of program points " << prog_pts.size() << endl;
 	for(auto p : prog_pts)
 	{
 //		cout << "Processing program point " << p.first << endl;

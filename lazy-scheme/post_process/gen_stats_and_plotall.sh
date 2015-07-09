@@ -56,7 +56,7 @@ limit["fft"]=3300
 limit["small"]=17
 limit["test"]=247
 limit["testsmall"]=267
-limit["knightstour"]=508245
+limit["knightstour"]=677800
 
 declare -A freq
 
@@ -97,7 +97,7 @@ xlimit["lcss"]=1e5:1.7e5	; ylimit["lcss"]=0:24e3
 xlimit["small"]=1		; ylimit["small"]=1
 xlimit["test"]=25		; ylimit["test"]=25
 xlimit["testsmall"]=25		; ylimit["testsmall"]=25
-xlimit["sudoku"]=.8e5:1.0e5		; ylimit["sudoku"]=1.8e3:4.2e3
+xlimit["sudoku"]=.8e5:1.0e5	; ylimit["sudoku"]=1.8e3:4.2e3
 xlimit["gc_bench"]=0:4e5	; ylimit["gc_bench"]=0:20e3
 xlimit["nperm"]=5e5:9e5	        ; ylimit["nperm"]=12e3:28e3
 xlimit["fibheap"]=2.6e6:2.9e6	; ylimit["fibheap"]=31000:38000
@@ -112,16 +112,16 @@ fi
 
 for bm in $BMs
 do
-    #for opt in gc-plain gc-live
-    # for opt in gc-plain gc-live gc-freq=${freq[$bm]}
-    # do 
-    #  	echo "Processing $bm [$opt]"
-    #  	$DIR/gen_gc_stats.sh $OPTARG \
-    #  	    -bmdir ../benchmarks/programs/$bm \
-    #  	    -gcopt $opt -heap ${limit[$bm]}
-    # done
-    bash $DIR/val.plot $bm ${xtics[$bm]} ${ytics[$bm]}
-    bash $DIR/window.plot $bm ${xlimit[$bm]} ${ylimit[$bm]} 
+    # for opt in gc-plain gc-live
+    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    do 
+     	echo "Processing $bm [$opt]"
+     	$DIR/gen_gc_stats.sh $OPTARG \
+     	    -bmdir ../benchmarks/programs/$bm \
+     	    -gcopt $opt -heap ${limit[$bm]}
+    done
+    #bash $DIR/val.plot $bm ${xtics[$bm]} ${ytics[$bm]}
+    #bash $DIR/window.plot $bm ${xlimit[$bm]} ${ylimit[$bm]} 
     echo "$bm Done"
 done
 exit

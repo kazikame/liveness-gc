@@ -550,6 +550,7 @@ cons* LetExprNode::evaluate()
                 //std::string curr_let_pgmpt = return_stack().return_point;
                 //return_stack().return_point = getLabel();
                 reachability_gc();
+		detail_gc();
                 //return_stack().return_point = curr_let_pgmpt;
                 GC_STAT_DUMP_GARBAGE_STATS();
             }
@@ -560,6 +561,7 @@ cons* LetExprNode::evaluate()
                 std::string curr_let_pgmpt = return_stack().return_point;
                 return_stack().return_point = getLabel();
                 liveness_gc();
+		detail_gc();
                 GC_STAT_DUMP_GARBAGE_STATS();
                 return_stack().return_point = curr_let_pgmpt;
             }
@@ -1560,7 +1562,7 @@ ProgramNode * ProgramNode::clone() const {
 
 cons* ProgramNode::evaluate()
 {
-	std::cout << "Evaluating main expression " << std::endl;
+//	std::cout << "Evaluating main expression " << std::endl;
 	return this->pExpr->evaluate();
 }
 
