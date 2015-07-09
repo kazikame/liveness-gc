@@ -1473,7 +1473,6 @@ formed.
 \end{pspicture}
 \\
 (c) & (d)  \end{tabular}
-\\ \\ \\ \\
 \caption{(a) The  grammar rules for $\langle  \Df{\length}{1} \rangle$
   converted into an automaton, and simplified in (b). (c) and (d) show
   the   automata  for   \Lanv{9}{\pa}.   }\label{fig:example-automata}
@@ -1958,78 +1957,67 @@ would be live at the point of creation.
 %% }
 \begin{figure*}[t]
 \footnotesize
-
 \centering
-
-\scalebox{.9}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-\hline
-{Program} & {\sf sudoku} & {\sf lcss} & {\sf gc\_bench} &  {\sf
-  nperm} &  {\sf fibheap} & {\sf knightstour} &
-{\sf treejoin} & {\sf nqueens} & {\sf lambda}\\
-\hline
-\hline
-{Time (msec)}&106.56 &2.19 &0.32 &1.16 &2.4 &3.05 &2.61 &0.71&8.68 \\
-{DFA size} &4206 &726 &258 &526 &675 &922 &737 &241 & 694\\
-{Precision(\%)} &98.4&98.8&99.9&87.1&100&94.3&99.6&98.8&79.7\\
-\hline
-\end{tabular}}
-
-
-
-\centerline{(a)}
-
-\medskip
-
-\scalebox{0.87}{\begin{tabular}{| c | r | r | r | r | r | r  |  r | r |
-r | r | r | r | r |}
-\hline
-    & \multicolumn{2}{c|}{\# Collected} & \multicolumn{2}{c|}{\#
-Touched}
-  & \multicolumn{2}{c|}{} & \multicolumn{2}{c|}{} &
-\multicolumn{2}{c|}{} & \multicolumn{2}{c|}{GC time} \\
-
-
-
-                            &   \multicolumn{2}{c|}{cells per GC}
-                            &   \multicolumn{2}{c|}{cells per GC}
-                            &   \multicolumn{2}{c|}{\#GCs}
-                            &   \multicolumn{2}{c|}{MinHeap}
-                            &   \multicolumn{2}{c|}{Avg. Drag}
-                            &   \multicolumn{2}{c|}{(sec)} \\
-\cline{2-13}
-{Program}    &
-RGC & LGC & RGC & LGC  & RGC & LGC  &   RGC & LGC & RGC & LGC & RGC &
-LGC \\
-\hline
-\hline
-    {\sf   sudoku}  &381 &1107 &1268 &281 &169 &159 & 1346  &338 &527 &5
-&.008 & .026 \\
-    {\sf  lcss } & 46522 &51101 &6216 &1363&30&24& 52301  &1701 &5147
-&588 &.007 & .008 \\
-    {\sf   gc\_bench}  &129179 &131067 &1894 &4&34&4& 131071   &6 &16970
- &4 &.13 & .0002 \\
-     {\sf  nperm}  & 47586  &174478 &201585 &60882&710&386& 202597  &37507
-&171878 &76618 &0.250 & .154  \\
-    {\sf  fibheap} &249502  &251525 &5555 &2997&1002&975& 254520  &13558
-&78720 &0 &1.185 & 5.457  \\
-    {\sf  knightstour}  &2593 &314564 &907502 &319299&1161&10&508225
-&307092 &206729 &82112 &464.902 & 14.124  \\
-    {\sf  treejoin} & 288666  &519943 &297570 &5547&116&81& 525488  &7150
-&212653 &1954 &4.335 & 4.4 \\
-    {\sf   nqueens} & 283822 &1423226 &2133001 &584143&46&9& 1819579
-&501093 &521826 &39465 &70.314 & 24.811 \\
-    {\sf   lambda}  &205 & 556 &2072&90345 &775 &750&966 & 721  &303 &95
-&.179 &1.01  \\
-%    {\sf   fft }& &  & & &&&& ???? &???? &????? &????? &???? & ????
-\\
-%    {\sf  nboyer} & &  & &   & &  & & &  \\
-%    {\sf   circsim?} & &  & &   & & & & &   \\
- \hline
-\end{tabular}}
+%% \scalebox{.9}{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
+%% \hline
+%% {Program} & {\sf sudoku} & {\sf lcss} & {\sf gc\_bench} &  {\sf
+%%   nperm} &  {\sf fibheap} & {\sf knightstour} &
+%% {\sf treejoin} & {\sf nqueens} & {\sf lambda}\\
+%% \hline
+%% \hline
+%% {Time (msec)}&106.56 &2.19 &0.32 &1.16 &2.4 &3.05 &2.61 &0.71&8.68 \\
+%% {DFA size} &4206 &726 &258 &526 &675 &922 &737 &241 & 694\\
+%% {Precision(\%)} &98.4&98.8&99.9&87.1&100&94.3&99.6&98.8&79.7\\
+%% \hline
+%% \end{tabular}}
+%% \centerline{(a)}
+%% \medskip
+%% \scalebox{0.87}{\begin{tabular}{| c | r | r | r | r | r | r  |  r | r |
+%% r | r | r | r | r |}
+%% \hline
+%%     & \multicolumn{2}{c|}{\# Collected} & \multicolumn{2}{c|}{\#
+%% Touched}
+%%   & \multicolumn{2}{c|}{} & \multicolumn{2}{c|}{} &
+%% \multicolumn{2}{c|}{} & \multicolumn{2}{c|}{GC time} \\
+%%                             &   \multicolumn{2}{c|}{cells per GC}
+%%                             &   \multicolumn{2}{c|}{cells per GC}
+%%                             &   \multicolumn{2}{c|}{\#GCs}
+%%                             &   \multicolumn{2}{c|}{MinHeap}
+%%                             &   \multicolumn{2}{c|}{Avg. Drag}
+%%                             &   \multicolumn{2}{c|}{(sec)} \\
+%% \cline{2-13}
+%% {Program}    &
+%% RGC & LGC & RGC & LGC  & RGC & LGC  &   RGC & LGC & RGC & LGC & RGC &
+%% LGC \\
+%% \hline
+%% \hline
+%%     {\sf   sudoku}  &381 &1107 &1268 &281 &169 &159 & 1346  &338 &527 &5
+%% &.008 & .026 \\
+%%     {\sf  lcss } & 46522 &51101 &6216 &1363&30&24& 52301  &1701 &5147
+%% &588 &.007 & .008 \\
+%%     {\sf   gc\_bench}  &129179 &131067 &1894 &4&34&4& 131071   &6 &16970
+%%  &4 &.13 & .0002 \\
+%%      {\sf  nperm}  & 47586  &174478 &201585 &60882&710&386& 202597  &37507
+%% &171878 &76618 &0.250 & .154  \\
+%%     {\sf  fibheap} &249502  &251525 &5555 &2997&1002&975& 254520  &13558
+%% &78720 &0 &1.185 & 5.457  \\
+%%     {\sf  knightstour}  &2593 &314564 &907502 &319299&1161&10&508225
+%% &307092 &206729 &82112 &464.902 & 14.124  \\
+%%     {\sf  treejoin} & 288666  &519943 &297570 &5547&116&81& 525488  &7150
+%% &212653 &1954 &4.335 & 4.4 \\
+%%     {\sf   nqueens} & 283822 &1423226 &2133001 &584143&46&9& 1819579
+%% &501093 &521826 &39465 &70.314 & 24.811 \\
+%%     {\sf   lambda}  &205 & 556 &2072&90345 &775 &750&966 & 721  &303 &95
+%% &.179 &1.01  \\
+%% %    {\sf   fft }& &  & & &&&& ???? &???? &????? &????? &???? & ????
+%% \\
+%% %    {\sf  nboyer} & &  & &   & &  & & &  \\
+%% %    {\sf   circsim?} & &  & &   & & & & &   \\
+%%  \hline
+%% \end{tabular}}
+%% \centerline{(b)}
 
 \include{autotable}
-
-\centerline{(b)}
 \vskip -0.75mm
 \caption{Experimental results comparing RGC and LGC. Table (a) gives
   data related to liveness analysis, and (b) gives garbage collection
