@@ -38,7 +38,7 @@
 
 \Fn{\Copy{$\mathit{ref}$}}
 {
-     \If{$\mathit{ref}$ is live}
+     \If{$\mathit{ref}$ is found live after referring to dfa}
        {$\mathit{newRef} = $  $\mathit{dupHeapCell(ref})$\;
      \If{cellType($\mathit{ref}$) is $cons$}
         {

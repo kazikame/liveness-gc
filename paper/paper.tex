@@ -1403,17 +1403,20 @@ NFAs are converted to DFAs.
    \mid \epsilon
  \end{eqnarray*}
 
-The strongly regular grammar is converted into a set of
-NFAs,   one  for   each  $\var{\Lanv{i}{x}}$.   The  $\hookrightarrow$
-simplification  is now  done  on the  NFAs  by repeatedly  introducing
-$\epsilon$  edges  to  bypass  pairs  of  consecutive  edges  labelled
-\bcar\acar\ or \bcdr\acdr\  and constructing the
-$\epsilon$-closure. Since the $\epsilon$-closure step may create more
-adjacent \bcar\acar\ and \bcdr\acdr\  edges, the simplification is
- continued  till a  fixed point is  reached. The algorithm  for this
-appears  in~\cite{asati14lgc},   Figure[].  Finally  we   replace  the
-$\clazy$  edges  by  $\epsilon$  and determinize  the  automaton  thus
-formed.
+The strongly regular grammar is converted  into a set of NFAs, one for
+each $\var{\Lanv{i}{x}}$.  The $\hookrightarrow$ simplification is now
+done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
+pairs  of consecutive  edges labelled  \bcar\acar\ or  \bcdr\acdr\ and
+constructing the $\epsilon$-closure. Since the $\epsilon$-closure step
+may  create  more  adjacent  \bcar\acar\ and  \bcdr\acdr\  edges,  the
+simplification  is  continued  till  a fixed  point  is  reached.  The
+algorithm for this appears in~\cite{asati14lgc}, Figure[].  Finally we
+replace the  $\clazy$ edges by  $\epsilon$ and check if  the automaton
+has  valid path  (consisting  of only  \acar\ and  \acdr)  to a  final
+state. If it has a valid path,  we remove the \clazy\ edge and mark the
+source node as  final, else we remove the \clazy\  edge without marking
+the source  node as final.   Once the  \clazy\ edges are  eliminated we
+convert the automaton into a deterministic automaton.
 
 \begin{figure}[t!]
   \begin{tabular}{cc}
@@ -1485,7 +1488,7 @@ simplified by replacing the edges labeled \clazy\ by $\epsilon$. While
 checking for liveness during GC, a forward access-path traversing such
 an edge  will be accepted  only if it  can reach a final  state.  This
 effectively implements  the $\hookrightarrow$ simplification  rule for
-\clazy for forward paths. The resulting automaton, made deterministic,
+\clazy\ for forward paths. The resulting automaton, made deterministic,
 is shown in Figure~\ref{fig:example-automata}(b). This expectedly says
 that  given  a demand  $\epsilon$  on  \length,  the liveness  of  its
 argument             is             $\acdr^{*}$.            Similarly,
@@ -1548,7 +1551,7 @@ cell or terminated through the function $\mathit{makenull}$.
      
      \Fn{\Copy{$\mathit{ref}$}}
         {
-          \If{$\mathit{ref}$ is live}
+          \If{$\mathit{ref}$ is found live using dfa}
              {
                $\mathit{newRef} = $  $\mathit{dupHeapCell(ref})$\;
                \If{cellType($\mathit{ref}$) is $cons$}
@@ -1623,21 +1626,21 @@ if we reach the cell in one of these states.
   \Fn{\Lgc{}}
      {
        \For {each reference $\mathit{ref}$ in root set}
-            {copy($\mathit{ref}$)\;}
+            {\LCopy($\mathit{ref}$)\;}
             $\mathit{copyReferencesOnPrintStack()}$\;  
      }
      \Fn{\LCopy{$\mathit{ref}$}}
         {
           \eIf{cellType$(\mathit{ref})$ is $cons$}
               {
-                \eIf {$\mathit{ref}$ is live and has not been copied using
+                \eIf {$\mathit{ref}$ is found live using dfa and has not been copied using
                   reachability}
                      {
                        $\mathit{newRef}$ =  $\mathit{dupHeapcell(ref})$\; 
                        $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.car)}$\;
                        $\mathit{ newRef.car}   = \mathit{ newCar}$\;
-                       $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.cdr)}$\;
-                       $\mathit{ newRef.cdr}   = \mathit{newCar}$\;
+                       $\mathit{ newCdr}  =$  \LCopy$\mathit{(ref.cdr)}$\;
+                       $\mathit{ newRef.cdr}   = \mathit{newCdr}$\;
                      }
                      { $\mathit{makenull(ref)}$\;}}
               {
@@ -1669,10 +1672,9 @@ live. This  is correct  because any reference  which is dead  during a
 collection will not be dereferenced any further.
 
 
-An advantage of  using reachablity for closures it  avoids the problem
-of  multiple  explorations  from  the  same  cell.  This  is  done  by
-maintaining  a flag in  each cell  to indicate  whether it  was copied
-using  reachability. 
+Using  reachablity  for  closures   avoids  the  problem  of  multiple
+explorations from the  same cell.  This is done by  maintaining a flag
+in each cell to indicate whether it was copied using reachability.
 
 
 \subsection{Garbage collection for references on print stack}
@@ -1802,13 +1804,20 @@ live the copied \CONS\ cell will get the updated addresses of its
 %% pointer otherwise.}
 
 \subsection{Copying closure using liveness vs Copying closures using reachability}
-To compare the effect of using reachability to copy closures instead of liveness we take a couple of programs from our benchmark suite and execute them with 
-both. As shown in figure-add-figure-here, the number of garbage collections 
-in both cases are same but the time taken varies largely. Both these observations can be explained as follows, since we approximate the liveness of closure to 
-the liveness at its creation point, the liveness we get is usually grossly over approximated. 
-Using this liveness may not give too much of a benefit compared to reachability as nearly everything would be live at its point of creation. 
-As mentioned in section-ref, using liveness for closures may entail multiple traversals over the same structure consuming more time. 
-Therefore we believe that using reachability for closures is a sweet spot in terms of performance for liveness based garbage collectors. 
+To compare the  effect of using reachability to  copy closures instead
+of liveness we take a couple  of programs from our benchmark suite and
+execute them with both. As shown in \cred{figure-add-figure-here}, the
+number of  garbage collections  in both  cases are  same but  the time
+taken  varies largely.  Both these  observations can  be explained  as
+follows, since we approximate the  liveness of closure to the liveness
+at its  creation point, the  liveness we  get is usually  grossly over
+approximated.  Using this liveness may not  give too much of a benefit
+compared to  reachability as  nearly everything would  be live  at its
+point of  creation.  As mentioned  in section-ref, using  liveness for
+closures  may  entail  multiple  traversals over  the  same  structure
+consuming more time.  Therefore we believe that using reachability for
+closures is  a sweet spot in  terms of performance for  liveness based
+garbage collectors.
 %%
 %% \comment{
 %% The graphs  in Figure~\ref{fig:memory-usage} show the  number of cells
@@ -1919,7 +1928,7 @@ for copying we  end up copying more  cells. Any data which  is part of
 closure irrespective  of whether it is  live or not gets  copied. Thus
 many non-live  cells get  copied during garbage  collection increasing
 the drag  time.  Our  experiments have  shown that  unless we  use the
-exact  execution  point  for  closures bringing  down  the  number  of
+exact  execution  point  for  closures, bringing  down  the  number  of
 non-live  cells  copied in  closures  cannot  be reduced.   Using  the
 approximated liveness (liveness  at the creation point)  does not give
 benefits  in terms  of non-live  cells inside  closures as  everything
@@ -2093,7 +2102,14 @@ would be live at the point of creation.
 %% \end{figure}
 %%\clearpage
 
-\section{Related Work} Previous attempts to  increase  the space
+\section{Related Work} 
+\cred{Need to rewrite this entire section need to probably mention some of these 
+papers at least i found by googling liveness based GC,\\
+http://www.cs.hmc.edu/~oneill/papers/Simplifiers-MSPC.pdf\\
+http://costa.ls.fi.upm.es/papers/costa/AlbertGGZ12.pdf\\
+http://hirzels.com/martin/papers/ecoop01-gc-liveness.pdf\\
+}
+Previous attempts to  increase  the space
 efficiency
 of functional programs by additional  reclamation of memory fall in two
 broad categories. In the first,  the program itself is instrumented to
@@ -2121,35 +2137,80 @@ heap during garbage collection.
 
 \section{Conclusions}
 \label{sec:conclusion}
-We  have  defined  a  notion  of liveness  on  structured  data;  this
-generalizes classical liveness and strong liveness.  We started with a
-general fully context-sensitive analysis  which we proved correct with
-respect to  a minefield semantics  (this models the effect  of garbage
-collection between every evaluation step).
+%% We  have  defined  a  notion  of liveness  on  structured  data;  this
+%% generalizes classical liveness and strong liveness.  We started with a
+%% general fully context-sensitive analysis  which we proved correct with
+%% respect to  a minefield semantics  (this models the effect  of garbage
+%% collection between every evaluation step).
 
-To  avoid scalability  issues (and  to  avoid performing  part of  the
-liveness computation at run time)  we defined an 0-CFA version of this
-liveness analysis  in which  demands for function  $f$ at  all calling
-contexts are conflated into  a single demand $\sigma_f$.  This enabled
-us to treat the liveness equations symbolically obtaining context-free
-grammars for liveness at each GC point (calls to user functions and to
-$\CONS$).  These were then converted to DFAs for run-time consultation
-by  the garbage collector.  Experiments confirm  the precision  of the
-analysis.
+%% To  avoid scalability  issues (and  to  avoid performing  part of  the
+%% liveness computation at run time)  we defined an 0-CFA version of this
+%% liveness analysis  in which  demands for function  $f$ at  all calling
+%% contexts are conflated into  a single demand $\sigma_f$.  This enabled
+%% us to treat the liveness equations symbolically obtaining context-free
+%% grammars for liveness at each GC point (calls to user functions and to
+%% $\CONS$).  These were then converted to DFAs for run-time consultation
+%% by  the garbage collector.  Experiments confirm  the precision  of the
+%% analysis.
 
-To obtain performance figures we compared a reachability-based garbage
-collector with a liveness-based  collector.  This showed a decrease in
-the  number  of  GCs,   more  garbage  collected  per  invocation.   A
-significant benefit of LGC is  that programs can run in smaller memory
-when compared to  RGC. This is potentially useful  in situations where
-memory  is  limited---as with  embedded  systems.  For  a majority  of
-programs, the garbage collection times were reduced.
+%% To obtain performance figures we compared a reachability-based garbage
+%% collector with a liveness-based  collector.  This showed a decrease in
+%% the  number  of  GCs,   more  garbage  collected  per  invocation.   A
+%% significant benefit of LGC is  that programs can run in smaller memory
+%% when compared to  RGC. This is potentially useful  in situations where
+%% memory  is  limited---as with  embedded  systems.  For  a majority  of
+%% programs, the garbage collection times were reduced.
 
-One issue we  highlighted was that while fewer  nodes were marked (and
-more garbage collected), sometimes  cons cells could be visited and
-traversed  multiple times  with different  sets of  liveness  paths to
-explore.  Further work includes  improvements to the classical copying
-collector to reduce the cost of this.
+%% One issue we  highlighted was that while fewer  nodes were marked (and
+%% more garbage collected), sometimes  cons cells could be visited and
+%% traversed  multiple times  with different  sets of  liveness  paths to
+%% explore.  Further work includes  improvements to the classical copying
+%% collector to reduce the cost of this.
+{\color{blue}In our current  work we have extended  the liveness based
+  garbage collection to lazy languages  and show that it has benefits.
+  Our  biggest   contribution  is  our  ability   to  handle  closures
+  (suspended evaluations) during garbage collection.  We show that for
+  a  practical  garbage collector  it  is  not possible  to  implement
+  liveness based collector for  closures efficiently.  By implementing
+  a mixed-mode garbage collection scheme, we were able to collect more
+  cells than reachability based  collectors without paying the penalty
+  of  a full  liveness based  collector.  We  believe this  is a  very
+  practical idea and hence easily implementable.
+
+We  also overcome  the drawback  of  multiple traversals  that a  full
+liveness based  collector has  by using  an extra  bit and  setting it
+whenever  the  cell   is  copied  using  reachability(as   part  of  a
+closure). Our experimental results  have shown that such optimizations
+provide performance benefits with very little loss of precision. Using
+the  liveness  annotations  for  the  print  primitive  also  improves
+performance and subsumes compile  time optimizations such as tail-call
+optimization.
+
+\subsection{Future work}
+Although we  provide an  implementation for  a liveness  based garbage
+collection scheme for lazy language, we  do not provide a formal proof
+of its correctness.  A formal  proof of correctness would describe how
+closures  are  handled  during  garbage  collection  and  liveness  is
+propogated inside closures. 
+
+ Another interesting exercise is to narrow
+the gap between the actual liveness  and the perceived liveness of our
+garbage collector. Our  experiments show that a  significant number of
+dead cells get trapped inside  closures. Using strictness analysis and
+eagerly evaluating closures might release  more of these dead cells to
+be  garbage  collected.   Since   our  garbage  collector  can  handle
+closures(suspended evaluations)  another challenge would be  to extend
+it to support higher order programs.
+
+Orthogonally,  we can  improve the  efficiency of  the liveness  based
+garbage  collector so  that  even  when the  decrease  in the  garbage
+collections compared  to reachability is  not much, the  total garbage
+collection is  not bad. Making  the DFA  smaller by using  better data
+structures like Binary Decision Diagrams(BDD), truncating the liveness
+automata  after   certain  depth(k-liveness)  are  some   ideas  worth
+investigating.
+
+ }
 
 
 %Add graphs for memort usage LGC vs RGC
@@ -2161,12 +2222,12 @@ collector to reduce the cost of this.
 %Future work
 %Mention full LGC
 %Mention k-liveness, use length example to show 1-liveness is not
-sufficient.
+%sufficient.
 %Mention mixed mode GC,
 % - doing RGC most of the times and switching to LGC in case RGC fails
-to collect any garbage
+%to collect any garbage
 % - doing LGC most of the times but regularly checking the reachability
-of the heap and
+%of the heap and
 % switching to RGC if LGC almost equals RGC
 
 \subsection{References}

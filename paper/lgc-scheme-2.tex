@@ -32,21 +32,21 @@
 \Fn{\Lgc{}}
  {
  \For {each reference $\mathit{ref}$ in root set}
-   {copy($\mathit{ref}$)\;}
+   {\LCopy($\mathit{ref}$)\;}
   $\mathit{copyReferencesOnPrintStack()}$\;  
 }
 \Fn{\LCopy{$\mathit{ref}$}}
 {
   \eIf{cellType$(\mathit{ref})$ is $cons$}
     {
-      \eIf {$\mathit{ref}$ is live and has not been copied using
+      \eIf {$\mathit{ref}$ is found live after referring to dfa and has not been copied using
         reachability}
        {
          $\mathit{newRef}$ =  $\mathit{dupHeapcell(ref})$\; 
          $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.car)}$\;
          $\mathit{ newRef.car}   = \mathit{ newCar}$\;
-         $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.cdr)}$\;
-         $\mathit{ newRef.cdr}   = \mathit{newCar}$\;
+         $\mathit{ newCdr}  =$  \LCopy$\mathit{(ref.cdr)}$\;
+         $\mathit{ newRef.cdr}   = \mathit{newCdr}$\;
         }
        { $\mathit{makenull(ref)}$\;}}
      {
