@@ -21,28 +21,28 @@ cat <<EOF
   &   \multicolumn{2}{c|}{Drag Reduction (\%)}
   &   \multicolumn{2}{c|}{(sec)} & \\\\
 \cline{2-11}
-{Program}&RGC&LGC&RGC&LGC&RGC&LGC&\#Cells&Time&LGC&RGC&Speedup \\\\
+{Program}&RGC&LGC&RGC&LGC&RGC&LGC&\#Cells&Time&RGC&LGC&Speedup \\\\
 \hline
 \hline
 
 EOF
 format="%s & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f"
-
+OUTPUTDIR=output.GOLD
 for BM in $AllBMs
 do
     line=""
-    FILE=output/${BM}_gc-plain_output/garbage-dump.txt
+    FILE=${OUTPUTDIR}/${BM}_gc-plain_output/garbage-dump.txt
     line="$line `awk -f $SCRIPT1 $FILE`"
-    FILE=output/${BM}_gc-live_output/garbage-dump.txt
+    FILE=${OUTPUTDIR}/${BM}_gc-live_output/garbage-dump.txt
     line="$line  `awk -f $SCRIPT1 $FILE`"
 
-    FILE=output/${BM}_gc-plain_output/general_stats.out
+    FILE=${OUTPUTDIR}/${BM}_gc-plain_output/general_stats.out
     tmpData=`cut -d: -f2 $FILE`
     data1=`echo $tmpData | cut -d' ' -f2`
     data2=`echo $tmpData | cut -d' ' -f3`
 
     factor=100000
-    FILE=output/${BM}_gc-live_output/general_stats.out
+    FILE=${OUTPUTDIR}/${BM}_gc-live_output/general_stats.out
     tmpData=`cut -d: -f2 $FILE`
     data3=`echo $tmpData | cut -d' ' -f2`
     data4=`echo $tmpData | cut -d' ' -f3`
@@ -53,17 +53,24 @@ do
 
     #GC time to be filled separately
     
-    FILE=output/${BM}_gc-plain_output/runlog.out
-    r1=TBD1
-    FILE=output/${BM}_gc-live_output/runlog.out
-    r2=TBD2
-    line="$line  $r1  $r2  r1/r2"
+    FILE=../benchmarks/programs/${BM}/results/${BM}-gc-plain
+    r1=`grep "GC Time" $FILE | cut -d= -f3`
+    FILE=../benchmarks/programs/${BM}/results/${BM}-gc-live
+    r2=`grep "GC Time" $FILE | cut -d= -f3`
+    ratio=`bc -l << EOF                                                  
+scale=2
+$r1/$r2
+EOF
+`
+    
+    line="$line  $r1  $r2  $ratio"
     line="\\\\verb@$BM@  $line"
-
-    echo $line | awk '{print $1, "&", $2, "&", $5, "&", $3, "&", $6, "&", 
-                             $4, "&", $7, "&", $8, "&", $9, "&", $10, "&",
-                             $11, "&", $12}'
+    #echo $line
+    echo $line | awk '{
+    printf "%s & %.1f & %.1f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f\n", $1, $2, $5, $3, $6, $4, $7, $8, $9, $10, $11, $12}'
     echo "\\\\\\\\ \\hline"
+    echo
+    
 done
 
 echo "\end{tabular}"

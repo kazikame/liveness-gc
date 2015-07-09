@@ -56,7 +56,7 @@ limit["fft"]=3300
 limit["small"]=17
 limit["test"]=247
 limit["testsmall"]=267
-limit["knightstour"]=677800
+limit["knightstour"]=6778000
 
 declare -A freq
 
