@@ -184,6 +184,53 @@ number of  memory objects that are  reachable but not  live (here {\em
   live} means the  object can potentially be used by  the program at a
 later stage).  This results in unnecessary memory retention.
 
+In this paper,  we propose the use of liveness  analysis of heap cells
+for garbage collection in a lazy first-order functional language.  The
+central notion in our analysis  is a generalization of liveness called
+{\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
+expression.   The analysis  has two  parts.  First,  each  function is
+summarized in a context-sensitive manner as a {\em demand transformer}
+that transforms a {\em symbolic} demand  on its body to demands on its
+arguments.  This summary  is then used to step  through function calls
+during analysis.   Second, the concrete  demand on a function  body is
+obtained through a 0-CFA-like conservative approximation that combines
+the  demands on  all the  calls to  the function.   The result  of the
+analysis  is the annotation  of each  program point  with finite-state
+automata capturing  the liveness of variables at  the point. Depending
+on the program point where  garbage collection has been triggered, the
+GC consults  a set of automata  to curtail reachability
+during marking.  This results in  an increase in the garbage reclaimed
+and consequently in fewer garbage collections.
+
+While this idea has been shown to be effective~\cite{asati14lgc} for a
+first-order {\em  eager} language, a straightforward  extension of the
+earlier  technique  is  not  possible  for  lazy  languages,  where  a
+heap-allocated  object may either  be an  unevaluated expression  or a
+closure. Since  data is  made live by  evaluation of closures,  and in
+lazy languages  the place in  the program where this  evaluation takes
+place cannot  be statically determined,  laziness complicates liveness
+analysis itself.  In  addition, apart from evaluated data,  we want to
+extend  liveness-based collection also  to closures---closures with no
+future use should also  be collected.  This involves tracking closures
+to  their points of  creation at  runtime from  where we  obtain their
+liveness.  This  requires significant  modification to the  earlier GC
+scheme.
+
+{\color  {Myblue}Rewrite after the experiments:  Experiments  with a
+single
+  generation  copying  collector   confirm  the  expected  performance
+  benefits.   Liveness-based  collection  results  in an  increase  in
+  garbage reclaimed.   As a  consequence, there is  a decrease  in the
+  number of  collections and a  (some quantification) decrease  in the
+  memory size required  to run programs. Besides there  is a reduction
+  in the overall execution time for some programs.}
+
+
+%------------------------------------------------------------%
+\subsection{Motivating Example}
+\label{sec:motiv}
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%
 %%% MOTIVATING EXAMPLE
@@ -235,62 +282,16 @@ later stage).  This results in unnecessary memory retention.
 %      \includegraphics[width=.45\textwidth]{motiv-example}
       \input{mem-graph} \\ 
       \renewcommand{\arraystretch}{.9}
-      \begin{tabular}[t]{l}
-        (b) Memory graph at $\pi$. Thick edges denote live
-        links. Traversal \\{\white (b)} stops at edges
-        marked $\times$ during garbage collection.
+      \begin{tabular}[t]{p{0.9\columnwidth}}
+        (b) Memory graph at $\pi$.  \scalebox{.7}{\TwoCellsAD{a1}{a2}}
+        denotes a closure. Thick edges denote live links. Traversal
+        stops at edges marked $\times$ during garbage collection.
       \end{tabular}
     \end{tabular} 
   \end{pspicture}
   \vspace*{-3ex}
   \caption{Example Program and its Memory Graph}\label{fig:mot-example}
 \end{figure}
-
-In this paper,  we propose the use of liveness  analysis of heap cells
-for garbage collection in a lazy first-order functional language.  The
-central notion in our analysis  is a generalization of liveness called
-{\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
-expression.   The analysis  has two  parts.  First,  each  function is
-summarized in a context-sensitive manner as a {\em demand transformer}
-that transforms a {\em symbolic} demand  on its body to demands on its
-arguments.  This summary  is then used to step  through function calls
-during analysis.   Second, the concrete  demand on a function  body is
-obtained through a 0-CFA-like conservative approximation that combines
-the  demands on  all the  calls to  the function.   The result  of the
-analysis  is the annotation  of each  program point  with finite-state
-automata capturing  the liveness of variables at  the point. Depending
-on the program point where  garbage collection has been triggered, the
-GC consults  a set of automata  to curtail reachability
-during marking.  This results in  an increase in the garbage reclaimed
-and consequently in fewer garbage collections.
-
-While this idea has been shown to be effective~\cite{asati14lgc} for a
-first-order {\em  eager} language, a straightforward  extension of the
-earlier  technique  is  not  possible  for  lazy  languages,  where  a
-heap-allocated  object may either  be an  unevaluated expression  or a
-closure. Since  data is  made live by  evaluation of closures,  and in
-lazy languages  the place in  the program where this  evaluation takes
-place cannot  be statically determined,  laziness complicates liveness
-analysis itself.  In  addition, apart from evaluated data,  we want to
-extend  liveness-based collection also  to closures---closures with no
-future use should also  be collected.  This involves tracking closures
-to  their points of  creation at  runtime from  where we  obtain their
-liveness.  This  requires significant  modification to the  earlier GC
-scheme.
-
-{\color  {Myblue}Rewrite after the experiments:  Experiments  with a
-single
-  generation  copying  collector   confirm  the  expected  performance
-  benefits.   Liveness-based  collection  results  in an  increase  in
-  garbage reclaimed.   As a  consequence, there is  a decrease  in the
-  number of  collections and a  (some quantification) decrease  in the
-  memory size required  to run programs. Besides there  is a reduction
-  in the overall execution time for some programs.}
-
-
-%------------------------------------------------------------%
-\subsection{Motivating Example}
-\label{sec:motiv}
 
 Figure~\ref{fig:mot-example} shows an example program and the state of
 the heap at the program point $\pi$, i.e. just before the  evaluation
@@ -327,6 +328,7 @@ paper
 
 \subsection{Organization of the paper}
 
+{\color {Myblue}Rewrite at the end: 
 Section~\ref{sec:defs} introduces the syntax and semantics of the
 language used to illustrate our
 analysis.
@@ -341,12 +343,11 @@ experimental  results  and Section~\ref{sec:lgc-always-better}  proves
 that a liveness based collector  can never do more garbage collections
 than a reachability based collector.
 % and Section~\ref{sec:conclusion} concludes the paper.
-
+}
 \section{The target language---syntax and semantics}
 \label{sec:defs}
-%%We let $x$, $y$, $z$ range over variables, $f$ over user-functions
-and
-%% $p$    over    primitive    functions   ($\CONS$,    $\PRIM$ etc.).
+%%We let $x$,  $y$, $z$ range over variables,  $f$ over user-functions
+%% and $p$ over primitive functions ($\CONS$, $\PRIM$ etc.).
 Figure~\ref{fig:lang-syntax} describes the  syntax of our language. It
 is a first order language with lazy semantics. Programs are restricted
 to        be        in        Administrative        Normal        Form
