@@ -1828,30 +1828,32 @@ garbage collectors.
 \newcommand{\hgt}{3cm}
 \begin{figure*}[p]
 \renewcommand{\arraystretch}{.1}
-\begin{tabular}{@{}c@{}c@{}}
+\begin{tabular}{@{}c@{}@{}c@{}}
    \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
    & {\epsfig{file=lambda_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=gc_bench_win.eps, height=\hgt}}
 \\ \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
 \\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
-\end{tabular}\vskip -10mm
- \caption{Memory usage  snapshot of  programs.  The  blue and  the red
-   curves indicate the  number of cons cells in  the active semi-space
-   for  LGC and  RGC  respectively.  The  black  curve represents  the
-   number of reachable cells and  the grey curve represents the number
-   of cells that are actually live  (of which liveness analysis does a
-   static approximation).  x-axis is  the time  measured in  number of
+\\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
+\\ (a) & (b)
+\end{tabular}%\vskip -10mm
+ \caption{Memory  usage  for (a)  full  benchmarks  and (b)  for  some
+   interesting part  of the benchmarks.   The blue and the  red curves
+   indicate the number of cons cells  in the active semi-space for RGC
+   and LGC  respectively.  The  black curve  represents the  number of
+   reachable cells and  the grey curve represents the  number of cells
+   that are  actually live (of  which liveness analysis does  a static
+   approximation).   x-axis   is  the  time  measured   in  number  of
    cons-cells allocated (scaled down by  factor $10^5$). y-axis is the
    number of cons-cells (scaled down by factor $10^3$).}
 \label{fig:memory-usage} \figrule

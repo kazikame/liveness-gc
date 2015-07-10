@@ -13,7 +13,7 @@ set border 3 lw 0
 
 set output "treejoin.eps"
 set xtics nomirror ("7" 7e5, "14" 14e5, "21" 21e5, "28" 28e5, "35" 35e5, "42" 42e5, "49" 49e5, "56" 56e5, "63" 63e5)
-set ytics nomirror ("330" 330, "660" 660e3, "990" 990e3, "1320" 1320e3, "1650" 1650e3)
+set ytics nomirror ("330" 330e3, "660" 660e3, "990" 990e3, "1320" 1320e3, "1650" 1650e3)
 set autoscale
 set grid noxtics
 

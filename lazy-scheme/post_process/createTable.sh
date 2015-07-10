@@ -1,9 +1,8 @@
 #!/bin/sh
 DIR=`dirname $0`
 SCRIPT1=$DIR/touchedAndCopied.awk
-
-#AllBMs="sudoku lcss gc_bench nperm fibheap  knightstour treejoin nqueens "
 AllBMs="lambda nperm treejoin lcss sudoku fibheap nqueens gc_bench"
+AllBMs="lambda nperm treejoin lcss sudoku fibheap nqueens knightstour gc_bench "
 #AllBMs="sudoku"
 
 cat <<EOF
@@ -21,14 +20,15 @@ cat <<EOF
   &   \multicolumn{2}{@{}c@{}|}{cells per GC}
   &   \multicolumn{2}{@{}c@{}|}{\#GCs}
   &   \multicolumn{2}{@{}c@{}|}{Drag Reduction (\%)}
-  &   \multicolumn{2}{@{}c@{}|}{(sec)} & \\\\
+  &   \multicolumn{2}{@{}c@{}|}{(sec)} &Speedup \\\\
 \cline{4-13}
-{Program}&States&Time (sec) &RGC&LGC&RGC&LGC&RGC&LGC&\#Cells&Time&RGC&LGC&Speedup \\\\
+{Program}&States&Time (sec) &RGC&LGC&RGC&LGC&RGC&LGC&\#Cells&\#Allocs&RGC&LGC&RGC/LGC \\\\
 \hline
 \hline
 
 EOF
 format="%s & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f & %.2f"
+
 OUTPUTDIR=output.GOLD
 for BM in $AllBMs
 do
@@ -49,8 +49,16 @@ do
     data3=`echo $tmpData | cut -d' ' -f2`
     data4=`echo $tmpData | cut -d' ' -f3`
     
-    d1=`expr $data1 \* 100 / $data3 - 100`
-    d2=`expr $data2 \* 100 / $data4 - 100`
+    d1=`bc -l << EOF                                                  
+scale=2
+$data1 * 100/$data3 - 100
+EOF
+`
+    d2=`bc -l << EOF                                                  
+scale=2
+$data2 * 100/$data4 - 100
+EOF
+`
     line="$line  $d1  $d2"
 
     #GC time to be filled separately

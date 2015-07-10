@@ -8,12 +8,12 @@ set terminal postscript dashed color portrait "Helvetica" 16
 
 set size ratio 0 1, .25
 
-set xlabel "lambda"
+set xlabel "knightstour"
+set xtics nomirror ("300" 300e5, "320" 320e5, "340" 340e5, "360" 360e5,"380" 380e5,  "400" 400e5)
+set ytics nomirror ("200" 200e3, "400" 400e3, "600" 600e3, "7000" 700e3)
 set border 3 lw 0
 
-set output "lambda_win.eps"
-set xtics nomirror ("50.0" 50e5, "50.2" 50.2e5, "50.4" 50.4e5, "50.6" 50.6e5, "50.8" 50.8e5, "51.0" 51e5)
-set ytics nomirror ("0" 0, "5" 5e3, "10" 10e3, "15" 15e3, "20" 20e3)
+set output "knightstour_win.eps"
 set autoscale
 set grid noxtics
 
@@ -29,6 +29,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [50e5:51e5] [0:] "output/lambda_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/lambda_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/lambda_gc-freq_output/rch.sort"  w l ls 3 notitle,            "output/lambda_gc-live_output/use.sort"  w l ls 4 notitle
+plot [300e5:400e5] [400e3:] "output/knightstour_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/knightstour_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/knightstour_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/knightstour_gc-live_output/use.sort"  w l ls 4 notitle
 
 #    EOF

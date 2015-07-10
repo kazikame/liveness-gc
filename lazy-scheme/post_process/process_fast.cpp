@@ -152,7 +152,6 @@ void parse(const char* line)
     getValues(line, &time_gc, &address, &create_time, &first_use,
               &last_use, &last_copied);
 
-    //assert(last_use < MAXCELL);
     if (time_gc != this_gc_time) {
         fprintf(stderr, "Error_1 in GC statistics\n\t");
         fprintf(stderr, "%ld != %ld\n", time_gc, this_gc_time);
@@ -171,13 +170,11 @@ void parse(const char* line)
         c_dragged++;
         t_dragged += (time_gc - last_use);
     }
-    assert(gc_count < MAXGC);
  
     int idx;
     long the_time;
     for (idx = 0; idx < gc_count; idx++) {
         the_time = gc_times[idx];
-        //assert(the_time < MAXCELL);
         if (time_gc > this_gc_time) {
             fprintf(stderr, "Error_2 in GC statistics\n\t");
             fprintf(stderr, "%ld > %ld\n", time_gc, this_gc_time);

@@ -5,8 +5,7 @@ import time
 import datetime
 from collections import namedtuple
 
-#'knightstour':677800
-prog_size = {'nqueens':22729, 'nperm':27429, 'fibheap':38001, 'treejoin':1616535, 'sudoku':4075, 'lcss':22243, 'lambda':20466, 'gc_bench':204850, 'knightstour':6778000}
+prog_size = {'nqueens':22729, 'nperm':27429, 'fibheap':38001, 'treejoin':1616535, 'sudoku':4075, 'lcss':22243, 'lambda':20466, 'gc_bench':204850, 'knightstour':680000}
 gc_info = namedtuple("gc_info", "heap_total heap_left heap_used gc_invocations gc_time dfa_time num_states exec_time")
 gc_stat = namedtuple("gc_stat", "prog_name reachability liveness")
 gc_stat_list = []
