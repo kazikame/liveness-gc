@@ -1628,7 +1628,7 @@ nullifying any  reference which is  not live. This is  correct because
 any reference which  is dead during a collection is  guaranteed not be
 dereferenced any further by the program.
 
-Another advnatage of  this mixed garbage collection scheme  is that it
+Another advantage of  this mixed garbage collection scheme  is that it
 avoids the problem of multiple  explorations from the same cell.  This
 is done by maintaining a flag in  each cell to indicate whether it was
 copied using reachability.
@@ -1709,10 +1709,12 @@ use its result during garbage collection.
 %% becomes unreachable or  dead is assuredly collected in  the next round
 %% of garbage collection.}
 
-To test the utility of our method we have implemented a garbage-collector 
-for a simple scheme-like first order language. It consists of an interpreter, 
-liveness analyzer and a garbage-collector that can optionally use use reachability or liveness. 
-Our benchmark consists of programs from nofib suite and some external programs manually converted to ANF. 
+To   test  the   utility  of   our  method   we  have   implemented  a
+garbage-collector for a simple scheme-like first order language having
+non-strict semantics. It consists of an interpreter, liveness analyzer
+and a  garbage-collector that can  optionally use  reachability or
+liveness.  Our  benchmark consists  of programs  from nofib~\cite{nofib}  suite and
+some external programs manually converted to ANF.
 
 %% \comment{
 %% While exploring the activation record of a function, LGC uses the DFAs
