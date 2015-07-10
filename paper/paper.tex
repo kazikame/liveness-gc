@@ -1486,7 +1486,7 @@ needs to  be handled in an  approximate way.  We describe this in detail next.
 
 
 \subsection{A liveness-based garbage collection scheme}
-
+\label{sec:live-clo}
   \SetStartEndCondition{ }{}{}%
   \SetKwProg{Fn}{procedure}{\string:}{}
   \SetKwFunction{Range}{range}%%
@@ -1772,7 +1772,7 @@ follows, since we approximate the  liveness of closure to the liveness
 at its  creation point, the  liveness we  get is usually  grossly over
 approximated.  Using this liveness may not  give too much of a benefit
 compared to  reachability as  nearly everything would  be live  at its
-point of  creation.  As mentioned  in section-ref, using  liveness for
+point of  creation.  As mentioned  in Section~\ref{sec:live-clo}, using  liveness for
 closures  may  entail  multiple  traversals over  the  same  structure
 consuming more time.  Therefore we believe that using reachability for
 closures is  a sweet spot in  terms of performance for  liveness based
