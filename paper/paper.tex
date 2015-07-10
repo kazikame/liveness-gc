@@ -1826,24 +1826,25 @@ garbage collectors.
 
 \subsection{Results}
 \newcommand{\hgt}{3cm}
-\begin{figure*}[t!]
+\begin{figure*}[p]
 \renewcommand{\arraystretch}{.1}
 \begin{tabular}{@{}c@{}c@{}}
-\hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}%, width=4.10cm}}
-&
-{\epsfig{file=lcss.eps, height=\hgt}}%, width=4.10cm}}
-\\
-\hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}%
- &
-{\epsfig{file=nperm.eps, height=\hgt}}%
-\\
-\hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}%
-&
-{\epsfig{file=sudoku.eps, height=\hgt}}%%%Add knightstour.eps
-\\
-\hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}%
-&
-{\epsfig{file=treejoin.eps, height=\hgt}}%
+   \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
+   & {\epsfig{file=lambda_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=gc_bench_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
 \end{tabular}\vskip -10mm
  \caption{Memory usage  snapshot of  programs.  The  blue and  the red
    curves indicate the  number of cons cells in  the active semi-space
