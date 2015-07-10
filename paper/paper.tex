@@ -1551,17 +1551,16 @@ activation record of the function  which created this closure is still
 on the activation stack. This does  not always happen since a function
 could pack a closure in a \CONS\ cell and return the \CONS\ cell.
 
-An  alternative  could  be   to  carry  extra  information  with  each
-closure---the {\em free variables in the closure and the program point
-  at  which  it  was  evaluated}.   This  gives  us  precise  liveness
-information  of the  free  variables  of a  closure  but involves  the
-overhead of  updating the program point  information during execution.
-To avoid this  overhead we go for a safe  approximation by storing the
-{\em creation  point of the closure}  and using it  to check liveness.
-This is safe  since the liveness at the creation  point of the closure
-dominates all possible evaluation points  of the closure, but it might
-be imprecise  as the actual  liveness might be  way less than  what is
-found at the creation point.
+An alternative could be to  carry with each closure, extra information
+about the program point which triggered its evaluation.  This gives us
+precise liveness  information of the  free variables of a  closure but
+involves the overhead of updating the program point information during
+execution.  To avoid  this overhead we go for a  safe approximation by
+storing the {\em creation point of  the closure} and using it to check
+liveness.  This  is safe since the  liveness at the creation  point of
+the closure dominates  all possible evaluation points  of the closure,
+but it  might be imprecise  as the actual  liveness might be  way less
+than what is found at the creation point.
 
 Note that  when a reachability-based  collector visits a cell  for the
 first time,  it is  marked.  Explorations starting  from the  cell are
