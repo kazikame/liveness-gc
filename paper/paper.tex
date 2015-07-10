@@ -1378,9 +1378,9 @@ automaton.
   \ncline{t1}{t2}
   \putnode{l0}{t1}{7}{2}{\clazy}
   \nccurve[angleA=45, angleB=135, ncurv=4, nodesep=-1]{t1}{t1}
-  \putnode{l1}{t1}{0}{10}{\acdr, \clazy}
+  \putnode{l1}{t1}{0}{8}{\acdr, \clazy}
   \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t2}{t2}
-  \putnode{l2}{t2}{0}{10}{\clazy}
+  \putnode{l2}{t2}{0}{8}{\clazy}
 \end{pspicture}
 &
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
@@ -1390,7 +1390,7 @@ automaton.
   \psset{arrows=->}
   \ncline{t0}{t1}
   \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t1}{t1}
-  \putnode{l1}{t1}{0}{10}{\acdr}
+  \putnode{l1}{t1}{0}{8}{\acdr}
 \end{pspicture}
 \\
 (a) & (b) \\
@@ -1399,15 +1399,25 @@ automaton.
   \putnode{t0}{origin}{5}{0}{\var{\Lanv{9}{\pa}}}
   \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\ \ \ \ }}}
-  \putnode{t3}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
+%  \putnode{t3}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
   \psset{arrows=->}
   \ncline{t0}{t1}
   \ncline{t1}{t2}
   \putnode{l0}{t1}{5}{2}{\clazy}
-  \ncline{t2}{t3}
+%  \ncline{t2}{t3}
+%  \nccurve[angleA=55, angleB=125, ncurv=3, nodesep=-.8]{t3}{t3}
+%  \putnode{l2}{tD1}{0}{10}{\acdr}
+ \putnode{tD1}{t2}{12}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
+  \putnode{tD2}{tD1}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
+  \psset{arrows=->}
+  \ncline{t2}{tD1}
   \putnode{l1}{t2}{5}{2}{\bcar}
-  \nccurve[angleA=55, angleB=125, ncurv=3, nodesep=-.8]{t3}{t3}
-  \putnode{l2}{t3}{0}{10}{\acdr}
+  \ncline{tD1}{tD2}
+  \putnode{lD0}{tD1}{5}{2}{\clazy}
+  \nccurve[angleA=45, angleB=135, ncurv=4, nodesep=-1]{tD1}{tD1}
+  \putnode{lD1}{tD1}{0}{8}{\acdr, \clazy}
+  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{tD2}{tD2}
+  \putnode{lD2}{tD2}{0}{8}{\clazy}
 \end{pspicture}
 &
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
@@ -1420,13 +1430,13 @@ automaton.
 \\
 (c) & (d)  \end{tabular}
 \caption{(a) The  grammar rules for \var{\Df{\length}{1}}
-  converted into an automaton, and simplified in (b). (c) and (d) show
-  the   same  for   \var{\Lanv{9}{\pa}}.   }\label{fig:example-automata}
+  converted into an automaton, and simplified in (b). The same for \var{\Lanv{9}{\pa}}
+  is shown in (c) and (d)}\label{fig:example-automata}
 \figrule
 \end{figure}
 
 Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
-from the  grammar for  \var{\Df{\length}{1'}}.  The  NFA is
+from the  grammar for  \var{\Df{\length}{1}}.  The  NFA is
 simplified by replacing the edges labeled \clazy\ by $\epsilon$. While
 checking for liveness during GC, a forward access-path traversing such
 an edge  will be accepted  only if it  can reach a final  state.  This
