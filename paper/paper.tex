@@ -1770,20 +1770,47 @@ live the copied \CONS\ cell will get the updated addresses of its
 %% pointer otherwise.}
 
 \subsection{Copying closure using liveness vs copying closures using reachability}
+
+\begin{table*}[ht!]
+\caption{Comparing LGC with liveness for closures and reachability for closures}
+\label{tab:compare-live-clo-reach-clo}
+\centering
+\begin{tabular}
+{| l | r | r | r | r |}
+\hline
+Prog Name & Heap size & Num GC & Reachablity for closure & Liveness for closure \\ \hline
+\verb@nqueens(8)@ & 10000 & 183 & 0.0087 & 0.2267\\ \hline
+\verb@lambda@&10000&11&0.0010&4.9922\\ \hline
+\verb@lcss@&10000&1&0.00008&34.6684\\ \hline
+\end{tabular}
+\end{table*}
 To compare the  effect of using reachability to  copy closures instead
 of liveness we take a couple  of programs from our benchmark suite and
-execute them with both. As shown in \cred{figure-add-figure-here}, the
-number of  garbage collections  in both  cases are  same but  the time
-taken  varies largely.  Both these  observations can  be explained  as
-follows, since we approximate the  liveness of closure to the liveness
-at its  creation point, the  liveness we  get is usually  grossly over
-approximated.  Using this liveness may not  give too much of a benefit
-compared to  reachability as  nearly everything would  be live  at its
-point of  creation.  As mentioned  in Section~\ref{sec:live-clo}, using  liveness for
+execute       them      with       both.        As      shown       in
+Table~\ref{tab:compare-live-clo-reach-clo},  the   number  of  garbage
+collections in both cases are same but copying closures using liveness
+takes a lot more time compared to reachability based copying.
+
+The number  of garbage  collections is same  since we  approximate the
+liveness of  a closure  to the  liveness at  its creation  point.  The
+liveness  we get  is usually  grossly over  approximated.  Using  this
+liveness may not  give too much of a benefit  compared to reachability
+as nearly everything would be live at its point of creation.
+
+As  mentioned   in  Section~\ref{sec:live-clo},  using   liveness  for
 closures  may  entail  multiple  traversals over  the  same  structure
-consuming more time.  Therefore we believe that using reachability for
-closures is  a sweet spot in  terms of performance for  liveness based
-garbage collectors.
+consuming more  time.  The  advantage of avoiding  multiple traversals
+can be clearly seen from the lcss example where a single GC takes less
+than a millisecond for reachability  based closure collection where as
+the  liveness  based collection  is  of  the  order of  seconds.  Lazy
+languages tend  to have a  lot of sharing  and hence using  a liveness
+based collection for closures is impractical.
+
+Therefore we believe  that using reachability for closures  is a sweet
+spot   in   terms   of   performance  for   liveness   based   garbage
+collectors.  For the  remainder  of  the section  all  LGC results  we
+discuss uses  a mixed-mode collector--liveness for  evaluated data and
+reachability for closures.
 %%
 %% \comment{
 %% The graphs  in Figure~\ref{fig:memory-usage} show the  number of cells
@@ -1893,7 +1920,7 @@ been  mainly  studied  as  a compile  time  activity.  Either  through
 rewriting                methods                such                as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
 sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based  analysis~\cite{tofte98region} or  through insertion  of compile
+based  analysis~\cite{tofte98region}, or  through insertion  of compile
 time              nullifying              statements              such
 as~\cite{inoue88analysis,lee05static,Hamilton}.    The  compile   time
 marking approaches all rely on an efficient and precise alias analysis
@@ -1970,15 +1997,15 @@ evaluation and closures.
   context independent summaries of functions obtained using a symbolic
   demand. We show  that obtaining precise solution  to these equations
   is undecidable in  our formulation, and hence  we safely approximate
-  the result using DFAs. These DFAs are consulted by garbage collector
-  to improve to collection.
+  the result using DFA. These DFA are consulted by the garbage collector
+  to improve  collection.
 
   Liveness   of   closure   presented  further   challenges   to   our
   implementation.   We compared  different approximate  strategies for
   handling   liveness   of   closures,   and  found   that   a   mixed
   strategy---reachability  based  collection   of  closure  arguments,
   liveness  based  collection  of   everything  else---works  best  in
-  practice as it  avoid runtime and space  overheads.  With mixed-mode
+  practice as it  avoids runtime and space  overheads.  With mixed-mode
   garbage collection scheme,  we were able to collect  more cells than
   reachability based collectors at a reasonable overhead.
 
