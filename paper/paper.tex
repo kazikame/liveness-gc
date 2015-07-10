@@ -1375,9 +1375,9 @@ convert the automaton into a deterministic automaton.
   \ncline{t0}{t1}
   \ncline{t1}{t2}
   \putnode{l0}{t1}{7}{2}{\clazy}
-  \nccurve[angleA=45, angleB=135, ncurv=4, nodesep=-.5]{t1}{t1}
+  \nccurve[angleA=45, angleB=135, ncurv=4, nodesep=-1]{t1}{t1}
   \putnode{l1}{t1}{0}{10}{\acdr, \clazy}
-  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-.5]{t2}{t2}
+  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t2}{t2}
   \putnode{l2}{t2}{0}{10}{\clazy}
 \end{pspicture}
 &
@@ -1387,7 +1387,7 @@ convert the automaton into a deterministic automaton.
   \putnode{t1}{t0}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
   \psset{arrows=->}
   \ncline{t0}{t1}
-  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-.5]{t1}{t1}
+  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t1}{t1}
   \putnode{l1}{t1}{0}{10}{\acdr}
 \end{pspicture}
 \\
@@ -1404,7 +1404,7 @@ convert the automaton into a deterministic automaton.
   \putnode{l0}{t1}{5}{2}{\clazy}
   \ncline{t2}{t3}
   \putnode{l1}{t2}{5}{2}{\bcar}
-  \nccurve[angleA=55, angleB=125, ncurv=3, nodesep=-.5]{t3}{t3}
+  \nccurve[angleA=55, angleB=125, ncurv=3, nodesep=-.8]{t3}{t3}
   \putnode{l2}{t3}{0}{10}{\acdr}
 \end{pspicture}
 &
@@ -1419,7 +1419,7 @@ convert the automaton into a deterministic automaton.
 (c) & (d)  \end{tabular}
 \caption{(a) The  grammar rules for \var{\Df{\length}{1}}
   converted into an automaton, and simplified in (b). (c) and (d) show
-  the   automata  for   \var{\Lanv{9}{\pa}}.   }\label{fig:example-automata}
+  the   same  for   \var{\Lanv{9}{\pa}}.   }\label{fig:example-automata}
 \figrule
 \end{figure}
 
