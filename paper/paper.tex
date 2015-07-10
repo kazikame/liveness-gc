@@ -1355,14 +1355,16 @@ done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
 pairs  of consecutive  edges labelled  \bcar\acar\ or  \bcdr\acdr\ and
 constructing the $\epsilon$-closure. Since the $\epsilon$-closure step
 may  create  more  adjacent  \bcar\acar\ and  \bcdr\acdr\  edges,  the
-simplification  is  continued  till  a fixed  point  is  reached.  The
-algorithm for this appears in~\cite{asati14lgc}, Figure[].  Finally we
-replace the  $\clazy$ edges by  $\epsilon$ and check if  the automaton
-has  valid path  (consisting  of only  \acar\ and  \acdr)  to a  final
-state. If it has a valid path,  we remove the \clazy\ edge and mark the
-source node as  final, else we remove the \clazy\  edge without marking
-the source  node as final.   Once the  \clazy\ edges are  eliminated we
-convert the automaton into a deterministic automaton.
+simplification is continued till a fixed point is reached, after which
+the edges labelled \bcar \ and  \bcdr are deleted.  The details of the
+algorithm, its correctness and termination proofs are given by Karkare
+et.  al.~\cite{karkare07liveness,asati14lgc}.  The resulting automaton
+has  edges labelled  with  \acar,  \acdr\ and  \clazy\  only. In  this
+automaton, for every edge labelled \clazy, we check if the source node
+of the edge has  a valid path to a final final state.  If yes, we mark
+the mark  the source node as  final. Finally, we remove  all the edges
+labelled  \clazy\  and  convert  the automaton  into  a  deterministic
+automaton.
 
 \begin{figure}[t!]
   \begin{tabular}{cc}
