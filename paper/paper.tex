@@ -1475,11 +1475,13 @@ arg_1~arg_2}$) or   a closure.  The closure, in  turn, can be  one of
 ($\mathit{app~arg_1~arg_2})$.  Here each $\mathit{ arg_i}$ is a reference to another heap
 cell or terminated through the function $\mathit{makenull}$.
 
-While exploring the heap, the  GC may encounter closures. In RGC mode,
-the  closure will  be explored  as  usual. However,  \cred{  as
-  mentioned earlier}, our liveness analysis predicts the liveness of
-data in its evaluated form. The absence of liveness information of
-closures presents challenges for LGC.
+While exploring the heap, the GC  may encounter closures. In RGC mode,
+the  closure will  be  explored as  usual and  copied  by passing  the
+references. Since our liveness analysis  predicts the liveness of data
+in its evaluated form only, closures  present a challenge for LGC. LGC
+will need  to map the  liveness of the  free variables of  the closure
+back  to their  evaluation point.  This  situation can  be handled  in
+multiple ways and hence we present 2 algorithms for handling closures.
 
 
 \subsection{A liveness-based garbage collection scheme}
