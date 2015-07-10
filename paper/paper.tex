@@ -1001,7 +1001,7 @@ $\leftarrow$  (\length~\pu)  \IN
 (}$\cred{+}$\cred{\ \pa\ \acdr)}$
 \IN
 	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ \cred{(\LET\ \pc}\
-$\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
+$\cred{\leftarrow  (\CONS\ \pb\ \NIL)}$ \IN
           \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
           $\cred{(\LET\ \pw}\  $\cred{\leftarrow  (\length\ \pc)}$ \IN
           \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
@@ -1067,17 +1067,16 @@ maps.}\label{fig:mot-example2}
 \end{figure*}
 %================================================================
 
-The  program  in  Figure~\ref{fig:mot-example2}  serves as  a  running
-example.   Given a  function $\mathit{f}$,  we now  describe  how to
-generate    equations    for     the    demand    transformation
-\Lfonly$_\mathit{f}$.   Starting with a  symbolic demand  $\sigma$, we
-determine  \Lfun{e_{\mathit{f}}}{\sigma}{\Lfonly}.  In  particular, we
-consider $\Lanv{1}{x_i}$,  the  liveness of    the
-$i^{\mbox{\footnotesize  th}}$
-parameter $x_i$ at the  program point at the  beginning of
-$e_{\mathit{f}}$ (assumed  to be  $\pi_1$). By the rule {\sc
-  live-define}, this should be the
-same as $\Lf{f}{i}{\sigma}$. Applying this to  \length, we have:
+Given  a  function  $\mathit{f}$,  we now  describe  how  to  generate
+equations  for the  demand  transformation \Lfonly$_\mathit{f}$.   The
+program in Figure~\ref{fig:mot-example2} serves  as a running example.
+Starting   with    a   symbolic   demand   $\sigma$,    we   determine
+\Lfun{e_{\mathit{f}}}{\sigma}{\Lfonly}.   In  particular, we  consider
+$\Lanv{1}{x_i}$,  the liveness  of  the $i^{\mbox{\footnotesize  th}}$
+parameter   $x_i$  at   the  program   point  at   the  beginning   of
+$e_{\mathit{f}}$   (assumed  to   be  $\pi_1$).   By  the   rule  {\sc
+  live-define},      this     should      be      the     same      as
+$\Lf{f}{i}{\sigma}$. Applying this to \length, we have:
 \begin{eqnarray*}
 && \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
   \cup \clazy\Lf{\length}{1}{\clazy\sigma}
@@ -1124,10 +1123,9 @@ To avoid analyzing the body of a function for each call, we calculated
 the liveness  for the arguments and  the variables in  a function with
 respect to a symbolic demand  $\sigma$.  To get the actual liveness we
 calculate an over-approximation of the  actual demands made by all the
-calls by a {\em summary demand}  and calculate the liveness at each GC
-point inside the  function based on this summary  demand.  Even though
-we  lose precision  due to  this, our  experiments show  that  this is
-acceptable  \comment{Is  this  claim  true?}.   The  0-CFA-style  {\em
+calls and calculate the liveness at each GC
+point inside the  function based on this approximation.
+The  0-CFA-style  {\em
   summary demand}  is calculated by taking  a union of  the demands at
 every call site of a function.
 
@@ -1165,19 +1163,18 @@ of  $\sigma_{\length}$ are:
 \Lanv{1}{\pl} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
   \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
  \\
-\Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\epsilon
+\Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
 \end{align*}
 
 In summary, the equations generated during liveness analysis are:
 \begin{enumerate}
-\item   For    each   function   $\mathit{f}$,    equations   defining
-\Df{f}{i} for use by \Lfonly$_{\mathit f}$.
-\item  For  each   function  $\mathit{f}$, an  equation  defining
-the summary demand  $\sigma_{\mathit f}$ on $e_f$.
-\item For each function $\mathit{f}$ (including $\mainpgm$ for
-  $e_\mainpgm$)
-an equation defining
-  liveness at each GC point of $e_{\mathit f}$.
+\item For each function $\mathit{f}$, equations defining \Df{f}{i} for
+  use by \Lfonly$_{\mathit f}$.
+\item For each function $\mathit{f}$, an equation defining the summary
+  demand $\sigma_{\mathit f}$ on $e_f$.
+\item  For  each  function   $\mathit{f}$  (including  $\mainpgm$  for
+  $e_\mainpgm$)  an equation  defining liveness  at each  GC point  of
+  $e_{\mathit f}$.
 \end{enumerate}
 \subsection{Solving liveness equations---the grammar
 interpretation}\label{sec:grammar-formulation}
@@ -1193,9 +1190,9 @@ grammar    for   \var{\Lanv{1}{\xl}}   comprises    the   following
 productions:
 \begin{eqnarray*}
   \var{\Lanv{1}{\xl}}  &\rightarrow& 
-  \clazy\sigma_{\length} \mid \acdr \var{\Df {\length}{1}}{\clazy\sigma_{\length}}  \\
+  \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\
   & & \mid
-  \clazy\var{\Df{\length}{1}}{\clazy\sigma_{\length}} \\
+  \clazy\var{\Df{\length}{1}}{\clazy\var{\sigma_{\length}}} \\
   \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
   \acdr\var{\Df{\length}{1}}\clazy
        \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
