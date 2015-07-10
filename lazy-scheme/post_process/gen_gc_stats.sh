@@ -105,8 +105,8 @@ for file in $STATOUTFILES; do
     rm -f ${file}.out
 done
 
-PPSCRIPT=$DIRNAME/process_fast
 PPSCRIPT=$DIRNAME/process
+PPSCRIPT=$DIRNAME/process_fast
 OUTFILE=general_stats.out
 $PPSCRIPT $STATSFILE  > $OUTFILE
 
