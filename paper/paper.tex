@@ -1945,51 +1945,47 @@ heap during garbage collection.
 %% traversed  multiple times  with different  sets of  liveness  paths to
 %% explore.  Further work includes  improvements to the classical copying
 %% collector to reduce the cost of this.
-{\color{blue}In our current  work we have extended  the liveness based
-  garbage collection to lazy languages  and show that it has benefits.
-  Our  biggest   contribution  is  our  ability   to  handle  closures
-  (suspended evaluations) during garbage collection.  We show that for
-  a  practical  garbage collector  it  is  not possible  to  implement
-  liveness based collector for  closures efficiently.  By implementing
-  a mixed-mode garbage collection scheme, we were able to collect more
-  cells than reachability based  collectors without paying the penalty
-  of  a full  liveness based  collector.  We  believe this  is a  very
-  practical idea and hence easily implementable.
+{\color{blue}We extended the liveness based garbage collection to lazy
+  languages and shown its benefit  for garbage collection in practical
+  programs. We  defined context  senstive liveness analysis  that uses
+  context independent summaries of functions obtained using a symbolic
+  demand. We show  that obtaining precise solution  to these equations
+  is undecidable in  our formulation, and hence  we safely approximate
+  the result using DFAs. These DFAs are consulted by garbage collector
+  to improve to collection.
 
-We  also overcome  the drawback  of  multiple traversals  that a  full
-liveness based  collector has  by using  an extra  bit and  setting it
-whenever  the  cell   is  copied  using  reachability(as   part  of  a
-closure). Our experimental results  have shown that such optimizations
-provide performance benefits with very little loss of precision. Using
-the  liveness  annotations  for  the  print  primitive  also  improves
-performance and subsumes compile  time optimizations such as tail-call
-optimization.
+  Liveness   of   closure   presented  further   challenges   to   our
+  implementation.   We compared  different approximate  strategies for
+  handling   liveness   of   closures,   and  found   that   a   mixed
+  strategy---reachability  based  collection   of  closure  arguments,
+  liveness  based  collection  of   everything  else---works  best  in
+  practice as it  avoid runtime and space  overheads.  With mixed-mode
+  garbage collection scheme,  we were able to collect  more cells than
+  reachability based collectors at a reasonable overhead.
 
-%%\subsection{Future work}
-Although we  provide an  implementation for  a liveness  based garbage
-collection scheme for lazy language, we  do not provide a formal proof
-of its correctness.  A formal  proof of correctness would describe how
-closures  are  handled  during  garbage  collection  and  liveness  is
-propogated inside closures. 
+  Although we  provide an  implementation for  a liveness  based garbage
+  collection scheme for lazy language, we  do not provide a formal proof
+  of its correctness.  A formal  proof of correctness would describe how
+  closures  are  handled  during  garbage  collection  and  liveness  is
+  propogated inside closures. 
 
- Another interesting exercise is to narrow
-the gap between the actual liveness  and the perceived liveness of our
-garbage collector. Our  experiments show that a  significant number of
-dead cells get trapped inside  closures. Using strictness analysis and
-eagerly evaluating closures might release  more of these dead cells to
-be  garbage  collected.   Since   our  garbage  collector  can  handle
-closures(suspended evaluations)  another challenge would be  to extend
-it to support higher order programs.
+  Another interesting exercise is to narrow the gap between the actual
+  liveness and  the perceived liveness  of our garbage  collector. Our
+  experiments (not  reported here) show  that a significant  number of
+  dead cells  get trapped inside closures.   Using strictness analysis
+  to eagerly evaluate closures might  release more of these dead cells
+  to be  garbage collected.   Since our  garbage collector  can handle
+  closures  (suspended evaluations),  another  major  challenge is  to
+  extend it to support higher order programs.
 
-Orthogonally,  we can  improve the  efficiency of  the liveness  based
-garbage  collector so  that  even  when the  decrease  in the  garbage
-collections compared  to reachability is  not much, the  total garbage
-collection is  not bad. Making  the DFA  smaller by using  better data
-structures like Binary Decision Diagrams(BDD), truncating the liveness
-automata  after   certain  depth(k-liveness)  are  some   ideas  worth
-investigating.
-
- }
+  Orthogonally,  we plan  to improve  the efficiency  of the  liveness
+  based garbage collector using heuristics  such as limiting the depth
+  of  DFAs,   merging  nearly-equivalent   states  and   using  better
+  representation  and algorithms  for automata  manipulation. We  also
+  need  to   investigate  the  interaction  of   liveness  with  other
+  collection schemes, such as incremental and generational collection.
+  In short,  we need to  investigate the  ways to make  liveness based
+  garbage collection attractive for practical collectors.  }
 
 
 %Add graphs for memort usage LGC vs RGC
