@@ -1541,16 +1541,15 @@ copying the  \CAR\ and the  \CDR\ fields.   On the other  hand copying
 closures  requires  determining  the  liveness  of  its  arguments  at
 run-time.
 
-Let   us  consider   determining  the   liveness  of   a   closure  at
-runtime. Consider  a closure  $(app~f~y)$ has a  reference from
-the root  set variable $x$. If $x$  is live,  then we  know that the
-cell $(app~f~y)$ has  to be copied. To find out  the
-liveness of $y$, we need the program point which triggered the
-evaluation of $(app~f~y)$ and pick up the liveness of $y$ from this
-program point. However, this is only possible if the activation record
-of the function which created this closure is still on the activation
-stack. This does not always happen since a function could pack a
-closure in a \CONS\ cell and return the \CONS\ cell.
+Let   us  consider   determining  the   liveness  of   a  closure   at
+runtime. Consider a closure $(app~f~y)$  has a reference from the root
+set  variable  $x$.  If $x$  is  live,  then  we  know that  the  cell
+$(app~f~y)$ has  to be copied.  To copy  the heap structure  rooted at
+$y$, we need the liveness of  $y$ at the program point which triggered
+the evaluation of  $(app~f~y)$. However, this is only  possible if the
+activation record of the function  which created this closure is still
+on the activation stack. This does  not always happen since a function
+could pack a closure in a \CONS\ cell and return the \CONS\ cell.
 
 An  alternative  could  be   to  carry  extra  information  with  each
 closure---the {\em free variables in the closure and the program point
