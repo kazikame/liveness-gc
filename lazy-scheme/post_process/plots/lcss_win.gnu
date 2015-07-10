@@ -29,6 +29,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [1e5:1.7e5] [0:24e3] "output/lcss_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/lcss_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/lcss_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/lcss_gc-live_output/rgc.sort"  w l ls 5 notitle,      "output/lcss_gc-live_output/use.sort"  w l ls 4 notitle
+plot [1e5:1.7e5] [0:24e3] "output/lcss_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/lcss_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/lcss_gc-freq_output/rch.sort"  w l ls 3 notitle,        "output/lcss_gc-live_output/use.sort"  w l ls 4 notitle
 
 #    EOF
