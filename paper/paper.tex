@@ -784,18 +784,18 @@ program,  since ${\mathcal P}_{\length}(\pi_1)  = \lbrace  \epath_1, \epath_2,
 The formulation  of $\cal{P}$ is easy  and we do not  elaborate it any
 further.
 
-Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\SRETURN}.
-The  expression $(\SRETURN~\psi:x)$  with a  demand $\sigma$  forces an
-evaluation  of   $x$  and  hence  a  new   map  $[\mathit{\epath}  \mapsto
-  \{x.\sigma\}] $  needs to  be created, where the $\epath$ is a fresh
-evaluation path terminating in $\psi$.  The  map for  the expression
-$(\SIF~\psi:x~e_1~e_2)$ is a pointwise-union  of the maps of $e_1$ and
+Consider the  $\mathcal{L}$-rules for {\LET}, {\SIF},  and {\SRETURN}.
+The expression  $(\SRETURN~\psi:x)$ with  a demand $\sigma$  forces an
+evaluation  of  $x$ and  hence  a  new map  $[\mathit{\epath}  \mapsto
+  \{x.\sigma\}]  $ needs  to be  created,  where $\epath$  is a  fresh
+evaluation path  terminating in  $\psi$.  The  map for  the expression
+$(\SIF~\psi:x~e_1~e_2)$ is a pointwise-union of  the maps of $e_1$ and
 $e_2$. In addition, since the condition also triggers an evaluation of
-$x$,  the map  $[\mathit{\epath} \mapsto  \{x.\epsilon\}]$ is  created and
-added  to the  union.  Also  notice a  consequences  of laziness---the
-entire  expression including  the condition  is not  evaluated  if the
-demand on it is $\emptyset$.  This results in the empty map, which, by
-abuse of notation, is also denoted by $\emptyset_{\cal{M}}$.
+$x$, the map $[\mathit{\epath} \mapsto \{x.\epsilon\}]$ is created and
+added  to the  union.  Also  notice a  consequences of  laziness---the
+entire  expression including  the condition  is not  evaluated if  the
+demand on it is $\emptyset$.  This  results in the empty map, which is
+denoted by $\emptyset_{\cal{M}}$.
 
 
 
@@ -805,9 +805,9 @@ abuse of notation, is also denoted by $\emptyset_{\cal{M}}$.
  $s$.   We  model  the  definition  $x  \leftarrow~s$  as  a  possibly
  recursive function (named $\mathit{f}$ in the rule) which captures an
  arbitrary number of ``unrollings'' of the definition\footnote{The $*$
-   in  the definition  of ${\mathit  f}$  represents non-deterministic
-   choice.  During   liveness  it  can  be  assumed   to  generate  no
-   liveness.}.   We pass to  the demand  transformer $\Lfonly_{\mathit
+   in  the definition  of ${\mathit  f}$ represents  non-deterministic
+   choice.  During liveness analysis it  can be assumed to generate no
+   liveness.}.  We  pass to  the demand  transformer $\Lfonly_{\mathit
    f}$ of this function the demand  arising out of the liveness of $x$
  at the beginning of $e$. This  gives the liveness of the variables of
  $s$.
@@ -830,7 +830,7 @@ secondly  that  ({\sc  live-define})   resembles  the  rule  for  type
 inference of mutually recursive  function definitions, and thirdly the
 asymmetry of  demand and liveness (compared to  post- and pre-liveness
 classically) is due to the functional formulation here.
-}%mycomment
+}
 
 Section~\ref{sec:computing}   shows   how   the  demand   transformers
 $\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
@@ -915,36 +915,24 @@ $\lbrace\epsilon\rbrace$ otherwise.  To  realize these rules
 $\sigma$ needs to be known. This creates difficulties since we want to
 solve the equations arising out of liveness symbolically.
 
-The  solution  is  to   also  treat  the  operations  mentioned  above
-symbolically.   We  introduce three  new  symbols.  These symbols  are
-defined as a relation  $\hookrightarrow$ between sets of access paths.
-First, \bcar\ and \bcdr\ are defined as:
+The  solution  is  to  also   treat  the  operations  mentioned  above
+symbolically.  We  introduce three new symbols:  \bcar, \bcdr, \clazy.
+These symbols are defined as a relation $\hookrightarrow$ between sets
+of access paths.  First, \bcar\ and \bcdr\ are defined as:
 
 \begin{align*}
-  &\sigma_1\bcar\sigma_2  \hookrightarrow
-  \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
-&\sigma_1\bcdr\sigma_2  \hookrightarrow
-  \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
-  \acdr\sigma_2'
+  &\bcar\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acar\alpha \in \sigma\}\\
+  &\bcdr\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acdr\alpha \in \sigma\}
 \end{align*}
-Thus \bcar, for example, removes the leading \acar\ from $\sigma_2$.
-Similarly, the symbol \clazy\ reduces the string following it to an
-$\epsilon$. \clazy\  is defined by addition to
-$\hookrightarrow$ the rule:
+Thus \bcar\ selects those entries in $\sigma$ that have leading \acar, and removes the leading \acar\ from the.
+The symbol \clazy\ reduces the set of strings following it to a set containing only $\epsilon$. It filters out, however, the empty set of strings.
 \begin{align*}
-  &\sigma_1\clazy\sigma_2  \hookrightarrow
-  \sigma_1 \mbox{ if } \sigma_2 \subseteq  \{\acar,\acdr\}^\ast
+  \clazy\sigma \hookrightarrow & \left\{ 
+  \begin{array}{ll}
+    \emptyset&\mbox{if}~\sigma = \emptyset\\
+    \{\epsilon\} & \mbox{otherwise}
+  \end{array}\right.
 \end{align*}
-%% \begin{align*}
-%%  \bcar\sigma &\triangleq \{\alpha \mid 0\alpha \in \sigma\}\\
-%%  \bcdr\sigma &\triangleq \{\alpha \mid 1\alpha \in \sigma\}
-%% \end{align*}
-%% and \clazy\ as:
-%% \begin{align*}
-%%  \clazy\sigma \triangleq\; & \emptyset~\mbox{if}~\sigma = \emptyset\\
-%%                        & \{\epsilon\} ~\mbox{otherwise}
-%% \end{align*}
-%% Note that \clazy\ is idempotent.
 We can  now rewrite the \CONS\  and the \CAR\  rules of $\mathit{ref}$
 as:
 \begin{align*}
@@ -975,10 +963,11 @@ similar to \CAR.  %% The definitions  of \bcar\, \bcdr\ and \clazy\ induce
 %% \sigma_2 \ne
 %%   \emptyset
 %% \end{align*}
-The reflexive  transitive closure of  $\hookrightarrow$ will
-be   denoted    as   $\stackrel{*}{\hookrightarrow}$.    The
-following proposition relates  the original and the modified
-liveness rules.
+When  there  are  multiple  occurences of  \bcar,  \bcdr  and  \clazy,
+$\hookrightarrow$  is  applied  from  right to  left.   The  reflexive
+transitive   closure  of   $\hookrightarrow$   will   be  denoted   as
+$\stackrel{*}{\hookrightarrow}$.   The  following proposition  relates
+the original and the modified liveness rules.
 
 
 \begin{proposition}
