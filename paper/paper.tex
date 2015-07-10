@@ -1476,12 +1476,13 @@ arg_1~arg_2}$) or   a closure.  The closure, in  turn, can be  one of
 cell or terminated through the function $\mathit{makenull}$.
 
 While exploring the heap, the GC  may encounter closures. In RGC mode,
-the  closure will  be  explored as  usual and  copied  by passing  the
-references. Since our liveness analysis  predicts the liveness of data
-in its evaluated form only, closures  present a challenge for LGC. LGC
-will need  to map the  liveness of the  free variables of  the closure
-back  to their  evaluation point.  This  situation can  be handled  in
-multiple ways and hence we present 2 algorithms for handling closures.
+the closure  will be explored  as usual  and copied by  traversing the
+references corresponding to the arguments. Since our liveness analysis
+predicts the  liveness of  data in its  evaluated form  only, closures
+present a challenge for LGC. LGC will  need to map the liveness of the
+free variables of the closure to  their evaluation point.  This is not
+straight  forward as  variables may  escape their  creation scope  and
+needs to  be handled in an  approximate way.  We describe this in detail next.
 
 
 \subsection{A liveness-based garbage collection scheme}
@@ -1533,14 +1534,10 @@ multiple ways and hence we present 2 algorithms for handling closures.
         \caption{LGC with closure collection based on liveness.\label{algo:lgc-a}}
 \end{algorithm}
 Algorithm~\ref{algo:lgc-a}  describes  a  liveness-based  garbage  collection
-scheme.   The algorithm  assumes that  checking for  liveness involves
-traversing the  liveness-DFAs stored as  a table and does  not mention
-this explicitly.  Starting  with the root set, each  live reference is
+scheme.    Starting  with the root set, each  live reference is
 explored   using  $\mathit{  lgcCopy}$.    Copying  \CONS\   cells  is
 simple---it  just involves  copying  the cell  itself and  recursively
-copying the \CAR\ and  the \CDR\ fields.  Liveness-based collection of
-closures  is more  complicated since  our analysis  only  computes the
-liveness of evaluated objects and not closures.
+copying the \CAR\ and  the \CDR\ fields.  
 
 Let   us  consider   determining  the   liveness  of   a   closure  at
 runtime. Assume  that the closure  $(app~f~y)$ has a  reference from
