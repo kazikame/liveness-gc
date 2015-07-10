@@ -1882,26 +1882,49 @@ benefits  in terms  of non-live  cells inside  closures as  everything
 would be live at the point of creation.
 
 \section{Related Work} 
-\cred{Need to  rewrite this  entire section  need to  probably mention
-  some of  these papers at  least i  found by googling  liveness based
-  GC,\\ http://www.cs.hmc.edu/~oneill/papers/Simplifiers-MSPC.pdf\\ http://costa.ls.fi.upm.es/papers/costa/AlbertGGZ12.pdf\\ http://hirzels.com/martin/papers/ecoop01-gc-liveness.pdf\\ }
-Previous  attempts  to increase  the  space  efficiency of  functional
-programs  by  additional  reclamation  of memory  fall  in  two  broad
-categories. In the first, the program itself is instrumented to manage
-reclamation and reallocation without the aid of the garbage collector.
-Such      attempts      include:      sharing      analysis      based
-reallocation~\cite{jones89compile},                      deforestation
-techniques~\cite{wadler88deforest,gill93ashort,chitil99deforest},
-methods  based  on   linear  logic~\cite{hofmann00linear}  and  region
-analysis~\cite{tofte98region}.   Closer  to  our approach,  there  are
-methods   that  enable   the   garbage  collector   to  collect   more
-garbage~\cite{inoue88analysis,lee05static}  by  explicitly  nullifying
-pointers  that are  not  live.  However,  the  nullification, done  at
-compile  time,  requires sharing  (alias)  analysis.   Our method,  in
-contrast, does not require sharing  because of the availability of the
-heap itself  at runtime.  To  the best of  our knowledge, this  is the
-first attempt  at liveness-based  marking of  the heap  during garbage
-collection.
+Although augmenting  garbage collection with liveness  information has
+been  studied earlier,  it was  mainly  in the  context of  imperative
+languages~\cite{Albert,  Hirzel}.  Due  to   the  presence  of  global
+variables  and mutation,  practical utility  of simple  liveness based
+techniques are found to be inefficient.
+
+In the space  of functional languages, improving  space efficiency has
+been  mainly  studied  as  a compile  time  activity.  Either  through
+rewriting                methods                such                as
+deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
+sharing  analysis   based  reallocation~\cite{jones89compile},  region
+based  analysis~\cite{tofte98region} or  through insertion  of compile
+time              nullifying              statements              such
+as~\cite{inoue88analysis,lee05static,Hamilton}.    The  compile   time
+marking approaches all rely on an efficient and precise alias analysis
+and in the absence of it cannot provide notable improvement.
+
+The closest  to our approach  is the liveness based  garbage collector
+implemented in~\cite{asati14lgc}. We extend  their work to handle lazy
+evaluation and closures.
+ 
+
+%% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
+
+
+
+%% Previous  attempts  to increase  the  space  efficiency of  functional
+%% programs  by  additional  reclamation  of memory  fall  in  two  broad
+%% categories. In the first, the program itself is instrumented to manage
+%% reclamation and reallocation without the aid of the garbage collector.
+%% Such      attempts      include:      sharing      analysis      based
+%% reallocation~\cite{jones89compile},                      deforestation
+%% techniques~\cite{wadler88deforest,gill93ashort,chitil99deforest},
+%% methods  based  on   linear  logic~\cite{hofmann00linear}  and  region
+%% analysis~\cite{tofte98region}.   Closer  to  our approach,  there  are
+%% methods   that  enable   the   garbage  collector   to  collect   more
+%% garbage~\cite{inoue88analysis,lee05static}  by  explicitly  nullifying
+%% pointers  that are  not  live.  However,  the  nullification, done  at
+%% compile  time,  requires sharing  (alias)  analysis.   Our method,  in
+%% contrast, does not require sharing  because of the availability of the
+%% heap itself  at runtime.  To  the best of  our knowledge, this  is the
+%% first attempt  at liveness-based  marking of  the heap  during garbage
+%% collection.
 
 %% \begin{figure}[t]
 %% \centerline{\epsfig{file=lambda.eps, height=4cm, width=7cm}}
