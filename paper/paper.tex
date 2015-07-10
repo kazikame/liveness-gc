@@ -759,15 +759,14 @@ the following observations:
 
 We thus  regard the  body of  the function as  an expression  tree and
 consider paths from  the root of this tree to  the nodes corresponding
-to the program points  which trigger evaluation---\SIF\ conditions and
-\SRETURN\     expressions.      We     call    such     paths     {\em
-  e-paths}.\footnote{Program  points  which   trigger  evaluation  are
-  labelled with $\psi$. By an abuse of notation, we use the same label
-  $\psi$ to refer  to the e-path terminating at a  point $\psi$.}  For
-example, for the function \length, there  are three such paths $\epath_1 =
-\langle  \pi_1, \pi_2,  \psi_1\rangle$, $\epath_2  = \langle\pi_1,  \pi_2,
-\pi_3, \pi_4, \psi_2\rangle$ and $\epath_3  = \langle \pi_1, \pi_2, \pi_5,
-\pi_6, \pi_7, \pi_8, \psi_3\rangle$.
+to the program points which trigger evaluation\footnote{Program points
+  which      trigger      evaluation       are      labelled      with
+  $\psi$.}---\SIF\ conditions and \SRETURN\ expressions.  We call such
+paths {\em e-paths}.  For example, for the function \length, there are
+three  such paths  $\epath_1 =  \langle \pi_1,  \pi_2, \psi_1\rangle$,
+$\epath_2  = \langle\pi_1,  \pi_2,  \pi_3,  \pi_4, \psi_2\rangle$  and
+$\epath_3  =  \langle  \pi_1,   \pi_2,  \pi_5,  \pi_6,  \pi_7,  \pi_8,
+\psi_3\rangle$.
 
 Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
 analysis  computes  two   maps:  $\mathcal{L}(e_f,  \sigma,  \Lfonly)$
