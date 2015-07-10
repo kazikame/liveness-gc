@@ -1643,7 +1643,7 @@ language, both \CAR\ and \CDR\ could be closures requiring evaluation,
 and this  may trigger  a garbage collection.   When this  happens.  we
 have to consider  any references that might be on  the print stack and
 copy them. We extend the liveness analysis to the print function and
-use its results during garbage collection.
+use its result during garbage collection.
 
 %% Liveness automata  does not exist for  the print function  as it is
 %% not part of the executing  program.  Since the print function makes
