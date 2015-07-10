@@ -1361,10 +1361,14 @@ algorithm, its correctness and termination proofs are given by Karkare
 et.  al.~\cite{karkare07liveness,asati14lgc}.  The resulting automaton
 has  edges labelled  with  \acar,  \acdr\ and  \clazy\  only. In  this
 automaton, for every edge labelled \clazy, we check if the source node
-of the edge has  a valid path to a final final state.  If yes, we mark
+of the edge has a valid path to  a final final state.  If yes, we mark
 the mark  the source node as  final. Finally, we remove  all the edges
 labelled  \clazy\  and  convert  the automaton  into  a  deterministic
-automaton.
+automaton.    This   effectively  implements   the   $\hookrightarrow$
+simplification rules for  \bcar, \bcdr, and \clazy\  to obtain forward
+paths. While  checking for liveness  during GC, a  forward access-path
+only if it can reach a final state.
+
 
 \begin{figure}[t!]
   \begin{tabular}{cc}
@@ -1436,20 +1440,17 @@ automaton.
 \end{figure}
 
 Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
-from the  grammar for  \var{\Df{\length}{1}}.  The  NFA is
-simplified by replacing the edges labeled \clazy\ by $\epsilon$. While
-checking for liveness during GC, a forward access-path traversing such
-an edge  will be accepted  only if it  can reach a final  state.  This
-effectively implements  the $\hookrightarrow$ simplification  rule for
-\clazy\ for forward paths. The resulting automaton, made deterministic,
-is shown in Figure~\ref{fig:example-automata}(b). This expectedly says
-that  given  a demand  $\epsilon$  on  \length,  the liveness  of  its
-argument             is             $\acdr^{*}$.            Similarly,
-Figure~\ref{fig:example-automata}(c)    shows   the    automaton   for
-\var{\Lanv{9}{\pa}}. The simplified automaton, shown in
-Figure~\ref{fig:example-automata}(d) does not accept any forward
-paths. This reflects the lazy nature of our language. \length\  does not
-evaluate its elements and thus \pa\ is dead at $\pi_9$.
+from the grammar for \var{\Df{\length}{1}}.  The final DFA is shown in
+Figure~\ref{fig:example-automata}(b).  This expectedly says that given
+a  demand $\epsilon$  on  \length,  the liveness  of  its argument  is
+$\acdr^{*}$  (the  spine  of   the  list  is  traversed).   Similarly,
+Figure~\ref{fig:example-automata}(c)     shows     the     NFA     for
+\var{\Lanv{9}{\pa}}.          The         DFA         shown         in
+Figure~\ref{fig:example-automata}(d)  does  not   accept  any  forward
+paths.   This  reflects  the  lazy  nature  of  our  language.   Since
+\length\ does not  evaluate the member elements of  the argument list,
+the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
+liveness based GC is triggered beyond $\pi_9$.
 
 
 \section{The Garbage Collection Scheme}
