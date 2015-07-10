@@ -894,11 +894,11 @@ in terms of  a given $\sigma$ and \Lfonly.  However,  we still have to
 describe how to obtain demand transformers \Lfonly\ from the rule {\sc
   live-define} and how to compute the specific demand $\sigma$ on each
 function.
-
+%%
 To  answer these  questions, it  is convenient  to cast  the equations
-arising out of $\mathit{ref}$  and $\mathcal{L}$ as the rules of a
-grammar.   But first  we modify  the rules  themselves to  a different
-form.
+arising  out of  $\mathit{ref}$ and  $\mathcal{L}$ as  the rules  of a
+grammar.   To do  so, we  need  to modify  the rules  themselves to  a
+different form.
 
 \subsection{Modifying liveness rules}
 
@@ -914,13 +914,12 @@ solve the equations arising out of liveness symbolically.
 The  solution  is  to  also   treat  the  operations  mentioned  above
 symbolically.  We  introduce three new symbols:  \bcar, \bcdr, \clazy.
 These symbols are defined as a relation $\hookrightarrow$ between sets
-of access paths.  First, \bcar\ and \bcdr\ are defined as:
-
+of access paths:
 \begin{align*}
   &\bcar\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acar\alpha \in \sigma\}\\
   &\bcdr\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acdr\alpha \in \sigma\}
 \end{align*}
-Thus \bcar\ selects those entries in $\sigma$ that have leading \acar, and removes the leading \acar\ from the.
+Thus \bcar\ selects those entries in $\sigma$ that have leading \acar, and removes the leading \acar\ from them.
 The symbol \clazy\ reduces the set of strings following it to a set containing only $\epsilon$. It filters out, however, the empty set of strings.
 \begin{align*}
   \clazy\sigma \hookrightarrow & \left\{ 
@@ -947,25 +946,13 @@ for \SIF\ as:
         &[\,\mathit{\epath} \mapsto  x.\clazy \sigma]
 \end{align*}
 The rules for  \CDR, \PRIM\ and \NULLQ\ are also  modified in a manner
-similar to \CAR.  %% The definitions  of \bcar\, \bcdr\ and \clazy\ induce
-%% the following relation $\hookrightarrow$ over sets of access paths:
-%% \begin{align*}
-%%   &\sigma_1\bcar\sigma_2  \hookrightarrow
-%%   \sigma_1\sigma_2'\mbox{ where } \sigma_2 = \acar\sigma_2',\\
-%% &\sigma_1\bcdr\sigma_2  \hookrightarrow
-%%   \sigma_1\sigma_2'\mbox{ where } \sigma_2 =
-%%   \acdr\sigma_2',~\mbox{and}\\
-%% &\sigma_1\clazy \sigma_2 \hookrightarrow \sigma_1, \mbox{ if }
-%% \sigma_2 \ne
-%%   \emptyset
-%% \end{align*}
-When  there  are  multiple  occurences of  \bcar,  \bcdr  and  \clazy,
+similar to \CAR. 
+
+When  there  are  multiple  occurences of  \bcar,  \bcdr\  and  \clazy,
 $\hookrightarrow$  is  applied  from  right to  left.   The  reflexive
 transitive   closure  of   $\hookrightarrow$   will   be  denoted   as
 $\stackrel{*}{\hookrightarrow}$.   The  following proposition  relates
 the original and the modified liveness rules.
-
-
 \begin{proposition}
 Assume that a liveness computation  based on the original set of rules
 gives the liveness  of the variable $x$ at a  program point $\pi_i$ as
@@ -978,11 +965,7 @@ For  an explanation  of why  the  proposition holds  for the  modified
 \CONS\  rule,   we  refer   the  reader  to   \cite{asati14lgc}.   The
 proposition also holds for other modified rules for similar reasons.
 
-%Thick red line
-%{\color{red} \medskip \hrule \hrule \hrule  \medskip }
-
 \newcommand{\emm}[2]{\ensuremath{\mathcal{#1}_{#2}}}
-
 \subsection{Generating Liveness Equations}
 
 \begin{figure*}[t!]
