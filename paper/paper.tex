@@ -1610,6 +1610,13 @@ reachability for closures.
         }
         \caption{LGC with reachability-based closure collection.\label{algo:lgc-b}}
 \end{algorithm}
+\begin{table*}[ht!]
+\caption{Experimental results comparing RGC and LGC}
+\label{tab:experimental-results}
+\centering
+\include{autotable}
+\end{table*}
+
   Algorithm~\ref{algo:lgc-b}  describes  a garbage  collection  scheme
   where the liveness automata is  consulted only for \CONS\ cells; and
   assumes everything under a closure  to be live and copies everything
@@ -1632,7 +1639,6 @@ Another advantage of  this mixed garbage collection scheme  is that it
 avoids the problem of multiple  explorations from the same cell.  This
 is done by maintaining a flag in  each cell to indicate whether it was
 copied using reachability.
-
 
 \subsection{Garbage collection for references on print stack}
 In lazy  languages the evaluation of  closures is driven  by the print
@@ -1697,13 +1703,6 @@ use its result during garbage collection.
 
 
 
-\begin{table*}[t!]
-\caption{Experimental results comparing RGC and LGC}
-\label{tab:experimental-results}
-
-\centering
-\include{autotable}
-\end{table*}
 \section{Experimental Evaluation}
 
 %% \comment{To demonstrate the effectiveness of liveness-based garbage collection,
