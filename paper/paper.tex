@@ -1564,15 +1564,13 @@ than what is found at the creation point.
 
 Note that  when a reachability-based  collector visits a cell  for the
 first time,  it is  marked.  Explorations starting  from the  cell are
-curtailed if the cell is  visited subsequently due to sharing. This is
-because the collector can assume  that the region of the heap starting
-from  the  cell has  already  been  explored.  Since a  liveness-based
-collector may  reach the cell each  time with a  different state, this
-curtailment cannot  be done in  the case of  LGC. This is  an inherent
-drawback  of a  liveness-based collector.   This can  be  mitigated by
-maintaining a list of liveness  automata states that a particular heap
-cell was traversed with and  ensuring that we do not repeat traversals
-if we reach the cell in one of these states.
+curtailed if the cell is visited subsequently due to sharing.  Since a
+liveness-based collector may reach the  same cell multiple times, each
+time with a different automaton state, this curtailment cannot be done
+in the case  of LGC. This is an inherent  drawback of a liveness-based
+collector.  This  can be mitigated  by maintaining a list  of liveness
+automata states  that a  particular heap cell  was traversed  with and
+avoid repeated traversals if we reach the cell in one of these states.
 
 \subsection{Liveness-based collector with reachability-based closure
   collection}
