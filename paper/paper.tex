@@ -834,7 +834,7 @@ each function.   The summary is  in the  form of a  demand transformer
 that maps a demand on a call to the function to demands on each of its
 arguments.
 
-{\color{red}
+\mycomment{\color{red}
 \subsection{Correctness of liveness analysis}  
  
 We shall now  outline a proof of correctness  of the liveness analysis
@@ -887,7 +887,7 @@ and $\Sigma$ is a  stack of demands---one for each function
 
 \section{Computing liveness and its encoding as DFA}\label{sec:computing}
 Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis
-and  {\color  {red}  proved  it  correct  with  reference  to  a  {\em
+and  \mycomment{\color  {red}  proved  it  correct  with  reference  to  a  {\em
     minefield} semantics}.  In  particular, $\mathcal{L}$ and \pmap{f}
 together described a liveness set for each program point in a function
 in terms of  a given $\sigma$ and \Lfonly.  However,  we still have to
@@ -2013,8 +2013,10 @@ investigating.
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
-\pagebreak
 
+
+\mycomment{
+\pagebreak
 \pagebreak
 \section{Appendix}
 
@@ -2204,5 +2206,5 @@ $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
 
 %% %------------------------------------------------------------%
 %% %\input{lazy-liveness}
-
+}
 \end{document}
