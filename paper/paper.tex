@@ -1571,6 +1571,9 @@ in the case  of LGC. This is an inherent  drawback of a liveness-based
 collector.  This  can be mitigated  by maintaining a list  of liveness
 automata states  that a  particular heap cell  was traversed  with and
 avoid repeated traversals if we reach the cell in one of these states.
+However this also involves storage and run-time penalty.
+
+To avoid performance penalty, we experimented with a mixed-mode garbage collection scheme which uses liveness for evaluated data and reachability for closures.
 
 \subsection{Liveness-based collector with reachability-based closure
   collection}
