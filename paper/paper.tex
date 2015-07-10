@@ -211,19 +211,20 @@ to their  points of  creation at  runtime from  where we  obtain their
 liveness.  This  requires significant  modification to the  earlier GC
 scheme.  
 
-{\color {Myblue}Rewrite  after the  experiments: Experiments
-  with  a single  generation  copying collector  confirm the  expected
-  performance  benefits.   Liveness-based  collection  results  in  an
-  increase  in  garbage  reclaimed.   As a  consequence,  there  is  a
-  decrease in  the number of  collections and a  (some quantification)
-  decrease in the memory size  required to run programs. Besides there
-  is a reduction in the overall  execution time for some programs. Our
-  experiments further show that a mixed strategy, where we do liveness
-  based GC  up to the closure  boundary and reachability based  GC for
-  the  arguments (free  variables) of  the closure,  gives us  similar
-  benefits as  a fully liveness based  GC (where the arguments  of the
-  closure are also collected using liveness) at much less overhead (?).
-}
+{\color  {Myblue}   Experiments  with  a  single   generation  copying
+  collector confirm the expected performance benefits.  Liveness-based
+  collection  results  in an  increase  in  garbage reclaimed.   As  a
+  consequence, there is a decrease in  the number of collections and a
+  (some quantification)  decrease in the  memory size required  to run
+  programs. Besides there is a reduction in the overall execution time
+  for  some  programs.  Our  experiments  further  show that  a  mixed
+  strategy, where we  do liveness based GC up to  the closure boundary
+  and reachability based GC for  the arguments (free variables) of the
+  closure,  gives us  similar benefits  as a  fully liveness  based GC
+  (where  the  arguments  of  the closure  are  also  collected  using
+  liveness)  at  much  less  overhead (?).  [Overhead:  extra  memory,
+    book-keeping during run-time to update, multiple traversal of same
+    set of cells][Refer to Section~\ref{some-sec-in-impl}] }
 
 
 %------------------------------------------------------------%
@@ -268,7 +269,8 @@ scheme.
       \begin{tabular}[t]{p{0.9\columnwidth}}
         (b) Memory graph at $\pi$.  \scalebox{.7}{\TwoCellsAD{a1}{a2}}
         denotes a closure. Thick edges denote live links. Traversal
-        stops at edges marked $\times$ during garbage collection.
+        stops at edges marked $\times$ during garbage collection for
+        an ideal collector.
       \end{tabular}
     \end{tabular} 
   \end{pspicture}
@@ -277,29 +279,29 @@ scheme.
 \end{figure}
 
 Figure~\ref{fig:mot-example} shows an example program and the state of
-the heap at the program point $\pi$, i.e. just before the  evaluation
-of $(\length\ \pz)$.  The heap is represented by a graph in which
-a node  either represents atomic values ($\NIL$,  integers etc.), or
-a \CONS\  cell  containing $\CAR$  and  $\CDR$  fields, or a chunk of
-memory representing an unevaluated
-value  also called a  {\em closure}  (represented by  hatched boxes).
-Edges in the graph are  {\em references} and emanate from variables or
-fields.  The figure shows the lists \px\ and \pz\ partially evaluated.
-The evaluation was triggered by the test (\NULLQ~(\CAR~(\CDR~\pz))) in
-the \SIF\ expression.
+the heap at  the program point $\pi$, i.e. just  before the evaluation
+of $(\length\  \pz)$.  The heap is  represented by a graph  in which a
+node either  represents atomic  values ($\NIL$,  integers etc.),  or a
+\CONS\ cell containing $\CAR$ and $\CDR$  fields, or a chunk of memory
+representing  an  unevaluated  value   also  called  a  {\em  closure}
+(represented  by  hatched  boxes).   Edges   in  the  graph  are  {\em
+  references} and emanate from variables  or fields.  The figure shows
+the  lists \px\  and  \pz\ partially  evaluated.   The evaluation  was
+triggered    by   the    test   (\NULLQ~(\CAR~(\CDR~\pz)))    in   the
+\SIF\ expression.
 
 
-The edges shown by thick arrows are  those which are live at $\pi$.  A
-cell is  preserved during garbage  collection only if it  is reachable
-from the root set  through a path of live edges.   All other cells can
-be reclaimed.  Thus if a garbage  collection takes place at $\pi$ with
-the  heap shown  in Figure~\ref{fig:mot-example}(b),  a liveness-based
-collector  (LGC) will  preserve only  the cells  referenced by  $\pz$,
-$(\CDR~ \pz)$ and  (the cells constituting) the  closure referenced by
-$(\CDR~(\CDR~\pz))$.   In  contrast,  a  reachability-based  collector
-(RGC) would have preserved all cells.
+The edges  shown by thick  arrows are those  which are live  at $\pi$.
+Ideally, a cell should be  preserved during garbage collection only if
+it is reachable from  the root set through a path  of live edges.  All
+other  cells can  be reclaimed.   Thus if  a garbage  collection takes
+place at $\pi$ with the heap shown in Figure~\ref{fig:mot-example}(b),
+an ideal liveness-based  collector (LGC) will preserve  only the cells
+referenced by  $\pz$, $(\CDR~ \pz)$  and (the cells  constituting) the
+closure   referenced   by   $(\CDR~(\CDR~\pz))$.    In   contrast,   a
+reachability-based collector (RGC) would have preserved all cells.
 
-{\color {Myblue}Rewrite at the end: The  specific contributions of the
+{\color {Myblue}Rewrite at the end: The specific contributions of the
 paper
   are: The formulation of a  liveness analysis for a lazy language and
   the proof of its correctness, the undecidability of the grammar that
@@ -592,14 +594,6 @@ exit from $n$ becomes the demand on $y+z$, and this, in turn generates
 the liveness $\lbrace y.\epsilon, z.\epsilon  \rbrace$ at the entry of
 $n$.
 
-
-{
-\color {Myblue}[I don't think this is valid anymore!!]
-Note that  liveness refers to  access using variables and  fields, and
-not  to $\CONS$  cells (i.e.\  to edges  in the  memory graph,  not to
-locations themselves).
-}
-
 We follow the notations appearing in \cite{asati14lgc}. In particular,
 We use $\sigma$  to range over demands, $\alpha$ to  range over access
 paths and  $\Lv$ to  range over  liveness environments.   The notation
@@ -699,12 +693,13 @@ expressions.
  Since  in a  lazy language,  an  expression is  not evaluated  unless
  required, the null demand ($\emptyset$) does not generate liveness in
  any  of  the  rules  defining  $\mathit{ref}$  or  $\mathcal{L}$.   A
- non-null  demand of  $\sigma$ on  (\CDR~$x$), is  transformed  to the
- liveness $\{x.\epsilon, x.\acdr\sigma\}$.   In an opposite sense, the
+ non-null  demand of  $\sigma$ on  (\CDR~$x$), is  transformed to  the
+ liveness $\{x.\epsilon, x.\acdr\sigma\}$.  In  an opposite sense, the
  demand  of $\acdr\sigma$  on  (\CONS~$y$~$z$) is  transformed to  the
- demand  $\sigma$ on  $z$.   Note  that \CONS\  does  not, by  itself,
- dereference its  arguments. The rules for  (\PRIM~x~y) and (\NULLQ~x)
- are similar. Constants do not generate any liveness.
+ demand  $\sigma$  on $z$.   Since  \CONS\  does not  dereference  its
+ arguments, there  is no $\epsilon$ demand  on $y$ and $z$.  The rules
+ for (\PRIM~x~y) and (\NULLQ~x) are similar. Constants do not generate
+ any liveness.
 
 For the  case of a  function call we  use a third  parameter $\Lfonly$
 that  represents  the  summaries  of all  functions  in  the  program.
@@ -832,10 +827,10 @@ asymmetry of  demand and liveness (compared to  post- and pre-liveness
 classically) is due to the functional formulation here.
 }
 
-Section~\ref{sec:computing}   shows   how   the  demand   transformers
+Section~\ref{sec:computing}   shows   how  the   demand   transformers
 $\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
-analysis) can be safely approximated by a {\em procedure summary}. for
-each function.   The summary  is in the  form of a  demand transformer
+analysis) can be safely approximated  by a {\em procedure summary} for
+each function.   The summary is  in the  form of a  demand transformer
 that maps a demand on a call to the function to demands on each of its
 arguments.
 
