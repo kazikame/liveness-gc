@@ -120,19 +120,19 @@ section.
 
 
 \begin{abstract}
-We consider  the problem of reducing  the memory required  to run lazy
-first-order functional  programs. To do this, we  analyze programs for
-liveness of  heap-allocated data.  The  accompanying garbage collector
+We consider  the problem of reducing  the memory required to  run lazy
+first-order functional programs.  To do this, we  analyze programs for
+liveness of  heap-allocated data.  The accompanying  garbage collector
 is modified  to use the result  of the analysis to  preserve only live
-data---a subset  of reachable data---during  garbage collection.  This
+data---a subset  of reachable data---during garbage  collection.  This
 results  in an  increase  in the  garbage  reclaimed and  consequently
-reduces  the memory footprint  of programs.  While this  technique has
-already been shown to  yield benefits for eager first-order languages,
+reduces the  memory footprint of  programs.  While this  technique has
+already been shown to yield  benefits for eager first-order languages,
 the lack of a statically determinable execution order and the presence
-of  closures   at  run-time  poses  additional   challenges  for  lazy
-languages.   This  requires  changes  both  in  the  earlier  liveness
-analysis and also in the garbage collection scheme required to reclaim
-memory that is not live.
+of closures at run-time pose additional challenges for lazy languages.
+This requires changes  both in the earlier liveness  analysis and also
+in the  garbage collection scheme  required to reclaim memory  that is
+not live.
 
 The implementation  of our  analysis annotates each  potential garbage
 collection  point   in  the  program  with  a   set  of  deterministic
@@ -157,7 +157,8 @@ when compared to reachability based collectors.
 
 \terms{Algorithms, Languages, Theory}
 
-\keywords{Heap Analysis, Memory Management, Garbage Collection}
+\keywords{Heap Analysis, Liveness Analysis, Memory Management, Garbage
+  Collection, Lazy Languages}
 
 \section{Introduction}
 \label{sec:intro}
@@ -172,74 +173,62 @@ evaluation.
 While  the runtime  system  of most  functional  languages includes  a
 garbage  collector  (GC)  to  efficiently  reclaim  memory,  empirical
 studies on Scheme~\cite{karkare06effectiveness} and, more importantly,
-on Haskell~\cite{rojemo96lag}
-programs have shown that  GCs leave uncollected a large
-number of  memory objects that are  reachable but not  live (here {\em
-  live} means the  object can potentially be used by  the program at a
-later stage).  This results in unnecessary memory retention.
+on  Haskell~\cite{rojemo96lag}  programs  have shown  that  GCs  leave
+uncollected a  large number of  memory objects that are  reachable but
+not live (here {\em live} means  the object can potentially be used by
+the program  at a  later stage).  This  results in  unnecessary memory
+retention.
 
 In this paper,  we propose the use of liveness  analysis of heap cells
 for garbage collection in a lazy first-order functional language.  The
 central notion in our analysis  is a generalization of liveness called
 {\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
-expression.   The analysis  has two  parts.  First,  each  function is
+expression.   The analysis  has two  parts.  First,  each function  is
 summarized in a context-sensitive manner as a {\em demand transformer}
 that transforms a {\em symbolic} demand  on its body to demands on its
 arguments.  This summary  is then used to step  through function calls
 during analysis.   Second, the concrete  demand on a function  body is
 obtained through a 0-CFA-like conservative approximation that combines
 the  demands on  all the  calls to  the function.   The result  of the
-analysis  is the annotation  of each  program point  with finite-state
-automata capturing  the liveness of variables at  the point. Depending
+analysis  is an  annotation of  each program  point with  finite-state
+automata capturing the liveness of  variables at that point. Depending
 on the program point where  garbage collection has been triggered, the
-GC consults  a set of automata  to curtail reachability
-during marking.  This results in  an increase in the garbage reclaimed
-and consequently in fewer garbage collections.
+GC consults a set of  automata to restrict reachability during marking.
+This results in an increase  in the garbage reclaimed and consequently
+in fewer garbage collections.
 
 While this idea has been shown to be effective~\cite{asati14lgc} for a
 first-order {\em  eager} language, a straightforward  extension of the
 earlier  technique  is  not  possible  for  lazy  languages,  where  a
-heap-allocated  object may either  be an  unevaluated expression  or a
-closure. Since  data is  made live by  evaluation of closures,  and in
+heap-allocated   object   may   be  an   unevaluated   expression   or
+closure. Since  data is made  live by  evaluation of closures,  and in
 lazy languages  the place in  the program where this  evaluation takes
-place cannot  be statically determined,  laziness complicates liveness
-analysis itself.  In  addition, apart from evaluated data,  we want to
-extend  liveness-based collection also  to closures---closures with no
-future use should also  be collected.  This involves tracking closures
-to  their points of  creation at  runtime from  where we  obtain their
+place cannot  be statically determined, laziness  complicates liveness
+analysis itself.   In addition, apart  from evaluated data,  we extend
+extend liveness-based  collection also to closures---closures  with no
+future use should also be  collected.  This involves tracking closures
+to their  points of  creation at  runtime from  where we  obtain their
 liveness.  This  requires significant  modification to the  earlier GC
-scheme.
+scheme.  
 
-{\color  {Myblue}Rewrite after the experiments:  Experiments  with a
-single
-  generation  copying  collector   confirm  the  expected  performance
-  benefits.   Liveness-based  collection  results  in an  increase  in
-  garbage reclaimed.   As a  consequence, there is  a decrease  in the
-  number of  collections and a  (some quantification) decrease  in the
-  memory size required  to run programs. Besides there  is a reduction
-  in the overall execution time for some programs.}
+{\color {Myblue}Rewrite  after the  experiments: Experiments
+  with  a single  generation  copying collector  confirm the  expected
+  performance  benefits.   Liveness-based  collection  results  in  an
+  increase  in  garbage  reclaimed.   As a  consequence,  there  is  a
+  decrease in  the number of  collections and a  (some quantification)
+  decrease in the memory size  required to run programs. Besides there
+  is a reduction in the overall  execution time for some programs. Our
+  experiments further show that a mixed strategy, where we do liveness
+  based GC  up to the closure  boundary and reachability based  GC for
+  the  arguments (free  variables) of  the closure,  gives us  similar
+  benefits as  a fully liveness based  GC (where the arguments  of the
+  closure are also collected using liveness) at much less overhead (?).
+}
 
 
 %------------------------------------------------------------%
 \subsection{Motivating Example}
 \label{sec:motiv}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%
-%%% MOTIVATING EXAMPLE
-%% \newcommand{\nilfigure}
-%% {\scalebox{0.75}{
-%% \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-%% \begin{pspicture}(0,0)(1,1)
-%% %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,
-%% subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(1,1)
-%% \putnode{start}{origin}{0}{0}{}
-%% \putnode{stop}{origin}{10}{10}{}
-%% \ncline[offsetB=0,nodesepB=0,linewidth=.7]{-}{start}{stop} %here
-%% \end{pspicture}
-%% }}
-
 \begin{figure}[t!]
   \psset{unit=1mm}
   \begin{pspicture}(90,48)(0,-48)
@@ -300,16 +289,15 @@ The evaluation was triggered by the test (\NULLQ~(\CAR~(\CDR~\pz))) in
 the \SIF\ expression.
 
 
-The edges shown by thick arrows  are those which are live at $\pi$.  A
-cell is marked  and preserved during garbage collection  only if it is
-reachable from the  root set through a path of  live edges.  All other
-cells can be  reclaimed.  Thus if a garbage  collection takes place at
-$\pi$  with  the  heap  shown  in  Figure~\ref{fig:mot-example}(b),  a
-liveness-based collector (LGC) will  collect only the cells referenced
-by  $\pz$, $(\CDR~  \pz)$  and (the  cells  constituting) the  closure
-referenced by $(\CDR~(\CDR~\pz))$ need to be marked and preserved.  In
-contrast,  a reachability-based collector  (RGC) would  have preserved
-all cells.
+The edges shown by thick arrows are  those which are live at $\pi$.  A
+cell is  preserved during garbage  collection only if it  is reachable
+from the root set  through a path of live edges.   All other cells can
+be reclaimed.  Thus if a garbage  collection takes place at $\pi$ with
+the  heap shown  in Figure~\ref{fig:mot-example}(b),  a liveness-based
+collector  (LGC) will  preserve only  the cells  referenced by  $\pz$,
+$(\CDR~ \pz)$ and  (the cells constituting) the  closure referenced by
+$(\CDR~(\CDR~\pz))$.   In  contrast,  a  reachability-based  collector
+(RGC) would have preserved all cells.
 
 {\color {Myblue}Rewrite at the end: The  specific contributions of the
 paper
@@ -340,23 +328,22 @@ than a reachability based collector.
 }
 \section{The target language---syntax and semantics}
 \label{sec:defs}
-%%We let $x$,  $y$, $z$ range over variables,  $f$ over user-functions
-%% and $p$ over primitive functions ($\CONS$, $\PRIM$ etc.).
-Figure~\ref{fig:lang-syntax} describes the  syntax of our language. It
+Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
 is a first order language with lazy semantics. Programs are restricted
 to        be        in        Administrative        Normal        Form
-(ANF)~\cite{chakravarty03perspective}  where all actual  parameters to
+(ANF)~\cite{chakravarty03perspective} where  all actual  parameters to
 functions  are  variables.  While  this  restriction  does not  affect
 expressibility,  this form  has  the benefit  of  making explicit  the
-creation  of closures through  the $\LET$  construct.  $\LET$s  in our
-language  are lazy;  in the  expression $\LET\,\,  x  \leftarrow s\,\,
-\IN\,\, e$, $x$ may occur  in $s$. This enables creation of graph-like
-structures in  a pure language. The  restriction of \LET\  to a single
-definition  is  for ease  of  exposition---generalization to  multiple
-definitions  does  not add conceptual  difficulties.  We  further
-restrict each variable  in a program to be distinct,  so that no scope
-shadowing   occurs---this  simplifies   proofs   of  soundness.    The
-$\SRETURN$ and \SIF\ expressions trigger evaluation of closures.
+creation of  closures through  the $\LET$  construct.  $\LET$s  in our
+language  are lazy;  in the  expression $\LET\,\,  x \leftarrow  s\,\,
+\IN\,\, e$, $x$ may occur in  $s$. This enables creation of graph-like
+structures in  a pure language. The  restriction of \LET\ to  a single
+definition  is for  ease  of  exposition---generalization to  multiple
+definitions does not add conceptual difficulties.  We further restrict
+each variable in a program to  be distinct, so that no scope shadowing
+occurs---this  simplifies  the  reasoning   about  the  program.   The
+$\SRETURN$  and   \SIF\  expressions  and  strict   operators  trigger
+evaluation of closures.
 
 The body  of a function ${\mathit  f}$ is denoted  as $e_{\mathit f}$.
 We   shall   extend   this   convention   to   the   main   expression
@@ -366,19 +353,6 @@ $e_\mainpgm$. We assume that each program has a distinguished function
 with the call to \mainpgm.  We write $\pi\!:\!e$ to associate the label
 $\pi$ (not  part of the language  syntax) with the  program point just
 before expression $e$.
-
-% \paragraph{Inlining.}
-{ \color {Myblue} Relook after proof: In spite of the  ANF restrictions
-it
-  is still possible  to inline non-recursive functions (a  fact we use
-  to  prove the safety  of liveness  analysis).  A  user-function call
-  $(\LET\,\, x \leftarrow (f\,y_1\,\ldots\,y_n)  \,\, \IN\,\, e)$ to a
-  function  defined  (after renaming  its  formals  and  locals to  be
-  disjoint         from         existing         variables)         by
-  $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ e_f)$ is replaced by a sequence of
-  $\LET$'s of  the form  $z_i\leftarrow (\ID\,\,y_i)$ followed  by the
-  body $e_f$  but with  its $(\SRETURN\,\,w)$ expressions  replaced by
-  $(\LET\,\, x \leftarrow (\ID\,\, w) \,\, \IN\,\, e)$.}
 
 \begin{figure}[t]
 \footnotesize
@@ -417,6 +391,7 @@ and generic arithmetic} \\
 
 \begin{figure*}[t!]
 \begin{center}
+\renewcommand{\arraystretch}{1.5}
 \begin{tabular}{|c|c|c|}
 \hline
 Premise & Transition & Rule name \\
@@ -515,9 +490,9 @@ Since all data objects are boxed, we model an environment as a mapping
 from the set  of variables of the program  $\mathit{Var}$ to locations
 in the  heap.  These  either contain  a value in  WHNF (a  number, the
 empty  list  $\NIL$,  or  a  \CONS\  cell  with  possibly  unevaluated
-constituents) or  a {\em  closure}.  A closure  is a pair  $\langle s,
-\rho\rangle$  in which  $s$  is an  unevaluated  application, and  the
-values of its free variables is given by $\rho$.
+constituents) or  a {\em closure}.   A closure  is a pair  $\langle s,
+\rho\rangle$ in  which $s$ is  an unevaluated application,  and $\rho$
+maps free variables of $s$ to their respective locations.
 
 The  semantics  of   expressions  (and  applications\footnote{In  most
   contexts, we  shall use  the term 'expression' and the notation $e$  for
@@ -574,63 +549,64 @@ has to be resumed after the argument is evaluated.
 
 \section{Liveness}\label{sec:liveness}
 
-A variable is {\em live} if  there is a possibility of its value being
-used in  future computations  and dead if  it is definitely  not used.
+A variable is {\em live} if there  is a possibility of its value being
+used in  future computations and  dead if  it is definitely  not used.
 Heap-allocated data needs a richer model of liveness which talks about
-liveness  of references.   Using  $\acar$, $\acdr$  to represent  access
+liveness of  references.  Using  $\acar$, $\acdr$ to  represent access
 using  $\CAR$  and  $\CDR$  fields,  the  liveness  of  the  structure
 reachable from a  variable can be represented by a  set of {\em access
-  paths} i.e.  prefix-closed  strings from $\{\acar,\acdr\}^\ast$.  As
-an  example,  if $x$  is  a  list  with liveness  $\{\epsilon,  \acdr,
-\acdr\acar,  \acdr\acdr, \acdr\acdr\acar\}$, then  future computations
-can only  refer up  to the second  and third  members of $x$.   A {\em
-  liveness  environment} is  a mapping  from variables  to  subsets of
-$\{\acar,\acdr\}^\ast$, but  often expressed as a set,  for example by
-writing $\{x.\epsilon, x.\acdr, x.\acdr\acdr, y.\epsilon\}$ instead of
-$[x     \mapsto\{\epsilon,\acdr,\acdr\acdr\},    y\mapsto\{\epsilon\},
-  z\mapsto\{\}]$.    In  this   notation,  $x   \mapsto  \{\epsilon\}$
-represents access using $x$ itself and $x \mapsto \{\}$ indicates that
-$x$ is dead.  We  associate liveness environments with program points.
-The liveness at $\pi:e$ is the liveness just before executing $e$.
+  paths}     i.e.     prefix-closed     set     of    strings     from
+$\{\acar,\acdr\}^\ast$.  As an example, if $x$ is a list with liveness
+$\{\epsilon, \acdr,  \acdr\acar, \acdr\acdr,  \acdr\acdr\acar\}$, then
+future computations can only refer up  to the second and third members
+of $x$.  A  {\em liveness environment} is a mapping  from variables to
+subsets of $\{\acar,\acdr\}^\ast$,  but often expressed as  a set, for
+example by writing $\{x.\epsilon, x.\acdr, x.\acdr\acdr, y.\epsilon\}$
+instead       of       $[x       \mapsto\{\epsilon,\acdr,\acdr\acdr\},
+  y\mapsto\{\epsilon\}, z\mapsto\{\}]$.  In  this notation, $x \mapsto
+\{\epsilon\}$ represents access using $x$  itself and $x \mapsto \{\}$
+indicates that $x$  is dead.  We associate  liveness environments with
+program points.  The  liveness at $\pi:e$ is the  liveness just before
+executing $e$.
 
 
 A  notion  related  to  liveness  is  {\em  demand}.   While  liveness
 represents the future use of variables, a demand represents the future
-use of the value of an  expression. The demand on an expression $e$ is
+use of the value of an expression.  The demand on an expression $e$ is
 again a  set of  access paths---that subset  of $\{\acar,\acdr\}^\ast$
 which the context of $e$ may explore of $e$'s result.  To see the need
 for  demands,  consider   the  let  expression  $\pi:(\LET~x\leftarrow
-(\CDR~y)~\IN~  \pi':\SRETURN~x)$.   Assume that  the  context of  this
+(\CDR~y)~\IN~  \pi':\SRETURN~x)$.  Assume  that  the  context of  this
 expression produces  the liveness $[x \mapsto  \lbrace \epsilon, \acar
   \rbrace]$ at $\pi'$.  Due to the \LET\ definition which binds $x$ to
-$(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes  the demand on
-$(\CDR~y)$.    This,  in   turn,  generates   the   liveness  $\lbrace
+$(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes the  demand on
+$(\CDR~y)$.    This,  in   turn,  generates   the  liveness   $\lbrace
 y.\epsilon, y.\acdr, y.\acdr\acar \rbrace$ at $\pi$. These are the set
 of $y$-rooted  accesses required  to explore $\lbrace  \epsilon, \acar
-\rbrace$  paths   of  the  result   of  $(\CDR~y)$\footnote{Reproduced
-  from~\cite{asati14lgc}: In  classical strong liveness  analysis, $y$
-  and $z$  are live at the  entry $n: x:=y+z$,  if and only if  $x$ is
-  live  at exit  of $n$.   In our  terminology, the  liveness $\lbrace
-  \epsilon\rbrace $ of $x$ at the  exit from $n$ becomes the demand on
-  $y+z$, and this, in turn generates the liveness $\lbrace y.\epsilon,
-  z.\epsilon \rbrace$ at the entry of $n$.}.
-%% Exploring $\lbrace \epsilon, \acar \rbrace$ of the
-%% result of $(\CDR~y)$ first requires access using $y$ ( and the \CDR\
-%% field of the cons cell pointed by
-%% $y$.
+\rbrace$  paths  of  the  result of  $(\CDR~y)$.  In  strong  liveness
+analysis       (dual      of       classical      faint       variable
+analysis~\cite{horwitz.faint}),  $y$ and  $z$  are live  at the  entry
+$\pi: x:=y+z$, if  and only if $x$  is live at exit of  $\pi$.  In our
+terminology, the  liveness $\lbrace  \epsilon\rbrace $  of $x$  at the
+exit from $n$ becomes the demand on $y+z$, and this, in turn generates
+the liveness $\lbrace y.\epsilon, z.\epsilon  \rbrace$ at the entry of
+$n$.
 
 
+{
+\color {Myblue}[I don't think this is valid anymore!!]
 Note that  liveness refers to  access using variables and  fields, and
 not  to $\CONS$  cells (i.e.\  to edges  in the  memory graph,  not to
 locations themselves).
-We use $\sigma$  to range over demands, $\alpha$  to range over access
-paths  and $\Lv$ to  range over  liveness environments.   The notation
+}
+
+We follow the notations appearing in \cite{asati14lgc}. In particular,
+We use $\sigma$  to range over demands, $\alpha$ to  range over access
+paths and  $\Lv$ to  range over  liveness environments.   The notation
 $\sigma_1\sigma_2$  denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
 \alpha_1 \in \sigma_1, \alpha_2  \in \sigma_2\rbrace$.  Often we shall
 abuse notation to  juxtapose an edge label and a  set of access paths:
-$\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$. A more
-elaborate explanation of these notions appear in \cite{asati14lgc}
-
+$\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 
 \subsection{Liveness Analysis for lazy languages}
 \label{sec:liveness-analysis}
@@ -674,25 +650,25 @@ $\NIL$}\\
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
-\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{ep}
+\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{\epath}
 \mapsto
-x.\sigma\rbrack, \mbox{ where $\mathit{ep}$ is a
+x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
   new e-path terminating with $\psi$}\\
 \mathcal{L}((\SIF~\psi:x~e_1~e_2),\sigma,\Lfonly) &=&
 \begin{array}{l l}
                     \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
         \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
-        \lbrack\lbrace \mathit{ep} \mapsto
+        \lbrack\lbrace \mathit{\epath} \mapsto
 \{x.\epsilon\}\rbrace\rbrack,  & \mbox{if}~\sigma \ne \emptyset\\
         \emptyset_{\cal{M}}  & \mbox{otherwise}
                  \end{array} \\
-&&\mbox{where $\mathit{ep}$ is a new e-path
+&&\mbox{where $\mathit{\epath}$ is a new e-path
   terminating with $\psi$}\\
 \mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-        \lambda\mathit{ep}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
+        \lambda\mathit{\epath}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
 \mbox{where}~\mathcal{M} =
 \mathcal{L}(e,\sigma,\Lfonly),~\Lv =
-\mathcal{M}(ep),~\mbox{and}~f~\mbox{is the new function}\\
+\mathcal{M}(\epath),~\mbox{and}~f~\mbox{is the new function}\\
 && \makebox[0mm]{\hspace*{7cm}
  $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
            x_2\, \ldots\, x_n)/x]))$,} \\
@@ -730,19 +706,19 @@ expressions.
  dereference its  arguments. The rules for  (\PRIM~x~y) and (\NULLQ~x)
  are similar. Constants do not generate any liveness.
 
-For  the  case  of a  user-function  call  we  use a  third  parameter
-$\Lfonly$  that  represents the  summaries  of  all  functions in  the
-program.   $\Lfonly_{\mathit f}$  (the  component of  $\Lfonly$ for  a
-specific function $f$), expresses how the demand $\sigma$ on a call to
-$f$  is  transformed  into  the  liveness of  its  parameters  at  the
-beginning of the call.  $\Lfonly$  is determined by the judgement form
+For the  case of a  function call we  use a third  parameter $\Lfonly$
+that  represents  the  summaries  of all  functions  in  the  program.
+$\Lfonly_{\mathit  f}$  (the component  of  $\Lfonly$  for a  specific
+function $f$), expresses  how the demand $\sigma$ on a  call to $f$ is
+transformed into  the liveness of  its parameters at the  beginning of
+the   call.    $\Lfonly$  is   determined   by   the  judgement   form
 $\mathit{Prog} \len \Lfonly$ using inference rule ({\sc live-define}).
-This  rule  describes the  fixed-point  property  to  be satisfied  by
+This  rule  describes the  fixed-point  property  to be  satisfied  by
 $\Lfonly$, namely, the demand transformation assumed for each function
 in  the  program should  be  the  same  as the  demand  transformation
 calculated    from    its    body.      As    we    shall    see    in
 Section~\ref{sec:grammar-formulation},  we  convert  the rule  into  a
-grammar  and the  the  language  generated by  this  grammar is  least
+grammar and  the the language generated  by this grammar is  the least
 solution satisfying  the rule. We  prefer the least solution  since it
 ensures the safe collection of the greatest amount of garbage.
 
@@ -768,28 +744,30 @@ the following observations:
   marking more cells as live,  since, during execution, \py\ is yet to
   come  into  existence at  $\pi_6$,  and  its  liveness will  not  be
   consulted by the garbage collector at this point.
-\item In an eager language, \py\ would not have been live at $\pi_8$,
-  a program point  beyond its last use.  In  a lazy language, however,
-  the  definition $\pz  \leftarrow  (1+\py)$, does  not  result in  an
-  evaluation  of  $(1+\py)$;  instead   a  closure  is  created.   The
-  evaluation  actually takes  place while  evaluating $(\SRETURN~\pz)$.
-  We therefore  record  the liveness of $\py$ at the program
-  point $\pi_8$,  indeed at every  program point from $\pi_8$  up to
-  the beginning  of the program $\pi_1$ (since  we do not  kill
-liveness).
+\item In an  eager language, the heap location referred  by \py\ would
+  not have been live at $\pi_8$,  a program point beyond its last use.
+  In  a  lazy  language,   however,  the  definition  $\pz  \leftarrow
+  (1+\py)$, does not  result in an evaluation of  $(1+\py)$; instead a
+  closure  is  created.  The  evaluation  actually  takes place  while
+  evaluating $(\SRETURN~\pz)$.   We therefore  record the  liveness of
+  $\py$ at  the program point  $\pi_8$, indeed at every  program point
+  from $\pi_8$ up to the beginning of the program $\pi_1$ (since we do
+  not kill liveness).
 \end{enumerate}
 
 
 
-We thus regard  the body of the function as a  tree and consider paths
-from  the  root   of  this  tree  to  program   points  which  trigger
-evaluation\footnote{Program   points  which  trigger   evaluation  are
-  labelled  with   $\psi$  }---\SIF\ conditions  and \SRETURN\
-expressions.   We call such
-paths {\em e-paths}.   For the function \length, there  are three such
-paths  $ep_1   =  \langle   \pi_1,  \pi_2,  \psi_1\rangle$,   $ep_2  =
-\langle\pi_1, \pi_2, \pi_3, \pi_4,  \psi_2\rangle$ and $ep_3 = \langle
-\pi_1, \pi_2, \pi_5, \pi_6, \pi_7, \pi_8, \psi_3\rangle$.
+We thus  regard the  body of  the function as  an expression  tree and
+consider paths from  the root of this tree to  the nodes corresponding
+to the program points  which trigger evaluation---\SIF\ conditions and
+\SRETURN\     expressions.      We     call    such     paths     {\em
+  e-paths}.\footnote{Program  points  which   trigger  evaluation  are
+  labelled with $\psi$. By an abuse of notation, we use the same label
+  $\psi$ to refer  to the e-path terminating at a  point $\psi$.}  For
+example, for the function \length, there  are three such paths $\epath_1 =
+\langle  \pi_1, \pi_2,  \psi_1\rangle$, $\epath_2  = \langle\pi_1,  \pi_2,
+\pi_3, \pi_4, \psi_2\rangle$ and $\epath_3  = \langle \pi_1, \pi_2, \pi_5,
+\pi_6, \pi_7, \pi_8, \psi_3\rangle$.
 
 Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
 analysis  computes  two   maps:  $\mathcal{L}(e_f,  \sigma,  \Lfonly)$
@@ -800,21 +778,21 @@ $\mathit f$  to the set  of e-paths sharing  the point.  If  a program
 point happens to fall on more  than one such e-path, then the liveness
 environment of  the program  point is the  variable-wise union  of the
 liveness  environments  of the  individual  e-paths.   In the  example
-program,  since ${\mathcal P}_{\length}(\pi_1)  = \lbrace  ep_1, ep_2,
-ep_3\rbrace$, the  liveness at $\pi_1$  is ${\cal M}(ep_1)  \cup {\cal
-  M}(ep_2) \cup  {\cal M}(ep_3)$,  where ${\cal M}  = \mathcal{L}(e_f,
+program,  since ${\mathcal P}_{\length}(\pi_1)  = \lbrace  \epath_1, \epath_2,
+\epath_3\rbrace$, the  liveness at $\pi_1$  is ${\cal M}(\epath_1)  \cup {\cal
+  M}(\epath_2) \cup  {\cal M}(\epath_3)$,  where ${\cal M}  = \mathcal{L}(e_f,
 \sigma, \Lfonly)$.  In the  sequel we shall only define $\mathcal{L}$.
 The formulation  of $\cal{P}$ is easy  and we do not  elaborate it any
 further.
 
 Consider  the $\mathcal{L}$-rules for  {\LET}, {\SIF},  and {\SRETURN}.
 The  expression $(\SRETURN~\psi:x)$  with a  demand $\sigma$  forces an
-evaluation  of   $x$  and  hence  a  new   map  $[\mathit{ep}  \mapsto
-  \{x.\sigma\}] $  needs to  be created, where the $ep$ is a fresh
+evaluation  of   $x$  and  hence  a  new   map  $[\mathit{\epath}  \mapsto
+  \{x.\sigma\}] $  needs to  be created, where the $\epath$ is a fresh
 evaluation path terminating in $\psi$.  The  map for  the expression
 $(\SIF~\psi:x~e_1~e_2)$ is a pointwise-union  of the maps of $e_1$ and
 $e_2$. In addition, since the condition also triggers an evaluation of
-$x$,  the map  $[\mathit{ep} \mapsto  \{x.\epsilon\}]$ is  created and
+$x$,  the map  $[\mathit{\epath} \mapsto  \{x.\epsilon\}]$ is  created and
 added  to the  union.  Also  notice a  consequences  of laziness---the
 entire  expression including  the condition  is not  evaluated  if the
 demand on it is $\emptyset$.  This results in the empty map, which, by
@@ -983,7 +961,7 @@ for \SIF\ as:
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) =
                     &\mathcal{L}(e_1,\sigma,\Lfonly)~\uplus
         \mathcal{L}(e_2,\sigma,\Lfonly)~\uplus\\
-        &[\,\mathit{ep} \mapsto  x.\clazy \sigma]
+        &[\,\mathit{\epath} \mapsto  x.\clazy \sigma]
 \end{align*}
 The rules for  \CDR, \PRIM\ and \NULLQ\ are also  modified in a manner
 similar to \CAR.  %% The definitions  of \bcar\, \bcdr\ and \clazy\ induce
@@ -1072,10 +1050,10 @@ $\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
         \small
 \begin{eqnarray*}
         \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
-              [\;ep_1 \mapsto \lbrace \px.\clazy \sigma,
-\xl.\clazy\sigma\rbrace ,~ep_2 \mapsto \lbrace \cred{
+              [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
+\xl.\clazy\sigma\rbrace ,~\epath_2 \mapsto \lbrace \cred{
 \pv.\sigma}  \rbrace,\\
- &&          \;\;  ep_3 \mapsto \lbrace \pz.\sigma,
+ &&          \;\;  \epath_3 \mapsto \lbrace \pz.\sigma,
                 \py.\clazy\sigma,
 \pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
 &&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
@@ -1084,30 +1062,30 @@ $\cred{\leftarrow  (\CONS\ \pb\ ())}$ \IN
 \cred{\clazy\Lf{\length}{1}{\clazy\sigma}}\}\}
              \rbrack \\
             \cal{P_{\mbox{\tiny \length}}} &=&
-                [\;\pi_1 \mapsto \lbrace ep_1, ep_2, ep_3 \rbrace,  \
-                 \pi_2 \mapsto \lbrace ep_1, ep_2, ep_3
+                [\;\pi_1 \mapsto \lbrace \epath_1, \epath_2, \epath_3 \rbrace,  \
+                 \pi_2 \mapsto \lbrace \epath_1, \epath_2, \epath_3
                   \rbrace, \\
-&&\;\;  \pi_3 \mapsto \lbrace ep_2
-                  \rbrace ,  \pi_4 \mapsto \lbrace ep_2
-                  \rbrace, \pi_5 \mapsto \lbrace  ep_3 \rbrace, \\
- &&  \;\;                        \pi_6 \mapsto \lbrace ep_3 \rbrace,
+&&\;\;  \pi_3 \mapsto \lbrace \epath_2
+                  \rbrace ,  \pi_4 \mapsto \lbrace \epath_2
+                  \rbrace, \pi_5 \mapsto \lbrace  \epath_3 \rbrace, \\
+ &&  \;\;                        \pi_6 \mapsto \lbrace \epath_3 \rbrace,
 \pi_7 \mapsto
-                   \lbrace ep_3\rbrace, \pi_8 \mapsto \lbrace ep_3
+                   \lbrace \epath_3\rbrace, \pi_8 \mapsto \lbrace \epath_3
 \rbrace~\rbrack\\
               \mathcal{L}(e_{\main},\sigma,\Lfonly) &=&
                 [\;
-                  ep_4 \mapsto \lbrace \cred {\pw.\sigma,
+                  \epath_4 \mapsto \lbrace \cred {\pw.\sigma,
                                        \pc.\Lf{\length}{\mbox{1}}{\sigma},}\\
 && \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
 \cred{\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},}
 \cred{\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma}} \rbrace
                                ] \\
                \cal{P_{\mbox{\tiny \main}}} &=&
-                  \lbrack~ \cred{\pi_9 \mapsto \lbrace ep_4 \rbrace,  \
-                    \pi_{10} \mapsto \lbrace ep_4 \rbrace,  \
-                   \pi_{11} \mapsto \lbrace ep_4 \rbrace,} \\
-                   && \;\; \cred{\pi_{12} \mapsto \lbrace ep_4 \rbrace,
-\pi_{13} \mapsto \lbrace ep_4 \rbrace}~\rbrack
+                  \lbrack~ \cred{\pi_9 \mapsto \lbrace \epath_4 \rbrace,  \
+                    \pi_{10} \mapsto \lbrace \epath_4 \rbrace,  \
+                   \pi_{11} \mapsto \lbrace \epath_4 \rbrace,} \\
+                   && \;\; \cred{\pi_{12} \mapsto \lbrace \epath_4 \rbrace,
+\pi_{13} \mapsto \lbrace \epath_4 \rbrace}~\rbrack
 \end{eqnarray*}
     \end{minipage} \\
 (a)&
