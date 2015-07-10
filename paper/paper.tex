@@ -1573,7 +1573,9 @@ automata states  that a  particular heap cell  was traversed  with and
 avoid repeated traversals if we reach the cell in one of these states.
 However this also involves storage and run-time penalty.
 
-To avoid performance penalty, we experimented with a mixed-mode garbage collection scheme which uses liveness for evaluated data and reachability for closures.
+To  avoid  performance  penalty,  we experimented  with  a  mixed-mode
+garbage collection scheme  which uses liveness for  evaluated data and
+reachability for closures.
 
 \subsection{Liveness-based collector with reachability-based closure
   collection}
@@ -1608,28 +1610,27 @@ To avoid performance penalty, we experimented with a mixed-mode garbage collecti
         }
         \caption{LGC with reachability-based closure collection.\label{algo:lgc-b}}
 \end{algorithm}
-  Since the first  algorithm has  significant bookkeeping
-overheads,  we have  a  second GC  scheme  that not  use liveness  for
-copying closures.  In this  scheme, the liveness automata is consulted
-only for \CONS\ cells; we assume everything under a closure to be live
-and copy everything  that is reachable. Algorithm~\ref{algo:lgc-b}  describes  this scheme. 
+  Algorithm~\ref{algo:lgc-b}  describes  a garbage  collection  scheme
+  where the liveness automata is  consulted only for \CONS\ cells; and
+  assumes everything under a closure  to be live and copies everything
+  that is reachable.
  
-A consequence of copying everything under a closure is that we can end
-up trying to copy things which are not live and corrupt the heap. This
-can happen if a \CONS\  cell copied using liveness during a collection
-subsequently  becomes   part  of  a  closure.    During  a  subsequent
-collection,  the  collector  may  try  to copy  everything  under  the
-\CONS\ cell thus copying heap  locations which might not be valid.  To
-avoid  this, we  should ensure  that any  non-live references  are not
-carried across  GC's.  We  do this  by scanning the  live part  of the
-buffer after every  GC and setting to null any  reference which is not
-live. This  is correct  because any reference  which is dead  during a
-collection will not be dereferenced any further.
+A consequence of  copying everything under a closure is  that we might
+reach  a non-live  cell that  has been  reclaimed earlier  by liveness
+based GC.   This can  happen if  a \CONS\  cell having  partially live
+sub-structure  is copied  using liveness  during a  collection and  it
+subsequently  becomes part  of a  live closure.   During a  subsequent
+collection, the collector may try to copy everything under the closure
+including the dead  sub-structure of the \CONS\ cell.   To avoid this,
+we ensure  that any non-live  references are not carried  across GC's.
+We do this by scanning the live  part of the buffer after every GC and
+nullifying any  reference which is  not live. This is  correct because
+any reference which  is dead during a collection is  guaranteed not be
+dereferenced any further by the program.
 
-
-Using  reachablity  for  closures   avoids  the  problem  of  multiple
-explorations from the  same cell.  This is done by  maintaining a flag
-in each cell to indicate whether it was copied using reachability.
+This mixed scheme avoids the problem of multiple explorations from the
+same  cell.  This  is  done by  maintaining  a flag  in  each cell  to
+indicate whether it was copied using reachability.
 
 
 \subsection{Garbage collection for references on print stack}
