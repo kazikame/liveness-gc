@@ -1974,15 +1974,21 @@ of global variables and mutation, practical utility of simple liveness
 based techniques are found to be inefficient.
 
 In the space  of functional languages, improving  space efficiency has
-been  mainly  studied  as  a compile  time  activity.  Either  through
+been  mainly  studied as  a  compile  time activity.   Either  through
 rewriting                methods                such                as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
 sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based  analysis~\cite{tofte98region}, or  through insertion  of compile
+based analysis~\cite{tofte98region},  or through insertion  of compile
 time              nullifying              statements              such
 as~\cite{inoue88analysis,lee05static,Hamilton}.    The  compile   time
 marking approaches all rely on an efficient and precise alias analysis
-and in the absence of it cannot provide notable improvement.
+and in the  absence of it cannot provide  notable improvement. Another
+important approach  advocated by  Hofmann~\cite{HofmannJ03} is  to use
+linear  typing to  analyze  first-order programs  for  heap usage  and
+annotated  them. The  system  then uses  these  annotations to  re-use
+allocated memory  cells instead  of requesting  for newer  cells. This
+requires the  user to write programs  in a specific way  and hence may
+not be practical
 
 Another  interesting  research  in  this   field  is  the  concept  of
 Simplifiers~\cite{ONeill}. They are  described as lightweight daemons
