@@ -1646,7 +1646,7 @@ Prog Name & Heap size & Num GC & Time taken using reachability for closure  & Ti
 
 
 \begin{table*}[ht!]
-\caption{Compile time and Garbage Collection statistics}
+\caption{Liveness Analysis and Garbage Collection statistics}
 \label{tab:exp-results}
 \centering
  \begin{tabular}{|l||c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c|} \hline
@@ -1657,7 +1657,7 @@ Prog Name & Heap size & Num GC & Time taken using reachability for closure  & Ti
    \#DFA Transitions             & 5792          & 3632         & 4235            & 4261        & 10857         & 4076           & 2078           & 3101               & 1124            \\\hline
    DFA Generation Time (sec)      & 14.7          & 1.1          & 2690.5          & 13.3        & 798.5         & 49.8           & 0.5            & 5.1                & 0.1             \\\hline
  \end{tabular}\\
- (a) Data for Compile-time Liveness Analysis \\[3pt]
+ (a) Data for Liveness Analysis \\[3pt]
 \include{autotable}
 \end{table*}
 
@@ -1695,88 +1695,14 @@ have to consider  any references that might be on  the print stack and
 copy them. We extend the liveness analysis to the print function and
 use its result during garbage collection.
 
-%% Liveness automata  does not exist for  the print function  as it is
-%% not part of the executing  program.  Since the print function makes
-%% everything  reachable  from a  cell  live  we  can copy  all  cells
-%% reachable from the reference.
-
-
-%% Consider  the case  where a  \CONS\ cells  is being  printed  and a
-%% garbage collection  is triggered when  printing the \CDR\  part. In
-%% this case, since  the refernce to the \CONS\ cells  is still on the
-%% print stack both the \CAR\ and the \CDR\ parts are reachable but we
-%% know that the \CAR\ part has already been printed and can be safely
-%% garbage collected. A liveness  analysis of the print function would
-%% have given  the same information.   In our implementation  we mimic
-%% the  behavior of the  liveness analysis  by using  a flag  in every
-%% \CONS\ cell which  says whether the \CAR\ part  has been printed or
-%% not. For any \CONS\ cell if  the \CAR\ part has not been printed, a
-%% reference  to the  \CAR\ part  will also  be on  the stack  but the
-%% \CDR\ part has to be explicitly copied.  In case the \CAR\ part has
-%% been printed,  then a reference  to the \CDR\  part will be  on the
-%% stack and  since the \CAR\ part  is not required anymore  we do not
-%% copy anything.  This  optimization subsumes tail call optimization.
-%% Again, experimental results show that this optimization minimizes a
-%% lot of copying.  \cred{Very sketchy: Make another attempt to write}
-%% \hrule
-
-%% \comment{ Unlike  eager languages where  GC happens only  at \CONS~
-%%   points or at function calls,  every \LET~ point is a potential GC
-%%   point.  The number of automata that needs to be stored is reduced
-%%   by sharing  automata along all  the program points along  an {\em
-%%   E-path}.
-
-%% By the time the program starts executing, the liveness automata are
-%% created  and stored  in a  file.  This  is re-used  every  time the
-%% program executes.   An important difference in GC  of lazy language
-%% compared to an  eager language is the point  of garbage collection.
-%% In case  of eager languages  only \CONS~ points and  function calls
-%% are the  GC points. In a  lazy language every \LET~  statement is a
-%% potential  GC  point. Hence  we  need  to  store liveness  automata
-%% corresponding to  every \LET~ statement in the  program. This leads
-%% to an  explosion in  the number of  automata. From  our observation
-%% that  along  an {\em  E-path}  all  program  points have  the  same
-%% liveness, we  can reduce the  number of automata state  required by
-%% sharing  the same  automata for  all program  points along  an {\em
-%% E-path}.} In the  example program, we only need  to create automata
-%% for program  points \ldots, since  they are the only  distinct {\em
-%% E-path}s in the program.
-
-
-
-
-
-
 \section{Experimental Evaluation}
 \label{sec:experiments}
-%% \comment{To demonstrate the effectiveness of liveness-based garbage collection,
-%% we  have  built a  prototype  consisting  of  an interpreter  for  our
-%% language,  a  liveness  analyzer  and  a copying  collector  that  can
-%% optionally use the results of liveness analysis for marking instead of
-%% reachability. When the collector uses liveness for marking, we call it
-%% a  {\em liveness-based  collector} (LGC),  else we  use the  term {\em
-%%   reachability-based  collector}  (RGC).   The  copying  collector  is
-%% neither incremental nor generational.  As a consequence, any cell that
-%% becomes unreachable or  dead is assuredly collected in  the next round
-%% of garbage collection.}
-
 To   test  the   utility  of   our  method   we  have   implemented  a
 garbage-collector for a simple scheme-like first order language having
 non-strict semantics. It consists of an interpreter, liveness analyzer
 and a  garbage-collector that can  optionally use  reachability or
 liveness.  Our  benchmark consists  of programs  from nofib~\cite{nofib}  suite and
 some external programs manually converted to ANF.
-
-%% \comment{
-%% While exploring the activation record of a function, LGC uses the DFA
-%% at  the latest  program  point traversed  in the function's body.
-%% Thus, if  LGC
-%% is invoked  at the program point   $\pi$,  it would  use  the
-%% liveness  DFA at  $\pi$ itself for exploring the root set of the
-%% current activation record. For any other activation record in the
-%% stack, say for a function ${\mathit f}$ calling ${\mathit g}$ in the
-%% call-chain,
-%% the DFA at the point of call to  ${\mathit g}$ would be used.}
 
 The process of liveness-based garbage collection involves going through 
 each activation record on the stack and exploring each variable in the 
@@ -1789,35 +1715,11 @@ All cells that are live are copied to the live semi-space. In case of
 live the copied \CONS\ cell will get the updated addresses of its 
 \CAR\ and \CDR\ fields.
 
-
-%% \comment{
-%% Let $\dfa{\pi}{x}$  denote the DFA  for the variable  and program
-%% point  pair ($x$,  $\pi$).  We  assume that  there is  a function
-%% $\mathsf{initial}(\dfa{\pi}{x})$  returning the initial  state of
-%% $\dfa{\pi}{x}$.
-%% Considering   a   DFA   as   a   table,
-%% $\dfa{\pi}{x}\mathit{(q,sym)}$  returns the  next  state for  the
-%% state $q$ and the  symbol $\mathit{sym}$, where $\mathit{sym}$ is
-%% \acar\      or     \acdr.       We      shall     also      write
-%% $\dfa{\pi}{x}\mathit{(q,sym)\mathsf{?}}$    for    a    predicate
-%% indicating  whether there  is a  transition from  $q$ on
-%% $\mathit{sym}$.  The LGC action to chase the root variable $x$ at
-%% $\pi$ can be described as  follows: If $\mathscr{L}(\dfa{\pi}{x})$ is
-%% empty,  then  nothing  needs  to  be  done.   Otherwise  we  call
-%% $\mathsf{copy}(\dfa{\pi}{x},\mathsf{initial}(\dfa{\pi}{x}),    x)$
-%% in   Figure~\ref{algo:LGC-main-loop}  and  assign   the  returned
-%% pointer to $x$.
-%% The function $\mathsf{move\_to\_tospace}(x)$  copies the value of
-%% $x$  in the  other semi-space  and returns  the new  address.  It
-%% hides  details such as  returning the  forwarding pointer  if the
-%% value  of $x$  is  already copied,  and  creating the  forwarding
-%% pointer otherwise.}
-
 \subsection{Copying closure using liveness vs copying closures using reachability}\label{sec:strategies}
 
 To compare the  effect of using reachability to  copy closures instead
-of liveness we take some representative programs from our benchmark suite and
-execute       them      with       both.        As      shown       in
+of liveness  we take some  representative programs from  our benchmark
+suite    and    execute    them    with    both.     As    shown    in
 Table~\ref{tab:compare-live-clo-reach-clo},  the   number  of  garbage
 collections in both cases are same but copying closures using liveness
 takes a lot more time compared to reachability based copying.
@@ -1917,8 +1819,15 @@ reachability for closures.
 \label{fig:memory-usage} \figrule
 \end{figure*}
 
+The statistics related to compile  time liveness analysis are shown in
+Table~\ref{tab:exp-results}(a). We observe that the analysis requires
+a reasonable time except for  \verb@treejoin@ and  \verb@sudoku@. 
+The bottleneck in our analysis is the NFA to DFA conversion
+(worst-case exponential behaviour). To avoid this compile-time
+overhead, we have added a caching mechanism in our simulator that can
+reuse the DFAs from earlier analysis if the program has not changed..
 
-Table~\ref{tab:experimental-results}  compares the  garbage collection
+Table~\ref{tab:exp-results}(b)   compares   the   garbage   collection
 statistics  for RGC  and  LGC.  We  report the  number  of GC  events,
 average  number of  cells reclaimed  per GC,  average number  of cells
 touched  per GC,  total  number of  dragged cells  and  total time  to
@@ -1946,12 +1855,10 @@ window which  is representative  of the  behavior for  that particular
 benchmark (Column (b)).  In all the programs we can see that the curve
 corresponding to  LGC (red  line) regularly dips  below the  RGC curve
 (blue line), the dip is specially visible for the benchmarks where LGC
-outperforms                      RGC                     substantially
-(Table~\ref{tab:experimental-results}). The graphs  also include curve
-for reachable cells  (black, obtained approximately by  forcing RGC to
-run at  a very high frequency)  and the live cells  for particular run
-(grey, obtained  by post processing  the heap access  at the end  of a
-program).
+outperforms  RGC substantially.   The  graphs also  include curve  for
+reachable cells (black,  obtained approximately by forcing  RGC to run
+at a very high frequency) and the live cells for particular run (grey,
+obtained by post processing the heap access at the end of a program).
 
 One area  of concern is the  huge gap between the  actual liveness and
 the liveness  percieved by our  collector.  In  case of LGC  for eager
