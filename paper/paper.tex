@@ -415,10 +415,10 @@ Premise & Transition & Rule name \\
 \hline
           & {$\rho, (\rho', z, e)\!:\!S, H, (\CONS~x~y)
 \rightsquigarrow
-$  $\rho', S, H[z := (H(\rho(x)),H(\rho(y)))], e$}     &  \sc{cons} \\
+$  $\rho', S, H[\rho(z) := (H(\rho(x)),H(\rho(y)))], e$}     &  \sc{cons} \\
 \hline
-$H(\rho(x)) \mbox{ is } (d_1, d_2)$ & $\rho, (\rho', z, e)\!:\!S, H,
-(\CAR~x)  \rightsquigarrow \rho', S, H[\rho(z) := d_1], e$      &
+$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & $\rho, (\rho', z, e)\!:\!S, H,
+(\CAR~x)  \rightsquigarrow \rho', S, H[\rho(z) := H(l_1)], e$      &
 \sc{car-whnf} \\
 \hline
 $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S, H, (\CAR~x)
