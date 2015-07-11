@@ -1738,7 +1738,7 @@ The process of liveness-based garbage collection involves going through
 each activation record on the stack and exploring each variable in the 
 current activation record (root set). The liveness of each variable is 
 determined using the program point and the variable name. The liveness 
-of all variables are stored as DFAs. These DFAs are then encoded as a 
+of all variables are stored as DFA. These DFA are then encoded as a 
 table. A variable is live only if an entry is found in this table.
 All cells that are live are copied to the live semi-space. In case of 
 \CONS\ cells the \CAR\ and \CDR\ pointers are chased and if they are 
@@ -1772,16 +1772,16 @@ live the copied \CONS\ cell will get the updated addresses of its
 \subsection{Copying closure using liveness vs copying closures using reachability}
 
 \begin{table*}[ht!]
-\caption{Comparing LGC with liveness for closures and reachability for closures}
+\caption{Comparing LGC times for different strategies}
 \label{tab:compare-live-clo-reach-clo}
 \centering
 \begin{tabular}
 {| l | r | r | r | r |}
 \hline
-Prog Name & Heap size & Num GC & Reachablity for closure & Liveness for closure \\ \hline
-\verb@nqueens(8)@ & 10000 & 183 & 0.0087 & 0.2267\\ \hline
-\verb@lambda@&10000&11&0.0010&4.9922\\ \hline
-\verb@lcss@&10000&1&0.00008&34.6684\\ \hline
+Prog Name & Heap size & Num GC & Time taken using reachablity for closure  & Time taken using liveness for closure \\ \hline
+\verb@nqueens(8)@ & 10000 & 183 & 0.0087s & 0.2267s\\ \hline
+\verb@lambda@&10000&11&0.0010s&4.9922s\\ \hline
+\verb@lcss@&10000&1&0.00008s&34.6684s\\ \hline
 \end{tabular}
 \end{table*}
 To compare the  effect of using reachability to  copy closures instead
