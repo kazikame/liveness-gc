@@ -370,7 +370,7 @@ with the call to \mainpgm.  We write $\pi\!:\!e$ to associate the label
 $\pi$ (not  part of the language  syntax) with the  program point just
 before expression $e$.
 
-\begin{figure}[t]
+\begin{figure}[t]\footnotesize
 \renewcommand{\arraystretch}{1}
 \begin{eqnarray*}
    p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\, e_\mainpgm
@@ -405,7 +405,7 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
 
 
 \begin{figure*}[t!]
-\begin{center}
+\begin{center}\footnotesize
 \renewcommand{\arraystretch}{1}
 \begin{tabular}{|c|c|c|}
 \hline
@@ -858,7 +858,7 @@ the \bang\ state in the minefield semantics.
 \newcommand{\cred}[1]{{\color{red}{#1}}}
 \section{Minefield semantics for the language}
 \begin{figure*}[ht!]
-\begin{center}
+\begin{center}\footnotesize
 \begin{tabular}{|c|c|c|}
 \hline
 Premise & Transition & Rule name \\ 
@@ -1133,7 +1133,7 @@ proposition also holds for other modified rules for similar reasons.
 \renewcommand{\arraystretch}{1}
   \begin{tabular}{cc}
     \begin{minipage}{.40\textwidth}
-%        \small
+        \small
         \renewcommand{\arraystretch}{1}{
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
@@ -1181,7 +1181,7 @@ $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
 
     \begin{minipage}{.51\textwidth}
 
-      %\small
+      \small
 \begin{eqnarray*}
         \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
               [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
@@ -1895,8 +1895,9 @@ reachability for closures.
    \#DFA Transitions             & 5792          & 3632         & 4235            & 4261        & 10857         & 4076           & 2078           & 3101               & 1124            \\\hline
    DFA Generation Time (sec)      & 14.7          & 1.1          & 2690.5          & 13.3        & 798.5         & 49.8           & 0.5            & 5.1                & 0.1             \\\hline
  \end{tabular}\\
- (a) Data for Liveness Analysis \\[3pt]
+ (a) Data for Liveness Analysis \\[1pt]
 \include{autotable}
+\vskip -5mm
 \end{table*}
 
 \subsection{Results}
