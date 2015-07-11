@@ -302,26 +302,29 @@ referenced by  $\pz$, $(\CDR~ \pz)$  and (the cells  constituting) the
 closure   referenced   by   $(\CDR~(\CDR~\pz))$.    In   contrast,   a
 reachability-based collector (RGC) would have preserved all cells.
 
-The specific contributions of this work are
-  \begin{itemize}
-  \item  We formulate  a  liveness  analysis for  a  lazy first  order
-    functional language. We show how  to compute function summaries in
-    a  context  independent  manner  to achieve  a  context  sensitive
-    analysis. We  further describe the transformation  of the liveness
-    equations to grammar rules in a  way that the language accepted by
-    the resulting grammar describes live heap locations.\mycomment{the
-      proof of its correctness}
-  \item We prove  the undecidability of the grammar  that results from
-    the  analysis.   To overcome  this,  we  present an  algorithm  to
-    transform grammar  to finite  state automata  (DFA) such  that the
-    language accepted by the  DFA over-approximates the liveness (and
-    hence a safe approximation).
-  \item We have implemented a garbage  collector that can use the DFA
-    to  retain live  cells that  also include  closures. We  have done
-    extensive  experiments with  this garbage  collector and  obtained
-    empirical results  that show  the effectiveness  of liveness-based
-    garbage collection.
-  \end{itemize}
+While an ideal garbage collector is  impractical, in this work we show
+that  static analysis  of  heap data  can help  practical garbage
+collectors in reclaiming more  garbage.  The specific contributions of
+this paper are
+\begin{itemize}
+\item  We formulate  a  liveness  analysis for  a  lazy first  order
+  functional language. We show how  to compute function summaries in
+  a  context  independent  manner  to achieve  a  context  sensitive
+  analysis. We  further describe the transformation  of the liveness
+  equations to grammar rules in a  way that the language accepted by
+  the resulting grammar describes live heap locations.\mycomment{the
+    proof of its correctness}
+\item We prove  the undecidability of the grammar  that results from
+  the  analysis.   To overcome  this,  we  present an  algorithm  to
+  transform grammar  to finite  state automata  (DFA) such  that the
+  language accepted by the  DFA over-approximates the liveness (and
+  hence a safe approximation).
+\item We have implemented a garbage  collector that can use the DFA
+  to  retain live  cells that  also include  closures. We  have done
+  extensive  experiments with  this garbage  collector and  obtained
+  empirical results  that show  the effectiveness  of liveness-based
+  garbage collection.
+\end{itemize}
 
 \subsection{Organization of the paper}
 
