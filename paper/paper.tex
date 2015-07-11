@@ -1906,7 +1906,7 @@ reachability for closures.
 
 
 Table~\ref{tab:experimental-results}  compares the  garbage collection
-statisctics for  RGC and LGC  with reachability for  copying closures.
+statisctics for  RGC and LGC.
 We report the  number of GC events, average number  of cells reclaimed
 per  GC, average  number  of cells  touched per  GC,  total number  of
 dragged cells  and total time  to perform  all collections.  It  is no
@@ -1943,7 +1943,7 @@ program).
 
 One area  of concern is the  huge gap between the  actual liveness and
 the liveness  percieved by our  collector.  In  case of LGC  for eager
-languages~\ref{asati14lgc} the gap was  very narrow and almost touched
+languages~\cite{asati14lgc} the gap was  very narrow and almost touched
 the actual  liveness curve.  In  case of  lazy languages, this  gap is
 largely   due  to   approximate  reachability   based  collection   of
 closures. To implement liveness based  collection of closures, we need
@@ -1951,7 +1951,7 @@ to  record liveness  data  for  each closure  and  update  it at  each
 evaluation  point.   These  space  and  run  time  overheads  make  it
 infeasible  to  incorporate  liveness  based  GC  for  closures  in  a
 practical garbage collector.
->>>>>>> 86509285950f09b0dc95515465513023c4b6fa40
+
 
 \section{Related Work} 
 \label{sec:relatedwork}
@@ -2105,7 +2105,7 @@ We extended the liveness based garbage collection to lazy
 
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
-
+\end{document}
 
 \pagebreak
 \section{Appendix}
