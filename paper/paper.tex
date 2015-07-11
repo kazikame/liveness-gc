@@ -2105,7 +2105,7 @@ We extended the liveness based garbage collection to lazy
 
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
-\end{document}
+%\end{document}
 
 \pagebreak
 \section{Appendix}
@@ -2180,20 +2180,59 @@ collection followed  by a transition as  a step. We show  by induction
 that, starting  from the  initial state, any  transition of  $n$ steps
 occurs without a \bang.
 
-A few observations: First observe that the transitions which involving
-dereferencing and can lead to \bang are those which have a
-$H(...)$ term in the transition rule. 
-Of these most of the terms are of the form $H(\rho(x))$ which involve a root variable. They start from a root variable.
-There is exactly once occurance of $H(l)$ which means a derefencing from a heap location.
+We observe that  the transitions involving dereferencing  and can lead
+to \bang are those which have  a $H(...)$ term in the transition rule.
+Of these most  of the terms are of the  form $H(\rho(x))$, involving a
+root variable.  There is exactly  one occurrence of $H(l)$ which means
+dereferencing using a heap location.
 
-In both the cases we show that the dereferences cannot lead to a bang state in a function call less program.
+In both  the cases  we show  that the dereferencing  cannot lead  to a
+\bang\ state in a function call less program.
 
 For this we need the following lemma,
-1.Consider a let-defined variable $x \leftarrow...$ in . If there is an evaluation path in which the definition is followed by a use i.e an occurrence of (car x) (cdr x) (+ x y) if x & return x, then the demand on $x$ is non-null. 
-2. Consider a let definition of the form $z->pi1:(cons x y) in ...$, then the demand on $(\cons\ x\ y)$ includes $0\alpha$ for some $\alpha$ if there is an evaluation path in which there is an occurrence of pi2: (car x) pi2 follows pi1.
+\begin{lemma}
+\label{lem:correctness}
+Consider, 
+\begin{enumerate}
+\item
+ A \LET\ definition $\pi_i:(\LET~x \leftarrow~s~\IN~e)$ such
+that there is  an evaluation path in $e$ in  which $\pi_i$ is followed
+by a  use i.e an  occurrence of $\pi_j:(\CAR\ x)$,  $\pi_j:(\CDR\ x)$,
+$\pi_j:(+\ x\ y)$, $\pi_j:(\SIF\ x\ e1\ e2)$ or $\pi_j:(\SRETURN\ x)$
+\item
+ A \LET\ definition $\pi_i(\LET~z  \leftarrow~(\CONS~x~y)~\IN~e$, such that
+ $e$ includes  an evaluation path in  which there is an  occurrence of
+ $\pi_j: (\CAR~z)$ and $\pi_j$ follows $\pi_i$.
+\end{enumerate},
+the demand on $x$ is non-null between $\pi_i$ and $\pi_j$.
+\end{lemma} 
+\begin{proof}
+In the first case it is clear  that at all points $\pi_k$ which occurs
+in between $\pi_i$ and $\pi_j$, $x$  has non-null demand as $x$ is used
+directly in a strict computation.
+
+In the second case, it can be seen that the liveness of $x$ due to the
+\CONS\ is $\bcar\sigma$, where $\sigma$ is the demand on $z$. $\sigma$
+definitely  includes  the  demand  $\acar\alpha$ due  to  its  use  in
+$\pi_j$, therefore the demand on $x$ is at least $\alpha$. 
+
+ Since we do not kill the liveness of any variable along an evaluation
+ path, and all program points along  an evaluation path share the same
+ liveness environment, at any point along the evaluation path $x$ will
+ not be set to $\bot$.
+\end{proof}
+
+For a program  executing according to {\em minefield  semantics}, if a
+\bang\ has to occur then some variable which is dereferenced along the
+evaluation path  must be set to  $\bot$, between its creation  and use
+points.  This can  only happen  if the  demand on  the variable  being
+dereferenced  was null.  From  the  lemma~\ref{lem:correctness} it  is
+clear that this cannot happen.
 
 
-
+The rest  of the proof depends  on converting a program  with function
+calls to an equivalent program without function calls for which we 
+refer the user to~\cite{asati14lgc}.
 
 
 
