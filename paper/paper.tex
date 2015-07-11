@@ -1847,15 +1847,21 @@ of global variables and mutation, practical utility of simple liveness
 based techniques are found to be inefficient.
 
 In the space  of functional languages, improving  space efficiency has
-been  mainly  studied  as  a compile  time  activity.  Either  through
+been  mainly  studied as  a  compile  time activity.   Either  through
 rewriting                methods                such                as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
 sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based  analysis~\cite{tofte98region}, or  through insertion  of compile
+based analysis~\cite{tofte98region},  or through insertion  of compile
 time              nullifying              statements              such
 as~\cite{inoue88analysis,lee05static,Hamilton}.    The  compile   time
 marking approaches all rely on an efficient and precise alias analysis
-and in the absence of it cannot provide notable improvement.
+and in the  absence of it cannot provide  notable improvement. Another
+important approach  advocated by  Hofmann~\cite{HofmannJ03} is  to use
+linear  typing to  analyze  first-order programs  for  heap usage  and
+annotated  them. The  system  then uses  these  annotations to  re-use
+allocated memory  cells instead  of requesting  for newer  cells. This
+requires the  user to write programs  in a specific way  and hence may
+not be practical
 
 Another  interesting  research  in  this   field  is  the  concept  of
 Simplifiers~\cite{ONeill}. They are  described as lightweight daemons
@@ -1990,7 +1996,7 @@ We extended the liveness based garbage collection to lazy
 
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
-\end{document}
+%\end{document}
 
 \pagebreak
 \section{Appendix}
@@ -2065,7 +2071,62 @@ collection followed  by a transition as  a step. We show  by induction
 that, starting  from the  initial state, any  transition of  $n$ steps
 occurs without a \bang.
 
-A few observations: First observe that the transitions  which involving dereferencing and can lead to \bang are those which have a $H(\rho(x))$ term in their premise for some variable $x$.
+We observe that  the transitions involving dereferencing  and can lead
+to \bang are those which have  a $H(...)$ term in the transition rule.
+Of these most  of the terms are of the  form $H(\rho(x))$, involving a
+root variable.  There is exactly  one occurrence of $H(l)$ which means
+dereferencing using a heap location.
+
+In both  the cases  we show  that the dereferencing  cannot lead  to a
+\bang\ state in a function call less program.
+
+For this we need the following lemma,
+\begin{lemma}
+\label{lem:correctness}
+Consider, 
+\begin{enumerate}
+\item
+ A \LET\ definition $\pi_i:(\LET~x \leftarrow~s~\IN~e)$ such
+that there is  an evaluation path in $e$ in  which $\pi_i$ is followed
+by a  use i.e an  occurrence of $\pi_j:(\CAR\ x)$,  $\pi_j:(\CDR\ x)$,
+$\pi_j:(+\ x\ y)$, $\pi_j:(\SIF\ x\ e1\ e2)$ or $\pi_j:(\SRETURN\ x)$
+\item
+ A \LET\ definition $\pi_i(\LET~z  \leftarrow~(\CONS~x~y)~\IN~e$, such that
+ $e$ includes  an evaluation path in  which there is an  occurrence of
+ $\pi_j: (\CAR~z)$ and $\pi_j$ follows $\pi_i$.
+\end{enumerate},
+the demand on $x$ is non-null between $\pi_i$ and $\pi_j$.
+\end{lemma} 
+\begin{proof}
+In the first case it is clear  that at all points $\pi_k$ which occurs
+in between $\pi_i$ and $\pi_j$, $x$  has non-null demand as $x$ is used
+directly in a strict computation.
+
+In the second case, it can be seen that the liveness of $x$ due to the
+\CONS\ is $\bcar\sigma$, where $\sigma$ is the demand on $z$. $\sigma$
+definitely  includes  the  demand  $\acar\alpha$ due  to  its  use  in
+$\pi_j$, therefore the demand on $x$ is at least $\alpha$. 
+
+ Since we do not kill the liveness of any variable along an evaluation
+ path, and all program points along  an evaluation path share the same
+ liveness environment, at any point along the evaluation path $x$ will
+ not be set to $\bot$.
+\end{proof}
+
+For a program  executing according to {\em minefield  semantics}, if a
+\bang\ has to occur then some variable which is dereferenced along the
+evaluation path  must be set to  $\bot$, between its creation  and use
+points.  This can  only happen  if the  demand on  the variable  being
+dereferenced  was null.  From  the  lemma~\ref{lem:correctness} it  is
+clear that this cannot happen.
+
+
+The rest  of the proof depends  on converting a program  with function
+calls to an equivalent program without function calls for which we 
+refer the user to~\cite{asati14lgc}.
+
+
+
 
 \begin{figure*}[h!]
 \begin{center}
