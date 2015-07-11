@@ -1629,18 +1629,35 @@ reachability for closures.
         }
         \caption{LGC with reachability-based closure collection.\label{algo:lgc-b}}
 \end{algorithm}
+
 \begin{table*}[ht!]
-\caption{Experimental results comparing RGC and LGC}
-\label{tab:experimental-results}
+\caption{Comparing LGC times for different strategies}
+\label{tab:compare-live-clo-reach-clo}
 \centering
- \begin{tabular}{cccccccccc} \hline
-   Program & \verb@lambda@& \verb@nperm@& \verb@treejoin@& \verb@lcss@& \verb@sudoku@& \verb@fibheap@& \verb@nqueens@& \verb@knightstour@& \verb@gc_bench@ \\
-   \#NFA Nonterminals & \\
-   \#NFA Rules & \\
-   \#DFA States & 6296 & 4077& 5110 & 4772 42608 4474 2537 5640 1808 \\
-   \#DFA Transitions & \\
-   DFA Generation Time(sec) & \\
- \end{tabular}
+\begin{tabular}
+{| l | r | r | r | r |}
+\hline
+Prog Name & Heap size & Num GC & Time taken using reachability for closure  & Time taken using liveness for closure \\ \hline
+\verb@nqueens (reduced) @ & 10000 & 183 & 0.0087s & 0.2267s\\ \hline
+\verb@lambda@&10000&11&0.0010s&4.9922s\\ \hline
+\verb@lcss@&10000&1&0.00008s&34.6684s\\ \hline
+\end{tabular}
+\end{table*}
+
+
+\begin{table*}[ht!]
+\caption{Compile time and Garbage Collection statistics}
+\label{tab:exp-results}
+\centering
+ \begin{tabular}{|l||c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c|} \hline
+   \multicolumn{1}{|r||}{Program} & \verb@lambda@ & \verb@nperm@ & \verb@treejoin@ & \verb@lcss@ & \verb@sudoku@ & \verb@fibheap@ & \verb@nqueens@ & \verb@knightstour@ & \verb@gc_bench@ \\ \hline\hline
+   \#CFG Nonterminals            & 1078          & 794          & 709             & 839         & 1758          & 780            & 529            & 659                & 417             \\ \hline
+   \#CFG Rules                   & 1823          & 1038         & 1610            & 1752        & 2509          & 1358           & 748            & 909                & 486             \\  \hline 
+   \#DFA States                  & 3312          & 2055         & 2332            & 2340        & 5672          & 2254           & 1229           & 1742               & 729             \\\hline
+   \#DFA Transitions             & 5792          & 3632         & 4235            & 4261        & 10857         & 4076           & 2078           & 3101               & 1124            \\\hline
+   DFA Generation Time (sec)      & 14.7          & 1.1          & 2690.5          & 13.3        & 798.5         & 49.8           & 0.5            & 5.1                & 0.1             \\\hline
+ \end{tabular}\\
+ (a) Data for Compile-time Liveness Analysis \\[3pt]
 \include{autotable}
 \end{table*}
 
@@ -1798,19 +1815,6 @@ live the copied \CONS\ cell will get the updated addresses of its
 
 \subsection{Copying closure using liveness vs copying closures using reachability}\label{sec:strategies}
 
-\begin{table*}[ht!]
-\caption{Comparing LGC times for different strategies}
-\label{tab:compare-live-clo-reach-clo}
-\centering
-\begin{tabular}
-{| l | r | r | r | r |}
-\hline
-Prog Name & Heap size & Num GC & Time taken using reachability for closure  & Time taken using liveness for closure \\ \hline
-\verb@nqueens (reduced) @ & 10000 & 183 & 0.0087s & 0.2267s\\ \hline
-\verb@lambda@&10000&11&0.0010s&4.9922s\\ \hline
-\verb@lcss@&10000&1&0.00008s&34.6684s\\ \hline
-\end{tabular}
-\end{table*}
 To compare the  effect of using reachability to  copy closures instead
 of liveness we take some representative programs from our benchmark suite and
 execute       them      with       both.        As      shown       in
