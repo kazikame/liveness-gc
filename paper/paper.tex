@@ -1906,26 +1906,25 @@ reachability for closures.
 
 
 Table~\ref{tab:experimental-results}  compares the  garbage collection
-statisctics for  RGC and LGC.
-We report the  number of GC events, average number  of cells reclaimed
-per  GC, average  number  of cells  touched per  GC,  total number  of
-dragged cells  and total time  to perform  all collections.  It  is no
-surprise  that  number  of  cells  reclaimed per  GC  is  higher  (and
-consequently the  number of  GCs is lower)  for LGC  based collection.
-LGC also reduces  the number of dragged  cells significantly. However,
-the cost for LGC is that per  GC execution time is more for LGC, which
-results in higher overall execution  time for garbage collection, even
-with reduced  number of collections.   However, LGC run time  is still
-competitive (slowdown within 5X of RGC  for worst case), and is better
-for   3    benchmarks   (best    case   2X   speedup).     Note   that
-\verb@gc_bench@~\cite{gc_bench}   is  a   synthestic  benchmark   that
-allocates complete binary trees of  various sizes.  These binary trees
-are  never used  by the  program. As  a result,  the benchmark  highly
-favours LGC.   We have included  this benchmark for  completeness only
-and the numbers for it  are not considered representative of practical
-programs. All  our benchmarks were executed  on a desktop with  64 bit
-Ubuntu 14.04, 8 core Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz, L2 cache
-of 8192 KB and 15922 MiB (16 GB) RAM.
+statistics  for RGC  and  LGC.  We  report the  number  of GC  events,
+average  number of  cells reclaimed  per GC,  average number  of cells
+touched  per GC,  total  number of  dragged cells  and  total time  to
+perform  all collections.   It is  no  surprise that  number of  cells
+reclaimed per  GC is  higher (and  consequently the  number of  GCs is
+lower)  for LGC  based collection.   LGC  also reduces  the number  of
+dragged cells significantly. However, the cost  for LGC is that per GC
+execution  time is  more  for  LGC, which  results  in higher  overall
+execution time  for garbage  collection, even  with reduced  number of
+collections.   However, LGC  run time  is still  competitive (slowdown
+within 5X of RGC for worst case), and is better for 3 benchmarks (best
+case  2X speedup).   Note  that  \verb@gc_bench@~\cite{gc_bench} is  a
+synthestic benchmark  that allocates complete binary  trees of various
+sizes.  These binary trees are never used by the program. As a result,
+the benchmark highly favours LGC.  We have included this benchmark for
+completeness  only  and   the  numbers  for  it   are  not  considered
+representative of practical programs. All our benchmarks were executed
+on  a desktop  with  64 bit  Ubuntu 14.04,  8  core Intel(R)  Core(TM)
+i7-4770 CPU @ 3.40GHz, L2 cache of 8192 KB and 15922 MiB (16 GB) RAM.
 
 Memory   usage   graphs   for   select   benchmarks   in   are   shown
 Figure~\ref{fig:memory-usage}, Column  (a).  As the number  of garbage
