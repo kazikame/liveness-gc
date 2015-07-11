@@ -214,18 +214,18 @@ liveness.  This  requires significant  modification to the  earlier GC
 scheme.  
 
 Experiments    with   a    single    generation   copying    collector
-(Section~\ref{sec:experiments})  confirm   the  expected  performance
-  benefits.   Liveness-based  collection  results in  an  increase  in
-  garbage reclaimed.   As a  consequence, there is  a decrease  in the
-  number of  collections (up to 45\%)  and a decrease (up  to 88\%) in
-  the number  of {\em dragged}  cells (cells  that survive a  GC after
-  their  last  use). Besides  there  is  a  reduction in  the  overall
-  execution time for some programs.  Our experiments show that a mixed
-  strategy, where we  do liveness based GC up to  the closure boundary
-  and reachability based GC for  the arguments (free variables) of the
-  closure,  gives us  similar benefits  as a  fully liveness  based GC
-  (where  the  arguments  of  the closure  are  also  collected  using
-  liveness) at much less overheads (Section~\ref{sec:strategies}).
+(Section~\ref{sec:experiments})   confirm  the   expected  performance
+benefits.  Liveness-based collection results in an increase in garbage
+reclaimed.  As  a consequence, there  is a  decrease in the  number of
+collections (up to 45\%) and a decrease  (up to 88\%) in the number of
+{\em  dragged}  cells  (cells  that  survive a  GC  after  their  last
+use). Besides, there is a reduction  in the overall execution time for
+some programs.  Our  experiments show that a mixed  strategy, where we
+do liveness based GC up to the closure boundary and reachability based
+GC for the arguments (free variables) of the closure, gives us similar
+benefits as  a fully  liveness based  GC (where  the arguments  of the
+closure  are  also  collected  using liveness)  with  lesser  overhead
+(Section~\ref{sec:strategies}).
 
 
 %------------------------------------------------------------%
@@ -302,14 +302,26 @@ referenced by  $\pz$, $(\CDR~ \pz)$  and (the cells  constituting) the
 closure   referenced   by   $(\CDR~(\CDR~\pz))$.    In   contrast,   a
 reachability-based collector (RGC) would have preserved all cells.
 
-{\color {Myblue}Rewrite at the end: The specific contributions of the
-paper
-  are: The formulation of a  liveness analysis for a lazy language and
-  the proof of its correctness, the undecidability of the grammar that
-  results from the analysis and  its approximation by DFAs, the design
-  of a  garbage collector that can  use the DFAs to  retain live cells
-  that  also include  closures, and  empirical results  that  show the
-  effectiveness of liveness-based garbage collection.}
+The specific contributions of this work are
+  \begin{itemize}
+  \item  We formulate  a  liveness  analysis for  a  lazy first  order
+    functional language. We show how  to compute function summaries in
+    a  context  independent  manner  to achievs  a  context  sensitive
+    analysis. We  further describe the transformation  of the liveness
+    equations to grammar rules in a  way that the language accepted by
+    the resulting grammar describes live heap locations.\mycomment{the
+      proof of its correctness}
+  \item We prove  the undecidability of the grammar  that results from
+    the  analysis.   To overcome  this,  we  present an  algorithm  to
+    transform grammar  to finite  state automata  (DFA) such  that the
+    language accepted by the  DFA over-approximates the liveness (and
+    hence a safe approximation).
+  \item We have implemented a garbage  collector that can use the DFA
+    to  retain live  cells that  also include  closures. We  have done
+    extensive  experiments with  this garbage  collector and  obtained
+    empirical results  that show  the effectiveness  of liveness-based
+    garbage collection.
+  \end{itemize}
 
 \subsection{Organization of the paper}
 
@@ -1331,10 +1343,10 @@ right of the tape head. This completes the reduction.
 We circumvent the problem  of undecidability by over- approximating the
 CFG by non-deterministic finite state automata (NFA). The NFA are then
 simplified using  the $\hookrightarrow$ rules.  Finally the simplified
-NFAs are converted to DFAs.
+NFAs are converted to DFA.
 
 %------------------------------------------------------------%
-\subsubsection{From CFGs to GC-ready DFAs}
+\subsubsection{From CFGs to GC-ready DFA}
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
  approximate a CFG to a {\em strongly regular\/} grammar.  For
@@ -1458,11 +1470,11 @@ liveness based GC is triggered beyond $\pi_9$.
 Our experimental setup consists of  an interpreter for our language, a
 liveness  analyzer, and  a single  generation copying  collector.  The
 garbage collector  can be  easily configured to  work on the  basis of
-reachability (RGC  mode) or use  the liveness DFAs (LGC  mode).  While
-exploring the  activation record of a  function, LGC uses  the DFAs at
+reachability (RGC  mode) or use  the liveness DFA (LGC  mode).  While
+exploring the  activation record of a  function, LGC uses  the DFA at
 the latest program  point traversed in the function's  body.  Thus, if
 LGC is invoked  at the program point $\pi$, it  would use the liveness
-DFAs  at  $\pi$ itself  for  exploring the  root  set  of the  current
+DFA  at  $\pi$ itself  for  exploring the  root  set  of the  current
 activation record. For  any other activation record in  the stack, say
 for a function ${\mathit f}$  calling ${\mathit g}$ in the call-chain,
 the evaluation  point in ${\mathit f}$  which resulted in  the call to
@@ -1724,15 +1736,15 @@ liveness.  Our  benchmark consists  of programs  from nofib~\cite{nofib}  suite 
 some external programs manually converted to ANF.
 
 %% \comment{
-%% While exploring the activation record of a function, LGC uses the DFAs
+%% While exploring the activation record of a function, LGC uses the DFA
 %% at  the latest  program  point traversed  in the function's body.
 %% Thus, if  LGC
 %% is invoked  at the program point   $\pi$,  it would  use  the
-%% liveness  DFAs at  $\pi$ itself for exploring the root set of the
+%% liveness  DFA at  $\pi$ itself for exploring the root set of the
 %% current activation record. For any other activation record in the
 %% stack, say for a function ${\mathit f}$ calling ${\mathit g}$ in the
 %% call-chain,
-%% the DFAs at the point of call to  ${\mathit g}$ would be used.}
+%% the DFA at the point of call to  ${\mathit g}$ would be used.}
 
 The process of liveness-based garbage collection involves going through 
 each activation record on the stack and exploring each variable in the 
@@ -1983,7 +1995,7 @@ and closures.
 %% contexts are conflated into  a single demand $\sigma_f$.  This enabled
 %% us to treat the liveness equations symbolically obtaining context-free
 %% grammars for liveness at each GC point (calls to user functions and to
-%% $\CONS$).  These were then converted to DFAs for run-time consultation
+%% $\CONS$).  These were then converted to DFA for run-time consultation
 %% by  the garbage collector.  Experiments confirm  the precision  of the
 %% analysis.
 
@@ -2035,7 +2047,7 @@ and closures.
 
   Orthogonally,  we plan  to improve  the efficiency  of the  liveness
   based garbage collector using heuristics  such as limiting the depth
-  of  DFAs,   merging  nearly-equivalent   states  and   using  better
+  of  DFA,   merging  nearly-equivalent   states  and   using  better
   representation  and algorithms  for automata  manipulation. We  also
   need  to   investigate  the  interaction  of   liveness  with  other
   collection schemes, such as incremental and generational collection.
