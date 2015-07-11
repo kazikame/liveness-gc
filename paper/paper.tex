@@ -2179,7 +2179,23 @@ collection followed  by a transition as  a step. We show  by induction
 that, starting  from the  initial state, any  transition of  $n$ steps
 occurs without a \bang.
 
-A few observations: First observe that the transitions  which involving dereferencing and can lead to \bang are those which have a $H(\rho(x))$ term in their premise for some variable $x$.
+A few observations: First observe that the transitions which involving
+dereferencing and can lead to \bang are those which have a
+$H(...)$ term in the transition rule. 
+Of these most of the terms are of the form $H(\rho(x))$ which involve a root variable. They start from a root variable.
+There is exactly once occurance of $H(l)$ which means a derefencing from a heap location.
+
+In both the cases we show that the dereferences cannot lead to a bang state in a function call less program.
+
+For this we need the following lemma,
+1.Consider a let-defined variable $x \leftarrow...$ in . If there is an evaluation path in which the definition is followed by a use i.e an occurrence of (car x) (cdr x) (+ x y) if x & return x, then the demand on $x$ is non-null. 
+2. Consider a let definition of the form $z->pi1:(cons x y) in ...$, then the demand on $(\cons\ x\ y)$ includes $0\alpha$ for some $\alpha$ if there is an evaluation path in which there is an occurrence of pi2: (car x) pi2 follows pi1.
+
+
+
+
+
+
 
 \begin{figure*}[h!]
 \begin{center}
