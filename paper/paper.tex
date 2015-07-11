@@ -233,8 +233,9 @@ closure  are  also  collected  using liveness)  with  lesser  overhead
 \label{sec:motiv}
 \begin{figure}[t!]
   \psset{unit=1mm}
-  \begin{pspicture}(90,48)(0,-48)
+  \begin{pspicture}(90,52)(0,-52)
     %\psframe(90,48)(0,-48)
+    \renewcommand{\arraystretch}{1}
     \begin{tabular}{@{}c@{}}
       %\psframebox
           {\sf
@@ -262,10 +263,10 @@ closure  are  also  collected  using liveness)  with  lesser  overhead
             (\length\ \pz))))))
 	  \end{uprogram}
       }}
-      \\ 
+      \\ \\
       (a) Example program. \\  \\
 %      \includegraphics[width=.45\textwidth]{motiv-example}
-      \input{mem-graph} \\ 
+      \input{mem-graph} \\ \\
       \renewcommand{\arraystretch}{.9}
       \begin{tabular}[t]{p{0.9\columnwidth}}
         (b) Memory graph at $\pi$.  \scalebox{.7}{\TwoCellsAD{a1}{a2}}
@@ -275,7 +276,7 @@ closure  are  also  collected  using liveness)  with  lesser  overhead
       \end{tabular}
     \end{tabular} 
   \end{pspicture}
-  \vspace*{-3ex}
+%  \vspace*{-3ex}
   \caption{Example Program and its Memory Graph}\label{fig:mot-example}
 \end{figure}
 
@@ -368,16 +369,16 @@ $\pi$ (not  part of the language  syntax) with the  program point just
 before expression $e$.
 
 \begin{figure}[t]
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.2}
 \begin{eqnarray*}
    p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\, e_\mainpgm
     \hspace{5em} \mbox{\em --- program}\\
     \mathit{df} \in Fdef & \!\!\!::=\!\!\! & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots
 \,\,x_n)\,\,
     e)
-    \hspace{0.2em} \ \ \ \ \mbox{\em --- function definition} \\
+    \hspace{0.2em} \ \ \ \ \mbox{\em --- function def} \\
 e \in \mathit{Expr} & \!\!\!::=\!\!\! &
-\left\{\begin{array}{@{}ll@{\hspace{2em}}l}
+\left\{\begin{array}{@{}ll@{\hspace{1em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \!\!\!\mbox{\em --- conditional} \\
        (\LET\,\, x \leftarrow s\,\, \IN\,\, e) &&\!\!\! \mbox{\em --- let
 binding} \\
@@ -390,9 +391,8 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
        (\CAR\,\, x) & \\
        (\CDR\,\, x) & \mbox{\em --- selectors} \\
        (\NULLQ\,\, x) & \\
-       (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester
-and generic arithmetic} \\
-       (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
+       (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester/generic arithmetic} \\
+%%       (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
        (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
     \end{array}\right.
 \end{eqnarray*}
@@ -489,6 +489,7 @@ $\rho',~ (\rho, x, (\SRETURN~x))\!:\!S, H,  s$} &
 We now give  a small-step semantics for our  language.
 We first specify the domains used by the semantics:
 \[
+\renewcommand{\arraystretch}{1.1}
 \begin{array}{@{}r@{\ }l@{\ \ }c@{\ \ }l@{\hspace{0.5em}}l}
 \rho: & \mathit{Env} &=&\mathit{Var} \rightarrow \mathit{Loc} & \mbox{-- Environment} \\
 v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Data \times Data}& \mbox{-- Values}\\
@@ -619,6 +620,7 @@ $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 
 %==============================================================
 \begin{figure*}[t]
+\renewcommand{\arraystretch}{1.5}
 \begin{eqnarray*}
 \mathit{ref\/}(\kappa,\sigma,\Lfonly)
           &=& \{\,\} \mbox{, for $\kappa$ a constant, including
@@ -981,10 +983,11 @@ proposition also holds for other modified rules for similar reasons.
 \subsection{Generating Liveness Equations}
 
 \begin{figure*}[t!]
+\renewcommand{\arraystretch}{1.1}
   \begin{tabular}{cc}
     \begin{minipage}{.40\textwidth}
-        \small
-        \renewcommand{\arraystretch}{1}{
+%        \small
+        \renewcommand{\arraystretch}{1.1}{
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
             \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
@@ -1004,7 +1007,7 @@ $\leftarrow$  (\length~\pu)  \IN
             \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\,
 (\SRETURN~\psi_3:\pz)$)))))))
         \end{uprogram}}
-        \renewcommand{\arraystretch}{1}{
+        \renewcommand{\arraystretch}{1.1}{
 	  \begin{uprogram}
 	  \UNL{1} $(\DEFINE\ (\main)$
            \UNL{2} \!\!$\pi_9\!\!:\, \cred{(\LET\  \pa\  \leftarrow
@@ -1026,7 +1029,7 @@ $\cred{\leftarrow  (\CONS\ \pb\ \NIL)}$ \IN
 
     \begin{minipage}{.51\textwidth}
 
-        \small
+      %\small
 \begin{eqnarray*}
         \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
               [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
