@@ -24,6 +24,7 @@
 \usepackage{subfigure}
 \usepackage[boxed]{algorithm2e}
 \usepackage{makecell}
+\usepackage{balance}
 
 \input{fh_defs}
 \def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
@@ -850,56 +851,132 @@ each function.   The summary is  in the  form of a  demand transformer
 that maps a demand on a call to the function to demands on each of its
 arguments.
 
-\mycomment{\color{red}
 \subsection{Correctness of liveness analysis}  
- 
+
 We shall now  outline a proof of correctness  of the liveness analysis
 presented  in  Section~\ref{sec:liveness-analysis}.   This requires  a
 significant modification  to the technique  used in \cite{asati14lgc}.
-We shall first modify the standard semantics. This semantics, which we
-shall  call {\em  minefield semantics},  will model  a  liveness based
-garbage collection at  each transition. This is done  by starting from
-the root-set  and inserting a  special value $\bot$ at  each reference
-location in the  heap that is reachable but not  live by our analysis.
-Attempts  to dereference  such  locations during  the transition  will
-result in entering a special  state denoted \bang.  We shall then show
-that no program enters the \bang\ state.
+\cblue{Good points to  make in the main text, right  in the small step
+  semantics  section: Note  that the  state of  the  transition system
+  consists of the current evaluation context, given by $\rho$ and $e$,
+  and  the suspended evaluation  contexts recorded  in the  stack $S$.
+  The heap $H$  is common to all contexts.}
+
+The idea behind the proof is  as follows: We shall modify the standard
+semantics to a semantics  called {\em minefield semantics} that models
+a liveness based garbage collection  at each transition.  The state of
+the  transition system  is augmented  to carry  enough  information to
+calculate the liveness environment  at the current evaluation context,
+and  each   of  the   suspended  evaluation  contexts.    Before  each
+transition,  we start  from the  root-set and  insert a  special value
+$\bot$ at each  location in the heap that contains  a reference and is
+reachable but  not live by  our analysis.  Any attempt  to dereference
+such locations during the transition will result in entering a special
+state denoted \bang.  The main proof is to show that no program enters
+the \bang\ state in the minefield semantics.
  
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
-\item  Given an  demand transformer  \Lfonly\ we  enrich  the abstract
-  machine state $\rho, S, H, e$  to $\rho, S, H, e, \sigma$.  $\sigma$
-  is the  demand on the  currently active function. As  a consequence,
-  the liveness $\Lv$ at $e$ is $\mathcal{L}(e, \sigma, \Lfonly)$. Each
-  entry  in   the  stack  $S$   of  suspended  evaluations,   is  also
-  augmented---it is  now $(\rho, x,  e, eps, \sigma)$. The $\sigma$  in the
-  stack entry  represents the demand  on the  function where  the evaluation
-  \ldots.  And $eps$ is \ldots.
-\item We introduce a function $GC$ that takes the 4-tuple $(\rho, H, S,
-  \sigma)$ and  inserts $\bot$ in all locations in the current
-  environment $\rho$, the heap $H$ and the environments in the stack
-  $S$ that are dead. More formally:
+\item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
+  $\rho,$ $S,$ $H,$ $e,$ $\sigma,$ $e_f$, where $\sigma$ is the demand
+  on the expression $e$, and $e_f$ is the body of the function. As the
+  section on liveness  analysis shows, The entire  function body $e_f$
+  and $\sigma$  are needed  to calculate  the liveness  environment at
+  different program  points. The  demand sigma  is ``dynamic''  in the
+  sense  that it  arises from  the actual  function calls  made during
+  execution.   The  0-CFA  demand  is an  over-approximation  of  this
+  demand.  The information  in a suspended evaluation  context is also
+  similarly augmented with  the demand on it and the  function body of
+  which the suspended evaluation is a  part.  Thus a stacked entry now
+  takes the  form $(\rho, x, e,  \sigma, e_f)$. A modification  of the
+  small step semantics which carries the extra information is shown in
+  Figure~\ref{fig:minefield-semantics}.
+\item Given  the current  evaluation context $\rho,  S, H,  e, \sigma,
+  e_f$ and $LF$, we can construct a liveness environment as follows:
+  \begin{enumerate}
+  \item If $e$ is an expression, then:  
+  $$ \Lv = \bigcup_{\psi \in \mathcal{P}(e)} \mathcal{M}(\psi),
+    \text{where }
+  \mathcal{M} = \mathcal{L}(e_f, \sigma, \Lfonly)$$
+\item If $e$ is an application, then:  
+  $$ \Lv = ref(e, \sigma, \Lfonly)$$
+  \end{enumerate}
+We can define in the same way the liveness environment for each of the
+suspended  evaluation contexts in  $S$  giving  a  stack of  liveness
+environments that we shall denote $\mathsf{SL}$.
+\item $GC$ models a liveness based garbage collection:
+$GC(\rho,$ $ S,$ $ H,$ $ L,$ $ SL) = (\rho', S', H')$ 
+  \begin{enumerate}
+  \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
+    \notin \Lv$.
+\item For each stack entry $(\rho,\_,\_,\_,\_)$ in $S$ with $\Lv'$ as
+  the corresponding liveness environment in $\mathsf{SL}$,  and for each $x
+  \in domain(\rho)$,  $\rho'(x)=\bot$
+  iff $x.\epsilon \notin \Lv'$.
+\item For each location $\ell$, $H'(\ell) = \bot$, iff  there is no
+  $x$ in either the current environment or one of the stacked
+  environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
+  \ell$  and $x.\alpha \in \Lv$, .
+  \end{enumerate}
+\end{enumerate}
 
+Starting   from  the   initial  state   $([\;]_\rho,([\;]_\rho,  \ans,
+(\print~\ans)):[\;]_{S} ,  [\;]_{H}, (\mainpgm)$, every  transition is
+preceded by  a garbage collection  using $GC$.  We consider  a garbage
+collection followed  by a transition as  a step. We show  by induction
+that, for programs  without function calls, starting  from the initial
+state that  has $e_{\main}$  as the first  expression to  be evaluated
+instead  of $\main$,  any transition  of  $n$ steps  occurs without  a
+\bang.
 
+Observe  that  the  transitions  that dereference  and  therefore  can
+potentially lead to \bang\ are those  which have a $H(\ldots)$ term in
+the  transition  rule.   Of  these,  terms  of  the  form  $H(\ldots)$
+dereference a root  variable, and the term $H(l)$  dereferences a heap
+location.  In  both the  cases we show  that the  dereferencing cannot
+lead to a \bang\ state in programs without function calls.
 
+We  need the  following proposition that  connects  liveness analysis  with
+minefield semantics transitions. 
+\begin{proposition}
+\label{prop:correctness}
+\begin{enumerate} 
+\item Consider a \LET\ definition $:\pi: (\LET~x
+  \leftarrow~\ldots~\IN~e$, such that there is a use of $x$
+  in $e$, i.e.  an occurrence of $\LET~y~\leftarrow~s~in
+  \ldots$, where $s$ is $(\CAR\ x)$, $(\CDR\ x)$ or $(+\ x\ y)$, or
+  $(\SIF\ x\ e1\ e2)$ or $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null. 
+\item Assume that a  \LET\ definition $\pi: (\LET~z  \leftarrow~(\CONS~x~y)~\IN~e$ has an occurrence of 
+ $(\CAR~z)$ in $e$. Then the liveness of $x$ at $\pi$ includes $\epsilon$.  Similarly if $e$ contains $(CDR~z)$, then the liveness of$y$ at $\pi$ includes $\epsilon$.  
+\end{enumerate},
+\end{proposition} 
 
+In  the second  case for  example,  the liveness  of $x$  due to  the
+\CONS\ is  $\bcar\sigma$, where $\sigma$  is the demand on  $z$. Since
+$\sigma$  includes  the  demand  $\acar\alpha$   due  to  its  use  in
+$(\CAR~z)$, the liveness on $x$  includes $\epsilon$. We thus have the
+following lemma:
 
-and $\Sigma$ is a  stack of demands---one for each function
-  frame pushed in $S$.  Second,  we augment $Val$ with a value $\bot$.
-  To model strong liveness $\bot$ may be copied freely, including into
-  a  \CONS\  cell,  but  explodes  when  used  computationally  (in  a
-  primitive operation  other than a copy). Additionally  we define $GC
-  (\Lv, \Sigma)  : (\rho,  H, S) \rightarrow  (\rho ,  H , S  )$ which
-  determines live-reachability using $\rho$ and the $\rho$'s in $S$ as
-  the root  set and following links in  $H$ only as far  as allowed by
-  \Lv\   and   $\Sigma$.     Hence   $GC   (\Lv,   \Sigma)$   replaces
-  live-unreachable  values---in $\rho$,  in  $H$ and  the $\rho$'s  in
-  $S$---with $\bot$.  For example,  if $x.\epsilon \in \Lv$ then $\rho
-  (x) = \bot$.  Only $GC (\cdots )$ introduces $\bot$.
-\end{enumerate}  
+\begin{lemma}\label{lemma:no-calls-correctness} A program without function calls cannot enter the \bang\ state in the minefield semantics.
+\end{lemma}
 
+\begin{proof}
+For a program  executing according to {\em minefield  semantics}, if a
+\bang\ has to  occur then some variable which is  dereferenced must be
+set to  $\bot$, between its  creation and  use points.  This  can only
+happen if  the liveness of  the variable being dereferenced  was null.
+From  the lemma~\ref{lem:correctness}  it  is clear  that this  cannot
+happen.
+\end{proof}
 
- }
+For   a    programs   with   functions,   we    use   the   techniques
+in~\cite{asati14lgc}. We  assume as  a contradiction that  the program
+can enter a \bang\ state  and inline the  functions called to  obtain a
+program that is without functions  but has the same execution behavior
+and    demands    as   the    original    program.     We   then    use
+Lemma~\ref{lemma:no-calls-correctness}  to  show  that  the  resulting
+functionless program cannot enter a bang state.
+
 
 \section{Computing liveness and its encoding as DFA}\label{sec:computing}
 Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis%
@@ -1979,157 +2056,13 @@ We extended the liveness based garbage collection to lazy
   In  summary, we  need to  investigate  ways to  make liveness  based
   garbage collection attractive for practical collectors.  
 
-
-%Add graphs for memory usage LGC vs RGC
-%Add graphs/table showing the GC times and other statistics
-
-%Mention lower peak memory usage.
-%Mention faster GC than full LGC and more garbage collected than RGC.
-%Pitch it as sweet spot between full LGC and RGC.
-%Future work
-%Mention full LGC
-%Mention k-liveness, use length example to show 1-liveness is not
-%sufficient.
-%Mention mixed mode GC,
-% - doing RGC most of the times and switching to LGC in case RGC fails
-%to collect any garbage
-% - doing LGC most of the times but regularly checking the reachability
-%of the heap and
-% switching to RGC if LGC almost equals RGC
-
+\balance
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
-\end{document}
 
-\pagebreak
-\section{Appendix}
+\appendix
 
-We shall now  outline a proof of correctness  of the liveness analysis
-presented  in  Section~\ref{sec:liveness-analysis}.   This requires  a
-significant modification  to the technique  used in \cite{asati14lgc}.
-\cblue{Good points to  make in the main text, right  in the small step
-  semantics  section: Note  that the  state of  the  transition system
-  consists of the current evaluation context, given by $\rho$ and $e$,
-  and  the suspended evaluation  contexts recorded  in the  stack $S$.
-  The heap $H$  is common to all contexts.}
-
-The idea behind the proof is  as follows: We shall modify the standard
-semantics to a semantics  called {\em minefield semantics} that models
-a liveness based garbage collection  at each transition.  The state of
-the  transition system  is augmented  to carry  enough  information to
-calculate the liveness environment  at the current evaluation context,
-and  each   of  the   suspended  evaluation  contexts.    Before  each
-transition,  we start  from the  root-set and  insert a  special value
-$\bot$ at each  location in the heap that contains  a reference and is
-reachable but  not live by  our analysis.  Any attempt  to dereference
-such locations during the transition will result in entering a special
-state denoted \bang.  The main proof is to show that no program enters
-the \bang\ state in the minefield semantics.
- 
-To set up the minefield semantics, we follow these steps:
-\begin{enumerate}
-\item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
-  $\rho,$ $S,$ $H,$ $e,$ $\sigma,$ $e_f$, where $\sigma$ is the demand
-  on the expression $e$, and $e_f$  is the body of the function. $e_f$
-  and $\sigma$ are  both needed to calculate  the liveness environment
-  for expressions.  The information  in a suspended evaluation context
-  is also similarly  augmented with the demand on it  and the function
-  body of  which the suspended evaluation  is a part.  Thus  a stacked
-  entry now takes the form $(\rho, x, e, \sigma, e_f)$. A modification
-  of the small  step semantics which carries the  extra information is
-  shown in Figure~\ref{fig:minefield-semantics}.
-\item Given  the current  evaluation context $\rho,  S, H,  e, \sigma,
-  e_f$ and $LF$, we can construct a liveness environment as follows:
-  \begin{enumerate}
-  \item If $e$ is an expression, then:  
-  $$ \Lv = \bigcup_{\psi \in \mathcal{P}(e)} \mathcal{M}(\psi),
-    \text{where }
-  \mathcal{M} = \mathcal{L}(e_f, \sigma, \Lfonly)$$
-\item If $e$ is an application, then:  
-  $$ \Lv = ref(e, \sigma, \Lfonly)$$
-  \end{enumerate}
-We can define in the same way the liveness environment for each of the
-suspended  evaluation contexts in  $S$  giving  a  stack of  liveness
-environments that we shall denote $\mathsf{SL}$.
-\item $GC$ models a liveness based garbage collection:
-$GC(\rho,$ $ S,$ $ H,$ $ L,$ $ SL) = (\rho', S', H')$ 
-  \begin{enumerate}
-  \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
-    \notin \Lv$.
-\item For each stack entry $(\rho,\_,\_,\_,\_)$ in $S$ with $\Lv'$ as
-  the corresponding liveness environment in $\mathsf{SL}$,  and for each $x
-  \in domain(\rho)$,  $\rho'(x)=\bot$
-  iff $x.\epsilon \notin \Lv'$.
-\item For each location $\ell$, $H'(\ell) = \bot$, iff  there is no
-  $x$ in either the current environment or one of the stacked
-  environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
-  \ell$  and $x.\alpha \in \Lv$, .
-  \end{enumerate}
-\end{enumerate}
-
-Starting   from  the   initial  state   $([\;]_\rho,([\;]_\rho,  \ans,
-(\print~\ans)):[\;]_{S} ,  [\;]_{H}, (\mainpgm)$, every  transition is
-preceded by  a garbage  collection using $GC$.  We consider  a garbage
-collection followed  by a transition as  a step. We show  by induction
-that, starting  from the  initial state, any  transition of  $n$ steps
-occurs without a \bang.
-
-We observe that  the transitions involving dereferencing  and can lead
-to \bang are those which have  a $H(...)$ term in the transition rule.
-Of these most  of the terms are of the  form $H(\rho(x))$, involving a
-root variable.  There is exactly  one occurrence of $H(l)$ which means
-dereferencing using a heap location.
-
-In both  the cases  we show  that the dereferencing  cannot lead  to a
-\bang\ state in a function call less program.
-
-For this we need the following lemma,
-\begin{lemma}
-\label{lem:correctness}
-Consider, 
-\begin{enumerate}
-\item
- A \LET\ definition $\pi_i:(\LET~x \leftarrow~s~\IN~e)$ such
-that there is  an evaluation path in $e$ in  which $\pi_i$ is followed
-by a  use i.e an  occurrence of $\pi_j:(\CAR\ x)$,  $\pi_j:(\CDR\ x)$,
-$\pi_j:(+\ x\ y)$, $\pi_j:(\SIF\ x\ e1\ e2)$ or $\pi_j:(\SRETURN\ x)$
-\item
- A \LET\ definition $\pi_i(\LET~z  \leftarrow~(\CONS~x~y)~\IN~e$, such that
- $e$ includes  an evaluation path in  which there is an  occurrence of
- $\pi_j: (\CAR~z)$ and $\pi_j$ follows $\pi_i$.
-\end{enumerate},
-the demand on $x$ is non-null between $\pi_i$ and $\pi_j$.
-\end{lemma} 
-\begin{proof}
-In the first case it is clear  that at all points $\pi_k$ which occurs
-in between $\pi_i$ and $\pi_j$, $x$  has non-null demand as $x$ is used
-directly in a strict computation.
-
-In the second case, it can be seen that the liveness of $x$ due to the
-\CONS\ is $\bcar\sigma$, where $\sigma$ is the demand on $z$. $\sigma$
-definitely  includes  the  demand  $\acar\alpha$ due  to  its  use  in
-$\pi_j$, therefore the demand on $x$ is at least $\alpha$. 
-
- Since we do not kill the liveness of any variable along an evaluation
- path, and all program points along  an evaluation path share the same
- liveness environment, at any point along the evaluation path $x$ will
- not be set to $\bot$.
-\end{proof}
-
-For a program  executing according to {\em minefield  semantics}, if a
-\bang\ has to occur then some variable which is dereferenced along the
-evaluation path  must be set to  $\bot$, between its creation  and use
-points.  This can  only happen  if the  demand on  the variable  being
-dereferenced  was null.  From  the  lemma~\ref{lem:correctness} it  is
-clear that this cannot happen.
-
-
-The rest  of the proof depends  on converting a program  with function
-calls to an equivalent program without function calls for which we 
-refer the user to~\cite{asati14lgc}.
-
-
-
+\section{Minefield semantics for the language}
 
 \begin{figure*}[h!]
 \begin{center}
@@ -2213,7 +2146,11 @@ $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
 \sc{return-clo} \\
 \hline
 \end{tabular}
-\caption{Minefield semantics for the language.\label{fig:minefield-semantics}}
+\caption{Minefield semantics.\label{fig:minefield-semantics}}
 \end{center}
 \end{figure*}
+
 \end{document}
+
+
+
