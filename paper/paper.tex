@@ -165,9 +165,9 @@ compared to a reachability based collector.
 \section{Introduction}
 \label{sec:intro}
 
-Functional programs extensively use dynamically allocated memory.  The
-allocation  is either  explicit (for  example, using  constructors) or
-implicit  (during creation  of  closures).  Programs  written in  lazy
+Functional programs use dynamically allocated memory extensively.  The
+allocation  is either  explicit (while using  constructors, for example) or
+implicit (as while creating  closures).  Programs  written in  lazy
 functional languages put additional  demands on memory as they require
 closures to  be carried  from the  point of creation  to the  point of
 evaluation.
@@ -1904,31 +1904,54 @@ reachability for closures.
 \label{fig:memory-usage} \figrule
 \end{figure*}
 
-Table~\ref{tab:experimental-results} shows  that  LGC
-improves the  garbage collection time  and efficiency for most  of the
-programs.  Even for  programs where the time taken is  more it is very
-competitive.  Memory usage  graphs are shown for  select benchmarks in
-Figure~\ref{fig:memory-usage}.  As  the number of  garbage collections
-tend  to  be  very large  our  graphs  show  only  a window  which  is
-representative of the behavior for  that particular benchmark.  In all
-the programs we can see that  the curve corresponding to LGC regularly
-dips below the RGC curve. All our benchmarks were executed on a desktop with 64 bit Ubuntu 14.04,  8 core
-Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz, L2 cache of 8192 KB and 
-15922 MiB (16 GB) RAM.
+
+Table~\ref{tab:experimental-results}  compares the  garbage collection
+statisctics for  RGC and LGC  with reachability for  copying closures.
+We report the  number of GC events, average number  of cells reclaimed
+per  GC, average  number  of cells  touched per  GC,  total number  of
+dragged cells  and total time  to perform  all collections.  It  is no
+surprise  that  number  of  cells  reclaimed per  GC  is  higher  (and
+consequently the  number of  GCs is lower)  for LGC  based collection.
+LGC also reduces  the number of dragged  cells significantly. However,
+the cost for LGC is that per  GC execution time is more for LGC, which
+results in higher overall execution  time for garbage collection, even
+with reduced  number of collections.   However, LGC run time  is still
+competitive (slowdown within 5X of RGC  for worst case), and is better
+for   3    benchmarks   (best    case   2X   speedup).     Note   that
+\verb@gc_bench@~\cite{gc_bench}   is  a   synthestic  benchmark   that
+allocates complete binary trees of  various sizes.  These binary trees
+are  never used  by the  program. As  a result,  the benchmark  highly
+favours LGC.   We have included  this benchmark for  completeness only
+and the numbers for it  are not considered representative of practical
+programs. All  our benchmarks were executed  on a desktop with  64 bit
+Ubuntu 14.04, 8 core Intel(R) Core(TM) i7-4770 CPU @ 3.40GHz, L2 cache
+of 8192 KB and 15922 MiB (16 GB) RAM.
+
+Memory   usage   graphs   for   select   benchmarks   in   are   shown
+Figure~\ref{fig:memory-usage}, Column  (a).  As the number  of garbage
+collections tend to  be very large, for each benchmark  we also show a
+window which  is representative  of the  behavior for  that particular
+benchmark (Column (b)).  In all the programs we can see that the curve
+corresponding to  LGC (red  line) regularly dips  below the  RGC curve
+(blue line), the dip is specially visible for the benchmarks where LGC
+outperforms                      RGC                     substantially
+(Table~\ref{tab:experimental-results}). The graphs  also include curve
+for reachable cells  (black, obtained approximately by  forcing RGC to
+run at  a very high frequency)  and the live cells  for particular run
+(grey, obtained  by post processing  the heap access  at the end  of a
+program).
 
 One area  of concern is the  huge gap between the  actual liveness and
-the liveness  perceived by  our collector.  In case  of LGC  for eager
-languages  the gap  was  very  narrow and  almost  touched the  actual
-liveness curve.  In case of  lazy languages, due to using reachability
-for copying we  end up copying more  cells. Any data which  is part of
-closure irrespective  of whether it is  live or not gets  copied. Thus
-many non-live  cells get  copied during garbage  collection increasing
-the drag  time.  Our  experiments have  shown that  unless we  use the
-exact  execution  point  for  closures, bringing  down  the  number  of
-non-live  cells  copied in  closures  cannot  be reduced.   Using  the
-approximated liveness (liveness  at the creation point)  does not give
-benefits  in terms  of non-live  cells inside  closures as  everything
-would be live at the point of creation.
+the liveness  percieved by our  collector.  In  case of LGC  for eager
+languages~\ref{asati14lgc} the gap was  very narrow and almost touched
+the actual  liveness curve.  In  case of  lazy languages, this  gap is
+largely   due  to   approximate  reachability   based  collection   of
+closures. To implement liveness based  collection of closures, we need
+to  record liveness  data  for  each closure  and  update  it at  each
+evaluation  point.   These  space  and  run  time  overheads  make  it
+infeasible  to  incorporate  liveness  based  GC  for  closures  in  a
+practical garbage collector.
+>>>>>>> 86509285950f09b0dc95515465513023c4b6fa40
 
 \section{Related Work} 
 \label{sec:relatedwork}
@@ -2084,9 +2107,6 @@ We extended the liveness based garbage collection to lazy
 \bibliographystyle{abbrv}
 
 
-
-\mycomment{
-\pagebreak
 \pagebreak
 \section{Appendix}
 
@@ -2115,17 +2135,16 @@ the \bang\ state in the minefield semantics.
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
 \item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
-  $\rho,$ $S,$ $H,$  $e,$ $\sigma,$ $e_f$.  $\sigma$ is  the demand on
-  the expression and $e_f$ is the  body of the function.  The body and
-  the demand are both needed to calculate the liveness environment for
-  expressions.  The evaluation of  an expression may make variables in
-  the scope live because of closures that are created outside it.  The
-  information  in a  suspended  evaluation context  is also  similarly
-  augmented with the demand on it and the function body of which the
-  suspended evaluation is a part.  Thus a stacked entry now takes the
-  form $(\rho, x, e, \sigma, e_f)$. A modification of the small step
-  semantics which carries the extra information is shown in Figure[].
-\item Given the current evaluation context $\rho, S, H, e, \sigma,
+  $\rho,$ $S,$ $H,$ $e,$ $\sigma,$ $e_f$, where $\sigma$ is the demand
+  on the expression $e$, and $e_f$  is the body of the function. $e_f$
+  and $\sigma$ are  both needed to calculate  the liveness environment
+  for expressions.  The information  in a suspended evaluation context
+  is also similarly  augmented with the demand on it  and the function
+  body of  which the suspended evaluation  is a part.  Thus  a stacked
+  entry now takes the form $(\rho, x, e, \sigma, e_f)$. A modification
+  of the small  step semantics which carries the  extra information is
+  shown in Figure~\ref{fig:minefield-semantics}.
+\item Given  the current  evaluation context $\rho,  S, H,  e, \sigma,
   e_f$ and $LF$, we can construct a liveness environment as follows:
   \begin{enumerate}
   \item If $e$ is an expression, then:  
@@ -2153,6 +2172,15 @@ $GC(\rho,$ $ S,$ $ H,$ $ L,$ $ SL) = (\rho', S', H')$
   \ell$  and $x.\alpha \in \Lv$, .
   \end{enumerate}
 \end{enumerate}
+
+Starting   from  the   initial  state   $([\;]_\rho,([\;]_\rho,  \ans,
+(\print~\ans)):[\;]_{S} ,  [\;]_{H}, (\mainpgm)$, every  transition is
+preceded by  a garbage  collection using $GC$.  We consider  a garbage
+collection followed  by a transition as  a step. We show  by induction
+that, starting  from the  initial state, any  transition of  $n$ steps
+occurs without a \bang.
+
+A few observations: First observe that the transitions  which involving dereferencing and can lead to \bang are those which have a $H(\rho(x))$ term in their premise for some variable $x$.
 
 \begin{figure*}[h!]
 \begin{center}
@@ -2239,42 +2267,4 @@ $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
 \caption{Minefield semantics for the language.\label{fig:minefield-semantics}}
 \end{center}
 \end{figure*}
- 
-
-
-
-
-
-%% Generated by bibtex from your ~.bib file.  Run latex,
-%% then bibtex, then latex twice (to resolve references)
-%% to create the ~.bbl file.  Insert that ~.bbl file into
-%% the .tex source file and comment out
-%% the command \texttt{{\char'134}thebibliography}.
-%% % This next section command marks the start of
-%% % Appendix B, and does not continue the present hierarchy
-%% \section{More Help for the Hardy}
-%% The sig-alternate.cls file itself is chock-full of succinct
-%% and helpful comments.  If you consider yourself a moderately
-%% experienced to expert user of \LaTeX, you may find reading
-%% it useful but please remember not to change it.
-%% %\balancecolumns % GM June 2007
-%% % That's all folks!
-
-
-
-
-
-%% % {\color{red}
-%% %   (Note 3.\ includes $e_\mainpgm$ treated as the body of
-%% %   $(\DEFINE\ ({\tt main})\ e_\mainpgm)$.)
-%% % }
-
-
-
-
-%% %% =======
-
-%% %------------------------------------------------------------%
-%% %\input{lazy-liveness}
-}
 \end{document}
