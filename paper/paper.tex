@@ -557,66 +557,6 @@ has to be resumed after the argument is evaluated.
 
 %==============================================================
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
-
-
-
-\section{Liveness}
-\label{sec:liveness}
-
-A variable is {\em live} if there  is a possibility of its value being
-used in  future computations and  dead if  it is definitely  not used.
-Heap-allocated data needs a richer model of liveness which talks about
-liveness of  references.  Using  $\acar$, $\acdr$ to  represent access
-using  $\CAR$  and  $\CDR$  fields,  the  liveness  of  the  structure
-reachable from a  variable can be represented by a  set of {\em access
-  paths}     i.e.     prefix-closed     set     of    strings     from
-$\{\acar,\acdr\}^\ast$.  As an example, if $x$ is a list with liveness
-$\{\epsilon, \acdr,  \acdr\acar, \acdr\acdr,  \acdr\acdr\acar\}$, then
-future computations can only refer up  to the second and third members
-of $x$.  A  {\em liveness environment} is a mapping  from variables to
-subsets of $\{\acar,\acdr\}^\ast$,  but often expressed as  a set, for
-example by writing $\{x.\epsilon, x.\acdr, x.\acdr\acdr, y.\epsilon\}$
-instead       of       $[x       \mapsto\{\epsilon,\acdr,\acdr\acdr\},
-  y\mapsto\{\epsilon\}, z\mapsto\{\}]$.  In  this notation, $x \mapsto
-\{\epsilon\}$ represents access using $x$  itself and $x \mapsto \{\}$
-indicates that $x$  is dead.  We associate  liveness environments with
-program points.  The  liveness at $\pi:e$ is the  liveness just before
-executing $e$.
-
-
-A  notion  related  to  liveness  is  {\em  demand}.   While  liveness
-represents the future use of variables, a demand represents the future
-use of the value of an expression.  The demand on an expression $e$ is
-again a  set of  access paths---that subset  of $\{\acar,\acdr\}^\ast$
-which the context of $e$ may explore of $e$'s result.  To see the need
-for  demands,  consider   the  let  expression  $\pi:(\LET~x\leftarrow
-(\CDR~y)~\IN~  \pi':\SRETURN~x)$.  Assume  that  the  context of  this
-expression produces  the liveness $[x \mapsto  \lbrace \epsilon, \acar
-  \rbrace]$ at $\pi'$.  Due to the \LET\ definition which binds $x$ to
-$(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes the  demand on
-$(\CDR~y)$.    This,  in   turn,  generates   the  liveness   $\lbrace
-y.\epsilon, y.\acdr, y.\acdr\acar \rbrace$ at $\pi$. These are the set
-of $y$-rooted  accesses required  to explore $\lbrace  \epsilon, \acar
-\rbrace$  paths  of  the  result of  $(\CDR~y)$.  In  strong  liveness
-analysis       (dual      of       classical      faint       variable
-analysis~\cite{horwitz.faint}),  $y$ and  $z$  are live  at the  entry
-$\pi: x:=y+z$, if  and only if $x$  is live at exit of  $\pi$.  In our
-terminology, the  liveness $\lbrace  \epsilon\rbrace $  of $x$  at the
-exit from $n$ becomes the demand on $y+z$, and this, in turn generates
-the liveness $\lbrace y.\epsilon, z.\epsilon  \rbrace$ at the entry of
-$n$.
-
-We follow the notations appearing in \cite{asati14lgc}. In particular,
-We use $\sigma$  to range over demands, $\alpha$ to  range over access
-paths and  $\Lv$ to  range over  liveness environments.   The notation
-$\sigma_1\sigma_2$  denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
-\alpha_1 \in \sigma_1, \alpha_2  \in \sigma_2\rbrace$.  Often we shall
-abuse notation to  juxtapose an edge label and a  set of access paths:
-$\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
-
-\subsection{Liveness Analysis for lazy languages}
-\label{sec:liveness-analysis}
-
 %==============================================================
 \begin{figure*}[t]
 \renewcommand{\arraystretch}{1.5}
@@ -695,6 +635,66 @@ x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
 \end{minipage}
   \caption{Liveness equations and judgement rule}\label{fig:live-judge}
 \end{figure*}
+
+
+
+\section{Liveness}
+\label{sec:liveness}
+
+A variable is {\em live} if there  is a possibility of its value being
+used in  future computations and  dead if  it is definitely  not used.
+Heap-allocated data needs a richer model of liveness which talks about
+liveness of  references.  Using  $\acar$, $\acdr$ to  represent access
+using  $\CAR$  and  $\CDR$  fields,  the  liveness  of  the  structure
+reachable from a  variable can be represented by a  set of {\em access
+  paths}     i.e.     prefix-closed     set     of    strings     from
+$\{\acar,\acdr\}^\ast$.  As an example, if $x$ is a list with liveness
+$\{\epsilon, \acdr,  \acdr\acar, \acdr\acdr,  \acdr\acdr\acar\}$, then
+future computations can only refer up  to the second and third members
+of $x$.  A  {\em liveness environment} is a mapping  from variables to
+subsets of $\{\acar,\acdr\}^\ast$,  but often expressed as  a set, for
+example by writing $\{x.\epsilon, x.\acdr, x.\acdr\acdr, y.\epsilon\}$
+instead       of       $[x       \mapsto\{\epsilon,\acdr,\acdr\acdr\},
+  y\mapsto\{\epsilon\}, z\mapsto\{\}]$.  In  this notation, $x \mapsto
+\{\epsilon\}$ represents access using $x$  itself and $x \mapsto \{\}$
+indicates that $x$  is dead.  We associate  liveness environments with
+program points.  The  liveness at $\pi:e$ is the  liveness just before
+executing $e$.
+
+
+A  notion  related  to  liveness  is  {\em  demand}.   While  liveness
+represents the future use of variables, a demand represents the future
+use of the value of an expression.  The demand on an expression $e$ is
+again a  set of  access paths---that subset  of $\{\acar,\acdr\}^\ast$
+which the context of $e$ may explore of $e$'s result.  To see the need
+for  demands,  consider   the  let  expression  $\pi:(\LET~x\leftarrow
+(\CDR~y)~\IN~  \pi':\SRETURN~x)$.  Assume  that  the  context of  this
+expression produces  the liveness $[x \mapsto  \lbrace \epsilon, \acar
+  \rbrace]$ at $\pi'$.  Due to the \LET\ definition which binds $x$ to
+$(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes the  demand on
+$(\CDR~y)$.    This,  in   turn,  generates   the  liveness   $\lbrace
+y.\epsilon, y.\acdr, y.\acdr\acar \rbrace$ at $\pi$. These are the set
+of $y$-rooted  accesses required  to explore $\lbrace  \epsilon, \acar
+\rbrace$  paths  of  the  result of  $(\CDR~y)$.  In  strong  liveness
+analysis       (dual      of       classical      faint       variable
+analysis~\cite{horwitz.faint}),  $y$ and  $z$  are live  at the  entry
+$\pi: x:=y+z$, if  and only if $x$  is live at exit of  $\pi$.  In our
+terminology, the  liveness $\lbrace  \epsilon\rbrace $  of $x$  at the
+exit from $n$ becomes the demand on $y+z$, and this, in turn generates
+the liveness $\lbrace y.\epsilon, z.\epsilon  \rbrace$ at the entry of
+$n$.
+
+We follow the notations appearing in \cite{asati14lgc}. In particular,
+We use $\sigma$  to range over demands, $\alpha$ to  range over access
+paths and  $\Lv$ to  range over  liveness environments.   The notation
+$\sigma_1\sigma_2$  denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
+\alpha_1 \in \sigma_1, \alpha_2  \in \sigma_2\rbrace$.  Often we shall
+abuse notation to  juxtapose an edge label and a  set of access paths:
+$\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
+
+\subsection{Liveness Analysis for lazy languages}
+\label{sec:liveness-analysis}
+
 
 Figure~\ref{fig:live-judge}  describes  our  analysis  which  has  two
 parts. The function $\mathit{ref}$,  takes  an application $s$ and
@@ -899,8 +899,8 @@ and $\Sigma$ is a  stack of demands---one for each function
  }
 
 \section{Computing liveness and its encoding as DFA}\label{sec:computing}
-Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis
-and  \mycomment{\color  {red}  proved  it  correct  with  reference  to  a  {\em
+Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis%
+  \mycomment{\color  {red}  and proved  it  correct  with  reference  to  a  {\em
     minefield} semantics}.  In  particular, $\mathcal{L}$ and \pmap{f}
 together described a liveness set for each program point in a function
 in terms of  a given $\sigma$ and \Lfonly.  However,  we still have to
@@ -1630,41 +1630,26 @@ reachability for closures.
         \caption{LGC with reachability-based closure collection.\label{algo:lgc-b}}
 \end{algorithm}
 
-\begin{table*}[ht!]
-\caption{Comparing LGC times for different strategies}
+\begin{table}[ht!]
+\caption{Time taken by LGC for different strategies.  The programs are
+  modified (smaller) instances of original benchmarks.}
 \label{tab:compare-live-clo-reach-clo}
 \centering
 \begin{tabular}
-{| l | r | r | r | r |}
+{| l | r | r | r |}
 \hline
-Prog Name & Heap size & Num GC & Time taken using reachability for closure  & Time taken using liveness for closure \\ \hline
-\verb@nqueens (reduced) @ & 10000 & 183 & 0.0087s & 0.2267s\\ \hline
-\verb@lambda@&10000&11&0.0010s&4.9922s\\ \hline
-\verb@lcss@&10000&1&0.00008s&34.6684s\\ \hline
+Program        & \#GC & \multicolumn{2}{c|}{Closure collected using} \\ \cline{3-4}
+               &      & Reachability & Liveness                      \\ \hline
+\verb@nqueens@ & 183  & 0.009 sec    & 0.228 sec                     \\\hline
+\verb@lambda@  & 11   & 0.001 sec    & 4.992 sec                     \\ \hline
+\verb@lcss@    & 1    & 0.000 sec    & 34.668 sec                    \\ \hline
 \end{tabular}
-\end{table*}
+\end{table}
 
-
-\begin{table*}[ht!]
-\caption{Liveness Analysis and Garbage Collection statistics}
-\label{tab:exp-results}
-\centering
- \begin{tabular}{|l||c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c|} \hline
-   \multicolumn{1}{|r||}{Program} & \verb@lambda@ & \verb@nperm@ & \verb@treejoin@ & \verb@lcss@ & \verb@sudoku@ & \verb@fibheap@ & \verb@nqueens@ & \verb@knightstour@ & \verb@gc_bench@ \\ \hline\hline
-   \#CFG Nonterminals            & 1078          & 794          & 709             & 839         & 1758          & 780            & 529            & 659                & 417             \\ \hline
-   \#CFG Rules                   & 1823          & 1038         & 1610            & 1752        & 2509          & 1358           & 748            & 909                & 486             \\  \hline 
-   \#DFA States                  & 3312          & 2055         & 2332            & 2340        & 5672          & 2254           & 1229           & 1742               & 729             \\\hline
-   \#DFA Transitions             & 5792          & 3632         & 4235            & 4261        & 10857         & 4076           & 2078           & 3101               & 1124            \\\hline
-   DFA Generation Time (sec)      & 14.7          & 1.1          & 2690.5          & 13.3        & 798.5         & 49.8           & 0.5            & 5.1                & 0.1             \\\hline
- \end{tabular}\\
- (a) Data for Liveness Analysis \\[3pt]
-\include{autotable}
-\end{table*}
-
-  Algorithm~\ref{algo:lgc-b}  describes  a garbage  collection  scheme
-  where the liveness automata is  consulted only for \CONS\ cells; and
-  assumes everything under a closure  to be live and copies everything
-  that is reachable.
+Algorithm~\ref{algo:lgc-b} describes a garbage collection scheme where
+the liveness automata is consulted  only for \CONS\ cells; and assumes
+everything under  a closure to be  live and copies everything  that is
+reachable.
  
 A consequence of  copying everything under a closure is  that we might
 reach  a non-live  cell that  has been  reclaimed earlier  by liveness
@@ -1700,9 +1685,13 @@ use its result during garbage collection.
 To   test  the   utility  of   our  method   we  have   implemented  a
 garbage-collector for a simple scheme-like first order language having
 non-strict semantics. It consists of an interpreter, liveness analyzer
-and a  garbage-collector that can  optionally use  reachability or
-liveness.  Our  benchmark consists  of programs  from nofib~\cite{nofib}  suite and
-some external programs manually converted to ANF.
+and  a  garbage-collector  that  can optionally  use  reachability  or
+liveness.  Our benchmark consists  of programs from nofib~\cite{nofib}
+suite and some  external programs manually converted to  ANF.  All our
+benchmarks were executed on a  machine having 8 core Intel(R) Core(TM)
+i7-4770 3.40GHz  CPU ,  8192 KB  L2 cache,  16 GB  RAM running  64 bit
+Ubuntu 14.04.
+
 
 The process of liveness-based garbage collection involves going through 
 each activation record on the stack and exploring each variable in the 
@@ -1744,47 +1733,53 @@ spot   in   terms   of   performance  for   liveness   based   garbage
 collectors.  For the  remainder  of  the section  all  LGC results  we
 discuss uses  a mixed-mode collector--liveness for  evaluated data and
 reachability for closures.
-%%
-%% \comment{
-%% The graphs  in Figure~\ref{fig:memory-usage} show the  number of cells
-%% in the heap over time for RGC and LGC---here time is measured in terms
-%% of the number of cons cells allocated. In addition, they also show the
-%% number of  reachable cells and the  number of cells  that are actually
-%% live\footnote{This   is  statically   approximated  by   our  liveness
-%%   analysis}.  Since  the programs have  different memory requirements,
-%% we have tuned the size of heap for each program to ensure a reasonable
-%% number of  collections. An invocation  of RGC decreases the  number of
-%% cells  in heap  till  it touches  the  curve of  reachable cells.   An
-%% invocation of LGC decreases the number  of heap cells to no lower than
-%% the curve of live cells.
 
-%% To construct the  reachable and live curves, we  record for every cell
-%% its creation time (\CreateTime), its last use time (\UseTime), and the
-%% earliest time  when the  cell becomes unreachable  and can  be garbage
-%% collected (\CollTime).  For accurate recording of  \CollTime, we force
-%% frequent invocations  of a reachability based collector  in a separate
-%% run.     A    cell   is    live    at    time   \mbox{\exectime}    if
-%% \mbox{$\mbox{\CreateTime}       \leq       \mbox{\exectime}       \leq
-%%   \mbox{\UseTime}$}.       If      \mbox{$\mbox{\CreateTime}      \leq
-%%   \mbox{\exectime} \leq \mbox{\CollTime}$}, it is reachable.
 
-%% The benchmark programs are drawn from the {\tt no-fib} suite and other
-%% sources and have been  manually converted to  ANF.  All  graphs  except
-%%  {\tt  fibheap}  show  fewer  garbage
-%% collector  invocations for  LGC. The  number  of reachable  cells in
-%% {\tt
-%%   fibheap} increases  initially, comes  down before the  heap becomes
-%% gets
-%% full and then  continues to remains low.  This results in  a single
-%% garbage
-%% collection in both RGC and LGC.  The graphs also show the precision of
-%% our liveness analysis.  For  all programs  except  {\tt nperms} and
-%% {\tt lambda} (Figure~\ref{fig:memory-usage-lambda}),  LGC
-%% manages to collect a good portion of the data that are not live.}
-%%
-
+\begin{table*}[ht!]
+\caption{Statistics for liveness analysis and garbage collection}
+\label{tab:exp-results}
+\centering
+ \begin{tabular}{|l||c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c|} \hline
+   \multicolumn{1}{|r||}{Program} & \verb@lambda@ & \verb@nperm@ & \verb@treejoin@ & \verb@lcss@ & \verb@sudoku@ & \verb@fibheap@ & \verb@nqueens@ & \verb@knightstour@ & \verb@gc_bench@ \\ \hline\hline
+   \#CFG Nonterminals            & 1078          & 794          & 709             & 839         & 1758          & 780            & 529            & 659                & 417             \\ \hline
+   \#CFG Rules                   & 1823          & 1038         & 1610            & 1752        & 2509          & 1358           & 748            & 909                & 486             \\  \hline 
+   \#DFA States                  & 3312          & 2055         & 2332            & 2340        & 5672          & 2254           & 1229           & 1742               & 729             \\\hline
+   \#DFA Transitions             & 5792          & 3632         & 4235            & 4261        & 10857         & 4076           & 2078           & 3101               & 1124            \\\hline
+   DFA Generation Time (sec)      & 14.7          & 1.1          & 2690.5          & 13.3        & 798.5         & 49.8           & 0.5            & 5.1                & 0.1             \\\hline
+ \end{tabular}\\
+ (a) Data for Liveness Analysis \\[3pt]
+\include{autotable}
+\end{table*}
 
 \subsection{Results}
+
+The statistics related to compile  time liveness analysis are shown in
+Table~\ref{tab:exp-results}(a). We observe that the analysis requires
+a reasonable time except for  \verb@treejoin@ and  \verb@sudoku@. 
+The bottleneck in our analysis is the NFA to DFA conversion
+(worst-case exponential behaviour). To avoid this compile-time
+overhead, we have added a caching mechanism in our simulator that can
+reuse the DFAs from earlier analysis if the program has not changed..
+
+Table~\ref{tab:exp-results}(b)   compares   the   garbage   collection
+statistics  for RGC  and  LGC.  We  report the  number  of GC  events,
+average  number of  cells reclaimed  per GC,  average number  of cells
+touched  per GC,  total  number of  dragged cells  and  total time  to
+perform  all collections.   It is  no  surprise that  number of  cells
+reclaimed per  GC is  higher (and  consequently the  number of  GCs is
+lower)  for LGC  based collection.   LGC  also reduces  the number  of
+dragged cells significantly. However, the cost  for LGC is that per GC
+execution  time is  more  for  LGC, which  results  in higher  overall
+execution time  for garbage  collection, even  with reduced  number of
+collections.   However, LGC  run time  is still  competitive (slowdown
+within 5X of RGC for worst case), and is better for 3 benchmarks (best
+case  2X speedup).   Note  that  \verb@gc_bench@~\cite{gc_bench} is  a
+synthestic benchmark  that allocates complete binary  trees of various
+sizes.  These binary trees are never used by the program. As a result,
+the benchmark highly favours LGC.  We have included this benchmark for
+completeness  only  and   the  numbers  for  it   are  not  considered
+representative of practical programs.
+
 \newcommand{\hgt}{3cm}
 \begin{figure*}[p]
 \renewcommand{\arraystretch}{.1}
@@ -1818,36 +1813,7 @@ reachability for closures.
    number of cons-cells (scaled down by factor $10^3$).}
 \label{fig:memory-usage} \figrule
 \end{figure*}
-
-The statistics related to compile  time liveness analysis are shown in
-Table~\ref{tab:exp-results}(a). We observe that the analysis requires
-a reasonable time except for  \verb@treejoin@ and  \verb@sudoku@. 
-The bottleneck in our analysis is the NFA to DFA conversion
-(worst-case exponential behaviour). To avoid this compile-time
-overhead, we have added a caching mechanism in our simulator that can
-reuse the DFAs from earlier analysis if the program has not changed..
-
-Table~\ref{tab:exp-results}(b)   compares   the   garbage   collection
-statistics  for RGC  and  LGC.  We  report the  number  of GC  events,
-average  number of  cells reclaimed  per GC,  average number  of cells
-touched  per GC,  total  number of  dragged cells  and  total time  to
-perform  all collections.   It is  no  surprise that  number of  cells
-reclaimed per  GC is  higher (and  consequently the  number of  GCs is
-lower)  for LGC  based collection.   LGC  also reduces  the number  of
-dragged cells significantly. However, the cost  for LGC is that per GC
-execution  time is  more  for  LGC, which  results  in higher  overall
-execution time  for garbage  collection, even  with reduced  number of
-collections.   However, LGC  run time  is still  competitive (slowdown
-within 5X of RGC for worst case), and is better for 3 benchmarks (best
-case  2X speedup).   Note  that  \verb@gc_bench@~\cite{gc_bench} is  a
-synthestic benchmark  that allocates complete binary  trees of various
-sizes.  These binary trees are never used by the program. As a result,
-the benchmark highly favours LGC.  We have included this benchmark for
-completeness  only  and   the  numbers  for  it   are  not  considered
-representative of practical programs. All our benchmarks were executed
-on  a desktop  with  64 bit  Ubuntu 14.04,  8  core Intel(R)  Core(TM)
-i7-4770 CPU @ 3.40GHz, L2 cache of 8192 KB and 15922 MiB (16 GB) RAM.
-
+ 
 Memory   usage   graphs   for   select   benchmarks   in   are   shown
 Figure~\ref{fig:memory-usage}, Column  (a).  As the number  of garbage
 collections tend to  be very large, for each benchmark  we also show a
