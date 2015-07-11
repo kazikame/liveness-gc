@@ -314,22 +314,20 @@ paper
 
 \subsection{Organization of the paper}
 
-{\color {Myblue}Rewrite at the end: 
-Section~\ref{sec:defs} introduces the syntax and semantics of the
-language used to illustrate our
-analysis.
-% Section~\ref{sec:operational} describes the operational semantics of
-% the language.
-Liveness analysis for this language is  described in
-Section~\ref{sec:liveness}. This section also has by  a  sketch  of  a
-correctness proof  relative  to  a  non-standard
-semantics.  Section~\ref{sec:computing}  shows how to  encode liveness
-as   finite-state  automata.    Section~\ref{sec:experiments}  reports
-experimental  results  and Section~\ref{sec:lgc-always-better}  proves
-that a liveness based collector  can never do more garbage collections
-than a reachability based collector.
-% and Section~\ref{sec:conclusion} concludes the paper.
-}
+{\color {Myblue}Section~\ref{sec:defs} introduces
+  the syntax and  describes a small-step operational  semantics of the
+  programming language  considered in  our analysis.  We  describe our
+  liveness     analysis     for      this     lazy     language     in
+  Section~\ref{sec:liveness}.   Section~\ref{sec:computing}  describes
+  the formulation of this liveness  as a grammar and its approximation
+  to DFA. It  also contains a proof showing the  undecidability of the
+  precise  liveness in  our formulation.   Section~\ref{sec:GC-scheme}
+  discusses different  ways of  handling closures  and their  pros and
+  cons.      We     report     our     experimental     results     in
+  Section~\ref{sec:experiments} along  with some of  our observations.
+  Section~\ref{sec:relatedwork}  discusses  previous work  related  to
+  garbage  collection  and liveness  and  Section~\ref{sec:conclusion}
+  discusses possible extensions and concludes the paper.  }
 \section{The target language---syntax and semantics}
 \label{sec:defs}
 Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
@@ -551,7 +549,8 @@ has to be resumed after the argument is evaluated.
 
 
 
-\section{Liveness}\label{sec:liveness}
+\section{Liveness}
+\label{sec:liveness}
 
 A variable is {\em live} if there  is a possibility of its value being
 used in  future computations and  dead if  it is definitely  not used.
@@ -1456,7 +1455,7 @@ liveness based GC is triggered beyond $\pi_9$.
 
 
 \section{The Garbage Collection Scheme}
-
+\label{sec:GC-scheme}
 Our experimental setup consists of  an interpreter for our language, a
 liveness  analyzer, and  a single  generation copying  collector.  The
 garbage collector  can be  easily configured to  work on the  basis of
@@ -1484,7 +1483,7 @@ predicts the  liveness of  data in its  evaluated form  only, closures
 present a challenge for LGC. LGC will  need to map the liveness of the
 free variables of the closure to  their evaluation point.  This is not
 straight  forward as  variables may  escape their  creation scope  and
-needs to  be handled in an  approximate way.  We describe this in detail next.
+need to  be handled in an  approximate way.  We describe this in detail next.
 
 
 \subsection{A liveness-based garbage collection scheme}
@@ -1706,7 +1705,7 @@ use its result during garbage collection.
 
 
 \section{Experimental Evaluation}
-
+\label{sec:experiments}
 %% \comment{To demonstrate the effectiveness of liveness-based garbage collection,
 %% we  have  built a  prototype  consisting  of  an interpreter  for  our
 %% language,  a  liveness  analyzer  and  a copying  collector  that  can
@@ -1913,6 +1912,7 @@ benefits  in terms  of non-live  cells inside  closures as  everything
 would be live at the point of creation.
 
 \section{Related Work} 
+\label{sec:relatedwork}
 Although augmenting  garbage collection with liveness  information has
 been  studied earlier,  it was  mainly  in the  context of  imperative
 languages~\cite{Albert,  Hirzel}.  Due  to   the  presence  of  global
