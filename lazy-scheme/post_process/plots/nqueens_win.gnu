@@ -29,6 +29,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [3e5:4e5] [0:23e3] "output/nqueens_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/nqueens_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/nqueens_gc-freq_output/rch.sort"  w l ls 3 notitle,         "output/nqueens_gc-live_output/use.sort"  w l ls 4 notitle
+plot [3e5:4e5] [0:23e3] "output/nqueens_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/nqueens_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/nqueens_gc-freq_output/rch.sort"  w l ls 3 notitle,         "output/nqueens_gc-live_output/use.sort"  w l ls 5 notitle
 
 #    EOF

@@ -13,7 +13,7 @@ set border 3 lw 0
 
 set output "fibheap.eps"
 set xtics nomirror ("0" 0, "8" 8e5, "16" 16e5, "24" 24e5, "32" 32e5, "40" 40e5, "48" 48e5)
-set ytics nomirror ("10" 10e3, "20" 20e3, "30" 30e3, "40" 40e3)
+set ytics nomirror ("0" 0, "10" 10e3, "20" 20e3, "30" 30e3, "40" 40e3)
 set autoscale
 set grid noxtics
 
@@ -29,6 +29,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [:48e5] [:40e3] "output/fibheap_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/fibheap_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/fibheap_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/fibheap_gc-live_output/use.sort"  w l ls 4 notitle
+plot [:48e5] [:40e3] "output/fibheap_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/fibheap_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/fibheap_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/fibheap_gc-live_output/use.sort"  w l ls 5 notitle
 
 #    EOF
