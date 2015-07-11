@@ -986,6 +986,11 @@ proposition also holds for other modified rules for similar reasons.
   \begin{tabular}{cc}
     \begin{minipage}{.40\textwidth}
 %        \small
+      \renewcommand{\arraystretch}{1.1}{
+        \begin{uprogram}
+          \UNL{1} (\DEFINE\ (\abigfunction~\py)
+          \UNL{2} $(Create\ a\ big\ closure\ and\ return)$ 
+          \end{uprogram}}
         \renewcommand{\arraystretch}{1.1}{
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
@@ -1009,15 +1014,14 @@ $\leftarrow$  (\length~\pu)  \IN
         \renewcommand{\arraystretch}{1.1}{
 	  \begin{uprogram}
 	  \UNL{1} $(\DEFINE\ (\main)$
-           \UNL{2} \!\!$\pi_9\!\!:\, \cred{(\LET\  \pa\  \leftarrow
-(\abigfunction\ \acdr)}$ \IN
-          \UNL{3} \!\!$\pi_{10}\!\!:\, \cred{(\LET\  \pb\  \leftarrow
-(}$\cred{+}$\cred{\ \pa\ \acdr)}$
+           \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow
+(\abigfunction\ \acdr)$ \IN
+          \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
 \IN
-	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ \cred{(\LET\ \pc}\
-$\cred{\leftarrow  (\CONS\ \pb\ \NIL)}$ \IN
+	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
+$\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
           \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-          $\cred{(\LET\ \pw}\  $\cred{\leftarrow  (\length\ \pc)}$ \IN
+          $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
           \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
 (\SRETURN~\psi_4:\pw)))))$
 \end{uprogram}}
@@ -1032,15 +1036,15 @@ $\cred{\leftarrow  (\CONS\ \pb\ \NIL)}$ \IN
 \begin{eqnarray*}
         \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
               [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
-\xl.\clazy\sigma\rbrace ,~\epath_2 \mapsto \lbrace \cred{
-\pv.\sigma}  \rbrace,\\
+\xl.\clazy\sigma\rbrace ,~\epath_2 \mapsto \lbrace 
+\pv.\sigma  \rbrace,\\
  &&          \;\;  \epath_3 \mapsto \lbrace \pz.\sigma,
                 \py.\clazy\sigma,
 \pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
 &&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
 \xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup
 %%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
-\cred{\clazy\Lf{\length}{1}{\clazy\sigma}}\}\}
+\clazy\Lf{\length}{1}{\clazy\sigma}\}\}
              \rbrack \\
             \cal{P_{\mbox{\tiny \length}}} &=&
                 [\;\pi_1 \mapsto \lbrace \epath_1, \epath_2, \epath_3 \rbrace,  \
@@ -1055,18 +1059,18 @@ $\cred{\leftarrow  (\CONS\ \pb\ \NIL)}$ \IN
 \rbrace~\rbrack\\
               \mathcal{L}(e_{\main},\sigma,\Lfonly) &=&
                 [\;
-                  \epath_4 \mapsto \lbrace \cred {\pw.\sigma,
-                                       \pc.\Lf{\length}{\mbox{1}}{\sigma},}\\
+                  \epath_4 \mapsto \lbrace \pw.\sigma,
+                                       \pc.\Lf{\length}{\mbox{1}}{\sigma},\\
 && \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\cred{\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},}
-\cred{\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma}} \rbrace
+\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},
+\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma} \rbrace
                                ] \\
                \cal{P_{\mbox{\tiny \main}}} &=&
-                  \lbrack~ \cred{\pi_9 \mapsto \lbrace \epath_4 \rbrace,  \
+                  \lbrack~ \pi_9 \mapsto \lbrace \epath_4 \rbrace,  \
                     \pi_{10} \mapsto \lbrace \epath_4 \rbrace,  \
-                   \pi_{11} \mapsto \lbrace \epath_4 \rbrace,} \\
-                   && \;\; \cred{\pi_{12} \mapsto \lbrace \epath_4 \rbrace,
-\pi_{13} \mapsto \lbrace \epath_4 \rbrace}~\rbrack
+                   \pi_{11} \mapsto \lbrace \epath_4 \rbrace, \\
+                   && \;\; \pi_{12} \mapsto \lbrace \epath_4 \rbrace,
+\pi_{13} \mapsto \lbrace \epath_4 \rbrace~\rbrack
 \end{eqnarray*}
     \end{minipage} \\
 (a)&
@@ -2014,7 +2018,7 @@ and closures.
 %% traversed  multiple times  with different  sets of  liveness  paths to
 %% explore.  Further work includes  improvements to the classical copying
 %% collector to reduce the cost of this.
-{\color{blue}We extended the liveness based garbage collection to lazy
+We extended the liveness based garbage collection to lazy
   languages and shown its benefit  for garbage collection in practical
   programs. We  defined context  senstive liveness analysis  that uses
   context independent summaries of functions obtained using a symbolic
@@ -2054,7 +2058,7 @@ and closures.
   need  to   investigate  the  interaction  of   liveness  with  other
   collection schemes, such as incremental and generational collection.
   In  summary, we  need to  investigate  ways to  make liveness  based
-  garbage collection attractive for practical collectors.  }
+  garbage collection attractive for practical collectors.  
 
 
 %Add graphs for memort usage LGC vs RGC
