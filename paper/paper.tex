@@ -314,20 +314,20 @@ paper
 
 \subsection{Organization of the paper}
 
-{\color {Myblue}Section~\ref{sec:defs} introduces
-  the syntax and  describes a small-step operational  semantics of the
-  programming language  considered in  our analysis.  We  describe our
-  liveness     analysis     for      this     lazy     language     in
-  Section~\ref{sec:liveness}.   Section~\ref{sec:computing}  describes
-  the formulation of this liveness  as a grammar and its approximation
-  to DFA. It  also contains a proof showing the  undecidability of the
-  precise  liveness in  our formulation.   Section~\ref{sec:GC-scheme}
-  discusses different  ways of  handling closures  and their  pros and
-  cons.      We     report     our     experimental     results     in
-  Section~\ref{sec:experiments} along  with some of  our observations.
-  Section~\ref{sec:relatedwork}  discusses  previous work  related  to
-  garbage  collection  and liveness  and  Section~\ref{sec:conclusion}
-  discusses possible extensions and concludes the paper.  }
+{\color  {Myblue}Section~\ref{sec:defs}  introduces   the  syntax  and
+  describes  a small-step  operational  semantics  of the  programming
+  language  considered  in our  analysis.   We  describe our  liveness
+  analysis  for  this  lazy  language  in  Section~\ref{sec:liveness}.
+  Section~\ref{sec:computing}  describes   the  formulation   of  this
+  liveness as a grammar and its approximation to DFA. It also contains
+  a proof  showing the undecidability  of the precise liveness  in our
+  formulation.   Section~\ref{sec:GC-scheme} discusses  different ways
+  of  handling  closures and  their  pros  and  cons.  We  report  our
+  experimental  results  in Section~\ref{sec:experiments}  along  with
+  some observations.  Section~\ref{sec:relatedwork} discusses previous
+  work   related    to   garbage    collection   and    liveness   and
+  Section~\ref{sec:conclusion}   discusses  possible   extensions  and
+  concludes the paper.  }
 \section{The target language---syntax and semantics}
 \label{sec:defs}
 Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
@@ -1786,7 +1786,7 @@ Prog Name & Heap size & Num GC & Time taken using reachablity for closure  & Tim
 \end{tabular}
 \end{table*}
 To compare the  effect of using reachability to  copy closures instead
-of liveness we take a couple  of programs from our benchmark suite and
+of liveness we take some representative programs from our benchmark suite and
 execute       them      with       both.        As      shown       in
 Table~\ref{tab:compare-live-clo-reach-clo},  the   number  of  garbage
 collections in both cases are same but copying closures using liveness
