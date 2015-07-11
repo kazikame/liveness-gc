@@ -986,11 +986,6 @@ proposition also holds for other modified rules for similar reasons.
   \begin{tabular}{cc}
     \begin{minipage}{.40\textwidth}
 %        \small
-      \renewcommand{\arraystretch}{1.1}{
-        \begin{uprogram}
-          \UNL{1} (\DEFINE\ (\abigfunction~\py)
-          \UNL{2} $(Create\ a\ big\ closure\ and\ return)$ 
-          \end{uprogram}}
         \renewcommand{\arraystretch}{1.1}{
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
@@ -1014,8 +1009,13 @@ $\leftarrow$  (\length~\pu)  \IN
         \renewcommand{\arraystretch}{1.1}{
 	  \begin{uprogram}
 	  \UNL{1} $(\DEFINE\ (\main)$
-           \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow
-(\abigfunction\ \acdr)$ \IN
+           \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
+           (
+           \mbox{\psframebox{%
+             \begin{tabular}{@{}p{20mm}@{}}
+               {\footnotesize something that creates a BIG closure}
+             \end{tabular}}}
+           ) \IN  
           \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
 \IN
 	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
