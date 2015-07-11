@@ -207,11 +207,10 @@ closure. Since  data is made  live by  evaluation of closures,  and in
 lazy languages  the place in  the program where this  evaluation takes
 place cannot  be statically determined, laziness  complicates liveness
 analysis itself.   In addition, apart  from evaluated data,  we extend
-extend liveness-based  collection also to closures---closures  with no
-future use should also be  collected.  This involves tracking closures
-to their  points of  creation at  runtime from  where we  obtain their
-liveness.  This  requires significant  modification to the  earlier GC
-scheme.  
+liveness-based collection  to closures---closures  with no  future use
+should also  be collected.  This  involves tracking closures  to their
+points of  creation at  runtime from where  we obtain  their liveness.
+This requires significant modification to the earlier GC scheme.
 
 Experiments    with   a    single    generation   copying    collector
 (Section~\ref{sec:experiments})   confirm  the   expected  performance
