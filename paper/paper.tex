@@ -325,19 +325,20 @@ The specific contributions of this work are
 
 \subsection{Organization of the paper}
 
-{\color  {Myblue}Section~\ref{sec:defs}  introduces   the  syntax  
-  of the  programming  language  considered  in our  analysis and describes describes  a small-step  operational semnatics for it.   We  describe our  liveness
-  analysis  for  this  lazy  language  in  Section~\ref{sec:liveness}.
-  Section~\ref{sec:computing}  describes   the  formulation   of  the
-  liveness as a grammar and its approximation to DFA. It also contains
-  a proof  showing the undecidability  of the precise liveness  in our
-  formulation which necessitates the approximation to DFA.   Section~\ref{sec:GC-scheme} discusses  different ways
-  of  handling  closures and  their  pros  and  cons.  We  report  our
-  experimental  results  in Section~\ref{sec:experiments}  along  with
-  some observations.  Section~\ref{sec:relatedwork} discusses previous
-  work   related    to   garbage    collection   and    liveness   and
-  Section~\ref{sec:conclusion}   discusses  possible   extensions  and
-  concludes the paper.  }
+Section~\ref{sec:defs}  introduces  the   syntax  of  the  programming
+language  considered  in our  analysis  and  a small-step  operational
+semnatics  for it.   We present  our liveness  analysis for  this lazy
+language  in Section~\ref{sec:liveness}.   Section~\ref{sec:computing}
+describes  the  formulation of  the  liveness  as  a grammar  and  its
+approximation  to   DFA.  It  also   contains  a  proof   showing  the
+undecidability  of  the  precise  liveness in  our  formulation  which
+necessitates  the approximation  to DFA.   Section~\ref{sec:GC-scheme}
+discusses different ways of handling closures and their pros and cons.
+We  report our  experimental results  in Section~\ref{sec:experiments}
+along with some observations.  Section~\ref{sec:relatedwork} discusses
+previous  work   related  to  garbage  collection   and  liveness  and
+Section~\ref{sec:conclusion}   discusses   possible   extensions   and
+concludes the paper.
 \section{The target language---syntax and semantics}
 \label{sec:defs}
 Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
@@ -1940,9 +1941,15 @@ as~\cite{inoue88analysis,lee05static,Hamilton}.    The  compile   time
 marking approaches all rely on an efficient and precise alias analysis
 and in the absence of it cannot provide notable improvement.
 
-The closest  to our approach  is the liveness based  garbage collector
-implemented in~\cite{asati14lgc}. We extend  their work to handle lazy
-evaluation and closures.
+Another  interesting  research  in  this   field  is  the  concept  of
+Simplifiers~\cite{ONeill}. They are  described as lightweight daeomons
+which improve the efficiency of the program in general and the garbage
+collector in particular. Most of the simplifications mentioned in this
+work are subsumed by a liveness  based collector. We feel this work is
+orthogonal and can augment our  liveness based collector.  The closest
+to our  approach is the  liveness based garbage  collector implemented
+in~\cite{asati14lgc}. We  extend their work to  handle lazy evaluation
+and closures.
  
 
 %% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
