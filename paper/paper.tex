@@ -371,7 +371,7 @@ $\pi$ (not  part of the language  syntax) with the  program point just
 before expression $e$.
 
 \begin{figure}[t]
-\renewcommand{\arraystretch}{1.2}
+\renewcommand{\arraystretch}{1}
 \begin{eqnarray*}
    p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\, e_\mainpgm
     \hspace{5em} \mbox{\em --- program}\\
@@ -406,7 +406,7 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
 
 \begin{figure*}[t!]
 \begin{center}
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1}
 \begin{tabular}{|c|c|c|}
 \hline
 Premise & Transition & Rule name \\
@@ -491,7 +491,7 @@ $\rho',~ (\rho, x, (\SRETURN~x))\!:\!S, H,  s$} &
 We now give  a small-step semantics for our  language.
 We first specify the domains used by the semantics:
 \[
-\renewcommand{\arraystretch}{1.1}
+\renewcommand{\arraystretch}{1}
 \begin{array}{@{}r@{\ }l@{\ \ }c@{\ \ }l@{\hspace{0.5em}}l}
 \rho: & \mathit{Env} &=&\mathit{Var} \rightarrow \mathit{Loc} & \mbox{-- Environment} \\
 v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Data \times Data}& \mbox{-- Values}\\
@@ -566,7 +566,7 @@ has to be resumed after the argument is evaluated.
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
 \begin{figure*}[t]
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1}
 \begin{eqnarray*}
 \mathit{ref\/}(\kappa,\sigma,\Lfonly)
           &=& \{\,\} \mbox{, for $\kappa$ a constant, including
@@ -854,12 +854,102 @@ such locations during the transition will result in entering a special
 state denoted \bang.  The main proof is to show that no program enters
 the \bang\ state in the minefield semantics.
  
+
+\newcommand{\cred}[1]{{\color{red}{#1}}}
+\section{Minefield semantics for the language}
+\begin{figure*}[ht!]
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Premise & Transition & Rule name \\ 
+\hline
+\hline
+          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma', e_f'})\!:\!S,
+  H, \kappa, \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
+    \kappa], e, \cred{\sigma', e_f'}$ }   &  \sc{const}
+\\
+\hline
+          & \makecell{$\rho, (\rho', z, e, \cred{\sigma',
+    e_f'})\!:\!S, H, (\CONS~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
+  \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma', e_f'}$}     &  \sc{cons} \\
+\hline
+$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
+  \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \cred{\sigma, e_f}$ \\ $
+  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma', e_f'}$}      &
+\sc{car-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+  H, (\CAR~x), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma , \_ }$}      &
+\sc{car-clo}
+\\
+\hline
+$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
+ & \makecell{$\rho, (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H,
+  (+~x~y), \cred{\sigma, e_f}$ \\  $\rightsquigarrow \rho', S, H[\rho'(z)
+    := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma', e_f'}$}      &
+\sc{prim-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+  H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
+  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_}$}      &
+\sc{prim-1-clo} \\
+\hline
+$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+  S, H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, y,
+  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_ }$}      &
+\sc{prim-2-clo} \\
+\hline
+{$\mathit{g}~\mbox{defined as}$
+$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
+  (g~\myvec{x}), \cred{\sigma, e_f}$ \\ $\rightsquigarrow [\myvec{y} \mapsto
+    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma, e_g}$}      &
+\sc{funcall} \\
+\hline
+$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
+  s~\IN~e), \cred{\sigma, e_f}$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+  \ell]\rangle], e, \cred{\sigma, e_f}$} &
+\sc{let} \\
+\hline
+$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma, e_f}$} & \sc{if-true} \\
+\hline
+$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \cred{\sigma, e_f}$ \\   $\rightsquigarrow
+\rho, S, H,  e_2, \cred{\sigma, e_f}$} & \sc{if-false} \\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
+\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma, e_f})\!:\!S, H, s,
+\cred{\clazy\sigma, e_f}$}
+&
+\sc{if-clo} \\
+\hline
+{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
+  (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \cred{\sigma,
+  e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
+  \cred{\sigma', e_f'}$} &
+\sc{return-whnf}\\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\psi:\SRETURN~x), \cred{\sigma, e_f}$ \\ $
+  \rightsquigarrow$
+$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
+  \cred{\sigma, e_f}$} &
+\sc{return-clo} \\
+\hline
+\end{tabular}
+\caption{Minefield semantics.\label{fig:minefield-semantics}}
+\end{center}
+\end{figure*}
+
+
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
 \item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
   $\rho,$ $S,$ $H,$ $e,$ $\sigma,$ $e_f$, where $\sigma$ is the demand
   on the expression $e$, and $e_f$ is the body of the function. As the
-  section on liveness  analysis shows, The entire  function body $e_f$
+  section on liveness  analysis shows, the entire  function body $e_f$
   and $\sigma$  are needed  to calculate  the liveness  environment at
   different program  points. The  demand sigma  is ``dynamic''  in the
   sense  that it  arises from  the actual  function calls  made during
@@ -920,7 +1010,7 @@ minefield semantics transitions.
 \begin{proposition}
 \label{prop:correctness}
 \begin{enumerate} 
-\item Consider a \LET\ definition $:\pi: (\LET~x
+\item Consider a \LET\ definition \linebreak $:\pi: (\LET~x
   \leftarrow~\ldots~\IN~e$, such that there is a use of $x$
   in $e$, i.e.  an occurrence of $\LET~y~\leftarrow~s~in
   \ldots$, where $s$ is $(\CAR\ x)$, $(\CDR\ x)$ or $(+\ x\ y)$, or
@@ -1040,11 +1130,11 @@ proposition also holds for other modified rules for similar reasons.
 \subsection{Generating Liveness Equations}
 
 \begin{figure*}[t!]
-\renewcommand{\arraystretch}{1.1}
+\renewcommand{\arraystretch}{1}
   \begin{tabular}{cc}
     \begin{minipage}{.40\textwidth}
 %        \small
-        \renewcommand{\arraystretch}{1.1}{
+        \renewcommand{\arraystretch}{1}{
           \begin{uprogram}
             \UNL{1} (\DEFINE\ (\length~\xl)
             \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
@@ -1064,7 +1154,7 @@ $\leftarrow$  (\length~\pu)  \IN
             \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\,
 (\SRETURN~\psi_3:\pz)$)))))))
         \end{uprogram}}
-        \renewcommand{\arraystretch}{1.1}{
+        \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
 	  \UNL{1} $(\DEFINE\ (\main)$
            \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
@@ -2037,96 +2127,6 @@ We extended the liveness based garbage collection to lazy
 \balance
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
-
-\appendix
-\newcommand{\cred}[1]{{\color{red}{#1}}}
-\section{Minefield semantics for the language}
-\begin{figure*}[h!]
-\begin{center}
-\begin{tabular}{|c|c|c|}
-\hline
-Premise & Transition & Rule name \\ 
-\hline
-\hline
-          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma', e_f'})\!:\!S,
-  H, \kappa, \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
-    \kappa], e, \cred{\sigma', e_f'}$ }   &  \sc{const}
-\\
-\hline
-          & \makecell{$\rho, (\rho', z, e, \cred{\sigma',
-    e_f'})\!:\!S, H, (\CONS~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
-  \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma', e_f'}$}     &  \sc{cons} \\
-\hline
-$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
-  \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \cred{\sigma, e_f}$ \\ $
-  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma', e_f'}$}      &
-\sc{car-whnf} \\
-\hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-  H, (\CAR~x), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma , \_ }$}      &
-\sc{car-clo}
-\\
-\hline
-$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
- & \makecell{$\rho, (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H,
-  (+~x~y), \cred{\sigma, e_f}$ \\  $\rightsquigarrow \rho', S, H[\rho'(z)
-    := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma', e_f'}$}      &
-\sc{prim-whnf} \\
-\hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-  H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_}$}      &
-\sc{prim-1-clo} \\
-\hline
-$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-  S, H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, y,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_ }$}      &
-\sc{prim-2-clo} \\
-\hline
-{$\mathit{g}~\mbox{defined as}$
-$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
-  (g~\myvec{x}), \cred{\sigma, e_f}$ \\ $\rightsquigarrow [\myvec{y} \mapsto
-    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma, e_g}$}      &
-\sc{funcall} \\
-\hline
-$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
-  s~\IN~e), \cred{\sigma, e_f}$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-  \ell]\rangle], e, \cred{\sigma, e_f}$} &
-\sc{let} \\
-\hline
-$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma, e_f}$} & \sc{if-true} \\
-\hline
-$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma, e_f}$ \\   $\rightsquigarrow
-\rho, S, H,  e_2, \cred{\sigma, e_f}$} & \sc{if-false} \\
-\hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma, e_f})\!:\!S, H, s,
-\cred{\clazy\sigma, e_f}$}
-&
-\sc{if-clo} \\
-\hline
-{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
-  (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \cred{\sigma,
-  e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
-  \cred{\sigma', e_f'}$} &
-\sc{return-whnf}\\
-\hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\psi:\SRETURN~x), \cred{\sigma, e_f}$ \\ $
-  \rightsquigarrow$
-$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
-  \cred{\sigma, e_f}$} &
-\sc{return-clo} \\
-\hline
-\end{tabular}
-\caption{Minefield semantics.\label{fig:minefield-semantics}}
-\end{center}
-\end{figure*}
-
 \end{document}
 
 
