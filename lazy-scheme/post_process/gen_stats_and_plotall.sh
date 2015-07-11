@@ -113,15 +113,14 @@ fi
 
 for bm in $BMs
 do
-    #for opt in gc-freq=${freq[$bm]}
-    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
-    #for opt in gc-plain gc-live
-    do 
-      	echo "Processing $bm [$opt]"
-      	$DIR/gen_gc_stats.sh $OPTARG \
-      	    -bmdir ../benchmarks/programs/$bm \
-      	    -gcopt $opt -heap ${limit[$bm]}
-     done
+    #for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    # for opt in gc-plain gc-live
+    # do 
+    #   	echo "Processing $bm [$opt]"
+    #   	$DIR/gen_gc_stats.sh $OPTARG \
+    #   	    -bmdir ../benchmarks/programs/$bm \
+    #   	    -gcopt $opt -heap ${limit[$bm]}
+    #  done
     #bash $DIR/val.plot $bm ${xtics[$bm]} ${ytics[$bm]}
     #bash $DIR/window.plot $bm ${xlimit[$bm]} ${ylimit[$bm]} 
     gnuplot $DIR/plots/${bm}.gnu
