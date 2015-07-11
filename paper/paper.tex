@@ -961,7 +961,7 @@ for \SIF\ as:
 The rules for  \CDR, \PRIM\ and \NULLQ\ are also  modified in a manner
 similar to \CAR. 
 
-When  there  are  multiple  occurences of  \bcar,  \bcdr\  and  \clazy,
+When  there  are  multiple  occurrences of  \bcar,  \bcdr\  and  \clazy,
 $\hookrightarrow$  is  applied  from  right to  left.   The  reflexive
 transitive   closure  of   $\hookrightarrow$   will   be  denoted   as
 $\stackrel{*}{\hookrightarrow}$.   The  following proposition  relates
@@ -1350,7 +1350,7 @@ right of the tape head. This completes the reduction.
 We circumvent the problem  of undecidability by over- approximating the
 CFG by non-deterministic finite state automata (NFA). The NFA are then
 simplified using  the $\hookrightarrow$ rules.  Finally the simplified
-NFAs are converted to DFA.
+NFA are converted to DFA.
 
 %------------------------------------------------------------%
 
@@ -1439,9 +1439,9 @@ NFAs are converted to DFA.
    \mid \epsilon
  \end{eqnarray*}
 
-The strongly regular grammar is converted  into a set of NFAs, one for
+The strongly regular grammar is converted  into a set of NFA, one for
 each $\var{\Lanv{i}{x}}$.  The $\hookrightarrow$ simplification is now
-done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
+done on the NFA by  repeatedly introducing $\epsilon$ edges to bypass
 pairs  of consecutive  edges labeled  \bcar\acar\ or  \bcdr\acdr\ and
 constructing the $\epsilon$-closure. Since the $\epsilon$-closure step
 may  create  more  adjacent  \bcar\acar\ and  \bcdr\acdr\  edges,  the
@@ -1759,7 +1759,7 @@ a reasonable time except for  \verb@treejoin@ and  \verb@sudoku@.
 The bottleneck in our analysis is the NFA to DFA conversion
 (worst-case exponential behaviour). To avoid this compile-time
 overhead, we have added a caching mechanism in our simulator that can
-reuse the DFAs from earlier analysis if the program has not changed..
+reuse the DFA from earlier analysis if the program has not changed..
 
 Table~\ref{tab:exp-results}(b)   compares   the   garbage   collection
 statistics  for RGC  and  LGC.  We  report the  number  of GC  events,
@@ -1774,7 +1774,7 @@ execution time  for garbage  collection, even  with reduced  number of
 collections.   However, LGC  run time  is still  competitive (slowdown
 within 5X of RGC for worst case), and is better for 3 benchmarks (best
 case  2X speedup).   Note  that  \verb@gc_bench@~\cite{gc_bench} is  a
-synthestic benchmark  that allocates complete binary  trees of various
+synthetic benchmark  that allocates complete binary  trees of various
 sizes.  These binary trees are never used by the program. As a result,
 the benchmark highly favours LGC.  We have included this benchmark for
 completeness  only  and   the  numbers  for  it   are  not  considered
@@ -1827,7 +1827,7 @@ at a very high frequency) and the live cells for particular run (grey,
 obtained by post processing the heap access at the end of a program).
 
 One area  of concern is the  huge gap between the  actual liveness and
-the liveness  percieved by our  collector.  In  case of LGC  for eager
+the liveness  perceived by our  collector.  In  case of LGC  for eager
 languages~\cite{asati14lgc} the gap was  very narrow and almost touched
 the actual  liveness curve.  In  case of  lazy languages, this  gap is
 largely   due  to   approximate  reachability   based  collection   of
@@ -1950,7 +1950,7 @@ We extended the liveness based garbage collection to lazy
   collection scheme for lazy language, we  do not provide a formal proof
   of its correctness.  A formal  proof of correctness would describe how
   closures  are  handled  during  garbage  collection  and  liveness  is
-  propogated inside closures. 
+  propagated inside closures. 
 
   Another interesting exercise is to narrow the gap between the actual
   liveness and  the perceived liveness  of our garbage  collector. Our
@@ -1971,7 +1971,7 @@ We extended the liveness based garbage collection to lazy
   garbage collection attractive for practical collectors.  
 
 
-%Add graphs for memort usage LGC vs RGC
+%Add graphs for memory usage LGC vs RGC
 %Add graphs/table showing the GC times and other statistics
 
 %Mention lower peak memory usage.
