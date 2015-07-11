@@ -1633,6 +1633,14 @@ reachability for closures.
 \caption{Experimental results comparing RGC and LGC}
 \label{tab:experimental-results}
 \centering
+ \begin{tabular}{cccccccccc} \hline
+   Program & \verb@lambda@& \verb@nperm@& \verb@treejoin@& \verb@lcss@& \verb@sudoku@& \verb@fibheap@& \verb@nqueens@& \verb@knightstour@& \verb@gc_bench@ \\
+   \#NFA Nonterminals & \\
+   \#NFA Rules & \\
+   \#DFA States & 6296 & 4077& 5110 & 4772 42608 4474 2537 5640 1808 \\
+   \#DFA Transitions & \\
+   DFA Generation Time(sec) & \\
+ \end{tabular}
 \include{autotable}
 \end{table*}
 
@@ -1798,7 +1806,7 @@ live the copied \CONS\ cell will get the updated addresses of its
 {| l | r | r | r | r |}
 \hline
 Prog Name & Heap size & Num GC & Time taken using reachability for closure  & Time taken using liveness for closure \\ \hline
-\verb@nqueens(8)@ & 10000 & 183 & 0.0087s & 0.2267s\\ \hline
+\verb@nqueens (reduced) @ & 10000 & 183 & 0.0087s & 0.2267s\\ \hline
 \verb@lambda@&10000&11&0.0010s&4.9922s\\ \hline
 \verb@lcss@&10000&1&0.00008s&34.6684s\\ \hline
 \end{tabular}
