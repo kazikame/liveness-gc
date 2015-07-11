@@ -144,12 +144,12 @@ number of collections.  In addition,  it reduces the execution time of
 several programs.  Experiments  also reveal that the  best results are
 obtained  for   a  mixed  garbage   collection  scheme  that   does  a
 liveness-based    collection   for    fully    evaluated   data    and
-reachability-based   collection  for   closures.   On   our  benchmark
-programs,  we  obtain a  decrease  of  up to  45\%  in  the number  of
-collections, and  a decrease of  up to 88\%  in the number  of dragged
-cells.  Even  though  liveness   based  collector  uses  an  expensive
-traversal scheme,  the execution  time is  competitive (0.2X  - 2.08X)
-when compared to a reachability based collector.
+reachability-based   collection  for   closures.   On our benchmark
+programs, we obtain a decrease of up to 45\% in the number of
+collections, and a decrease of up to 88\% in the number of dragged
+cells.  Even though liveness based collector uses an expensive
+traversal scheme, the execution time is competitive (0.2X - 2.1X) when
+compared to a reachability based collector.
 \end{abstract}
 
 \category{D.3.4}{Programming Languages}{Processors}[Memory Management
@@ -213,20 +213,19 @@ to their  points of  creation at  runtime from  where we  obtain their
 liveness.  This  requires significant  modification to the  earlier GC
 scheme.  
 
-{\color  {Myblue}   Experiments  with  a  single   generation  copying
-  collector confirm the expected performance benefits.  Liveness-based
-  collection  results  in an  increase  in  garbage reclaimed.   As  a
-  consequence, there is a decrease in  the number of collections and a
-  (some quantification)  decrease in the  memory size required  to run
-  programs. Besides there is a reduction in the overall execution time
-  for  some  programs.  Our  experiments  further  show that  a  mixed
+Experiments    with   a    single    generation   copying    collector
+(Section~\ref{sec:experiments})  confirm   the  expected  performance
+  benefits.   Liveness-based  collection  results in  an  increase  in
+  garbage reclaimed.   As a  consequence, there is  a decrease  in the
+  number of  collections (up to 45\%)  and a decrease (up  to 88\%) in
+  the number  of {\em dragged}  cells (cells  that survive a  GC after
+  their  last  use). Besides  there  is  a  reduction in  the  overall
+  execution time for some programs.  Our experiments show that a mixed
   strategy, where we  do liveness based GC up to  the closure boundary
   and reachability based GC for  the arguments (free variables) of the
   closure,  gives us  similar benefits  as a  fully liveness  based GC
   (where  the  arguments  of  the closure  are  also  collected  using
-  liveness)  at  much  less  overhead (?).  [Overhead:  extra  memory,
-    book-keeping during run-time to update, multiple traversal of same
-    set of cells][Refer to Section~\ref{some-sec-in-impl}] }
+  liveness) at much less overheads (Section~\ref{sec:strategies}).
 
 
 %------------------------------------------------------------%
@@ -1770,7 +1769,7 @@ live the copied \CONS\ cell will get the updated addresses of its
 %% value  of $x$  is  already copied,  and  creating the  forwarding
 %% pointer otherwise.}
 
-\subsection{Copying closure using liveness vs copying closures using reachability}
+\subsection{Copying closure using liveness vs copying closures using reachability}\label{sec:strategies}
 
 \begin{table*}[ht!]
 \caption{Comparing LGC times for different strategies}
