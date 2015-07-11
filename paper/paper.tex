@@ -944,7 +944,7 @@ For a program  executing according to {\em minefield  semantics}, if a
 \bang\ has to  occur then some variable which is  dereferenced must be
 set to  $\bot$, between its  creation and  use points.  This  can only
 happen if  the liveness of  the variable being dereferenced  was null.
-From  the lemma~\ref{lem:correctness}  it  is clear  that this  cannot
+From  the lemma~\ref{lemna:no-calls-correctness}  it  is clear  that this  cannot
 happen.
 \end{proof}
 
@@ -2041,7 +2041,6 @@ We extended the liveness based garbage collection to lazy
 \appendix
 \newcommand{\cred}[1]{{\color{red}{#1}}}
 \section{Minefield semantics for the language}
-
 \begin{figure*}[h!]
 \begin{center}
 \begin{tabular}{|c|c|c|}
