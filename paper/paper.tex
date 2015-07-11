@@ -1349,40 +1349,6 @@ simplified using  the $\hookrightarrow$ rules.  Finally the simplified
 NFAs are converted to DFA.
 
 %------------------------------------------------------------%
-\subsubsection{From CFGs to GC-ready DFA}
-\label{sec:NFA-approx}
- We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
- approximate a CFG to a {\em strongly regular\/} grammar.  For
- example, the grammar
- fragment  for  the  non-terminal  $\var{\Df{\length}{1}}$  after  the
- Mohri-Nederhof transformation is:
- \begin{eqnarray*}
-   \var{\Df{\length}{1}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid
-   \acdr\var{\Df{\length}{1}}
-   \mid \clazy\var{\Df{\length}{1}}\\
-   \var{\Df{\length}{1'}} &\rightarrow& \clazy\var{\Df{\length}{1'}}
-   \mid \epsilon
- \end{eqnarray*}
-
-The strongly regular grammar is converted  into a set of NFAs, one for
-each $\var{\Lanv{i}{x}}$.  The $\hookrightarrow$ simplification is now
-done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
-pairs  of consecutive  edges labelled  \bcar\acar\ or  \bcdr\acdr\ and
-constructing the $\epsilon$-closure. Since the $\epsilon$-closure step
-may  create  more  adjacent  \bcar\acar\ and  \bcdr\acdr\  edges,  the
-simplification is continued till a fixed point is reached, after which
-the edges labelled \bcar \ and  \bcdr are deleted.  The details of the
-algorithm, its correctness and termination proofs are given by Karkare
-et.  al.~\cite{karkare07liveness,asati14lgc}.  The resulting automaton
-has  edges labelled  with  \acar,  \acdr\ and  \clazy\  only. In  this
-automaton, for every edge labelled \clazy, we check if the source node
-of the edge has a valid path to  a final final state.  If yes, we mark
-the mark  the source node as  final. Finally, we remove  all the edges
-labelled  \clazy\  and  convert  the automaton  into  a  deterministic
-automaton.    This   effectively  implements   the   $\hookrightarrow$
-simplification rules for  \bcar, \bcdr, and \clazy\  to obtain forward
-paths. While  checking for liveness  during GC, a  forward access-path
-only if it can reach a final state.
 
 
 \begin{figure}[t!]
@@ -1454,6 +1420,40 @@ only if it can reach a final state.
 \figrule
 \end{figure}
 
+\subsubsection{From CFGs to GC-ready DFA}
+\label{sec:NFA-approx}
+ We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
+ approximate a CFG to a {\em strongly regular\/} grammar.  For
+ example, the grammar
+ fragment  for  the  non-terminal  $\var{\Df{\length}{1}}$  after  the
+ Mohri-Nederhof transformation is:
+ \begin{eqnarray*}
+   \var{\Df{\length}{1}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid
+   \acdr\var{\Df{\length}{1}}
+   \mid \clazy\var{\Df{\length}{1}}\\
+   \var{\Df{\length}{1'}} &\rightarrow& \clazy\var{\Df{\length}{1'}}
+   \mid \epsilon
+ \end{eqnarray*}
+
+The strongly regular grammar is converted  into a set of NFAs, one for
+each $\var{\Lanv{i}{x}}$.  The $\hookrightarrow$ simplification is now
+done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
+pairs  of consecutive  edges labelled  \bcar\acar\ or  \bcdr\acdr\ and
+constructing the $\epsilon$-closure. Since the $\epsilon$-closure step
+may  create  more  adjacent  \bcar\acar\ and  \bcdr\acdr\  edges,  the
+simplification is continued till a fixed point is reached, after which
+the edges labelled \bcar \ and  \bcdr are deleted.  The details of the
+algorithm, its correctness and termination proofs are given by Karkare
+et.  al.~\cite{karkare07liveness,asati14lgc}.  The resulting automaton
+has  edges labelled  with  \acar,  \acdr\ and  \clazy\  only. In  this
+automaton, for every edge labelled \clazy, we check if the source node
+of the edge has a valid path to  a final final state.  If yes, we mark
+the mark  the source node as  final. Finally, we remove  all the edges
+labelled  \clazy\  and  convert  the automaton  into  a  deterministic
+automaton.    This   effectively  implements   the   $\hookrightarrow$
+simplification rules for  \bcar, \bcdr, and \clazy\  to obtain forward
+paths. While  checking for liveness  during GC, a  forward access-path
+only if it can reach a final state.
 Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
 from the grammar for \var{\Df{\length}{1}}.  The final DFA is shown in
 Figure~\ref{fig:example-automata}(b).  This expectedly says that given
