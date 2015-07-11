@@ -214,18 +214,18 @@ liveness.  This  requires significant  modification to the  earlier GC
 scheme.  
 
 Experiments    with   a    single    generation   copying    collector
-(Section~\ref{sec:experiments})  confirm   the  expected  performance
-  benefits.   Liveness-based  collection  results in  an  increase  in
-  garbage reclaimed.   As a  consequence, there is  a decrease  in the
-  number of  collections (up to 45\%)  and a decrease (up  to 88\%) in
-  the number  of {\em dragged}  cells (cells  that survive a  GC after
-  their  last  use). Besides  there  is  a  reduction in  the  overall
-  execution time for some programs.  Our experiments show that a mixed
-  strategy, where we  do liveness based GC up to  the closure boundary
-  and reachability based GC for  the arguments (free variables) of the
-  closure,  gives us  similar benefits  as a  fully liveness  based GC
-  (where  the  arguments  of  the closure  are  also  collected  using
-  liveness) at much less overheads (Section~\ref{sec:strategies}).
+(Section~\ref{sec:experiments})   confirm  the   expected  performance
+benefits.  Liveness-based collection results in an increase in garbage
+reclaimed.  As  a consequence, there  is a  decrease in the  number of
+collections (up to 45\%) and a decrease  (up to 88\%) in the number of
+{\em  dragged}  cells  (cells  that  survive a  GC  after  their  last
+use). Besides, there is a reduction  in the overall execution time for
+some programs.  Our  experiments show that a mixed  strategy, where we
+do liveness based GC up to the closure boundary and reachability based
+GC for the arguments (free variables) of the closure, gives us similar
+benefits as  a fully  liveness based  GC (where  the arguments  of the
+closure  are  also  collected  using liveness)  with  lesser  overhead
+(Section~\ref{sec:strategies}).
 
 
 %------------------------------------------------------------%
@@ -302,14 +302,26 @@ referenced by  $\pz$, $(\CDR~ \pz)$  and (the cells  constituting) the
 closure   referenced   by   $(\CDR~(\CDR~\pz))$.    In   contrast,   a
 reachability-based collector (RGC) would have preserved all cells.
 
-{\color {Myblue}Rewrite at the end: The specific contributions of the
-paper
-  are: The formulation of a  liveness analysis for a lazy language and
-  the proof of its correctness, the undecidability of the grammar that
-  results from the analysis and  its approximation by DFAs, the design
-  of a  garbage collector that can  use the DFAs to  retain live cells
-  that  also include  closures, and  empirical results  that  show the
-  effectiveness of liveness-based garbage collection.}
+The specific contributions of this work are
+  \begin{itemize}
+  \item  We formulate  a  liveness  analysis for  a  lazy first  order
+    functional language. We show how  to compute function summaries in
+    a  context  independent  manner  to achievs  a  context  sensitive
+    analysis. We  further describe the transformation  of the liveness
+    equations to grammar rules in a  way that the language accepted by
+    the resulting grammar describes live heap locations.\mycomment{the
+      proof of its correctness}
+  \item We prove  the undecidability of the grammar  that results from
+    the  analysis.   To overcome  this,  we  present an  algorithm  to
+    transform grammar  to finite  state automata  (DFA) such  that the
+    language accepted by the  DFAs over-approximates the liveness (and
+    hence a safe approximation).
+  \item We have implemented a garbage  collector that can use the DFAs
+    to  retain live  cells that  also include  closures. We  have done
+    extensive  experiments with  this garbage  collector and  obtained
+    empirical results  that show  the effectiveness  of liveness-based
+    garbage collection.
+  \end{itemize}
 
 \subsection{Organization of the paper}
 
