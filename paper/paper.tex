@@ -35,12 +35,11 @@
 \def\concat{\mathrel{\drawplusplus {12pt}{0.4pt}{5pt}}}
       %It would be better to specify these in font-relative measures, but it
       %probably doesn't scale anyway.
-\newcommand{\mycomment}[1]{}
+%\newcommand{\mycomment}[1]{}
 \definecolor{Myblue}{rgb}{.2,0,1}
-\newcommand{\comment}[1]{{\color{Myblue}{(#1)}}}
-\newcommand{\cred}[1]{{\color{red}{#1}}}
-\newcommand{\cblue}[1]{{\color{blue}{#1}}}
-\newcommand{\blankout}[1]{}
+%\newcommand{\comment}[1]{{\color{Myblue}{(#1)}}}
+%\newcommand{\cblue}[1]{{\color{blue}{#1}}}
+%\newcommand{\blankout}[1]{}
 
 
 %\newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
@@ -308,13 +307,13 @@ that  static analysis  of  heap data  can help  practical garbage
 collectors in reclaiming more  garbage.  The specific contributions of
 this paper are
 \begin{itemize}
-\item  We formulate  a  liveness  analysis for  a  lazy first  order
-  functional language. We show how  to compute function summaries in
-  a  context  independent  manner  to achieve  a  context  sensitive
-  analysis. We  further describe the transformation  of the liveness
-  equations to grammar rules in a  way that the language accepted by
-  the resulting grammar describes live heap locations.\mycomment{the
-    proof of its correctness}
+\item  We  formulate  a  liveness  analysis for  a  lazy  first  order
+  functional language  and prove  of its correctness.  We show  how to
+  compute  function  summaries  in  a context  independent  manner  to
+  achieve  a  context  sensitive  analysis. We  further  describe  the
+  transformation of the  liveness equations to grammar rules  in a way
+  that the language  accepted by the resulting  grammar describes live
+  heap locations.
 \item We prove  the undecidability of the grammar  that results from
   the  analysis.   To overcome  this,  we  present an  algorithm  to
   transform grammar  to finite  state automata  (DFA) such  that the
@@ -512,24 +511,28 @@ constituents) or  a {\em closure}.   A closure  is a pair  $\langle s,
 maps free variables of $s$ to their respective locations.
 
 The  semantics  of   expressions  (and  applications\footnote{In  most
-  contexts, we  shall use  the term 'expression' and the notation $e$  for
-both  expressions and
-  applications.}) are  given by transitions  of the form  $\rho, \stk,
-\heap, e \rightarrow \rho', \stk', \heap', e'$.  Here \stk\ is a stack
-of  continuation  frames.  Each  continuation  frame  is  of the  form
-$(\rho, x, e)$, signifying that the  location of $x$ has to be updated
-with the  value of the currently  evaluating expression, and $e$  is to be
-evaluated  next  in  the  environment  $\rho$.   The  start  state  is
-$([\;]_\rho,([\;]_\rho,  \ans,   (\print~\ans)):[\;]_{S}  ,  [\;]_{H},
-(\mainpgm)$.  In  this, the initial  environment and the  initial heap
-are  denoted  by  $[\;]_\rho$  and  $[\;]_H$, and  the  initial  stack
-consists  of  a  single  continuation   frame  in  which  \ans\  is  a
-distinguished  variable  that  would  be  updated with  the  value  of
-(\mainpgm).  In  addition, \print\ is a function  modeling a printing
-mechanism---a standard  run-time support assumption  for lazy languages
-that prints the  value of (\mainpgm).  Notice the  use of the operator
-$:$ for adding elements to the top of the stack.
+  contexts, we  shall use the  term 'expression' and the  notation $e$
+  for both expressions and applications.}) are given by transitions of
+the form $\rho, \stk, \heap,  e \rightarrow \rho', \stk', \heap', e'$.
+Here \stk\ is a stack of continuation frames.  Each continuation frame
+is of the form $(\rho, x, e)$, signifying that the location of $x$ has
+to be updated  with the value of the  currently evaluating expression,
+and $e$ is to be evaluated  next in the environment $\rho$.  Note that
+the state of the transition  system consists of the current evaluation
+context,  given  by  $\rho$  and $e$,  and  the  suspended  evaluation
+contexts recorded  in the stack  $S$.  The heap  $H$ is common  to all
+contexts.
 
+
+The     start      state     is      $([\;]_\rho,([\;]_\rho,     \ans,
+(\print~\ans)):[\;]_{S} , [\;]_{H}, (\mainpgm)$.  In this, the initial
+environment  and  the initial  heap  are  denoted by  $[\;]_\rho$  and
+$[\;]_H$,  and the  initial stack  consists of  a single  continuation
+frame in which \ans\ is a distinguished variable that would be updated
+with  the value  of (\mainpgm).   In addition,  \print\ is  a function
+modeling a printing mechanism---a standard run-time support assumption
+for lazy  languages that prints  the value of (\mainpgm).   Notice the
+use of the operator $:$ for adding elements to the top of the stack.
 
 
 
@@ -801,10 +804,10 @@ The expression  $(\SRETURN~\psi:x)$ with  a demand $\sigma$  forces an
 evaluation  of  $x$ and  hence  a  new map  $[\mathit{\epath}  \mapsto
   \{x.\sigma\}]  $ needs  to be  created,  where $\epath$  is a  fresh
 evaluation path  terminating in  $\psi$.  The  map for  the expression
-$(\SIF~\psi:x~e_1~e_2)$ is a point-wise-union of  the maps of $e_1$ and
+$(\SIF~\psi:x~e_1~e_2)$ is a point-wise-union of the maps of $e_1$ and
 $e_2$. In addition, since the condition also triggers an evaluation of
 $x$, the map $[\mathit{\epath} \mapsto \{x.\epsilon\}]$ is created and
-added  to the  union.  Also  notice a  consequences of  laziness---the
+added  to the  union.   Also notice  a  consequence of  laziness---the
 entire  expression including  the condition  is not  evaluated if  the
 demand on it is $\emptyset$.  This  results in the empty map, which is
 denoted by $\emptyset_{\cal{M}}$.
@@ -825,25 +828,6 @@ denoted by $\emptyset_{\cal{M}}$.
  $s$.
 
 
-\mycomment{The function  $\mathcal{L}$ now gives  the (total) liveness
-  of  an   expression  $e$.   The  cases  $\SRETURN$   and  $\SIF$  are
-  straightforward, but note the liveness $x.\epsilon$ generated by the
-  latter.   The case  $(\LET\  z\leftarrow s\  \IN\  e')$ resembles  a
-  three-address instruction:  the liveness of  $e$ is given  by taking
-  the liveness, $\Lv$, of $e'$, killing any liveness of $z$ and adding
-  any incremental  liveness from  $s$.  The main  subtlety is  how the
-  liveness of  $z$ in $\Lv$  is converted to  a demand $\Lv(z)$  to be
-  placed on $s$ via $\mathit{ref}(s,\Lv(z),\Lfonly)$.
-
-
-We make three observations: firstly the rule ({\sc live-define}) has a
-least  solution  as  $\mathcal{L}(\cdot)$  is monotonic  in  $\sigma$;
-secondly  that  ({\sc  live-define})   resembles  the  rule  for  type
-inference of mutually recursive  function definitions, and thirdly the
-asymmetry of  demand and liveness (compared to  post- and pre-liveness
-classically) is due to the functional formulation here.
-}
-
 Section~\ref{sec:computing}   shows   how  the   demand   transformers
 $\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
 analysis) can be safely approximated  by a {\em procedure summary} for
@@ -853,14 +837,9 @@ arguments.
 
 \subsection{Correctness of liveness analysis}  
 
-We shall now  outline a proof of correctness  of the liveness analysis
-presented  in  Section~\ref{sec:liveness-analysis}.   This requires  a
-significant modification  to the technique  used in \cite{asati14lgc}.
-\cblue{Good points to  make in the main text, right  in the small step
-  semantics  section: Note  that the  state of  the  transition system
-  consists of the current evaluation context, given by $\rho$ and $e$,
-  and  the suspended evaluation  contexts recorded  in the  stack $S$.
-  The heap $H$  is common to all contexts.}
+We shall now  outline a proof of correctness of  the liveness analysis
+presented   in    Section~\ref{sec:liveness-analysis}.    This   proof
+technique  is  similar to  the  technique  used in  \cite{asati14lgc}.
 
 The idea behind the proof is  as follows: We shall modify the standard
 semantics to a semantics  called {\em minefield semantics} that models
@@ -979,14 +958,13 @@ functionless program cannot enter a bang state.
 
 
 \section{Computing liveness and its encoding as DFA}\label{sec:computing}
-Section~\ref{sec:liveness} gave  a context-sensitive liveness analysis%
-  \mycomment{\color  {red}  and proved  it  correct  with  reference  to  a  {\em
-    minefield} semantics}.  In  particular, $\mathcal{L}$ and \pmap{f}
-together described a liveness set for each program point in a function
-in terms of  a given $\sigma$ and \Lfonly.  However,  we still have to
-describe how to obtain demand transformers \Lfonly\ from the rule {\sc
-  live-define} and how to compute the specific demand $\sigma$ on each
-function.
+Section~\ref{sec:liveness} gave a  context-sensitive liveness analysis
+and proved it  correct with reference to a  {\em minefield} semantics.
+In  our  analysis, $\mathcal{L}$  and  \pmap{f}  together described  a
+liveness set for each program point in  a function in terms of a given
+$\sigma$  and \Lfonly.   However, we  still  have to  describe how  to
+obtain demand  transformers \Lfonly\  from the rule  {\sc live-define}
+and how to compute the specific demand $\sigma$ on each function.
 %%
 To  answer these  questions, it  is convenient  to cast  the equations
 arising  out of  $\mathit{ref}$ and  $\mathcal{L}$ as  the rules  of a
@@ -2061,7 +2039,7 @@ We extended the liveness based garbage collection to lazy
 \bibliographystyle{abbrv}
 
 \appendix
-
+\newcommand{\cred}[1]{{\color{red}{#1}}}
 \section{Minefield semantics for the language}
 
 \begin{figure*}[h!]
