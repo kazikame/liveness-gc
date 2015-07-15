@@ -1017,8 +1017,8 @@ minefield semantics transitions.
   \ldots$, where $s$ is $(\CAR\ x)$, $(\CDR\ x)$ or $(+\ x\ y)$, or
   $(\SIF\ x\ e1\ e2)$ or $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null. 
 \item Assume that a  \LET\ definition $\pi: (\LET~z  \leftarrow~(\CONS~x~y)~\IN~e$ has an occurrence of 
- $(\CAR~z)$ in $e$. Then the liveness of $x$ at $\pi$ includes $\epsilon$.  Similarly if $e$ contains $(CDR~z)$, then the liveness of$y$ at $\pi$ includes $\epsilon$.  
-\end{enumerate},
+ $(\CAR~z)$ in $e$. Then the liveness of $x$ at $\pi$ includes $\epsilon$.  Similarly if $e$ contains $(\CDR~z)$, then the liveness of $y$ at $\pi$ includes $\epsilon$.  
+\end{enumerate}
 \end{proposition} 
 
 In  the second  case for  example,  the liveness  of $x$  due to  the
@@ -1035,7 +1035,7 @@ For a program  executing according to {\em minefield  semantics}, if a
 \bang\ has to  occur then some variable which is  dereferenced must be
 set to  $\bot$, between its  creation and  use points.  This  can only
 happen if  the liveness of  the variable being dereferenced  was null.
-From  the lemma~\ref{lemma:no-calls-correctness}  it  is clear  that this  cannot
+From  the Proposition~\ref{prop:correctness}  it  is clear  that this  cannot
 happen.
 \end{proof}
 
