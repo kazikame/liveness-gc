@@ -39,3 +39,12 @@ lazy-scheme/src/test_list.scm
 lazy-scheme/src/__depends
 lazy-scheme/src/run.gnu
 paper/example-automata-eps-converted-to.pdf
+lazy-scheme/benchmarks/programs/fibheap/results/
+lazy-scheme/benchmarks/programs/gc_bench/results/
+lazy-scheme/benchmarks/programs/knightstour/results/
+lazy-scheme/benchmarks/programs/lambda/results/
+lazy-scheme/benchmarks/programs/lcss/results/
+lazy-scheme/benchmarks/programs/nperm/results/
+lazy-scheme/benchmarks/programs/nqueens/results/
+lazy-scheme/benchmarks/programs/sudoku/results/
+lazy-scheme/benchmarks/programs/treejoin/results/
