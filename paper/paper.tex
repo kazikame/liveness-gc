@@ -1012,14 +1012,17 @@ minefield semantics transitions.
 \begin{proposition}
 \label{prop:correctness}
 \begin{enumerate} 
-\item Consider a \LET\ definition \linebreak $:\pi: (\LET~x
-  \leftarrow~\ldots~\IN~e$, such that there is a use of $x$
-  in $e$, i.e.  an occurrence of $\LET~y~\leftarrow~s~in
-  \ldots$, where $s$ is $(\CAR\ x)$, $(\CDR\ x)$ or $(+\ x\ y)$, or
-  $(\SIF\ x\ e1\ e2)$ or $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null. 
-\item Assume that a  \LET\ definition $\pi: (\LET~z  \leftarrow~(\CONS~x~y)~\IN~e$ has an occurrence of 
- $(\CAR~z)$ in $e$. Then the liveness of $x$ at $\pi$ includes $\epsilon$.  Similarly if $e$ contains $(CDR~z)$, then the liveness of$y$ at $\pi$ includes $\epsilon$.  
-\end{enumerate},
+\item   Consider  a   \LET\  definition:   \linebreak  $\pi\!\!\!:   (\LET~x
+  \leftarrow~\ldots~\IN~e$, such  that there is  a use of $x$  in $e$,
+  i.e.  an occurrence of $\LET~y~\leftarrow~s~in \ldots$, where $s$ is
+  $(\CAR\ x)$, $(\CDR\ x)$  or $(+\ x\ y)$, or $(\SIF\  x\ e1\ e2)$ or
+  $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null.
+\item    Assume    that    a   \LET\    definition    $\pi:    (\LET~z
+  \leftarrow~(\CONS~x~y)~\IN~e$  has an  occurrence  of $(\CAR~z)$  in
+  $e$.  Then  the  liveness  of  $x$  at  $\pi$  includes  $\epsilon$.
+  Similarly  if $e$  contains $(CDR~z)$,  then the  liveness of$y$  at
+  $\pi$ includes $\epsilon$.
+\end{enumerate}
 \end{proposition} 
 
 In  the second  case for  example,  the liveness  of $x$  due to  the
@@ -1028,7 +1031,9 @@ $\sigma$  includes  the  demand  $\acar\alpha$   due  to  its  use  in
 $(\CAR~z)$, the liveness on $x$  includes $\epsilon$. We thus have the
 following lemma:
 
-\begin{lemma}\label{lemma:no-calls-correctness} A program without function calls cannot enter the \bang\ state in the minefield semantics.
+\begin{lemma}\label{lemma:no-calls-correctness} 
+A program without function calls cannot  enter the \bang\ state in the
+minefield semantics.
 \end{lemma}
 
 \begin{proof}
@@ -1036,8 +1041,9 @@ For a program  executing according to {\em minefield  semantics}, if a
 \bang\ has to  occur then some variable which is  dereferenced must be
 set to  $\bot$, between its  creation and  use points.  This  can only
 happen if  the liveness of  the variable being dereferenced  was null.
-From  the lemma~\ref{lemma:no-calls-correctness}  it  is clear  that this  cannot
-happen.
+From the lemma~\ref{lemma:no-calls-correctness} it  is clear that this
+cannot happen. {\color{Myblue}  Too bad - self  reference!! Should this
+  be Proposition~\ref{prop:correctness}? }
 \end{proof}
 
 For   a    program   with   functions,   we    use   the   techniques
@@ -1932,7 +1938,7 @@ the benchmark highly favours LGC.  We have included this benchmark for
 completeness  only  and   the  numbers  for  it   are  not  considered
 representative of practical programs.
 
-\newcommand{\hgt}{3cm}
+\newcommand{\hgt}{2.9cm}
 \begin{figure*}[p]
 \renewcommand{\arraystretch}{.1}
 \begin{tabular}{@{}c@{}@{}c@{}}
@@ -1954,15 +1960,15 @@ representative of practical programs.
 &  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
 \\ (a) & (b)
 \end{tabular}%\vskip -10mm
- \caption{Memory usage.  Column (a) shows complete  usage while column
+ \caption{Memory usage.  Column (a) shows complete  usage, column
    (b) enlarges  a part  of the  usage.  The blue  and the  red curves
    indicate the number of cons cells  in the active semi-space for RGC
    and LGC  respectively.  The  black curve  represents the  number of
-   reachable cells and  the grey curve represents the  number of cells
+   reachable cells and  the lightblue curve represents the  number of cells
    that are  actually live (of  which liveness analysis does  a static
    approximation).   x-axis   is  the  time  measured   in  number  of
    cons-cells allocated (scaled down by  factor $10^5$). y-axis is the
-   number of cons-cells (scaled down by factor $10^3$).}
+   number of cons-cells (scaled down by  $10^3$).}
 \label{fig:memory-usage} \figrule
 \end{figure*}
  
@@ -1975,7 +1981,7 @@ corresponding to  LGC (red  line) regularly dips  below the  RGC curve
 (blue line), the dip is specially visible for the benchmarks where LGC
 outperforms  RGC substantially.   The  graphs also  include curve  for
 reachable cells (black,  obtained approximately by forcing  RGC to run
-at a very high frequency) and the live cells for particular run (grey,
+at a very high frequency) and the live cells for particular run (lightblue,
 obtained by post processing the heap access at the end of a program).
 
 One area  of concern is the  huge gap between the  actual liveness and
