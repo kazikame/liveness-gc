@@ -243,7 +243,7 @@ closure  are  also  collected  using liveness)  with  lesser  overhead
             \UFL\
             \UNL{0} (\DEFINE\ (\length\  \pl)
 	    \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-            (\PRIM\ 1\ (\CAR\  \pl))))
+            (\PRIM\ 1\ (\length (\CDR\  \pl)))))
             \UNL{0}
 	    \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
 	    \UNL{1}  (\SIF~(\NULLQ \ \lista)
@@ -308,7 +308,7 @@ collectors in reclaiming more  garbage.  The specific contributions of
 this paper are
 \begin{itemize}
 \item  We  formulate  a  liveness  analysis for  a  lazy  first  order
-  functional language  and prove  of its correctness.  We show  how to
+  functional language  and prove its correctness.  We show  how to
   compute  function  summaries  in  a context  independent  manner  to
   achieve  a  context  sensitive  analysis. We  further  describe  the
   transformation of the  liveness equations to grammar rules  in a way
@@ -316,7 +316,7 @@ this paper are
   heap locations.
 \item We prove  the undecidability of the grammar  that results from
   the  analysis.   To overcome  this,  we  present an  algorithm  to
-  transform grammar  to finite  state automata  (DFA) such  that the
+  transform grammars  to finite  state automata  (DFA) such  that the
   language accepted by the  DFA over-approximates the liveness (and
   hence a safe approximation).
 \item We have implemented a garbage  collector that can use the DFA
@@ -481,7 +481,7 @@ $\rho',~ (\rho, x, (\SRETURN~x))\!:\!S, H,  s$} &
 \sc{return-clo} \\
 \hline
 \end{tabular}
-\caption{A small-step semantics for the language. \label{fig:lang-semantics}}
+\caption{The small-step semantics for the language. \label{fig:lang-semantics}}
 \end{center}
 \end{figure*}
 
@@ -525,13 +525,13 @@ contexts.
 
 
 The     start      state     is      $([\;]_\rho,([\;]_\rho,     \ans,
-(\print~\ans)):[\;]_{S} , [\;]_{H}, (\mainpgm)$.  In this, the initial
+(\print~\ans)):[\;]_{S} , [\;]_{H}, (\mainpgm))$.  In this, the initial
 environment  and  the initial  heap  are  denoted by  $[\;]_\rho$  and
 $[\;]_H$,  and the  initial stack  consists of  a single  continuation
 frame in which \ans\ is a distinguished variable that would be updated
 with  the value  of (\mainpgm).   In addition,  \print\ is  a function
 modeling a printing mechanism---a standard run-time support assumption
-for lazy  languages that prints  the value of (\mainpgm).   Notice the
+for lazy  languages---that prints  the value of (\mainpgm).   Notice the
 use of the operator $:$ for adding elements to the top of the stack.
 
 
@@ -711,7 +711,7 @@ $\mathcal{L}$  uses   $\mathit{ref}$  to  propagate   liveness  across
 expressions.
 
  Since  in a  lazy language,  an  expression is  not evaluated  unless
- required, the null demand ($\emptyset$) does not generate liveness in
+ required. The null demand ($\emptyset$) does not generate liveness in
  any  of  the  rules  defining  $\mathit{ref}$  or  $\mathcal{L}$.   A
  non-null  demand of  $\sigma$ on  (\CDR~$x$), is  transformed to  the
  liveness $\{x.\epsilon, x.\acdr\sigma\}$.  In  an opposite sense, the
@@ -726,7 +726,7 @@ that  represents  the  summaries  of all  functions  in  the  program.
 $\Lfonly_{\mathit  f}$  (the component  of  $\Lfonly$  for a  specific
 function $f$), expresses  how the demand $\sigma$ on a  call to $f$ is
 transformed into  the liveness of  its parameters at the  beginning of
-the   call.    $\Lfonly$  is   determined   by   the  judgement   form
+the   call.    $\Lfonly$  is   determined   by   the  judgement 
 $\mathit{Prog} \len \Lfonly$ using inference rule ({\sc live-define}).
 This  rule  describes the  fixed-point  property  to be  satisfied  by
 $\Lfonly$, namely, the demand transformation assumed for each function
@@ -758,7 +758,7 @@ the following observations:
   However, this  does not cause any  imprecision in the way  of the GC
   marking more cells as live,  since, during execution, \py\ is yet to
   come  into  existence at  $\pi_6$,  and  its  liveness will  not  be
-  consulted by the garbage collector at this point.
+  considered by the garbage collector at this point.
 \item In an  eager language, the heap location referred  by \py\ would
   not have been live at $\pi_8$,  a program point beyond its last use.
   In  a  lazy  language,   however,  the  definition  $\pz  \leftarrow
@@ -785,7 +785,7 @@ $\epath_3  =  \langle  \pi_1,   \pi_2,  \pi_5,  \pi_6,  \pi_7,  \pi_8,
 
 Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
 analysis  computes  two   maps:  $\mathcal{L}(e_f,  \sigma,  \Lfonly)$
-computes a  map that takes a  e-path in ${\mathit f}$  and returns the
+computes a  map that takes an  e-path in ${\mathit f}$  and returns the
 liveness environment  arising out of  all uses of variables  along the
 e-path.  A second map $\cal{P}_{\mathit  f}$ maps any program point in
 $\mathit f$  to the set  of e-paths sharing  the point.  If  a program
@@ -807,7 +807,7 @@ evaluation path  terminating in  $\psi$.  The  map for  the expression
 $(\SIF~\psi:x~e_1~e_2)$ is a point-wise-union of the maps of $e_1$ and
 $e_2$. In addition, since the condition also triggers an evaluation of
 $x$, the map $[\mathit{\epath} \mapsto \{x.\epsilon\}]$ is created and
-added  to the  union.   Also notice  a  consequence of  laziness---the
+added  to the  union.   Also notice  a  consequence of  laziness: the
 entire  expression including  the condition  is not  evaluated if  the
 demand on it is $\emptyset$.  This  results in the empty map, which is
 denoted by $\emptyset_{\cal{M}}$.
@@ -963,7 +963,7 @@ To set up the minefield semantics, we follow these steps:
   small step semantics which carries the extra information is shown in
   Figure~\ref{fig:minefield-semantics}.
 \item Given  the current  evaluation context $\rho,  S, H,  e, \sigma,
-  e_f$ and $LF$, we can construct a liveness environment as follows:
+  e_f$ and $\mathcal{LF}$, we can construct a liveness environment as follows:
   \begin{enumerate}
   \item If $e$ is an expression, then:  
   $$ \Lv = \bigcup_{\psi \in \mathcal{P}(e)} \mathcal{M}(\psi),
@@ -976,7 +976,7 @@ We can define in the same way the liveness environment for each of the
 suspended  evaluation contexts in  $S$  giving  a  stack of  liveness
 environments that we shall denote $\mathsf{SL}$.
 \item $GC$ models a liveness based garbage collection:
-$GC(\rho,$ $ S,$ $ H,$ $ L,$ $ SL) = (\rho', S', H')$ 
+$GC(\rho,$ $ S,$ $ H,$ $ \mathcal{L},$ $ \mathsf{SL}) = (\rho', S', H')$ 
   \begin{enumerate}
   \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
     \notin \Lv$.
@@ -1013,12 +1013,12 @@ minefield semantics transitions.
 \label{prop:correctness}
 \begin{enumerate} 
 \item   Consider  a   \LET\  definition:   \linebreak  $\pi\!\!\!:   (\LET~x
-  \leftarrow~\ldots~\IN~e$, such  that there is  a use of $x$  in $e$,
+  \leftarrow~\ldots~\IN~e)$, such  that there is  a use of $x$  in $e$,
   i.e.  an occurrence of $\LET~y~\leftarrow~s~in \ldots$, where $s$ is
   $(\CAR\ x)$, $(\CDR\ x)$  or $(+\ x\ y)$, or $(\SIF\  x\ e1\ e2)$ or
   $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null.
 \item    Assume    that    a   \LET\    definition    $\pi:    (\LET~z
-  \leftarrow~(\CONS~x~y)~\IN~e$  has an  occurrence  of $(\CAR~z)$  in
+  \leftarrow~(\CONS~x~y)~\IN~e)$  has an  occurrence  of $(\CAR~z)$  in
   $e$.  Then  the  liveness  of  $x$  at  $\pi$  includes  $\epsilon$.
   Similarly  if $e$  contains $(\CDR~z)$,  then the  liveness of $y$  at
   $\pi$ includes $\epsilon$.
@@ -1038,7 +1038,7 @@ minefield semantics.
 
 \begin{proof}
 For a program  executing according to {\em minefield  semantics}, if a
-\bang\ has to  occur then some variable which is  dereferenced must be
+\bang\ occurs then some variable which is  dereferenced must be
 set to  $\bot$, between its  creation and  use points.  This  can only
 happen if  the liveness of  the variable being dereferenced  was null.
 From  the Proposition~\ref{prop:correctness}  it  is clear  that this  cannot
@@ -1064,7 +1064,7 @@ obtain demand  transformers \Lfonly\  from the rule  {\sc live-define}
 and how to compute the specific demand $\sigma$ on each function.
 %%
 To  answer these  questions, it  is convenient  to cast  the equations
-arising  out of  $\mathit{ref}$ and  $\mathcal{L}$ as  the rules  of a
+arising from  $\mathit{ref}$ and  $\mathcal{L}$ as  the rules  of a
 grammar.   To do  so, we  need  to modify  the rules  themselves to  a
 different form.
 
@@ -1077,7 +1077,7 @@ rules for  \CAR, \CDR, \PRIM, \NULLQ,  and \SIF\ require  us to return
 $\emptyset$, if  $\sigma$ itself is $\emptyset$ and
 $\lbrace\epsilon\rbrace$ otherwise.  To  realize these rules
 $\sigma$ needs to be known. This creates difficulties since we want to
-solve the equations arising out of liveness symbolically.
+solve the equations arising from liveness symbolically.
 
 The  solution  is  to  also   treat  the  operations  mentioned  above
 symbolically.  We  introduce three new symbols:  \bcar, \bcdr, \clazy.
@@ -1387,7 +1387,7 @@ garbage collection at a program point $\pi_i$ is:
 Let  $x.\alpha$ be  a forward  access  path consisting  only of  edges
 \acar\    and   \acdr\    (but    not   \bcar, \bcdr\ or \clazy).     Let
 $\mathscr{L}(\var{\Lanv{i}{x}}) \stackrel{*}{\hookrightarrow} \sigma$,
-where $\sigma$ consists  of forward paths only. Then  does $\alpha \in
+where $\sigma$ consists  of forward access paths only. Then  does $\alpha \in
 \sigma$?
 \end{quote}
 
@@ -1396,9 +1396,9 @@ context-free  grammar  augmented  with  a fixed  set  of  unrestricted
 productions.
 
 \begin{definition}\label{def:specialgrammar}
-Consider a form of  grammar $(N,T, p_1\cup p_2,S)$ in which $N$ is a set of
+Consider the  grammar $(N,T, p_1\cup p_2,S)$ in which $N$ is a set of
 non-terminals, $T = \{\acar, \acdr, \bcar, \bcdr, \clazy, \$\}$, $p_1$
-is a set of context-free production that contains the distinguished
+is a set of context-free productions that contains the distinguished
 production $S \rightarrow \alpha\$$, $\alpha$ is a string of grammar
 symbols that does not contain $S$, and $p_2$ is the fixed set of
 unrestricted productions $\bcar\acar \rightarrow \epsilon$,
@@ -1503,9 +1503,9 @@ right of the tape head. This completes the reduction.
 \end{proof}
 
 We circumvent the problem  of undecidability by over- approximating the
-CFG by non-deterministic finite state automata (NFA). The NFA are then
+CFG by non-deterministic finite state automata (NFA). The NFAs are then
 simplified using  the $\hookrightarrow$ rules.  Finally the simplified
-NFA are converted to DFA.
+NFAs are converted to DFAs.
 
 %------------------------------------------------------------%
 
@@ -1583,7 +1583,7 @@ NFA are converted to DFA.
 \subsubsection{From CFGs to GC-ready DFA}
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
- approximate a CFG to a {\em strongly regular\/} grammar.  For
+ approximate a CFG by a {\em strongly regular\/} grammar.  For
  example, the grammar
  fragment  for  the  non-terminal  $\var{\Df{\length}{1}}$  after  the
  Mohri-Nederhof transformation is:
@@ -1595,14 +1595,14 @@ NFA are converted to DFA.
    \mid \epsilon
  \end{eqnarray*}
 
-The strongly regular grammar is converted  into a set of NFA, one for
+The strongly regular grammar is converted  into a set of NFAs, one for
 each $\var{\Lanv{i}{x}}$.  The $\hookrightarrow$ simplification is now
-done on the NFA by  repeatedly introducing $\epsilon$ edges to bypass
+done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
 pairs  of consecutive  edges labeled  \bcar\acar\ or  \bcdr\acdr\ and
 constructing the $\epsilon$-closure. Since the $\epsilon$-closure step
 may  create  more  adjacent  \bcar\acar\ and  \bcdr\acdr\  edges,  the
 simplification is continued till a fixed point is reached, after which
-the edges labeled \bcar \ and  \bcdr are deleted.  The details of the
+the edges labeled \bcar \ and  \bcdr\ are deleted.  The details of the
 algorithm, its correctness and termination proofs are given by Karkare
 et.  al.~\cite{karkare07liveness,asati14lgc}.  The resulting automaton
 has  edges labeled  with  \acar,  \acdr\ and  \clazy\  only. In  this
@@ -1613,7 +1613,7 @@ labeled  \clazy\  and  convert  the automaton  into  a  deterministic
 automaton.    This   effectively  implements   the   $\hookrightarrow$
 simplification rules for  \bcar, \bcdr, and \clazy\  to obtain forward
 paths. While  checking for liveness  during GC, a  forward access-path
-only if it can reach a final state.
+is valid only if it can reach a final state.
 Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
 from the grammar for \var{\Df{\length}{1}}.  The final DFA is shown in
 Figure~\ref{fig:example-automata}(b).  This expectedly says that given
