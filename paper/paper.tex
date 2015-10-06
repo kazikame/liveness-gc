@@ -1869,7 +1869,7 @@ Table~\ref{tab:compare-live-clo-reach-clo},  the   number  of  garbage
 collections in both cases are same but copying closures using liveness
 takes a lot more time compared to reachability based copying.
 
-The number  of garbage  collections is same  since we  approximate the
+The number  of garbage  collections is the same  since we  approximate the
 liveness of  a closure  to the  liveness at  its creation  point.  The
 liveness  we get  is usually  grossly over  approximated.  Using  this
 liveness may not  give too much of a benefit  compared to reachability
@@ -1971,7 +1971,7 @@ representative of practical programs.
 \label{fig:memory-usage} \figrule
 \end{figure*}
  
-Memory   usage   graphs   for   select   benchmarks   in   are   shown
+Memory   usage   graphs   for   select   benchmarks    are   shown
 Figure~\ref{fig:memory-usage}, Column  (a).  As the number  of garbage
 collections tend to  be very large, for each benchmark  we also show a
 window which  is representative  of the  behavior for  that particular
@@ -2092,14 +2092,14 @@ and closures.
 %% collector to reduce the cost of this.
 We extended the liveness based garbage collection to lazy
   languages and shown its benefit  for garbage collection in practical
-  programs. We  defined context  sensitive liveness analysis  that uses
+  programs. We  defined a context  sensitive liveness analysis  that uses
   context independent summaries of functions obtained using a symbolic
-  demand. We show  that obtaining precise solution  to these equations
+  demand. We showed  that obtaining precise solution  to these equations
   is undecidable in  our formulation, and hence  we safely approximate
   the result using DFA. These DFA are consulted by the garbage collector
   to improve  collection.
 
-  Liveness   of   closure   presented  further   challenges   to   our
+  Liveness   of   closures   presented  further   challenges   to   our
   implementation.   We compared  different approximate  strategies for
   handling   liveness   of   closures,   and  found   that   a   mixed
   strategy---reachability  based  collection   of  closure  arguments,

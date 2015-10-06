@@ -41,6 +41,7 @@ unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(con
 	label_set.insert(label);
 	pID->label_set.insert(label);
 
+	heap_cells_required = 0;
 
 	return gLivenessMap;
 }
@@ -54,6 +55,8 @@ expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand)
  	auto retval = new expr_demand_grammars({ new demand_grammar({{ label, demand }}),
         new demand_grammar({{ *pID, demand }})
     });
+
+ 	heap_cells_required = 1;
 	return retval;
 }
 
@@ -62,6 +65,7 @@ expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand)
 expr_demand_grammars * ConstExprNode::transformDemandRef(const rule & demand)
 {
 
+	heap_cells_required = 1;
 	return new expr_demand_grammars({ new demand_grammar({{ label, demand }}), new demand_grammar({{ }}) }); //TODO: verify this rule
 
 }
@@ -73,6 +77,8 @@ bool UnaryPrimExprNode::isExpressionRecursive(const std::string var) const
 	std::string argString = ((IdExprNode*)pArg)->getIDStr();
 	if (0==argString.compare(var))
 		isRecursive = true;
+
+
 	return isRecursive;
 }
 
@@ -125,6 +131,7 @@ expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand
 
     label_set.insert(pArg->label_set.begin(), pArg->label_set.end());
 
+    heap_cells_required = 1;
     return result;
 }
 
@@ -179,6 +186,7 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
     result->first->emplace(label, demand);
     
 
+    heap_cells_required = 1;
     return result;
  
 }
@@ -219,7 +227,11 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
 
     label_set.insert(label);
     label_set.insert(pThen->label_set.begin(), pThen->label_set.end());
-    label_set.insert(pElse->label_set.begin(), pElse->label_set.end());
+    label_set.insert(pElse->label_set.begin(), pElse->label_set.end());\
+
+    heap_cells_required = (pThen->heap_cells_required > pElse->heap_cells_required) ?
+    		                        pThen->heap_cells_required
+								  : pElse->heap_cells_required;
 
     return gLivenessMap;
 }
@@ -287,6 +299,8 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 	//Copy the label set
 	label_set.insert(pBody->label_set.begin(), pBody->label_set.end());
 
+	heap_cells_required = pBody->heap_cells_required + pExpr->heap_cells_required;
+
 	return gLivenessMap;
 }
 
@@ -351,11 +365,13 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
 
         result->first->emplace(label, demand);
 
+        heap_cells_required = pListArgs->size();
+
         return result;
     }
     else
     {
-
+    	heap_cells_required = 1;
     	return new expr_demand_grammars({new demand_grammar({{label, demand}}), new demand_grammar});
     }
 }
@@ -366,8 +382,6 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
 unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const rule & demand)
 {
     // The demand argument is unnecessary for this function.
-
-
 
 	gfunc_prog_pts.clear();
 	in_function_define = true;
@@ -447,6 +461,11 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
 //    }
 
     in_function_define = false;
+
+    heap_cells_required = this->pExpr->heap_cells_required;
+
+    cout << "The number of heap cells required by " << pID->getIDStr() << " " << this->pExpr->heap_cells_required <<endl;
+
     return gLivenessMap;
 }
 

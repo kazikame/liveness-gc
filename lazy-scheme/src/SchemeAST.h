@@ -166,6 +166,7 @@ public:
 	enum exprType type;
 	const std::string node_name;
 	std::unordered_set<std::string> label_set;
+	unsigned int heap_cells_required;
 protected:
 	std::string label;
 
@@ -550,6 +551,8 @@ public:
 	std::string getFunctionName() {return pID->getIDStr();}
 	std::vector<std::string> getArgs();
 	ExprNode* getFunctionBody() {return pExpr;}
+
+	unsigned int heap_cells_required;
 
 protected:
 	ExprNode * pExpr;

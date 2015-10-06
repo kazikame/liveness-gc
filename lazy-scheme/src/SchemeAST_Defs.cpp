@@ -525,9 +525,9 @@ cons* LetExprNode::evaluate()
 //	cout << "Current heap = " << current_heap() << endl;
 
 #endif
-	bool isFunctionCall = getVarExpr()->isFunctionCallExpression();
-    /* -------------------------------------------------------------------------------------------------------------*/
-    /* This is where we do the GC. Can this be made independent of ExprNode class? */
+	/*bool isFunctionCall = getVarExpr()->isFunctionCallExpression();
+     -------------------------------------------------------------------------------------------------------------
+     This is where we do the GC. Can this be made independent of ExprNode class?
     static clock_tick last_gc_clock = 0;
 
 	if (gc_status != gc_disable) 
@@ -583,7 +583,7 @@ cons* LetExprNode::evaluate()
             }
         }
     }
-    /* End of GC related stuff */
+*/    /* End of GC related stuff */
     /* -------------------------------------------------------------------------------------------------------------*/
 
 
@@ -1376,14 +1376,70 @@ std::string FuncExprNode::getFunction()
 
 cons* FuncExprNode::evaluate()
 {
+
 	cons* heap_cell = update_heap_refs.top();
 
 	if (heap_cell->inWHNF)
 		return heap_cell;
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
 
+	if (gc_status != gc_disable)
+	{
+		static clock_tick last_gc_clock = 0;
+		auto num_cells_reqd = funcDef->heap_cells_required;
+		cout << "Processing function " << getFunction() <<endl;
+		cout << "Num heap cells required " << num_cells_reqd<<endl;
+		if (gc_status == gc_freq)
+		{
+			if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD())
+			{
+				reachability_gc();
+
+				GC_STAT_DUMP_GARBAGE_STATS();
+				last_gc_clock = GC_STAT_GET_CLOCK();
+			}
+		}
+		if (current_heap() < num_cells_reqd)
+		{
+			if ((gc_status == gc_plain) || (gc_status == gc_freq)) // try to get more space even if gc-freq
+			{
+				//cout << "Num heap cells required " << num_cells_reqd<<endl;
+				reachability_gc();
+				detail_gc();
+
+				GC_STAT_DUMP_GARBAGE_STATS();
+			}
+			else
+			{
+				assert(gc_status == gc_live);
+
+				std::string curr_let_pgmpt = return_stack().return_point;
+				return_stack().return_point = getLabel();
+				liveness_gc();
+				detail_gc();
+				GC_STAT_DUMP_GARBAGE_STATS();
+				return_stack().return_point = curr_let_pgmpt;
+			}
+
+			//			if (current_heap() < heap_cells_required)
+			//			{
+			//
+			/*
+					cout << "heap cells required " << heap_cells_required << endl;
+					cout << "current heap size " << current_heap() << endl;
+			 */
+			//
+			//				fprintf(stderr,"No Sufficient Memory - cons\n");
+			//				throw bad_alloc();
+			//			}
+		}
+
+	}
+
+
 //	cout << "Creating activation record for func " << funcDef->getFuncName() << " with ret address " << curr_return_addr << endl;
 	make_environment(funcDef->getFuncName().c_str(), curr_return_addr);
+
 
 	auto num_args = pListArgs->size();
 	auto curr = heap_cell;
