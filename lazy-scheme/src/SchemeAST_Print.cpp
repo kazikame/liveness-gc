@@ -26,7 +26,7 @@ std::ostream & ReturnExprNode::print(std::ostream & stream, unsigned depth, bool
                                      Scheme::output::output_t format) const {
     Scheme::output::indentTill(stream, newline ? depth : 0);
     if (format == Scheme::output::SCHEME) {
-        stream;
+
         pID->print(stream, 0, false, with_label, format);
     } else if(format == Scheme::output::PLAIN) {
         stream << "(RETURN ";

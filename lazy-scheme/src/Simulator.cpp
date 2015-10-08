@@ -21,7 +21,7 @@ using namespace Scheme::output;
 double gctime=0;
 int gccount=0;
 extern demand_grammar gLivenessData;
-
+extern unordered_map<string, unsigned int> func_heap_cell_reqd;
 
 demand_grammar filter_grammar(demand_grammar gLivenessData, vector<string> filter_criteria)
 {
@@ -199,6 +199,8 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		}
 		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa, label_set_map);
 
+		Scheme::Demands::write_func_heap_requirement(pgmname, func_heap_cell_reqd);
+
 		dfa_gen_time = (double(clock() - dfa_gen_start)/CLOCKS_PER_SEC);
 
 		//Scheme::Demands::minimizeDFA(dfa, start_states);
@@ -220,6 +222,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		}
 		numkeys = n + 1;
 	}
+
 ///////////////////////////////////////////////////////////////////////
 //	cout << "Num of states " << numkeys << endl;
 	//Do the initialization of the dfa state map and transition table

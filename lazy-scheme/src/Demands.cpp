@@ -38,7 +38,7 @@ typedef std::unordered_set<std::string> partition;
 
 partition reachable_states(std::string nt, automaton* nfa);
 void print_path(path);
-void print_fa_to_graphviz_file(std::string pgmname, std::string non_terminal, automaton* nfa);
+//void print_fa_to_graphviz_file(std::string pgmname, std::string non_terminal, automaton* nfa);
 void print_split_lf(std::pair<rule,rule> res, std::string trans_demand_key);
 
 
@@ -650,6 +650,17 @@ std::vector<std::string> splitLivenessString(std::string ls)
 	v.push_back(label_set_str);
 	v.push_back(var_name);
 	return v;
+}
+
+
+void Scheme::Demands::write_func_heap_requirement(std::string pgmname, std::unordered_map<std::string, unsigned int> func_heap_cell_reqd)
+{
+	std::ofstream func_map(outdir + pgmname + "/fsmdump-" + pgmname + "-func-map");
+	for(auto func_tuple : func_heap_cell_reqd)
+	{
+		func_map << func_tuple.first << ":" << func_tuple.second << std::endl;
+	}
+
 }
 
 int Scheme::Demands::writeDFAToFile(std::string pgmname, automaton* dfa, std::map<std::string, std::unordered_set<std::string>> prog_pt_map)

@@ -49,6 +49,7 @@ unsigned long copycells,heapslot,garbagecells;
 actRec *stack_start, *stack_top;
 GCStatus gc_status = gc_plain;
 extern int gccount;
+extern unordered_map<string, unsigned int> func_heap_cell_reqd;
 
 //ofstream gout("gc_addr.txt", ios::app);
 
@@ -3033,6 +3034,30 @@ void read_state_map_from_file(string filepath)
   return;
 }
 
+
+void read_func_heap_requirements(string filepath)
+{
+	ifstream state_transition_file;
+	string line;
+
+	state_transition_file.open(filepath.c_str());
+	while(getline(state_transition_file, line))
+	{
+		auto start = 0;
+		auto end = line.find(':', start);
+		auto func_name = line.substr(start, end);
+		start = end + 1;
+		end = 0;
+		end = line.find(':', start);
+		auto heap_req = stol(line.substr(start, end));
+
+		func_heap_cell_reqd[func_name] = heap_req;
+		//cout << "Translated to "<<index1<<" "<<index2<<" "<<value<<endl;
+	}
+	state_transition_file.close();
+	return;
+}
+
 void read_state_transition_table_from_file(string filepath)
 {
 
@@ -3080,6 +3105,10 @@ void initialize (string program_name, state_index numkeys, GCStatus gc_type)
 		//cout << "Reading " << (filepath + "-state-transition-table") << endl;
 		read_state_transition_table_from_file(filepath + "-state-transition-table");
 	}
+
+	read_func_heap_requirements(outdir + program_name + "/fsmdump-" + program_name + "-func-map");
+
+
 	//cout << "Done initializing" << endl;
 #ifdef DUMP_HEAP_AS_GRAPHVIZ
 	if (gc_type != gc_live)

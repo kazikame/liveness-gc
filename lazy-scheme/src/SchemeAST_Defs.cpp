@@ -31,7 +31,7 @@ unsigned int reduction_count = 0;
 //extern unsigned int num_of_allocations;//
 //extern map<cons*, int> heap_map;
 //extern map<int, string> root_var_map;
-
+extern unordered_map<string, unsigned int> func_heap_cell_reqd;
 std::string curr_return_addr;
 
 
@@ -1386,7 +1386,7 @@ cons* FuncExprNode::evaluate()
 	if (gc_status != gc_disable)
 	{
 		static clock_tick last_gc_clock = 0;
-		auto num_cells_reqd = funcDef->heap_cells_required;
+		auto num_cells_reqd = func_heap_cell_reqd[getFunction()];
 		cout << "Processing function " << getFunction() <<endl;
 		cout << "Num heap cells required " << num_cells_reqd<<endl;
 		if (gc_status == gc_freq)

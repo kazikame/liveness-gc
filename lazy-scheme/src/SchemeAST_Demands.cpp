@@ -14,6 +14,7 @@ unordered_map<string, const Node*> prog_pt_map;
 /////////////////////////////////////////////////////////
 // the following variables are used to compute the liveness for user defined functions
 unordered_map<string,  const Node*> gfunc_prog_pts;
+unordered_map<string, unsigned int> func_heap_cell_reqd;
 bool in_function_define = false;
 
 
@@ -463,7 +464,7 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     in_function_define = false;
 
     heap_cells_required = this->pExpr->heap_cells_required;
-
+    func_heap_cell_reqd[pID->getIDStr()] = this->pExpr->heap_cells_required;
     cout << "The number of heap cells required by " << pID->getIDStr() << " " << this->pExpr->heap_cells_required <<endl;
 
     return gLivenessMap;
@@ -502,6 +503,8 @@ unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const 
     this->label_set.insert(pExpr->label_set.begin(), pExpr->label_set.end());
     this->progpt_map = &prog_pt_map;
     this->liveness_data = gLivenessData;
+
+
 
     return gLivenessMap;
 }
