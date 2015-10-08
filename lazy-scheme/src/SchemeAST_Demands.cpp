@@ -187,7 +187,7 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
     result->first->emplace(label, demand);
     
 
-    heap_cells_required = 1;
+    heap_cells_required = 2;
     return result;
  
 }

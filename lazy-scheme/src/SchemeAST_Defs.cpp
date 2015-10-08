@@ -1377,22 +1377,21 @@ std::string FuncExprNode::getFunction()
 cons* FuncExprNode::evaluate()
 {
 
-	cons* heap_cell = update_heap_refs.top();
 
-	if (heap_cell->inWHNF)
-		return heap_cell;
-	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
+
+	if (update_heap_refs.top()->inWHNF)
+		return update_heap_refs.top();
 
 	if (gc_status != gc_disable)
 	{
 		static clock_tick last_gc_clock = 0;
 		auto num_cells_reqd = func_heap_cell_reqd[getFunction()];
-		cout << "Processing function " << getFunction() <<endl;
-		cout << "Num heap cells required " << num_cells_reqd<<endl;
+
 		if (gc_status == gc_freq)
 		{
 			if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD())
 			{
+
 				reachability_gc();
 
 				GC_STAT_DUMP_GARBAGE_STATS();
@@ -1403,7 +1402,7 @@ cons* FuncExprNode::evaluate()
 		{
 			if ((gc_status == gc_plain) || (gc_status == gc_freq)) // try to get more space even if gc-freq
 			{
-				//cout << "Num heap cells required " << num_cells_reqd<<endl;
+				cout << "Num heap cells required " << num_cells_reqd << " in function "<< getFunction()<<endl;
 				reachability_gc();
 				detail_gc();
 
@@ -1421,21 +1420,23 @@ cons* FuncExprNode::evaluate()
 				return_stack().return_point = curr_let_pgmpt;
 			}
 
-			//			if (current_heap() < heap_cells_required)
-			//			{
-			//
-			/*
-					cout << "heap cells required " << heap_cells_required << endl;
-					cout << "current heap size " << current_heap() << endl;
-			 */
-			//
-			//				fprintf(stderr,"No Sufficient Memory - cons\n");
-			//				throw bad_alloc();
-			//			}
+			if (current_heap() < heap_cells_required)
+			{
+
+				cout << "heap cells required " << heap_cells_required << endl;
+				cout << "current heap size " << current_heap() << endl;
+
+
+				fprintf(stderr,"No Sufficient Memory - cons\n");
+				throw bad_alloc();
+			}
 		}
 
 	}
 
+
+	cons* heap_cell = update_heap_refs.top();
+	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
 
 //	cout << "Creating activation record for func " << funcDef->getFuncName() << " with ret address " << curr_return_addr << endl;
 	make_environment(funcDef->getFuncName().c_str(), curr_return_addr);
