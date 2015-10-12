@@ -525,46 +525,35 @@ cons* LetExprNode::evaluate()
 //	cout << "Current heap = " << current_heap() << endl;
 
 #endif
-	/*bool isFunctionCall = getVarExpr()->isFunctionCallExpression();
-     -------------------------------------------------------------------------------------------------------------
-     This is where we do the GC. Can this be made independent of ExprNode class?
+	bool isFunctionCall = getVarExpr()->isFunctionCallExpression();
+     //-------------------------------------------------------------------------------------------------------------
+     //This is where we do the GC. Can this be made independent of ExprNode class?
     static clock_tick last_gc_clock = 0;
 
-	if (gc_status != gc_disable) 
+	if (gc_status != gc_disable && (gc_status == gc_plain || gc_status == gc_freq))
     {
-        if (gc_status == gc_freq) {
-            if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD()) {
-                reachability_gc();
-                //return_stack().return_point = curr_let_pgmpt;
-                GC_STAT_DUMP_GARBAGE_STATS();
-                last_gc_clock = GC_STAT_GET_CLOCK();
-            }
-        }
+
+		if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD()) {
+			reachability_gc();
+			//return_stack().return_point = curr_let_pgmpt;
+			GC_STAT_DUMP_GARBAGE_STATS();
+			last_gc_clock = GC_STAT_GET_CLOCK();
+		}
+
         if ((!isFunctionCall && (current_heap() < 1))
                  || (isFunctionCall && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) 
         {
-            if ((gc_status == gc_plain) || (gc_status == gc_freq)) // try to get more space even if gc-freq 
-            {
-                // cerr << "DOING RGC"<<endl;
-                //TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
-                //std::string curr_let_pgmpt = return_stack().return_point;
-                //return_stack().return_point = getLabel();
-                reachability_gc();
-		detail_gc();
-                //return_stack().return_point = curr_let_pgmpt;
-                GC_STAT_DUMP_GARBAGE_STATS();
-            }
-            else
-            {
-                assert(gc_status == gc_live);
-                // cerr << "DOING LGC"<< endl;
-                std::string curr_let_pgmpt = return_stack().return_point;
-                return_stack().return_point = getLabel();
-                liveness_gc();
-		detail_gc();
-                GC_STAT_DUMP_GARBAGE_STATS();
-                return_stack().return_point = curr_let_pgmpt;
-            }
+
+        	// cerr << "DOING RGC"<<endl;
+        	//TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
+        	//std::string curr_let_pgmpt = return_stack().return_point;
+        	//return_stack().return_point = getLabel();
+        	reachability_gc();
+        	detail_gc();
+        	//return_stack().return_point = curr_let_pgmpt;
+        	GC_STAT_DUMP_GARBAGE_STATS();
+
+
             //We have to check for this condition here for lazy languages
             int num_cells_reqd = 0;
             if (!isFunctionCall )
@@ -583,7 +572,7 @@ cons* LetExprNode::evaluate()
             }
         }
     }
-*/    /* End of GC related stuff */
+    /* End of GC related stuff */
     /* -------------------------------------------------------------------------------------------------------------*/
 
 
@@ -1360,7 +1349,8 @@ FuncExprNode::FuncExprNode(IdExprNode * id, std::list<ExprNode *> * args)
 
 }
 
-FuncExprNode * FuncExprNode::clone() const {
+FuncExprNode * FuncExprNode::clone() const
+{
 	std::list<ExprNode *> * newArgs = new std::list<ExprNode *>();
 	for(std::list<ExprNode *>::const_iterator i = pListArgs->begin(); i != pListArgs->end(); ++i)
 		newArgs->push_back((*i)->clone());
@@ -1376,13 +1366,10 @@ std::string FuncExprNode::getFunction()
 
 cons* FuncExprNode::evaluate()
 {
-
-
-
 	if (update_heap_refs.top()->inWHNF)
 		return update_heap_refs.top();
 
-	if (gc_status != gc_disable)
+	if (gc_status != gc_disable && (gc_status == gc_live || gc_status == gc_freq))
 	{
 		static clock_tick last_gc_clock = 0;
 		auto num_cells_reqd = func_heap_cell_reqd[getFunction()];
@@ -1400,25 +1387,15 @@ cons* FuncExprNode::evaluate()
 		}
 		if (current_heap() < num_cells_reqd)
 		{
-			if ((gc_status == gc_plain) || (gc_status == gc_freq)) // try to get more space even if gc-freq
-			{
-				cout << "Num heap cells required " << num_cells_reqd << " in function "<< getFunction()<<endl;
-				reachability_gc();
-				detail_gc();
 
-				GC_STAT_DUMP_GARBAGE_STATS();
-			}
-			else
-			{
-				assert(gc_status == gc_live);
+			assert(gc_status == gc_live);
+			std::string curr_let_pgmpt = return_stack().return_point;
+			//				return_stack().return_point = getLabel();
+			liveness_gc();
+			detail_gc();
+			GC_STAT_DUMP_GARBAGE_STATS();
+			//				return_stack().return_point = curr_let_pgmpt;
 
-				std::string curr_let_pgmpt = return_stack().return_point;
-				return_stack().return_point = getLabel();
-				liveness_gc();
-				detail_gc();
-				GC_STAT_DUMP_GARBAGE_STATS();
-				return_stack().return_point = curr_let_pgmpt;
-			}
 
 			if (current_heap() < heap_cells_required)
 			{
@@ -1426,14 +1403,12 @@ cons* FuncExprNode::evaluate()
 				cout << "heap cells required " << heap_cells_required << endl;
 				cout << "current heap size " << current_heap() << endl;
 
-
 				fprintf(stderr,"No Sufficient Memory - cons\n");
 				throw bad_alloc();
 			}
 		}
 
 	}
-
 
 	cons* heap_cell = update_heap_refs.top();
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
