@@ -187,6 +187,36 @@ cons* ReturnExprNode::evaluate()
 	cons* retval = (cons*)lookup_addr(varName.c_str());
 	if (!retval->inWHNF)
 	{
+		//For each of the variables in the program stack top
+		//if variable points to a closure, update closure
+		//arguments to point to current prgrm point
+		for(vector<var_heap>::iterator vhit = actRecStack.begin()->heapRefs.begin(); vhit != actRecStack.begin()->heapRefs.end(); ++vhit)
+		{
+			cons* heap_cell = (cons*)vhit->ref;
+			if (!heap_cell->inWHNF)
+			{
+				switch(heap_cell->typecell)
+				{
+				case constIntExprClosure:
+				case constBoolExprClosure:
+				case constStringExprClosure:
+				case nilExprClosure:
+					break;
+				case unaryprimopExprClosure:
+				case binaryprimopExprClosure:
+				case funcApplicationExprClosure:
+				case funcArgClosure:
+				{
+					heap_cell->val.closure.prog_pt = new string(this->getLabel());
+				}
+
+				break;
+				default : cout << "Should not have come to this point"<<endl;
+				cout << "Processing " << heap_cell << " with type " << heap_cell->typecell << endl;
+				break;
+				}
+			}
+		}
 
 		curr_return_addr = this->getLabel();
 		actRecStack.front().return_point = this->getLabel();
