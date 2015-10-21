@@ -455,6 +455,35 @@ IfExprNode * IfExprNode::clone() const
 
 cons* IfExprNode::evaluate()
 {
+
+	for(vector<var_heap>::iterator vhit = actRecStack.begin()->heapRefs.begin(); vhit != actRecStack.begin()->heapRefs.end(); ++vhit)
+	{
+		cons* heap_cell = (cons*)vhit->ref;
+		if (!heap_cell->inWHNF)
+		{
+			switch(heap_cell->typecell)
+			{
+			case constIntExprClosure:
+			case constBoolExprClosure:
+			case constStringExprClosure:
+			case nilExprClosure:
+				break;
+			case unaryprimopExprClosure:
+			case binaryprimopExprClosure:
+			case funcApplicationExprClosure:
+			case funcArgClosure:
+			{
+				heap_cell->val.closure.prog_pt = new string(this->getLabel());
+			}
+
+			break;
+			default : cout << "Should not have come to this point"<<endl;
+			cout << "Processing " << heap_cell << " with type " << heap_cell->typecell << endl;
+			break;
+			}
+		}
+	}
+
 	IdExprNode* i = (IdExprNode*)this->pCond;
 	cons* cond_heap_ref = (cons*)lookup_addr(i->getIDStr().c_str());
 
@@ -615,6 +644,10 @@ cons* LetExprNode::evaluate()
 	//cout << "Created " << this->pID->getIDStr() << " at " << (temp - getbufferlive()) << endl;
 
 	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
+
+
+	//We need the prgm pt of the enclosing let expr while creating liveness automata
+	this->getVarExpr()->parent_let_pgmpt = getLabel();
 	if (getVarExpr()->isFunctionCallExpression())
 	{
 		FuncExprNode* funExpr = (FuncExprNode*)getVarExpr();

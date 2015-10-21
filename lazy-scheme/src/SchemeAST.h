@@ -194,6 +194,7 @@ public:
 	virtual cons* make_closure() = 0;
 	virtual bool isExpressionRecursive(const std::string) const {return false;}
 	//cons* heap_ptr;
+	std::string parent_let_pgmpt;
 protected:
 	ExprNode(const std::string name);
 
@@ -517,7 +518,6 @@ public:
 	void setNextExpr(std::string);
 	std::string getNextExpr();
 	virtual cons* make_closure();
-	std::string parent_let_pgmpt;
 	virtual bool isExpressionRecursive(const std::string) const;
 	//std::list<cons*> argsClosureList;
 protected:

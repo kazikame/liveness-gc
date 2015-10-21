@@ -175,7 +175,11 @@ long Scheme::SchemeDriver::process()
     std::unordered_map<std::string, Scheme::Demands::expr_demand_grammars*> livenessMap
                                            = anf_program->transformDemand(Scheme::Demands::rule({{}}));
 
+
+    //TODO: Modify convertLivenessMap to handle liveness of closures
     convertLivenessMap(livenessMap, anf_program->progpt_map);
+
+
     anf_program->liveness_data = *combined_grammar;
 
     //TODO remember to un-comment this line and ensure that the fields combined_grammar & program_grammars are correctly initialized
