@@ -1561,10 +1561,6 @@ demand_grammar * Scheme::Demands::sanitize(demand_grammar * gram)
 expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
                                               expr_demand_grammars * grams_from)
 {
-	// Merge the program point demands. There should be no intersection within
-	// the argument grammars.
-
-	//Do we need this merging?
 	
 	expr_demand_grammars *res =  new expr_demand_grammars;
 	*res = *grams_to;
@@ -1590,6 +1586,10 @@ expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
 
     return res;
 }
+
+
+
+
 
 /////////////////////////////////////////////DFA Minimization code/////////////////////////////////////////////////////////
 //typedef std::unordered_set<std::string> partition;

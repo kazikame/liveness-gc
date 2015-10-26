@@ -1749,6 +1749,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 
 		  DBG(out << "arg1 --> " << loc->val.closure.arg1 << " with index = " <<(loc->val.closure.arg1 - (cons*)buffer_dead) << endl);
 		  cons* oldarg1 = loc->val.closure.arg1;
+
 		  cons* addr = deep_copy(loc->val.closure.arg1, 1, out);
 		  loccopy->val.closure.arg1 = addr;
 		  DBG(out << "Copied arg1 from " << oldarg1 << " to " << addr <<endl);
@@ -1986,8 +1987,11 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 	  	  	  	  	  	  	  		  loccopy = copy(loc, out);
 	  	  	  	  	  	  	  	  break;
   	  	  	  	  	  	  	  	 }
-    case unaryprimopExprClosure :
+  case unaryprimopExprClosure :
   {
+	  if (loc->forward != NULL)
+		  return static_cast<cons*>(loc->forward);
+
 	  loccopy = copy(loc, out);
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
 
@@ -2003,6 +2007,9 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   break;
   case binaryprimopExprClosure:
   {
+	  if (loc->forward != NULL)
+		  return static_cast<cons*>(loc->forward);
+
 	  loccopy = copy(loc, out);
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
 
@@ -2029,6 +2036,9 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   case funcApplicationExprClosure:
   case funcArgClosure:
   {
+	  if (loc->forward != NULL)
+		  return static_cast<cons*>(loc->forward);
+
 	  loccopy = copy(loc, out);
 	  //What happens to arg1? Shouldn't it get updated during GC?
 	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
