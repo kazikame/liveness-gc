@@ -9,8 +9,15 @@ using namespace std;
 demand_grammar function_call_demands;
 demand_grammar gLivenessData;
 unordered_map<string, expr_demand_grammars*> gLivenessMap;
-unordered_map<string, expr_demand_grammars*> localLivenessMap;
+unordered_map<string, demand_grammar*> localLivenessMap;
 unordered_map<string, const Node*> prog_pt_map;
+unordered_map<string, unordered_set<string>> liveness_set_map;
+
+
+
+std::string current_label;
+
+
 
 /////////////////////////////////////////////////////////
 // the following variables are used to compute the liveness for user defined functions
@@ -18,6 +25,7 @@ unordered_map<string,  const Node*> gfunc_prog_pts;
 
 unordered_map<string, unsigned int> func_heap_cell_reqd;
 bool in_function_define = false;
+
 
 
 
@@ -41,13 +49,19 @@ unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(con
 
 	gLivenessMap[label] =  pID->transformDemandRef(demand);
 	
-	localLivenessMap[getLabel()] = pID->transformDemandRef(demand);
+	localLivenessMap[getLabel()] = new demand_grammar({{pID->getIDStr(), demand }});
 
 
 	label_set.insert(label);
 	pID->label_set.insert(label);
 
 	heap_cells_required = 0;
+
+	current_label = label;
+
+	live_var_set.insert(pID->getIDStr());
+
+	liveness_set_map[label] = live_var_set;
 
 	return gLivenessMap;
 }
@@ -56,7 +70,6 @@ unordered_map<string, expr_demand_grammars*> ReturnExprNode::transformDemand(con
 /* ref( (id x), s, T ) = x.s  */
 expr_demand_grammars * IdExprNode::transformDemandRef(const rule & demand)
 {
-
 
  	auto retval = new expr_demand_grammars({ new demand_grammar({{ label, demand }}),
         new demand_grammar({{ *pID, demand }})
@@ -125,19 +138,22 @@ expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand
         /* x.s */  /* should be x.eps */
     	//TODO : Should we add a epsilon demand or a Xb demand here?
     	path p;
-    	p.push_front(E);
+    	p.push_front(TXb);
     	arg_demand.insert(p);
     }
 
     expr_demand_grammars * result = pArg->transformDemandRef(arg_demand);
     result->first->emplace(label, demand);
 
-
-    localLivenessMap[getLabel() + "/" + this->parent_let_pgmpt + "/1"] = pArg->transformDemandRef(arg_demand);
-
-    //demand_grammar* var_grammar = result->second;
+    //TODO: This can be simplified to a map<label, rule>
+    localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "1", arg_demand }});
+    cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(1) << endl;
+    // demand_grammar* var_grammar = result->second;
 
     label_set.insert(pArg->label_set.begin(), pArg->label_set.end());
+
+    live_var_set.insert(((IdExprNode*)pArg)->getIDStr());
+
 
     heap_cells_required = 1;
     return result;
@@ -194,9 +210,13 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
     result->first->emplace(label, demand);
     
 
-    localLivenessMap[getLabel() + "/" + this->parent_let_pgmpt + "/1"] = pArg1->transformDemandRef(arg_1_demand);
-    localLivenessMap[getLabel() + "/" + this->parent_let_pgmpt + "/2"] = pArg2->transformDemandRef(arg_2_demand);
+    localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "1", arg_1_demand }});
+    cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(1) << endl;
+    localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "2", arg_2_demand }});
+    cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(2) << endl;
 
+    live_var_set.insert(((IdExprNode*)pArg1)->getIDStr());
+    live_var_set.insert(((IdExprNode*)pArg2)->getIDStr());
 
     heap_cells_required = 2;
     return result;
@@ -242,11 +262,17 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
     label_set.insert(pThen->label_set.begin(), pThen->label_set.end());
     label_set.insert(pElse->label_set.begin(), pElse->label_set.end());
 
-
+    current_label = label;
     //TODO: How do I insert the liveness of variables at this point?
     //Merge the liveness of then, else and condition and add it to liveness map
 
 
+
+    live_var_set.insert(pThen->live_var_set.begin(), pThen->live_var_set.end());
+    live_var_set.insert(pElse->live_var_set.begin(), pElse->live_var_set.end());
+    live_var_set.insert(cond_variable);
+
+    liveness_set_map[label] = live_var_set;
 
     heap_cells_required = (pThen->heap_cells_required > pElse->heap_cells_required) ?
     		                        pThen->heap_cells_required
@@ -267,11 +293,11 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 {
 	auto result = pBody->transformDemand(demand);
 
-	if (in_function_define)
+	/*if (in_function_define)
 		gfunc_prog_pts[getLabel()] = this;
 	else
 		prog_pt_map[getLabel()] = this;
-
+*/
 	
 	//Check if the let definition is recursive and if true create a function "f" and
 	//get its transformer
@@ -296,6 +322,7 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 		{
 			//Call the transformDemandRef function to get the liveness
 			//auto let_var_demand_it = gLivenessMap[l]->second->find(let_var);
+			current_label = l;
 			auto curr_expr_gram = gLivenessMap[l];
 
 			//Process demand only if the let variable has a non-null demand
@@ -309,7 +336,21 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 				//Merge the new demands with the existing demands
 				expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);
 				gLivenessMap[l] = res;
+
 				//Kill the liveness of the variable after calculating liveness
+
+				live_var_set.insert(pExpr->live_var_set.begin(), pExpr->live_var_set.end());
+				live_var_set.insert(pBody->live_var_set.begin(), pBody->live_var_set.end());
+				live_var_set.erase(live_var_set.find(getVar()));
+
+				cout << "Set of live variables at pgm_pt " << let_var << endl;
+				for (auto live_var:live_var_set)
+				{
+					cout << live_var << ",";
+				}
+				cout << endl;
+
+
 			}
 
 		}
@@ -317,10 +358,6 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 	}
 	//Copy the label set
 	label_set.insert(pBody->label_set.begin(), pBody->label_set.end());
-
-
-
-
 
 	heap_cells_required = pBody->heap_cells_required + pExpr->heap_cells_required;
 
@@ -377,7 +414,10 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
 
 
         //TODO: How do we disambiguate the labels for each argument?
-        localLivenessMap[getLabel() + "/" + this->parent_let_pgmpt + "/"  + to_string(index)] = (*iter)->transformDemandRef(arg_demand);
+        localLivenessMap[getLabel() + "/" + current_label] = new demand_grammar({{ to_string(index), arg_demand }});
+        cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(index) << endl;
+        live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());
+
 
         while(++iter != pListArgs->end())
         {
@@ -387,8 +427,9 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
                 p.push_front(prefix + std::to_string(index));
                 arg_demand.insert(p);
             }
-            localLivenessMap[getLabel() + "/" + this->parent_let_pgmpt + "/" + to_string(index)] = (*iter)->transformDemandRef(arg_demand);
+            localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ to_string(index), arg_demand }});
             result = merge(result, (*iter)->transformDemandRef(arg_demand));
+            live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());
         }
 
         result->first->emplace(label, demand);
@@ -530,7 +571,6 @@ unordered_map<string, expr_demand_grammars*> ProgramNode::transformDemand(const 
     this->label_set.insert(pExpr->label_set.begin(), pExpr->label_set.end());
     this->progpt_map = &prog_pt_map;
     this->liveness_data = gLivenessData;
-
 
 
     return gLivenessMap;

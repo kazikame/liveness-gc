@@ -1587,6 +1587,40 @@ expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
     return res;
 }
 
+expr_demand_grammars * Scheme::Demands::merge(expr_demand_grammars * grams_to,
+                                              expr_demand_grammars * grams_from,
+											  std::unordered_set<std::string> liveness_set)
+{
+
+	expr_demand_grammars *res =  new expr_demand_grammars;
+	*res = *grams_to;
+
+    for(auto & non_terminal : *(grams_from->first))
+    //assert(grams_to->first->emplace(non_terminal.first, non_terminal.second).second);
+    {
+    	res->first->emplace(non_terminal.first, non_terminal.second);
+    }
+
+    // Merge the variable name demands. There might be intersections here. In
+    // that case, we take the union of the demands.
+    for(auto & non_terminal : *(grams_from->second))
+    {
+    	//This condition was added to prevent null constants from being propagated during liveness propagation
+    	if (liveness_set.find(non_terminal.first) == liveness_set.end())
+    		continue;
+
+    	if(non_terminal.first.size() > 0) //merge only if the non_terminal is a variable
+    	{
+    		auto result = res->second->emplace(non_terminal.first, non_terminal.second);
+			if(!result.second)
+				result.first->second.insert(non_terminal.second.begin(), non_terminal.second.end());
+    	}
+    }
+
+    return res;
+}
+
+
 
 
 

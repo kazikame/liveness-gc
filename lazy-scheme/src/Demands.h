@@ -77,6 +77,10 @@ demand_grammar * sanitize(demand_grammar *);
 regular_demand_grammar * regularize(const demand_grammar *); //Converts arbit CFG into a strongly regular grammar using Mohri-Nederhoff transformation
 demand_grammar * solve_functions_and_combine(expr_demand_grammars *);
 expr_demand_grammars * merge(expr_demand_grammars *, expr_demand_grammars *);
+expr_demand_grammars * merge(expr_demand_grammars * grams_to,
+                                              expr_demand_grammars * grams_from,
+											  std::unordered_set<std::string> liveness_set);
+
 void minimizeDFA(automaton* dfa, std::unordered_set<std::string> nt);
 
 std::pair<rule,rule> splitLF(path p);

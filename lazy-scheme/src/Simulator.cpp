@@ -21,6 +21,7 @@ using namespace Scheme::output;
 double gctime=0;
 int gccount=0;
 extern demand_grammar gLivenessData;
+extern unordered_map<string, expr_demand_grammars*> localLivenessMap;
 extern unordered_map<string, unsigned int> func_heap_cell_reqd;
 
 demand_grammar filter_grammar(demand_grammar gLivenessData, vector<string> filter_criteria)
@@ -165,6 +166,16 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 
 		//cout << "program name " << pgmname << endl;
 		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/program-cfg.txt");
+
+
+		/*int i = 1;
+		for(auto expr_grmr:localLivenessMap)
+		{
+		    write_grammar_to_text_file(expr_grmr.second->second, "testgrammar.txt" + to_string(i));
+		    ++i;
+		}*/
+
+
 		//Simplify grammar
 		simplifyCFG(&gLivenessData);
 		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/simplified-program-cfg.txt");
