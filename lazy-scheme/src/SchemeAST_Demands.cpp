@@ -152,7 +152,7 @@ expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand
 
     label_set.insert(pArg->label_set.begin(), pArg->label_set.end());
 
-    live_var_set.insert(((IdExprNode*)pArg)->getIDStr());
+    live_var_set.insert(((IdExprNode*)pArg)->getLabel());
 
 
     heap_cells_required = 1;
@@ -215,8 +215,10 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
     localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "2", arg_2_demand }});
     cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(2) << endl;
 
-    live_var_set.insert(((IdExprNode*)pArg1)->getIDStr());
-    live_var_set.insert(((IdExprNode*)pArg2)->getIDStr());
+
+    cout << "Inserting to liveness set " << (((IdExprNode*)pArg1)->getLabel()) << endl;
+    live_var_set.insert(((IdExprNode*)pArg1)->getLabel());
+    live_var_set.insert(((IdExprNode*)pArg2)->getLabel());
 
     heap_cells_required = 2;
     return result;
@@ -337,25 +339,28 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 				expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);
 				gLivenessMap[l] = res;
 
-				//Kill the liveness of the variable after calculating liveness
-
-				live_var_set.insert(pExpr->live_var_set.begin(), pExpr->live_var_set.end());
-				live_var_set.insert(pBody->live_var_set.begin(), pBody->live_var_set.end());
-				live_var_set.erase(live_var_set.find(getVar()));
-
-				cout << "Set of live variables at pgm_pt " << let_var << endl;
-				for (auto live_var:live_var_set)
-				{
-					cout << live_var << ",";
-				}
-				cout << endl;
-
 
 			}
 
 		}
 
 	}
+	//Kill the liveness of the variable after calculating liveness
+	live_var_set.insert(pExpr->live_var_set.begin(), pExpr->live_var_set.end());
+	live_var_set.insert(pBody->live_var_set.begin(), pBody->live_var_set.end());
+
+	cout << "Deleting from liveness set "<< getVar() << endl;
+	live_var_set.erase(getVar());
+	cout << "Deleted from liveness set "<< getVar() << endl;
+
+	cout << "Set of live variables at pgm_pt " << let_var << endl;
+	for (auto live_var:live_var_set)
+	{
+		cout << live_var << ",";
+	}
+	cout << endl;
+
+
 	//Copy the label set
 	label_set.insert(pBody->label_set.begin(), pBody->label_set.end());
 
@@ -416,7 +421,7 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
         //TODO: How do we disambiguate the labels for each argument?
         localLivenessMap[getLabel() + "/" + current_label] = new demand_grammar({{ to_string(index), arg_demand }});
         cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(index) << endl;
-        live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());
+        live_var_set.insert(((IdExprNode*)(*iter))->getLabel());
 
 
         while(++iter != pListArgs->end())
@@ -429,7 +434,7 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
             }
             localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ to_string(index), arg_demand }});
             result = merge(result, (*iter)->transformDemandRef(arg_demand));
-            live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());
+            live_var_set.insert(((IdExprNode*)(*iter))->getLabel());
         }
 
         result->first->emplace(label, demand);

@@ -1,3 +1,14 @@
+(define (fun l1)
+  (let ((one 1))
+    (let ((l (cons one l1)))
+      (let ((c (null? l)))
+	(if c
+	    (let ((ret (car l)))
+	      ret)
+	    (let ((ans 1))
+	      ans))))))
+
+
 (let ((a0 '()))
   (let ((b1 1))
     (let ((a1 (cons b1 a0)))
@@ -7,7 +18,7 @@
 	    (let ((a3 (cons b3 a2)))
 	      (let ((c (null? a3)))
 		(if c
-		    (let ((num (car a3)))
+		    (let ((num (fun a3)))
 		      num)
 		    (let ((tl (cdr a3)))
 		      (let ((hd (car tl)))

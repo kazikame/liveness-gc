@@ -1993,7 +1993,8 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  return static_cast<cons*>(loc->forward);
 
 	  loccopy = copy(loc, out);
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/1";
 
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
@@ -2011,7 +2012,8 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  return static_cast<cons*>(loc->forward);
 
 	  loccopy = copy(loc, out);
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/1";
 
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
@@ -2021,7 +2023,8 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  loccopy->val.closure.arg1 = new_arg1;
 		  DBG(out << "Copied arg1 from " << loccopy->val.closure.arg1 << " to " << new_arg1 <<endl);
 	  }
-	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  //liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/2";
 
 	  liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
@@ -2040,8 +2043,10 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  return static_cast<cons*>(loc->forward);
 
 	  loccopy = copy(loc, out);
-	  //What happens to arg1? Shouldn't it get updated during GC?
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+
+	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  //TODO : How to get the argument position for the argument?
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) ;
 
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
