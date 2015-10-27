@@ -520,6 +520,7 @@ public:
 	std::string getNextExpr();
 	virtual cons* make_closure();
 	virtual bool isExpressionRecursive(const std::string) const;
+	size_t getNumArgs() {return pListArgs->size();}
 	//std::list<cons*> argsClosureList;
 protected:
 	IdExprNode * pID;
