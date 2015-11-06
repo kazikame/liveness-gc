@@ -836,7 +836,7 @@ int is_end_of_non_ref_vector()
 }
 
 //!!!!!caution update it to check for already existing variable in same environment
-void make_reference_addr(const char *var, void* addr, bool isParam)
+void make_reference_addr(const char *var, void* addr, bool isParam=false)
 {
 	int found=0;
 	vector<var_heap>& vh=actRecStack.front().heapRefs;
@@ -859,6 +859,7 @@ void make_reference_addr(const char *var, void* addr, bool isParam)
 		var_heap newref;
 		newref.varname=var;
 		newref.ref=addr;
+		newref.is_param = isParam;
 
 		actRecStack.front().heapRefs.push_back(newref);
 		mmc=mmc+(sizeof(var_heap));
@@ -1875,9 +1876,11 @@ void liveness_gc()
 #ifdef __DEBUG__GC
 	  ofstream pre("GC" + to_string(gccount) + ".txt", ios_base::out);
 	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
-//	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
-//	  create_heap_bft(pregc);
-//	  pregc.close();
+
+	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
+	  //create_heap_bft(pregc);
+	  pregc.close();
+
 	  print_activation_record_stack(pre);
 #else
 	  ostream &pre = null_stream;
@@ -1899,6 +1902,7 @@ void liveness_gc()
     		  DBG(pre << "Processing var " << vhit->varname << endl);
     		  DBG(pre << "Index is " << ((cons*)vhit->ref - (cons*)buffer_dead) << endl);
     		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second, pre);
+    		  DBG(pre << "Copied " << vhit->ref << " to " << addr << endl);
     		  vhit->ref = addr;
     		  DBG(pre << "Copied " << ((cons*)freept - (cons*)buffer_live) << " cells"<<endl);
 
@@ -1921,9 +1925,9 @@ void liveness_gc()
   numcopied = 0;
 #ifdef __DEBUG__GC
 	pre.close();
-//	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
-//	create_heap_bft(postgc);
-//	postgc.close();
+	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
+	//create_heap_bft(postgc);
+	postgc.close();
 #endif
 #ifdef ENABLE_SHARING_STATS
   print_sharing_stats();
@@ -1958,12 +1962,14 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 	  DBG(out << "Copying cell from " << loc << " with type " << loc->typecell << endl);
  	  DBG(out << "state index is " << index << endl);
  	  loccopy = copy(loc, out);
+ 	  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
 	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
 	  if (a0 > 0)
 	  {
 		  DBG(out<<"Copying car part"<<endl);
 		  cons* newloc = getCar(loc, 1);
 		  cons* addr = followpaths(newloc, a0, out);
+		  DBG(out << "Copied car part from " << loc << " to " << addr << endl);
 		  set_car(loccopy, addr);
 	  }
 
@@ -1974,6 +1980,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  DBG(out<<"Copying cdr part"<<endl);
 		  cons* newloc = getCdr(loc, 1);
 		  cons* addr = followpaths(newloc, a1, out);
+		  DBG(out << "Copied cdr part from " << loc << " to " << addr << endl);
 		  set_cdr(loccopy, addr);
 	  }
   }
@@ -1984,77 +1991,92 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   case constBoolExprClosure:
   case constStringExprClosure: {
 	  	  	  	  	  	  	  	  if (index > 0)
+	  	  	  	  	  	  	  	  {
 	  	  	  	  	  	  	  		  loccopy = copy(loc, out);
+	  	  	  	  	  	  	  		  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
+	  	  	  	  	  	  	  	  }
 	  	  	  	  	  	  	  	  break;
   	  	  	  	  	  	  	  	 }
   case unaryprimopExprClosure :
   {
+	  DBG(out << "Processing UnaryPrimOp  " << loc << endl );
 	  if (loc->forward != NULL)
 		  return static_cast<cons*>(loc->forward);
 
 	  loccopy = copy(loc, out);
-	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/1";
-
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/1";
+	  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
 	  auto liveness_state = statemap.find(liveness_string);
+	  DBG(out << "Checking liveness corresponding to " << liveness_string << endl);
 	  if (liveness_state != statemap.end())
 	  {
 	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
 	  	  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second, out);
-	  	  loccopy->val.closure.arg1 = new_arg1;
 	  	  DBG(out << "Copied arg1 from " << loccopy->val.closure.arg1 << " to " << new_arg1 <<endl);
+	  	  loccopy->val.closure.arg1 = new_arg1;
+
 	  }
   }
   break;
   case binaryprimopExprClosure:
   {
+
+	  DBG(out << "Processing BinaryPrimOp  " << loc << endl );
 	  if (loc->forward != NULL)
 		  return static_cast<cons*>(loc->forward);
 
 	  loccopy = copy(loc, out);
-	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/1";
-
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg1_name);
+	  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
+	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/1";
+	  DBG(out << "Checking liveness corresponding to " << liveness_string << endl);
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
-	    // cerr << "Doing GC corresponding to " << liveness_string << endl;
+		  DBG(out << "Doing GC corresponding to " << liveness_string << endl);
 		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second, out);
-		  loccopy->val.closure.arg1 = new_arg1;
 		  DBG(out << "Copied arg1 from " << loccopy->val.closure.arg1 << " to " << new_arg1 <<endl);
-	  }
-	  //liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
-	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/2";
+		  loccopy->val.closure.arg1 = new_arg1;
 
+	  }
+	  liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  //liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/2";
+
+	  DBG(out << "Checking liveness corresponding to " << liveness_string << endl);
 	  liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
-	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
+		  DBG(out << "Doing GC corresponding to " << liveness_string << endl);
 		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second, out);
-		  loccopy->val.closure.arg2 = new_arg2;
 		  DBG(out << "Copied arg2 from " << loccopy->val.closure.arg2 << " to " << new_arg2 <<endl);
+		  loccopy->val.closure.arg2 = new_arg2;
+
 	  }
   }
   break;
   case funcApplicationExprClosure:
   case funcArgClosure:
   {
+	  DBG(out << "Processing FuncApp/FuncArg " << endl);
 	  if (loc->forward != NULL)
 		  return static_cast<cons*>(loc->forward);
 
 	  loccopy = copy(loc, out);
 
-	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+	  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
 	  //TODO : How to get the argument position for the argument?
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) ;
-
+	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) ;
+	  DBG(out << "Checking liveness corresponding to " << liveness_string << endl);
 	  auto liveness_state = statemap.find(liveness_string);
 	  if (liveness_state != statemap.end())
 	  {
-	    //cerr << "Doing GC corresponding to " << liveness_string << endl;
+		  DBG(out << "Doing GC corresponding to " << liveness_string << endl);
 		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second, out);
-		  loccopy->val.closure.arg2 = new_arg2;
 		  DBG(out << "Copied arg2 from " << loccopy->val.closure.arg2 << " to " << new_arg2 <<endl);
+		  loccopy->val.closure.arg2 = new_arg2;
+
 	  }
 
 	  if (loccopy->val.closure.arg1 != NULL)
@@ -2063,8 +2085,9 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  auto liveness_state = statemap.find("L/-1/c");
 		  //Using dummy state to always make it live
 		  auto new_arg1 = followpaths(loccopy->val.closure.arg1, liveness_state->second, out);
-		  loccopy->val.closure.arg1 = new_arg1;
 		  DBG(out << "Copied arg1 from " << loccopy->val.closure.arg1 << " to " << new_arg1 <<endl);
+		  loccopy->val.closure.arg1 = new_arg1;
+
 	  }
   }
   break;

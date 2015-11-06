@@ -3,10 +3,12 @@
     (let ((l (cons one l1)))
       (let ((c (null? l)))
 	(if c
-	    (let ((ret (car l)))
-	      ret)
-	    (let ((ans 1))
-	      ans))))))
+	    (let ((ret1 (car l)))
+	      (let ((ret (cons ret1 l2)))
+	      ret))
+	    (let ((ans1 1))
+	      (let ((ans (cons ans1 l3)))
+	      ans)))))))
 
 
 (let ((a0 '()))

@@ -212,7 +212,8 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
 
     localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "1", arg_1_demand }});
     cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(1) << endl;
-    localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "2", arg_2_demand }});
+    (*(localLivenessMap[getLabel() + "/" + current_label ]))["2"] = arg_2_demand;
+    //localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "2", arg_2_demand }});
     cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(2) << endl;
 
 
@@ -432,7 +433,8 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
                 p.push_front(prefix + std::to_string(index));
                 arg_demand.insert(p);
             }
-            localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ to_string(index), arg_demand }});
+            (*localLivenessMap[getLabel() + "/" + current_label ])[to_string(index)] = arg_demand;
+            //localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ to_string(index), arg_demand }});
             result = merge(result, (*iter)->transformDemandRef(arg_demand));
             live_var_set.insert(((IdExprNode*)(*iter))->getLabel());
         }
@@ -491,7 +493,7 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     	Scheme::Demands::demand_grammar* var_gram = p.second->second;
     	for (auto g : (*var_gram))
     	{
-    		std::string liveness_label = "L/" + p.first + "/" + g.first; //change it to LF
+    		std::string liveness_label = "L/" + p.first + "/" + g.first;
     		((*dem_grams)[liveness_label]).insert(g.second.begin(), g.second.end());
     	}
     
@@ -509,6 +511,9 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     			arg_demands->emplace(func_demand_prefix + SEPARATOR + std::to_string(++index),
     					arg_demand_pair->second);
 
+    			cout << "Adding liveness for argument for program point " << ("L" + SEPARATOR + p.first + SEPARATOR + arg->getIDStr()) << endl;
+    			gLivenessData["L" + SEPARATOR + p.first + SEPARATOR + arg->getIDStr()] = arg_demand_pair->second;
+
     			(gLivenessData["T" + SEPARATOR + pID->getIDStr() + SEPARATOR + std::to_string(index)]).insert(arg_demand_pair->second.begin(), arg_demand_pair->second.end());
 
     		}
@@ -517,7 +522,6 @@ unordered_map<string, expr_demand_grammars*> DefineNode::transformDemand(const r
     			//This can happen when an argument to the function is not used in one of the branch.
     			//In such a case a null demand will be added.
     			//TODO : is there a better way?
-
     			rule null_demand;
     			((*arg_demands)[func_demand_prefix + SEPARATOR + std::to_string(++index)]).insert(null_demand.begin(), null_demand.end());
 
