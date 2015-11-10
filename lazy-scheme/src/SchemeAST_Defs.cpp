@@ -183,7 +183,7 @@ cons* ReturnExprNode::evaluate()
 {
 
 	curr_return_addr = getLabel();
-	DBG(cout << "At return updating curr_return_address to " << curr_return_addr << endl);
+//	DBG(cout << "At return updating curr_return_address to " << curr_return_addr << endl);
 	std::string varName = this->pID->getName();
 	cons* retval = (cons*)lookup_addr(varName.c_str());
 
@@ -194,10 +194,10 @@ cons* ReturnExprNode::evaluate()
 	{
 
 		cons* heap_cell = (cons*)vhit->ref;
-		DBG(cout << "Processing variable " << vhit->varname <<  " is_param " << vhit-> is_param << endl);
+//		DBG(cout << "Processing variable " << vhit->varname <<  " is_param " << vhit-> is_param << endl);
 		if (vhit->is_param)
 		{
-			DBG(cout << "Processing a parameter, not updating prog point" << endl);
+//			DBG(cout << "Processing a parameter, not updating prog point" << endl);
 			continue;
 		}
 
@@ -212,27 +212,27 @@ cons* ReturnExprNode::evaluate()
 				break;
 			case unaryprimopExprClosure:
 			{
-				cout << "Unaryprimop" << endl;
+//				cout << "Unaryprimop" << endl;
 				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
 				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
-				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+//				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
 				break;
 			}
 			case binaryprimopExprClosure:
 			{
 				assert(!heap_cell->inWHNF);
-				cout << "Binaryprimop" << endl;
+//				cout << "Binaryprimop" << endl;
 				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
 				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
-				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+//				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
 				arg_num = heap_cell->val.closure.arg2_name->substr(heap_cell->val.closure.arg2_name->rfind("/")+1);
 				heap_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
-				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+//				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
 				break;
 			}
 			case funcApplicationExprClosure:
 			{
-				cout << "FuncApp" << endl;
+//				cout << "FuncApp" << endl;
 				auto funcCallExpr = (FuncExprNode*)heap_cell->val.closure.expr;
 				auto num_args = funcCallExpr->getNumArgs();
 				if (num_args > 0)
@@ -240,10 +240,10 @@ cons* ReturnExprNode::evaluate()
 					auto curr_cell = heap_cell;
 					while (num_args > 0)
 					{
-						cout << "Processing arg" << (funcCallExpr->getArgs().size() - num_args + 1) << endl;
+//						cout << "Processing arg" << (funcCallExpr->getArgs().size() - num_args + 1) << endl;
 						auto arg_num = curr_cell->val.closure.arg2_name->substr(curr_cell->val.closure.arg2_name->rfind("/")+1);
 						curr_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
-						cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+//						cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
 						--num_args;
 						curr_cell = curr_cell->val.closure.arg1;
 					}
@@ -499,15 +499,15 @@ cons* IfExprNode::evaluate()
 {
 
 	curr_return_addr = getLabel();
-	DBG(cout << "At If updating curr_return_address to " << curr_return_addr << endl);
+//	DBG(cout << "At If updating curr_return_address to " << curr_return_addr << endl);
 	for(vector<var_heap>::iterator vhit = actRecStack.begin()->heapRefs.begin(); vhit != actRecStack.begin()->heapRefs.end(); ++vhit)
 	{
 
 		cons* heap_cell = (cons*)vhit->ref;
-		DBG(cout << "Processing variable " << vhit->varname <<  " is_param " << vhit-> is_param << endl);
+//		DBG(cout << "Processing variable " << vhit->varname <<  " is_param " << vhit-> is_param << endl);
 		if (vhit->is_param)
 		{
-			DBG(cout << "Processing a parameter, not updating prog point" << endl);
+//			DBG(cout << "Processing a parameter, not updating prog point" << endl);
 			continue;
 		}
 
@@ -522,28 +522,28 @@ cons* IfExprNode::evaluate()
 				break;
 			case unaryprimopExprClosure:
 			{
-				cout << "Unaryprimop" << endl;
+//				cout << "Unaryprimop" << endl;
 				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
-				cout << "Updating argument prg_pt " << *(heap_cell->val.closure.arg1_name)  << " to " << this->getLabel() + "/" + arg_num <<
-						" for " << vhit->varname << endl;
+//				cout << "Updating argument prg_pt " << *(heap_cell->val.closure.arg1_name)  << " to " << this->getLabel() + "/" + arg_num <<
+//						" for " << vhit->varname << endl;
 				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
 				break;
 			}
 			case binaryprimopExprClosure:
 			{
 				assert(!heap_cell->inWHNF);
-				cout << "Binaryprimop" << endl;
+//				cout << "Binaryprimop" << endl;
 				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
 				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
-				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+//				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
 				arg_num = heap_cell->val.closure.arg2_name->substr(heap_cell->val.closure.arg2_name->rfind("/")+1);
 				heap_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
-				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+//				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
 				break;
 			}
 			case funcApplicationExprClosure:
 			{
-				cout << "FuncApp" << endl;
+//				cout << "FuncApp" << endl;
 				auto funcCallExpr = (FuncExprNode*)heap_cell->val.closure.expr;
 				auto num_args = funcCallExpr->getNumArgs();
 				if (num_args > 0)
@@ -551,10 +551,10 @@ cons* IfExprNode::evaluate()
 					auto curr_cell = heap_cell;
 					while (num_args > 0)
 					{
-						cout << "Processing arg" << (funcCallExpr->getArgs().size() - num_args + 1) << endl;
+//						cout << "Processing arg" << (funcCallExpr->getArgs().size() - num_args + 1) << endl;
 						auto arg_num = curr_cell->val.closure.arg2_name->substr(curr_cell->val.closure.arg2_name->rfind("/")+1);
 						curr_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
-						cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+//						cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
 						--num_args;
 						curr_cell = curr_cell->val.closure.arg1;
 					}

@@ -1785,7 +1785,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 void update_heap_ref_stack(ostream& out, int gc_type)
 {
 	stack<cons*> temp;
-	DBG(cerr<<"Number of elements on print stack "<<print_stack.size()<<endl);
+//	DBG(cerr<<"Number of elements on print stack "<<print_stack.size()<<endl);
 	int j = 0;
 	cons* prev_freept = (cons*)freept;
 	while(!print_stack.empty())
@@ -1823,7 +1823,7 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 		print_stack.pop();
 		if (prev_freept != freept)
 		{
-			DBG(cerr<<"Copied " << ((cons*)freept-prev_freept)<< " for " << j << "th element on print stack"<<endl);
+//			DBG(cerr<<"Copied " << ((cons*)freept-prev_freept)<< " for " << j << "th element on print stack"<<endl);
 			prev_freept = (cons*)freept;
 		}
 		++j;
