@@ -277,6 +277,9 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
 
     liveness_set_map[label] = live_var_set;
 
+    func_heap_cell_reqd[pThen->getLabel()] = this->pThen->heap_cells_required;
+    func_heap_cell_reqd[pElse->getLabel()] = this->pElse->heap_cells_required;
+
     heap_cells_required = (pThen->heap_cells_required > pElse->heap_cells_required) ?
     		                        pThen->heap_cells_required
 								  : pElse->heap_cells_required;

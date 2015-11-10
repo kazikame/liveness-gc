@@ -735,6 +735,7 @@ cons* LetExprNode::evaluate()
 
 	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
 
+	DBG(cout<<"In let expr " << getLabel() << endl);
 
 	//We need the prgm pt of the enclosing let expr while creating liveness automata
 	this->getVarExpr()->parent_let_pgmpt = getLabel();
@@ -742,6 +743,7 @@ cons* LetExprNode::evaluate()
 	{
 		FuncExprNode* funExpr = (FuncExprNode*)getVarExpr();
 		funExpr->parent_let_pgmpt = getLabel();
+		DBG(cout << "Current heap cell before creating closure " << current_heap()<< " for function " << funExpr->getFunction()<<endl);
 	}
 	
 
@@ -1538,6 +1540,7 @@ cons* FuncExprNode::evaluate()
 				last_gc_clock = GC_STAT_GET_CLOCK();
 			}
 		}
+		DBG(cout << "Allocating for function " << getFunction() << " requires " << num_cells_reqd << " current heap is " << current_heap() << endl);
 		if (current_heap() < num_cells_reqd)
 		{
 
@@ -1552,11 +1555,11 @@ cons* FuncExprNode::evaluate()
 			GC_STAT_DUMP_GARBAGE_STATS();
 			//				return_stack().return_point = curr_let_pgmpt;
 
-
-			if (current_heap() < heap_cells_required)
+			DBG(cout << "Current heap = " << current_heap() << " heap_cells_required= " << num_cells_reqd << " num arguments= " << pListArgs->size() << endl);
+			if (current_heap() < num_cells_reqd)
 			{
 
-				cout << "heap cells required " << heap_cells_required << endl;
+				cout << "heap cells required " << num_cells_reqd << endl;
 				cout << "current heap size " << current_heap() << endl;
 
 				fprintf(stderr,"No Sufficient Memory - cons\n");
@@ -1586,6 +1589,7 @@ cons* FuncExprNode::evaluate()
 		}
 	}
 
+	DBG(cout << "Current heap size " << current_heap() << endl);
 	cons *temp = funcDef->getFunctionBody()->evaluate();
 	assert(temp->inWHNF);
 
@@ -1608,6 +1612,7 @@ cons* FuncExprNode::make_closure()
 {
 	int num_args = pListArgs->size() - 1;
 	int size = pListArgs->size();
+	DBG(cout << "Current heap cell while creating closure " << current_heap()<< " for function " << getFunction()<<endl);
 	cons* retval = (cons*)allocate_cons();
 	auto rarglistiter = this->pListArgs->rbegin();
 
@@ -1644,6 +1649,7 @@ cons* FuncExprNode::make_closure()
 			--num_args;
 		}
 	}
+	DBG(cout << "Current heap cell after creating closure " << current_heap()<< " for function " << getFunction()<<endl);
 	retval->closure_id = ++closure_count;
 	return retval;
 }

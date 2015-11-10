@@ -657,6 +657,7 @@ int check_space(int size)
     {
     	cout << "Boundary Live = "<<boundary_live << endl;
     	cout << "Freept = " << freept << endl;
+    	assert(false);
     	return 0;
     }
 }
