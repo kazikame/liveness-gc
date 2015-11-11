@@ -657,7 +657,6 @@ int check_space(int size)
     {
     	cout << "Boundary Live = "<<boundary_live << endl;
     	cout << "Freept = " << freept << endl;
-    	assert(false);
     	return 0;
     }
 }
@@ -1865,7 +1864,7 @@ void liveness_gc()
 {
 	clock_t pstart = clock();
 	 ++gccount;
-	 DBG(cerr << "Starting LGC#"<<gccount<<endl);
+//	 DBG(cerr << "Starting LGC#"<<gccount<<endl);
 #ifdef ENABLE_SHARING_STATS
 	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
 			  ((cons*)i)->visited = 0;
@@ -1879,7 +1878,7 @@ void liveness_gc()
 	  pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl;
 
 	  ofstream pregc("PreGC" + to_string(gccount) + ".txt", ios_base::out);
-	  //create_heap_bft(pregc);
+	  create_heap_bft(pregc);
 	  pregc.close();
 
 	  print_activation_record_stack(pre);
@@ -1927,7 +1926,7 @@ void liveness_gc()
 #ifdef __DEBUG__GC
 	pre.close();
 	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
-	//create_heap_bft(postgc);
+	create_heap_bft(postgc);
 	postgc.close();
 #endif
 #ifdef ENABLE_SHARING_STATS
@@ -2065,20 +2064,24 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 
 	  loccopy = copy(loc, out);
 
-	  string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
-	  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
-	  //TODO : How to get the argument position for the argument?
-	  //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) ;
-	  DBG(out << "Checking liveness corresponding to " << liveness_string << endl);
-	  auto liveness_state = statemap.find(liveness_string);
-	  if (liveness_state != statemap.end())
-	  {
-		  DBG(out << "Doing GC corresponding to " << liveness_string << endl);
-		  auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second, out);
-		  DBG(out << "Copied arg2 from " << loccopy->val.closure.arg2 << " to " << new_arg2 <<endl);
-		  loccopy->val.closure.arg2 = new_arg2;
+	 if (loccopy->val.closure.arg2 != NULL)
+	 {
 
-	  }
+		 string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) + "/" + *(loccopy->val.closure.arg2_name);
+		 DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
+		 //TODO : How to get the argument position for the argument?
+		 //string liveness_string = "L/" + *(loccopy->val.closure.prog_pt) ;
+		 DBG(out << "Checking liveness corresponding to " << liveness_string << endl);
+		 auto liveness_state = statemap.find(liveness_string);
+		 if (liveness_state != statemap.end())
+		 {
+			 DBG(out << "Doing GC corresponding to " << liveness_string << endl);
+			 auto new_arg2 = followpaths(loccopy->val.closure.arg2, liveness_state->second, out);
+			 DBG(out << "Copied arg2 from " << loccopy->val.closure.arg2 << " to " << new_arg2 <<endl);
+			 loccopy->val.closure.arg2 = new_arg2;
+
+		 }
+	 }
 
 	  if (loccopy->val.closure.arg1 != NULL)
 	  {

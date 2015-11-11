@@ -511,7 +511,7 @@ cons* IfExprNode::evaluate()
 			continue;
 		}
 
-		if (!heap_cell->inWHNF)
+		if (heap_cell && !heap_cell->inWHNF)
 		{
 			switch(heap_cell->typecell)
 			{
@@ -592,14 +592,44 @@ cons* IfExprNode::evaluate()
 	assert(cond_resultValue->typecell == constBoolExprClosure);
 	cons* retval;
 
-	if (cond_resultValue->val.boolval)
-	{
-		retval = this->pThen->evaluate();
-	}
-	else
-	{
-		retval = this->pElse->evaluate();
-	}
+    auto cond_val = cond_resultValue->val.boolval;
+
+    if (gc_status != gc_disable && (gc_status == gc_live || gc_status == gc_freq))
+    {
+
+    	auto num_cells_required = cond_val?func_heap_cell_reqd[pThen->getLabel()]:func_heap_cell_reqd[pElse->getLabel()];
+//    	DBG(cout << "Num heap cells required for the rest of the branch is " << num_cells_required << endl);
+
+    	if (current_heap() < num_cells_required)
+    	{
+    		liveness_gc();
+    		detail_gc();
+    		GC_STAT_DUMP_GARBAGE_STATS();
+
+    		if (current_heap() < num_cells_required)
+    		{
+
+    			cout << "heap cells required " << num_cells_required << endl;
+    			cout << "current heap size " << current_heap() << endl;
+
+    			fprintf(stderr,"No Sufficient Memory - cons\n");
+    			throw bad_alloc();
+    		}
+
+    	}
+    }
+
+//	if (cond_resultValue->val.boolval)
+//	{
+//		retval = this->pThen->evaluate();
+//	}
+//	else
+//	{
+//		retval = this->pElse->evaluate();
+//	}
+
+	auto resExpr = cond_val ? pThen : pElse;
+	retval = resExpr->evaluate();
 
 	assert(retval->inWHNF);
 	return retval;
@@ -735,7 +765,7 @@ cons* LetExprNode::evaluate()
 
 	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
 
-	DBG(cout<<"In let expr " << getLabel() << endl);
+//	DBG(cout<<"In let expr " << getLabel() << endl);
 
 	//We need the prgm pt of the enclosing let expr while creating liveness automata
 	this->getVarExpr()->parent_let_pgmpt = getLabel();
@@ -743,7 +773,7 @@ cons* LetExprNode::evaluate()
 	{
 		FuncExprNode* funExpr = (FuncExprNode*)getVarExpr();
 		funExpr->parent_let_pgmpt = getLabel();
-		DBG(cout << "Current heap cell before creating closure " << current_heap()<< " for function " << funExpr->getFunction()<<endl);
+
 	}
 	
 
@@ -1418,7 +1448,9 @@ cons* BinaryPrimExprNode::evaluateEQ()
 		return heap_cell;
 
 
+
 	update_heap_refs.push(heap_cell->val.closure.arg1);
+
 	cons* arg1 = reduceParamToWHNF(heap_cell->val.closure.arg1);
 
 	assert(arg1 == update_heap_refs.top());
@@ -1435,6 +1467,7 @@ cons* BinaryPrimExprNode::evaluateEQ()
 	update_heap_refs.push(arg1);
 
 	update_heap_refs.push(heap_cell->val.closure.arg2);
+
 	cons* arg2 = reduceParamToWHNF(heap_cell->val.closure.arg2);
 
 	assert(arg2 == update_heap_refs.top());
@@ -1540,7 +1573,7 @@ cons* FuncExprNode::evaluate()
 				last_gc_clock = GC_STAT_GET_CLOCK();
 			}
 		}
-		DBG(cout << "Allocating for function " << getFunction() << " requires " << num_cells_reqd << " current heap is " << current_heap() << endl);
+
 		if (current_heap() < num_cells_reqd)
 		{
 
@@ -1555,7 +1588,7 @@ cons* FuncExprNode::evaluate()
 			GC_STAT_DUMP_GARBAGE_STATS();
 			//				return_stack().return_point = curr_let_pgmpt;
 
-			DBG(cout << "Current heap = " << current_heap() << " heap_cells_required= " << num_cells_reqd << " num arguments= " << pListArgs->size() << endl);
+
 			if (current_heap() < num_cells_reqd)
 			{
 
@@ -1589,7 +1622,7 @@ cons* FuncExprNode::evaluate()
 		}
 	}
 
-	DBG(cout << "Current heap size " << current_heap() << endl);
+
 	cons *temp = funcDef->getFunctionBody()->evaluate();
 	assert(temp->inWHNF);
 
@@ -1612,7 +1645,7 @@ cons* FuncExprNode::make_closure()
 {
 	int num_args = pListArgs->size() - 1;
 	int size = pListArgs->size();
-	DBG(cout << "Current heap cell while creating closure " << current_heap()<< " for function " << getFunction()<<endl);
+
 	cons* retval = (cons*)allocate_cons();
 	auto rarglistiter = this->pListArgs->rbegin();
 
@@ -1649,7 +1682,7 @@ cons* FuncExprNode::make_closure()
 			--num_args;
 		}
 	}
-	DBG(cout << "Current heap cell after creating closure " << current_heap()<< " for function " << getFunction()<<endl);
+
 	retval->closure_id = ++closure_count;
 	return retval;
 }

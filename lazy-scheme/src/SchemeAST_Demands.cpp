@@ -152,7 +152,8 @@ expr_demand_grammars * UnaryPrimExprNode::transformDemandRef(const rule & demand
 
     label_set.insert(pArg->label_set.begin(), pArg->label_set.end());
 
-    live_var_set.insert(((IdExprNode*)pArg)->getLabel());
+//    live_var_set.insert(((IdExprNode*)pArg)->getLabel());
+    live_var_set.insert(((IdExprNode*)pArg)->getIDStr());
 
 
     heap_cells_required = 1;
@@ -218,8 +219,10 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
 
 
 //    cout << "Inserting to liveness set " << (((IdExprNode*)pArg1)->getLabel()) << endl;
-    live_var_set.insert(((IdExprNode*)pArg1)->getLabel());
-    live_var_set.insert(((IdExprNode*)pArg2)->getLabel());
+//    live_var_set.insert(((IdExprNode*)pArg1)->getLabel());
+//    live_var_set.insert(((IdExprNode*)pArg2)->getLabel());
+    live_var_set.insert(((IdExprNode*)pArg1)->getIDStr());
+    live_var_set.insert(((IdExprNode*)pArg2)->getIDStr());
 
     heap_cells_required = 2;
     return result;
@@ -249,8 +252,8 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
     //Create a new label and insert it in the map, along with the liveness for the condition variable
     string cond_variable = ((IdExprNode*)pCond)->getIDStr();
 
-    pThen->transformDemand(demand);
-    pElse->transformDemand(demand);
+    auto thendemands = pThen->transformDemand(demand);
+    auto elsedemands = pElse->transformDemand(demand);
 
 
    auto result = new expr_demand_grammars({ new demand_grammar({{ label, rule({path({TXb})})}}),
@@ -276,6 +279,7 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
     live_var_set.insert(cond_variable);
 
     liveness_set_map[label] = live_var_set;
+
 
     func_heap_cell_reqd[pThen->getLabel()] = this->pThen->heap_cells_required;
     func_heap_cell_reqd[pElse->getLabel()] = this->pElse->heap_cells_required;
@@ -425,7 +429,7 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
         //TODO: How do we disambiguate the labels for each argument?
         localLivenessMap[getLabel() + "/" + current_label] = new demand_grammar({{ to_string(index), arg_demand }});
 //        cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(index) << endl;
-        live_var_set.insert(((IdExprNode*)(*iter))->getLabel());
+        live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());
 
 
         while(++iter != pListArgs->end())
@@ -439,7 +443,7 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
             (*localLivenessMap[getLabel() + "/" + current_label ])[to_string(index)] = arg_demand;
             //localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ to_string(index), arg_demand }});
             result = merge(result, (*iter)->transformDemandRef(arg_demand));
-            live_var_set.insert(((IdExprNode*)(*iter))->getLabel());
+            live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());
         }
 
         result->first->emplace(label, demand);
