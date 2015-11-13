@@ -350,7 +350,7 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 			}
 			else
 			{
-				cout << "Adding null demand for " << l << " as it does not contribute to liveness at " << getLabel() << endl;
+//				cout << "Adding null demand for " << l << " as it does not contribute to liveness at " << getLabel() << endl;
 				//Add an empty demand corresponding to the label when there is no demand
 				auto let_expr_demand = pExpr->transformDemandRef(rule {});
 				expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);

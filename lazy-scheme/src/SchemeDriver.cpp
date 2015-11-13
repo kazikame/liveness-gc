@@ -125,7 +125,7 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 //	cout << "Number of program points " << prog_pts.size() << endl;
 	for(auto p : prog_pts)
 	{
-		cout << "Processing program point " << p.first << endl;
+//		cout << "Processing program point " << p.first << endl;
 		std::unordered_set<std::string> label_set = p.second->label_set;
 		string key = make_key(label_set);
 		if (livenessData.find(p.first) == livenessData.end())
@@ -134,7 +134,7 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 			livenessData[p.first] = new Scheme::Demands::expr_demand_grammars({ new Scheme::Demands::demand_grammar, new Scheme::Demands::demand_grammar});
 			for (auto l : label_set)
 			{
-				cout << "Label = " << l << endl;
+//				cout << "Label = " << l << endl;
 				assert(livenessMap[l]);
 				if (livenessMap[l])
 				{
@@ -168,16 +168,16 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 		for (auto g : (*var_gram))
 		{
 			std::string liveness_label = "L/" + p.first + "/" + g.first;
-			cout << "g.first = " << g.first << " liveness label" << liveness_label << endl;
+//			cout << "g.first = " << g.first << " liveness label" << liveness_label << endl;
 			if ( prog_pts.find(pgmpt) != prog_pts.end() &&
 					prog_pts[pgmpt]->label_set.size() > 1)
 			{
-				cout << "Handling if statement " << prog_pts[pgmpt]->label_set.size() << endl;
+//				cout << "Handling if statement " << prog_pts[pgmpt]->label_set.size() << endl;
 				for (auto l : prog_pts[pgmpt]->label_set)
 				{
 
 					auto curr_pgm_pt = p.first.substr(0, p.first.find("/"));
-					cout << "Looking for liveness value " << curr_pgm_pt + "/" + l << endl;
+//					cout << "Looking for liveness value " << curr_pgm_pt + "/" + l << endl;
 					if (localLivenessMap.find(curr_pgm_pt + "/" + l) != localLivenessMap.end())
 					{
 						auto dem =  localLivenessMap[curr_pgm_pt + "/" + l];
