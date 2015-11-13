@@ -269,10 +269,9 @@ unordered_map<string, expr_demand_grammars*> IfExprNode::transformDemand(const r
     label_set.insert(pElse->label_set.begin(), pElse->label_set.end());
 
     current_label = label;
+
     //TODO: How do I insert the liveness of variables at this point?
     //Merge the liveness of then, else and condition and add it to liveness map
-
-
 
     live_var_set.insert(pThen->live_var_set.begin(), pThen->live_var_set.end());
     live_var_set.insert(pElse->live_var_set.begin(), pElse->live_var_set.end());
@@ -347,6 +346,15 @@ unordered_map<string, expr_demand_grammars*> LetExprNode::transformDemand(const 
 				expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);
 				gLivenessMap[l] = res;
 
+
+			}
+			else
+			{
+				cout << "Adding null demand for " << l << " as it does not contribute to liveness at " << getLabel() << endl;
+				//Add an empty demand corresponding to the label when there is no demand
+				auto let_expr_demand = pExpr->transformDemandRef(rule {});
+				expr_demand_grammars* res = merge(gLivenessMap[l], let_expr_demand);
+				gLivenessMap[l] = res;
 
 			}
 

@@ -1864,7 +1864,7 @@ void liveness_gc()
 {
 	clock_t pstart = clock();
 	 ++gccount;
-//	 DBG(cerr << "Starting LGC#"<<gccount<<endl);
+	 DBG(cout << "Starting LGC#"<<gccount<<endl);
 #ifdef ENABLE_SHARING_STATS
 	  for (void* i = buffer_dead; i < boundary_dead ; i += sizeof(cons))
 			  ((cons*)i)->visited = 0;

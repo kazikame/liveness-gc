@@ -286,14 +286,14 @@
                   (let ((_var152 (eq? _var151
                                       _var153)))
                        (if _var152
-                           (let ((_var155 516))
+                           (let ((_var155 6))
                                 (let ((_var157 "empty"))
                                      (let ((_var159 ()))
                                           (let ((_var158 (cons _var157
                                                                _var159)))
                                                (let ((a (readTree _var155
                                                                   _var158)))
-                                                    (let ((_var162 1530))
+                                                    (let ((_var162 15))
                                                          (let ((_var164 "empty"))
                                                               (let ((_var166 '()))
                                                                    (let ((_var165 (cons _var164
