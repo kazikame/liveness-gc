@@ -765,7 +765,7 @@ cons* LetExprNode::evaluate()
 
 	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
 
-	cout<<"In let expr " << getLabel() << endl;
+	DBG(cout<<"In let expr " << getLabel() << endl);
 
 	//We need the prgm pt of the enclosing let expr while creating liveness automata
 	this->getVarExpr()->parent_let_pgmpt = getLabel();
