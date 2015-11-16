@@ -1,0 +1,15 @@
+(define (fun x)
+  (let ((a 5))
+    (let ((b 10))
+      (let ((c (+ a b)))
+	(let ((d (< x c)))
+	  (if d
+	      (let ((y 7))
+		(let ((z (+ x y)))
+		  (let ((res (+ z a)))
+		    res)))
+	      c))))))
+
+(let ((val 7))
+  (let ((res (fun val)))
+    res))

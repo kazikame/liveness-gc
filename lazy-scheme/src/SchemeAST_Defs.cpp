@@ -765,7 +765,7 @@ cons* LetExprNode::evaluate()
 
 	//If VarExpr is a function call, store the pgmpt of the let as the return point for liveness based GC 
 
-//	DBG(cout<<"In let expr " << getLabel() << endl);
+	DBG(cout<<"In let expr " << getLabel() << endl);
 
 	//We need the prgm pt of the enclosing let expr while creating liveness automata
 	this->getVarExpr()->parent_let_pgmpt = getLabel();
@@ -778,6 +778,9 @@ cons* LetExprNode::evaluate()
 	
 
 	cons* var_res = this->getVarExpr()->make_closure();
+
+	DBG(cout << "Created let expr at " << var_res << endl);
+
 	cons* retval = this->getBody()->evaluate();
 	assert(retval->inWHNF && is_valid_address(retval));
 
@@ -1100,6 +1103,8 @@ cons* BinaryPrimExprNode::make_closure()
 {
 	cons* retval = (cons*) allocate_cons();
 
+
+
 	if (type != consExpr)
 	{
 		retval->val.closure.arg1 = pArg1->make_closure();
@@ -1111,6 +1116,9 @@ cons* BinaryPrimExprNode::make_closure()
 		retval->val.closure.arg2_name = new string(curr_return_addr + "/2");
 		retval->val.closure.prog_pt = new string(getLabel());
 		retval->closure_id = ++closure_count;
+
+		DBG(cout << "Arg1 = " << retval->val.closure.arg1<<endl);
+		DBG(cout << "Arg2 = " << retval->val.closure.arg2<<endl);
 	}
 	else
 	{
@@ -1119,7 +1127,11 @@ cons* BinaryPrimExprNode::make_closure()
 		retval->typecell = consExprClosure;
 		retval->inWHNF = true;
 		retval->closure_id = ++closure_count;
+		DBG(cout << "CAR = " << retval->val.cell.car<<endl);
+		DBG(cout << "CDR = " << retval->val.cell.cdr<<endl);
 	}
+
+
 
 	return retval;
 }
@@ -1450,9 +1462,9 @@ cons* BinaryPrimExprNode::evaluateEQ()
 
 
 	update_heap_refs.push(heap_cell->val.closure.arg1);
-
+	DBG(cout << "Arg1 = " << *(heap_cell->val.closure.arg1_name) << endl);
 	cons* arg1 = reduceParamToWHNF(heap_cell->val.closure.arg1);
-
+	DBG(cout << "Processing closure " << heap_cell << endl);
 	assert(arg1 == update_heap_refs.top());
 	//CANNOT IMMEDIATELY POP THE FIRST PARAMETER. NEED TO KEEP IT ON THE STACK
 	//SO THAT IF A GC HAPPENS DURING THE PROCESSING OF THE SECOND PARAMETER
@@ -1467,9 +1479,9 @@ cons* BinaryPrimExprNode::evaluateEQ()
 	update_heap_refs.push(arg1);
 
 	update_heap_refs.push(heap_cell->val.closure.arg2);
-
+	DBG(cout << "Processing closure " << heap_cell << endl);
 	cons* arg2 = reduceParamToWHNF(heap_cell->val.closure.arg2);
-
+	DBG(cout << "Arg2 = " << *(heap_cell->val.closure.arg2_name) << endl);
 	assert(arg2 == update_heap_refs.top());
 	update_heap_refs.pop();
 	//NOW IT CAN BE SAFELY TRANSFERRED. THEN POP THE FIRST ARGUMENT ALSO.

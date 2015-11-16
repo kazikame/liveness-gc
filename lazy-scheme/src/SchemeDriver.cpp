@@ -130,10 +130,11 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 		string key = make_key(label_set);
 		if (livenessData.find(p.first) == livenessData.end())
 		{
-			//cout << "Processing liveness key " << p.first << endl;
+
 			livenessData[p.first] = new Scheme::Demands::expr_demand_grammars({ new Scheme::Demands::demand_grammar, new Scheme::Demands::demand_grammar});
 			for (auto l : label_set)
 			{
+//				cout << "Label = " << l << endl;
 				assert(livenessMap[l]);
 				if (livenessMap[l])
 				{
@@ -147,12 +148,15 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 	for (auto p : livenessData)
 	{
 		Scheme::Demands::demand_grammar* var_gram = p.second->second;
+
 		for (auto g : (*var_gram))
 		{
 			std::string liveness_label = "L/" + p.first + "/" + g.first;
 			(*combined_grammar)[liveness_label] = g.second;
 		}
 	}
+
+
 
 	for (auto p : localLivenessMap)
 	{
@@ -164,7 +168,7 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 		for (auto g : (*var_gram))
 		{
 			std::string liveness_label = "L/" + p.first + "/" + g.first;
-//			cout << "g.first = " << g.first << endl;
+//			cout << "g.first = " << g.first << " liveness label" << liveness_label << endl;
 			if ( prog_pts.find(pgmpt) != prog_pts.end() &&
 					prog_pts[pgmpt]->label_set.size() > 1)
 			{
