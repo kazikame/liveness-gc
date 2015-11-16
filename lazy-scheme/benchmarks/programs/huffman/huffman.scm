@@ -1,5 +1,19 @@
+(define nil '())
+
+(define (list1 x)
+  (cons x nil))
+
+(define (list2 x y)
+  (cons x (list1 y)))
+
+(define (list3 x y z)
+  (cons x (list2 y z)))
+
+(define (list4 x y z w)
+  (cons x (list3 y z w)))
+
 (define (make-leaf symbol weight)
-  (list 'leaf symbol weight))
+  (list3 'leaf symbol weight))
 
 (define (leaf? object)
   (eq? (car object) 'leaf))
@@ -9,10 +23,10 @@
 (define (weight-leaf x) (car (cdr (cdr x))))
 
 (define (make-code-tree left right)
-  (list left
-        right
-        (append (symbols left) (symbols right))
-        (+ (weight left) (weight right))))
+  (list4 left
+	 right
+	 (append (symbols left) (symbols right))
+	 (+ (weight left) (weight right))))
 
 (define (left-branch tree) (car tree))
 
@@ -20,7 +34,7 @@
 
 (define (symbols tree)
   (if (leaf? tree)
-      (list (symbol-leaf tree))
+      (list1 (symbol-leaf tree))
       (car (cdr (cdr tree)))))
 
 (define (weight tree)
@@ -30,7 +44,7 @@
 
 (define (decode-1 bits current-branch tree)
   (if (null? bits)
-      '()
+      nil
       (let ((next-branch
 	     (choose-branch (car bits) current-branch)))
 	(if (leaf? next-branch)
@@ -48,14 +62,14 @@
 
 (define (adjoin-set x set)
   (if (null? set)
-      (list x)
+      (list1 x)
       (if (< (weight x) (weight (car set)))
 	  (cons x set)
 	  (cons (car set) (adjoin-set x (cdr set))))))
 
 (define (make-leaf-set pairs)
   (if (null? pairs)
-      '()
+      nil
       (let ((pair (car pairs)))
         (adjoin-set (make-leaf (car pair)         ; symbol
                                (car (cdr pair)))  ; frequency
@@ -63,13 +77,13 @@
 
 (define (encode message tree)
   (if (null? message)
-      '()
+      nil
       (append (encode-symbol (car message) tree)
               (encode (cdr message) tree))))
 
 (define (encode-symbol symbol tree) 
   (if (leaf? tree)
-      '()
+      nil
       (if (member symbol (symbols (left-branch tree)))
 	  (cons 0 (encode-symbol symbol (left-branch tree)))	
 	  (cons 1 (encode-symbol symbol (right-branch tree))))))
