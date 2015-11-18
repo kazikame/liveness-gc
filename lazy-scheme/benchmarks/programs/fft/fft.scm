@@ -61,7 +61,7 @@
 
 (define (good-enough? x y)
         (let ((_var27 1))
-             (let ((_var29 100))
+             (let ((_var29 1))
                   (let ((_var28 (/ _var27
                                    _var29)))
                        (let ((_var32 (- x
@@ -647,6 +647,6 @@
                                                           _var335)))
                                           _var334))))))))
 
-(let ((_var337 10))
+(let ((_var337 2))
      (let ((_var338 (main _var337)))
           _var338))

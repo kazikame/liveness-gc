@@ -269,92 +269,88 @@
 (define (print-tree tree)
         tree)
 
-(let ((_var136 "A"))
-     (let ((_var138 4))
-          (let ((_var137 (make-leaf _var136
-                                    _var138)))
-               (let ((_var141 "B"))
-                    (let ((_var143 2))
-                         (let ((_var142 (make-leaf _var141
-                                                   _var143)))
-                              (let ((_var146 "D"))
-                                   (let ((_var148 1))
-                                        (let ((_var147 (make-leaf _var146
-                                                                  _var148)))
-                                             (let ((_var151 "C"))
-                                                  (let ((_var153 1))
-                                                       (let ((_var152 (make-leaf _var151
-                                                                                 _var153)))
-                                                            (let ((_var150 (make-code-tree _var147
-                                                                                           _var152)))
-                                                                 (let ((_var145 (make-code-tree _var142
-                                                                                                _var150)))
-                                                                      (let ((sample-tree (make-code-tree _var137
-                                                                                                         _var145)))
-                                                                           (let ((_var158 0))
-                                                                                (let ((_var160 1))
-                                                                                     (let ((_var162 1))
-                                                                                          (let ((_var164 0))
-                                                                                               (let ((_var166 0))
-                                                                                                    (let ((_var168 1))
-                                                                                                         (let ((_var170 0))
-                                                                                                              (let ((_var172 1))
-                                                                                                                   (let ((_var174 0))
-                                                                                                                        (let ((_var176 1))
-                                                                                                                             (let ((_var178 1))
-                                                                                                                                  (let ((_var180 1))
-                                                                                                                                       (let ((_var182 0))
-                                                                                                                                            (let ((_var184 '()))
-                                                                                                                                                 (let ((_var183 (cons _var182
-                                                                                                                                                                      _var184)))
-                                                                                                                                                      (let ((_var181 (cons _var180
-                                                                                                                                                                           _var183)))
-                                                                                                                                                           (let ((_var179 (cons _var178
-                                                                                                                                                                                _var181)))
-                                                                                                                                                                (let ((_var177 (cons _var176
-                                                                                                                                                                                     _var179)))
-                                                                                                                                                                     (let ((_var175 (cons _var174
-                                                                                                                                                                                          _var177)))
-                                                                                                                                                                          (let ((_var173 (cons _var172
-                                                                                                                                                                                               _var175)))
-                                                                                                                                                                               (let ((_var171 (cons _var170
-                                                                                                                                                                                                    _var173)))
-                                                                                                                                                                                    (let ((_var169 (cons _var168
-                                                                                                                                                                                                         _var171)))
-                                                                                                                                                                                         (let ((_var167 (cons _var166
-                                                                                                                                                                                                              _var169)))
-                                                                                                                                                                                              (let ((_var165 (cons _var164
-                                                                                                                                                                                                                   _var167)))
-                                                                                                                                                                                                   (let ((_var163 (cons _var162
-                                                                                                                                                                                                                        _var165)))
-                                                                                                                                                                                                        (let ((_var161 (cons _var160
-                                                                                                                                                                                                                             _var163)))
-                                                                                                                                                                                                             (let ((sample-message (cons _var158
-                                                                                                                                                                                                                                         _var161)))
-                                                                                                                                                                                                                  (let ((_var198 "A"))
-                                                                                                                                                                                                                       (let ((_var200 "D"))
-                                                                                                                                                                                                                            (let ((_var202 "A"))
-                                                                                                                                                                                                                                 (let ((_var204 "B"))
-                                                                                                                                                                                                                                      (let ((_var206 "B"))
-                                                                                                                                                                                                                                           (let ((_var208 "C"))
-                                                                                                                                                                                                                                                (let ((_var210 "A"))
-                                                                                                                                                                                                                                                     (let ((_var212 '()))
-                                                                                                                                                                                                                                                          (let ((_var211 (cons _var210
-                                                                                                                                                                                                                                                                               _var212)))
-                                                                                                                                                                                                                                                               (let ((_var209 (cons _var208
-                                                                                                                                                                                                                                                                                    _var211)))
-                                                                                                                                                                                                                                                                    (let ((_var207 (cons _var206
-                                                                                                                                                                                                                                                                                         _var209)))
-                                                                                                                                                                                                                                                                         (let ((_var205 (cons _var204
-                                                                                                                                                                                                                                                                                              _var207)))
-                                                                                                                                                                                                                                                                              (let ((_var203 (cons _var202
-                                                                                                                                                                                                                                                                                                   _var205)))
-                                                                                                                                                                                                                                                                                   (let ((_var201 (cons _var200
-                                                                                                                                                                                                                                                                                                        _var203)))
-                                                                                                                                                                                                                                                                                        (let ((_var199 (cons _var198
-                                                                                                                                                                                                                                                                                                             _var201)))
-                                                                                                                                                                                                                                                                                             (let ((_var220 (encode _var199
-                                                                                                                                                                                                                                                                                                                    sample-tree)))
-                                                                                                                                                                                                                                                                                                  (let ((enc-dec (decode _var220
-                                                                                                                                                                                                                                                                                                                         sample-tree)))
-                                                                                                                                                                                                                                                                                                       enc-dec)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))
+(define (make-string n)
+        (let ((_var136 0))
+             (let ((_var137 (= n
+                               _var136)))
+                  (if _var137
+                      (let ((_var138 '()))
+                           _var138)
+                      (let ((_var139 "A"))
+                           (let ((_var141 1))
+                                (let ((_var142 (- n
+                                                  _var141)))
+                                     (let ((_var143 (make-string _var142)))
+                                          (let ((_var140 (cons _var139
+                                                               _var143)))
+                                               _var140)))))))))
+
+(let ((_var145 "A"))
+     (let ((_var147 4))
+          (let ((_var146 (make-leaf _var145
+                                    _var147)))
+               (let ((_var150 "B"))
+                    (let ((_var152 2))
+                         (let ((_var151 (make-leaf _var150
+                                                   _var152)))
+                              (let ((_var155 "D"))
+                                   (let ((_var157 1))
+                                        (let ((_var156 (make-leaf _var155
+                                                                  _var157)))
+                                             (let ((_var160 "C"))
+                                                  (let ((_var162 1))
+                                                       (let ((_var161 (make-leaf _var160
+                                                                                 _var162)))
+                                                            (let ((_var159 (make-code-tree _var156
+                                                                                           _var161)))
+                                                                 (let ((_var154 (make-code-tree _var151
+                                                                                                _var159)))
+                                                                      (let ((sample-tree (make-code-tree _var146
+                                                                                                         _var154)))
+                                                                           (let ((_var167 0))
+                                                                                (let ((_var169 1))
+                                                                                     (let ((_var171 1))
+                                                                                          (let ((_var173 0))
+                                                                                               (let ((_var175 0))
+                                                                                                    (let ((_var177 1))
+                                                                                                         (let ((_var179 0))
+                                                                                                              (let ((_var181 1))
+                                                                                                                   (let ((_var183 0))
+                                                                                                                        (let ((_var185 1))
+                                                                                                                             (let ((_var187 1))
+                                                                                                                                  (let ((_var189 1))
+                                                                                                                                       (let ((_var191 0))
+                                                                                                                                            (let ((_var193 '()))
+                                                                                                                                                 (let ((_var192 (cons _var191
+                                                                                                                                                                      _var193)))
+                                                                                                                                                      (let ((_var190 (cons _var189
+                                                                                                                                                                           _var192)))
+                                                                                                                                                           (let ((_var188 (cons _var187
+                                                                                                                                                                                _var190)))
+                                                                                                                                                                (let ((_var186 (cons _var185
+                                                                                                                                                                                     _var188)))
+                                                                                                                                                                     (let ((_var184 (cons _var183
+                                                                                                                                                                                          _var186)))
+                                                                                                                                                                          (let ((_var182 (cons _var181
+                                                                                                                                                                                               _var184)))
+                                                                                                                                                                               (let ((_var180 (cons _var179
+                                                                                                                                                                                                    _var182)))
+                                                                                                                                                                                    (let ((_var178 (cons _var177
+                                                                                                                                                                                                         _var180)))
+                                                                                                                                                                                         (let ((_var176 (cons _var175
+                                                                                                                                                                                                              _var178)))
+                                                                                                                                                                                              (let ((_var174 (cons _var173
+                                                                                                                                                                                                                   _var176)))
+                                                                                                                                                                                                   (let ((_var172 (cons _var171
+                                                                                                                                                                                                                        _var174)))
+                                                                                                                                                                                                        (let ((_var170 (cons _var169
+                                                                                                                                                                                                                             _var172)))
+                                                                                                                                                                                                             (let ((sample-message (cons _var167
+                                                                                                                                                                                                                                         _var170)))
+                                                                                                                                                                                                                  (let ((_var207 50000))
+                                                                                                                                                                                                                       (let ((_var208 (make-string _var207)))
+                                                                                                                                                                                                                            (let ((_var209 (encode _var208
+                                                                                                                                                                                                                                                   sample-tree)))
+                                                                                                                                                                                                                                 (let ((enc-dec (decode _var209
+                                                                                                                                                                                                                                                        sample-tree)))
+                                                                                                                                                                                                                                      enc-dec))))))))))))))))))))))))))))))))))))))))))))))

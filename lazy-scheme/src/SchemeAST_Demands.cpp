@@ -201,21 +201,22 @@ expr_demand_grammars * BinaryPrimExprNode::transformDemandRef(const rule & deman
         /* x.s + y .s */
     	//Inserting epsilon demands for arguments for primitive functions other than cons
     	path p;
-    	p.push_front(E);
+    	p.push_front(TXb);
     	arg_1_demand.insert(p);
     	arg_2_demand.insert(p);
     }
     
     expr_demand_grammars * result =  merge(pArg1->transformDemandRef(arg_1_demand),
                                            pArg2->transformDemandRef(arg_2_demand));
+    cout << "Label = " << label << endl;
     result->first->emplace(label, demand);
     
 
     localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "1", arg_1_demand }});
-//    cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(1) << endl;
+    cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(1) << endl;
     (*(localLivenessMap[getLabel() + "/" + current_label ]))["2"] = arg_2_demand;
     //localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ "2", arg_2_demand }});
-//    cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(2) << endl;
+    cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(2) << endl;
 
 
 //    cout << "Inserting to liveness set " << (((IdExprNode*)pArg1)->getLabel()) << endl;
@@ -436,7 +437,7 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
 
         //TODO: How do we disambiguate the labels for each argument?
         localLivenessMap[getLabel() + "/" + current_label] = new demand_grammar({{ to_string(index), arg_demand }});
-//        cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(index) << endl;
+        cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(index) << endl;
         live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());
 
 
@@ -449,6 +450,7 @@ expr_demand_grammars * FuncExprNode::transformDemandRef(const rule & demand)
                 arg_demand.insert(p);
             }
             (*localLivenessMap[getLabel() + "/" + current_label ])[to_string(index)] = arg_demand;
+            cout << "Added liveness for argument " << getLabel() + "/" + current_label + "/"  + to_string(index) << endl;
             //localLivenessMap[getLabel() + "/" + current_label ] = new demand_grammar({{ to_string(index), arg_demand }});
             result = merge(result, (*iter)->transformDemandRef(arg_demand));
             live_var_set.insert(((IdExprNode*)(*iter))->getIDStr());

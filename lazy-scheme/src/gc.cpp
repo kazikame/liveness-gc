@@ -1923,7 +1923,8 @@ void liveness_gc()
   clear_live_buffer(pre);
   DBG(pre << "Number of cells copied after print buffer processing " << ((cons*)freept - (cons*)buffer_live) << " = " << copycells << endl);
   numcopied = 0;
-#ifdef __DEBUG__GC
+
+  #ifdef __DEBUG__GC
 	pre.close();
 	ofstream postgc("PostGC" + to_string(gccount) + ".txt", ios_base::out);
 	create_heap_bft(postgc);
@@ -1969,7 +1970,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  DBG(out<<"Copying car part"<<endl);
 		  cons* newloc = getCar(loc, 1);
 		  cons* addr = followpaths(newloc, a0, out);
-		  DBG(out << "Copied car part from " << loc << " to " << addr << endl);
+		  DBG(out << "Copied car part from " << getCar(loc, 1) << " to " << addr << endl);
 		  set_car(loccopy, addr);
 	  }
 
@@ -1980,7 +1981,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  DBG(out<<"Copying cdr part"<<endl);
 		  cons* newloc = getCdr(loc, 1);
 		  cons* addr = followpaths(newloc, a1, out);
-		  DBG(out << "Copied cdr part from " << loc << " to " << addr << endl);
+		  DBG(out << "Copied cdr part from " << getCdr(loc, 1) << " to " << addr << endl);
 		  set_cdr(loccopy, addr);
 	  }
   }
@@ -1993,7 +1994,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 	  	  	  	  	  	  	  	  if (index > 0)
 	  	  	  	  	  	  	  	  {
 	  	  	  	  	  	  	  		  loccopy = copy(loc, out);
-	  	  	  	  	  	  	  		  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
+//	  	  	  	  	  	  	  		  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
 	  	  	  	  	  	  	  	  }
 	  	  	  	  	  	  	  	  break;
   	  	  	  	  	  	  	  	 }

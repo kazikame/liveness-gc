@@ -1712,7 +1712,7 @@ cons* FuncExprNode::evaluate()
 	cons* heap_cell = update_heap_refs.top();
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
 
-	cout << "Looking up function " << this->getFunction() << endl;
+//	cout << "Looking up function " << this->getFunction() << endl;
 	assert(funcDef);
 //	cout << "Creating activation record for func " << funcDef->getFuncName() << " with ret address " << curr_return_addr << endl;
 	make_environment(funcDef->getFuncName().c_str(), curr_return_addr);
