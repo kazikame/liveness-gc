@@ -1139,54 +1139,51 @@ proposition also holds for other modified rules for similar reasons.
 \begin{figure*}[t!]
 \renewcommand{\arraystretch}{1}
   \begin{tabular}{cc}
-    \begin{minipage}{.40\textwidth}
+    \begin{minipage}{.50\textwidth}
         \small
         \renewcommand{\arraystretch}{1}{
           \begin{uprogram}
-            \UNL{1} (\DEFINE\ (\length~\xl)
-            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
-(\NULLQ~\xl) \IN
-            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
-$\psi_1\!\!:\,$ \px
-            \UNL{4} \hspace*{.27cm} $\pi_3\!\!:\,
-            $(\LET\ \pv\ $\leftarrow 0$ \IN
-            \UNL{5} \hspace*{.32cm} $\pi_4\!\!:\,
-(\SRETURN~\psi_2:\pv)$
-            \UNL{4} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\
-$\leftarrow$  (\CDR~\xl)  \IN
-            \UNL{5} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\
-$\leftarrow$  (\length~\pu)  \IN
-            \UNL{6} \hspace*{.34cm} $\pi_7\!\!:\,
-            $(\LET~\pz\ $\leftarrow$ (1~+~\py) \IN
-            \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\,
-(\SRETURN~\psi_3:\pz)$)))))))
+            \UNL{1} (\DEFINE\ (\fun~\px\ \pn)
+            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \py\ $\leftarrow $\
+(\length~\px) \IN
+            \UNL{3} $\pi_2\!\!:\, $(\LET\ \pl\ $\leftarrow $\
+(\makelist~\pn) \IN
+            \UNL{4} \hspace*{.05cm} $\pi_3\!\!:\,$(\SIF\
+$\psi_1\!\!:\,$ \py
+            \UNL{5} \hspace*{.27cm} $\pi_4\!\!:\, $(\LET\ \xhd\ $\leftarrow$\ (\CAR\ \pl) \IN
+            \UNL{6} \hspace*{.27cm} $\pi_5\!\!:\, $(\LET\ \xtl\ $\leftarrow$\ (\CDR\ \px) \IN
+            \UNL{7} \hspace*{.27cm} $\pi_6\!\!:\, $(\LET\ \rest\ $\leftarrow$\ (\fun~ \xtl\ \xhd) \IN
+            \UNL{8} \hspace*{.27cm} $\pi_7\!\!:\, $(\LET\ \ret\ $\leftarrow$\ (\CONS\ \py\ \rest) \IN
+            \UNL{9} \hspace*{.32cm} $\pi_8\!\!:\,
+(\SRETURN~\psi_2:\ret)))))$
+            \UNL{5} \hspace*{.29cm}    $\pi_9\!\!:\, $(\LET~\ps\
+$\leftarrow$  (\Sum~\pl)  \IN
+            \UNL{6} \hspace*{.34cm}   $\pi_{10}\!\!:\, $(\LET~\pu\
+$\leftarrow$  (+~1~\py)  \IN
+            \UNL{7} \hspace*{.34cm} $\pi_{11}\!\!:\,
+            $(\LET~\pr\ $\leftarrow$ ($/$~\ps~\pu) \IN
+            \UNL{8} \hspace*{.27cm} $\pi_{12}\!\!:\, $(\LET\ \res\ $\leftarrow$\ (\CONS\ \pr\ \NIL) \IN
+            \UNL{9} \hspace*{.34cm} $\pi_{13}\!\!:\,
+(\SRETURN~\psi_3:\res)$)))))))))
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
 	  \UNL{1} $(\DEFINE\ (\main)$
-           \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
-           (
-           \scalebox{0.8}{\psframebox[framearc=.5,
-	fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
-             \begin{tabular}{@{}c@{}}
-               {a BIG closure}
-             \end{tabular}}}
-           ) \IN  
-          \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
+           \UNL{2} \!\!$\pi_{14}\!\!:\, (\LET\  \pa\  \leftarrow$
+           (\CONS\ $1$\ (\CONS\ $2$\ \NIL) \IN  
+          \UNL{3} \!\!$\pi_{15}\!\!:\, (\LET\  \pb\  \leftarrow $5$)$
 \IN
-	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
-$\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
-          \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-          $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
-          \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
-(\SRETURN~\psi_4:\pw)))))$
+	  \UNL{4}   \hspace*{.05cm}$\pi_{16}\!\!:\,      $ (\LET\ \pc\
+$\leftarrow  (\fun\ \pa\ \pb)$ \IN
+          \UNL{5}   \hspace*{.15cm}    $\pi_{17}\!\!:\,
+          (\SRETURN~\psi_4:\pc)))))$
 \end{uprogram}}
         %%}
     \end{minipage}
 
     &
 
-    \begin{minipage}{.51\textwidth}
+    \begin{minipage}{.48\textwidth}
 
       \small
 \begin{eqnarray*}
@@ -1251,19 +1248,20 @@ parameter   $x_i$  at   the  program   point  at   the  beginning   of
 $e_{\mathit{f}}$   (assumed  to   be  $\pi_1$).   By  the   rule  {\sc
   live-define},      this     should      be      the     same      as
 $\Lf{f}{i}{\sigma}$. Applying this to \length, we have:
+
 \begin{eqnarray*}
 && \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
   \cup \clazy\Lf{\length}{1}{\clazy\sigma}
 \end{eqnarray*}
-and  the only equation defining \Lfone{\length} is:
+and  the equation defining \Lfone{\fun} is:
   \begin{eqnarray*}
-   && \Lf{\length}{1}{\sigma}
-    =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup
-\clazy\Lf{\length}{1}{\clazy\sigma}
+   && \Lf{\fun}{1}{\sigma}
+    =  \clazy\sigma \cup \Lf{\length}{1}{\bcar\sigma_{\mathit{\length}}} \cup  \Lf{\length}{1}{\clazy\sigma} 
+       \cup  \acdr\Lf{\fun}{1}{\bcdr\sigma_{\mathit{\fun}}}
 \end{eqnarray*}
 
 In general, the equations for  \Lfonly\ are recursive since, as in the
-case  of  \length,  \Lan{1}\  may   have  been  defined  in  terms  of
+case  of  \fun,  \Lan{1}\  may   have  been  defined  in  terms  of
 \Lfone{\mathit{f}}.  However,  it is desirable  to have a  closed form
 solution for $\Lfone{\mathit{f}}$.  As mentioned in \cite{asati14lgc},
 each  of the liveness  rules modifies  a demand  by prefixing  it with
@@ -1279,16 +1277,16 @@ Substituting   the   guessed   form   in   the   equation   describing
 \Lfonly$_{\mathit f}$, and factoring  out $\sigma$, we get an equation
 for  \Df{f}{i} that  is  independent of  $\sigma$.   Any solution  for
 \Df{f}{i}  yields a  solution for  \Lfonly$_{\mathit f}$.   Applied to
-\Lfonly$_{\mathit \length}$, we get:
+\Lfonly$_{\mathit \fun}$, we get:
   \begin{eqnarray*}
-&&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}\sigma,~\mbox{and}\\
-&&   \Df{\length}{1} = \clazy \cup \acdr\Df{\length}{1}\clazy
-       \cup \clazy\Df{\length}{1}{\clazy}
+&&  \Lf{\fun }{1}{\sigma} = \Df{\fun}{1}\sigma,~\mbox{and}\\
+&&   \Df{\fun}{1} =  \clazy \cup \Df{\length}{1}\bcar \cup  \Df{\length}{1}\clazy 
+       \cup  \acdr\Df{\fun}{1}\bcdr
   \end{eqnarray*}
 
-Note that this equation can also be viewed as a CFG with \{\acdr,
-\clazy\} as terminal symbols and \Df{\length}{1} as the sole
-non-terminal.
+Note that this equation can also be viewed as a CFG with \{\acdr, \bcar, \bcdr,
+\clazy\} as terminal symbols and \Df{\length}{1} and \Df{\fun}{1} as the 
+non-terminals.
 
 \subsection{Generating liveness equations \Lv\  for function bodies}
 \label{sec:bodylivenessbodies}
@@ -1321,23 +1319,22 @@ $\sigma_{\!all}$) if \mainpgm\ returns a structure and $\epsilon$ if
 it returns a base value.
 
 
-For  the  running  example,   $\length$  has  calls  from  $\main$  at
-$\pi_{12}$ and a recursive call at $\pi_6$.
+For  the  running  example,   $\fun$  has  calls  from  $\main$  at
+$\pi_{16}$ and a recursive call at $\pi_6$.
 So $\sigma_{\length} =
-     \deltacall{\length}{\pi_{12}}{\main}  \cup
-\deltacall{\length}{\pi_6}{\length}$.
+     \deltacall{\fun}{\pi_{16}}{\main}  \cup
+\deltacall{\fun}{\pi_6}{\length}$.
 Filling in  the values gives:
 \begin{eqnarray*}
-\sigma_{\length}    &=&
- \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
+\sigma_{\fun}    &=&
+ \{\sigma_{\mathit{all}}\}  ~\cup~{\bcdr\sigma_{\mathit{\fun}}}
 \end{eqnarray*}
-As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pa} in terms
-of  $\sigma_{\length}$ are:
+As examples, the liveness of \Lanv{2}{\pl} and \Lanv{1}{\py} in terms
+of  $\sigma_{\fun}$ are:
 \begin{align*}
-\Lanv{1}{\pl} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
-  \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
+\Lanv{2}{\pl} &= \clazy \cup \acar\Lf{\fun}{2}{\bcdr\sigma_{\mathit{\fun}}}
  \\
-\Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
+\Lanv{1}{\py} &= \clazy \cup \bcar\sigma_{\mathit{\fun}}
 \end{align*}
 
 In summary, the equations generated during liveness analysis are:
