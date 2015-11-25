@@ -317,6 +317,11 @@ int main(int argc, char ** argv)
 	if (argc < 4)
 	{
 		cerr << "Insufficient number of arguments " << endl;
+		cerr << "USAGE: " << endl;
+		cerr << "\t" << argv[0] << "  <filename>  <heapsize>  <gc-type>" << endl;
+		cerr << endl;
+		cerr << "\t<gc-type> is one of: gc-live, gc-plain, gc-freq[=<threshold>]" << endl;
+		cerr << endl;
 		 //printHelp(); //TODO: implement printhelp() method
 		 return(EXIT_FAILURE);
 	}

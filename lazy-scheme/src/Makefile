@@ -5,7 +5,7 @@ OBJ_FLAGS=-c
 DBG_FLAGS= -g
 PROD_FLAGS= -O4
 
-CPPFLAGS = -g -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive 
+CPPFLAGS = -O4 -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive 
 
 TARGET = Simulator
 
