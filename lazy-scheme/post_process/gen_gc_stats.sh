@@ -8,6 +8,7 @@ CPWD=`pwd`
 echo "Current dir is `pwd`"
 DIRNAME=`echo $DIRNAME | sed -e "s|\.|$CPWD|"`
 echo "Script home is $DIRNAME"
+PROJDIR=`dirname $DIRNAME`
 
 parse()
 {
@@ -79,7 +80,8 @@ mkdir -p $OUTPUT;
 LOG=$OUTPUT/runtime
 echo -n 'Start At : ' > $LOG
 date                 >> $LOG
-EXECNAME=${HOME}/Work/LiveNStrict/lazy-scheme/src/Simulator_Stats
+#EXECNAME=${HOME}/Work/LiveNStrict/lazy-scheme/src/Simulator_Stats
+EXECNAME=${PROJDIR}/src/Simulator_Stats
 STATSFILE=GC_STATS.txt
 SCMFILE=$TEST/${TESTNAME}.scm
 if [ "$PPONLY" = "false" ]; then
