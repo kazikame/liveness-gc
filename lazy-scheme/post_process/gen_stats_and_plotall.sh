@@ -3,7 +3,7 @@
 DIR=`dirname $0`
 PROGNAME=`basename $0`
 TestBMs="  test testsmall small"
-SmallBMs=" nperm fibheap lambda sudoku lcss nqueens gc_bench "
+SmallBMs=" nperm fibheap lambda sudoku lcss nqueens fft huffman "
 LargeBMs=" treejoin knightstour "
 AllBMs="$SmallBMs $LargeBMs"
 help()
@@ -44,17 +44,17 @@ done
 
 declare -A limit
 
-limit["nqueens"]=22729
-limit["nperm"]=27429
-limit["fibheap"]=38001
-limit["treejoin"]=1616535
-limit["sudoku"]=4075
+limit["nqueens"]=10101
+limit["nperm"]=27428
+limit["fibheap"]=37041
+limit["treejoin"]=1616533
+limit["sudoku"]=4066
 limit["lcss"]=22243
 limit["lambda"]=20466
-limit["gc_bench"]=204850
-limit["knightstour"]=680000
+limit["knightstour"]=677800
+limit["fft"]=172762
+limit["huffman"]=100070
 ## UNUSED BMs
-limit["fft"]=3300
 limit["small"]=17
 limit["test"]=247
 limit["testsmall"]=267
@@ -114,17 +114,17 @@ fi
 for bm in $BMs
 do
     #for opt in gc-plain gc-live gc-freq=${freq[$bm]}
-    # for opt in gc-plain gc-live
-    # do 
-    #   	echo "Processing $bm [$opt]"
-    #   	$DIR/gen_gc_stats.sh $OPTARG \
-    #   	    -bmdir ../benchmarks/programs/$bm \
-    #   	    -gcopt $opt -heap ${limit[$bm]}
-    #  done
+    for opt in gc-plain gc-live
+    do 
+      	echo "Processing $bm [$opt]"
+      	$DIR/gen_gc_stats.sh $OPTARG \
+      	    -bmdir ../benchmarks/programs/$bm \
+      	    -gcopt $opt -heap ${limit[$bm]}
+     done
     #bash $DIR/val.plot $bm ${xtics[$bm]} ${ytics[$bm]}
     #bash $DIR/window.plot $bm ${xlimit[$bm]} ${ylimit[$bm]} 
-    gnuplot $DIR/plots/${bm}.gnu
-    gnuplot $DIR/plots/${bm}_win.gnu
+    # gnuplot $DIR/plots/${bm}.gnu
+    # gnuplot $DIR/plots/${bm}_win.gnu
 
     echo "$bm Done"
 done
