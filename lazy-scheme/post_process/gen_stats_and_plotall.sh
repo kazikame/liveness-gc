@@ -3,7 +3,7 @@
 DIR=`dirname $0`
 PROGNAME=`basename $0`
 TestBMs="  test testsmall small"
-SmallBMs=" nperm fibheap lambda sudoku lcss nqueens fft huffman "
+SmallBMs=" nperm fibheap lambda sudoku lcss nqueens huffman "
 LargeBMs=" treejoin knightstour "
 AllBMs="$SmallBMs $LargeBMs"
 help()
@@ -46,7 +46,7 @@ declare -A limit
 
 limit["nqueens"]=10101
 limit["nperm"]=27428
-limit["fibheap"]=37041
+limit["fibheap"]=37043
 limit["treejoin"]=1616533
 limit["sudoku"]=4066
 limit["lcss"]=22243
