@@ -9,7 +9,7 @@ CPPFLAGS = -O4 -Wall $(EXTRA_FLAGS) -fPIC -std=c++11 -fpermissive
 
 TARGET = Simulator
 
-all : depend scheme.tab.h $(TARGET)
+all : 	depend scheme.tab.h $(TARGET)
 
 OBJS = gc.o  parser.o lexer.o \
 	SchemeDriver.o SchemeAST_Print.o SchemeAST_ANFs.o \

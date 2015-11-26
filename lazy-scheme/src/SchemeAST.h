@@ -195,6 +195,7 @@ public:
 	virtual bool isExpressionRecursive(const std::string) const {return false;}
 	//cons* heap_ptr;
 	std::string parent_let_pgmpt;
+	unordered_set<string> live_var_set;
 protected:
 	ExprNode(const std::string name);
 
@@ -519,6 +520,7 @@ public:
 	std::string getNextExpr();
 	virtual cons* make_closure();
 	virtual bool isExpressionRecursive(const std::string) const;
+	size_t getNumArgs() {return pListArgs->size();}
 	//std::list<cons*> argsClosureList;
 protected:
 	IdExprNode * pID;

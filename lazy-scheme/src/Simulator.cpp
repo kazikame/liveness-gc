@@ -21,6 +21,7 @@ using namespace Scheme::output;
 double gctime=0;
 int gccount=0;
 extern demand_grammar gLivenessData;
+extern unordered_map<string, expr_demand_grammars*> localLivenessMap;
 extern unordered_map<string, unsigned int> func_heap_cell_reqd;
 
 demand_grammar filter_grammar(demand_grammar gLivenessData, vector<string> filter_criteria)
@@ -152,9 +153,9 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		clock_t dfa_gen_start = clock();
 		
 		//Instead of driver.process returning an integer why can't it return the grammar?
-		int resint = driver.process();
+		driver.process();
 		//Use pgm->liveness_data as the final grammar
-		//Scheme::output::dumpGrammar(cout, &gLivenessData);
+
 		gLivenessData.insert(pgm->liveness_data.begin(), pgm->liveness_data.end()) ;
 		gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
 
@@ -165,6 +166,17 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 
 		//cout << "program name " << pgmname << endl;
 		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/program-cfg.txt");
+
+
+
+		/*int i = 1;
+		for(auto expr_grmr:localLivenessMap)
+		{
+		    write_grammar_to_text_file(expr_grmr.second->second, "testgrammar.txt" + to_string(i));
+		    ++i;
+		}*/
+
+
 		//Simplify grammar
 		simplifyCFG(&gLivenessData);
 		write_grammar_to_text_file(&gLivenessData, outdir + pgmname + "/simplified-program-cfg.txt");
@@ -305,6 +317,11 @@ int main(int argc, char ** argv)
 	if (argc < 4)
 	{
 		cerr << "Insufficient number of arguments " << endl;
+		cerr << "USAGE: " << endl;
+		cerr << "\t" << argv[0] << "  <filename>  <heapsize>  <gc-type>" << endl;
+		cerr << endl;
+		cerr << "\t<gc-type> is one of: gc-live, gc-plain, gc-freq[=<threshold>]" << endl;
+		cerr << endl;
 		 //printHelp(); //TODO: implement printhelp() method
 		 return(EXIT_FAILURE);
 	}

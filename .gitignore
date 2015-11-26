@@ -20,7 +20,6 @@ lazy-scheme/src/parser.cpp
 lazy-scheme/src/Simulator_Stats
 lazy-scheme/src/location.hh
 lazy-scheme/src/*.log
-lazy-scheme/src/output
 lazy-scheme/src/plain.txt
 lazy-scheme/src/position.hh
 lazy-scheme/src/scheme.output

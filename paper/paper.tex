@@ -1369,6 +1369,7 @@ The proposition also holds for other modified rules for
 similar reasons.
 
 \newcommand{\emm}[2]{\ensuremath{\mathcal{#1}_{#2}}}
+
 \subsection{Generating Equations for \Lfonly$_\mathit{f}$}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
@@ -1387,6 +1388,7 @@ $\Lf{f}{i}{\sigma}$. Applying this to \length, we have:
 && \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
   \cup \clazy\Lf{\length}{1}{\clazy\sigma}
 \end{eqnarray*}
+
 %% and  the only equation defining \Lfone{\length} is:
 %%   \begin{eqnarray*}
 %%    && \Lf{\length}{1}{\sigma}
@@ -1413,6 +1415,7 @@ form:
 \label{eq:LF:DI}
   \Lf{f}{i}{\sigma} = \Df{f}{i}\sigma
 \end{eqnarray}
+
 where \Df{f}{i}  are sets of strings  over the alphabet
 mentioned above.  Substituting the  guessed form in the
 equation   describing    \Lfonly$_{\mathit   f}$,   and
@@ -1433,6 +1436,7 @@ non-terminals.
 
 \subsection{Generating liveness equations \Lv\  for function bodies}
 \label{sec:bodylivenessbodies}
+
 
 To  avoid analyzing  the body  of a  function for  each
 call, we calculated the  liveness for the arguments and
@@ -1478,6 +1482,7 @@ So $\sigma_{\fun} =
 %% So $\sigma_{\length} =
 %%      \deltacall{\length}{\pi_{12}}{\main}  \cup
 %% \deltacall{\length}{\pi_6}{\length}$.
+
 Filling in  the values gives:
 \begin{eqnarray*}
 \sigma_{\fun}    &=&
@@ -1525,6 +1530,7 @@ productions:
        \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
 \langle {\sigma_{\length}} \rangle
 &\rightarrow&
+
 \clazy  \mid \bcar\langle{\sigma_{\Sum}}\rangle \\
  \var{\Df{\fun}{2}} &\rightarrow& \var{\Df{\makelist}{1}}\clazy \mid \var{\Df{\makelist}{1}}\var{\Df{\Sum}{1}}\clazy \\ 
 & & \mid \var{\Df{\makelist}{1}}\acar\var{\Df{\fun}{2}}\bcdr\var{\sigma_{\mathit{\fun}}} \\
