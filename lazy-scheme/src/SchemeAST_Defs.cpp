@@ -807,15 +807,15 @@ cons* LetExprNode::evaluate()
 	if (gc_status != gc_disable && (gc_status == gc_plain || gc_status == gc_freq))
     {
 
-		if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD()) {
+		if (gc_status == gc_freq && (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD())) {
 			reachability_gc();
 			//return_stack().return_point = curr_let_pgmpt;
 			GC_STAT_DUMP_GARBAGE_STATS();
 			last_gc_clock = GC_STAT_GET_CLOCK();
 		}
 
-        if ((!isFunctionCall && (current_heap() < 1))
-                 || (isFunctionCall && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))) 
+        if (gc_status == gc_plain && ((!isFunctionCall && (current_heap() < 1))
+                 || (isFunctionCall && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))))
         {
 
         	// cerr << "DOING RGC"<<endl;

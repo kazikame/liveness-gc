@@ -80,7 +80,6 @@ mkdir -p $OUTPUT;
 LOG=$OUTPUT/runtime
 echo -n 'Start At : ' > $LOG
 date                 >> $LOG
-#EXECNAME=${HOME}/Work/LiveNStrict/lazy-scheme/src/Simulator_Stats
 EXECNAME=${PROJDIR}/src/Simulator_Stats
 STATSFILE=GC_STATS.txt
 SCMFILE=$TEST/${TESTNAME}.scm

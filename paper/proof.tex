@@ -35,13 +35,15 @@
 \def\concat{\mathrel{\drawplusplus {12pt}{0.4pt}{5pt}}}
       %It would be better to specify these in font-relative measures, but it
       %probably doesn't scale anyway.
-%\newcommand{\mycomment}[1]{}
+%\newcommand{\mycomment}[1]{} 
 \definecolor{Myblue}{rgb}{.2,0,1}
+\definecolor{Myred}{rgb}{1,.2,.2}
+
 \newcommand{\comment}[1]{{\color{Myblue}{#1}}}
-%\newcommand{\cblue}[1]{{\color{blue}{#1}}}
+\newcommand{\warning}[1]{{\color{Myred}{#1}}}
 %\newcommand{\blankout}[1]{}
 
-
+\newcommand{\cred}[1]{\psframebox[linestyle=none, fillcolor=lightgray,fillstyle=solid,framesep=0.5pt]{#1}}
 %\newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
 \newcommand{\scmin} {\mbox{\sf\em in}}
 \newcommand{\scmnull}{\mbox{\sf\em null?}}
@@ -425,7 +427,7 @@ $  $\rho',\, S,\, H[\ell := (\rho(x), \rho(y))],\, e$}     &  \sc{cons} \\
 
 $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, H,\, (\CAR~x)
 \rightsquigarrow
-\rho',\, (\rho, x, (\CAR~x))\!:\!S, \,H,\, s$      &
+\rho',\, (\rho, \rho(x), (\CAR~x))\!:\!S, \,H,\, s$      &
 \sc{car-clo}
 \\
 \hline
@@ -510,7 +512,7 @@ We first specify the domains used by the semantics:
 \[
 \renewcommand{\arraystretch}{1}
 \begin{array}{@{}r@{\ }l@{\ \ }c@{\ \ }l@{\hspace{0.5em}}l}
-\heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow Data & \mbox{-- Heap}\\
+\heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow Data + \{empty\} & \mbox{-- Heap}\\
 d: & \mathit{Data} &=&\mathit{Val} + \mathit{Clo} & \mbox{-- Values \& Closures} \\
 v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Data \times Data}& \mbox{-- Values}\\
 c:   & \mathit{Clo} &=& \mathit{(App \times Env)}& \mbox{-- Closures}\\
@@ -541,7 +543,9 @@ expression, and $e$ is to be evaluated next in the environment $\rho$.
 Note that the  state of the transition system consists  of the current
 evaluation  context,  given  by  $\rho$ and  $e$,  and  the  suspended
 evaluation contexts (represented as  continuation frames) in the stack
-$S$.  The heap $H$ is common to all contexts.
+$S$.  The heap $H$ is common to all contexts. The 3-tuple $\rho, \stk,
+\heap$ representing 
+the state of the transition system will be denoted $\mathcal{S}$. 
 
 The  initial  state  of  the  transition  system  described  above  is
 $([\;]_\rho,\,   ([\;]_\rho,   \,   \ans,\,   (\print~\ans)):[\;]_{S},
@@ -571,49 +575,80 @@ evaluated  ({\sc car-1-clo}). The address ($addr (d_1)$) to be updated with the 
 value is  recorded in  a continuation frame.  This is
 required for lazy evaluation,
 %of an application involving a selector such  as $\CAR$, 
-else, in the presence of sharing,   $d_1$  may  be  evaluated  more  than  once~\cite{Jones87}.    Only after this  is the
-actual selection done ({\sc car-select}).
+else, in  the presence of  sharing, $d_1$  may be evaluated  more than
+once~\cite{Jones87}.   Only after  this is  the actual  selection done
+({\sc car-select}).  $\stackrel{+}{\rightsquigarrow}$
+denotes  the  transitive closure  of  $\rightsquigarrow$.  
+
+
+%% We call the sequence of  $\rightsquigarrow$ steps that starts with the
+%% evaluation of  an application  $s$ in a  state $\mathcal{S}$  and ends
+%% with its  value overwriting  the location of  $s$ as  an \emph{closure
+%%   evaluation subtrace (CES)} of $s$ in state $\mathcal{S}$. As an example,
+%% an $CES$ starting  with the {\sc car-clo} step may  have the form shown
+%% below.   In  this   $H(\rho(x))$  is  assumed  to   be  $\langle  s_1,
+%% \rho_1\rangle$ and $d_1$ is $\langle s_2, \rho_2\rangle$. \\
+
+%% 1:$\rho,\, (\_, \ell, \_)\!:\!S,\, H,\, (\CAR~x)
+%% \rightsquigarrow$\\
+%% \hspace*{.4cm}2:$\rho_1,\, (\rho, \rho(x), (\CAR~x))\!:\!(\_, \ell,
+%% \_)\!:\!S, \,H,\, s_1 \stackrel{+}{\rightsquigarrow}$ \\ 
+%% \hspace*{.4cm}3:$\rho,\, (\_, \ell, \_)\!:\!S,\, H'[\rho(x)=(d_1, d_2)],\, (\CAR~x)
+%%  \rightsquigarrow$\\
+%% \hspace*{.4cm}4:$\rho_2,\, (\rho, \rho(x), (\CAR~x))\!:\!(\_, \ell, \_)\!:\!S, \,H',\,
+%% s_2 \stackrel{+}{\rightsquigarrow}$\\
+%% \hspace*{.4cm}5:$\rho,\, (\_, \ell, \_)\!:\!S,\, H''[\rho(x)=(v_1, d_2)],\, (\CAR~x)
+%% \rightsquigarrow$\\ 
+%% \hspace*{.4cm}6:$\rho,\, S,\, H''[\ell=(v_1, d_2)],\, (\CAR~x)$ \\
+
+%% Notice that the $CES$ that begins  with a {\sc car-clo} is composed of
+%% four  more $CES$s  that  start at  lines 2  (evaluation  of $s_1$),  3
+%% (evaluation of $(\CAR~x)$ in a different state, 4 (evaluation of $s_2$
+%% and 5 (evaluation of $(\CAR~x)$ in a yet different state).
+
 
 }
 %==============================================================
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
 \begin{figure*}[t]
+\comment{
 \renewcommand{\arraystretch}{1}
 \begin{eqnarray*}
 \mathit{ref\/}(\kappa,\sigma,\Lfonly)
           &=& \{\,\} \mbox{, for $\kappa$ a constant, including
 $\NIL$}\\
-\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
-          &=& \{x.\alpha \mid \acar\alpha \in \sigma\} \cup \{y.\alpha
+\mathit{ref\/}(\pi:(\CONS~x~y),\sigma,\Lfonly)
+          &=& \{x_{\pi}.\alpha \mid \acar\alpha \in \sigma\} \cup
+  \{y_{\pi}.\alpha 
 \mid \acdr\alpha \in \sigma\} \\
-\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\CAR~x),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in
+                    \{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acar\alpha \mid \alpha \in
 \sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((\CDR~x),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\CDR~x),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in
+                    \{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acdr\alpha \mid \alpha \in
 \sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((\PRIM~x~y),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\PRIM~x~y),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon, y.\epsilon\},  & \mbox{if}~\sigma \ne
+                    \{x_{\pi}.\epsilon, y_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne
 \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((\NULLQ~x),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\NULLQ~x),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+                    \{x_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((f~\myvec{x}),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(f~\myvec{x}),\sigma,\Lfonly)
 %          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
           &=&  \begin{array}{@{}l}  % to discourage \displaystyle
-               \bigcup_{i=1}^n x_i.\Lf{f}{i}{\sigma}
+               \bigcup_{i=1}^n x_{i_{\pi}}.\Lf{f}{i}{\sigma}
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
@@ -631,16 +666,21 @@ x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
                  \end{array} \\
 &&\mbox{where $\mathit{\epath}$ is a new e-path
   terminating with $\psi$}\\
-\mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-        \lambda\mathit{\epath}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
-\mbox{where}~\mathcal{M} =
-\mathcal{L}(e,\sigma,\Lfonly),~\Lv =
-\mathcal{M}(\epath),~\mbox{and}~f~\mbox{is the new function}\\
-&& \makebox[0mm]{\hspace*{7cm}
- $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
-           x_2\, \ldots\, x_n)/x]))$,} \\
- \makebox[0mm]{\hspace*{8cm} where
-     $x_1\, \ldots\, x_n$ are the variables in $s$}
+%% \mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+%%         \lambda\mathit{\epath}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
+%% \mbox{where}~\mathcal{M} =
+%% \mathcal{L}(e,\sigma,\Lfonly),~\Lv =
+%% \mathcal{M}(\epath),~\mbox{and}~f~\mbox{is the new function}\\
+%% && \makebox[0mm]{\hspace*{7cm}
+%%  $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
+%%            x_2\, \ldots\, x_n)/x]))$,} \\
+%%  \makebox[0mm]{\hspace*{8cm} where
+%%      $x_1\, \ldots\, x_n$ are the variables in $s$}
+\mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+        \lambda\mathit{\epath}.\; 
+\mathit{ref\/}(s,\sigma,\Lfonly) \cup \Lv\\
+&&\mbox{where}~ \mathcal{M} = \mathcal{L}(e,\sigma,\Lfonly), ~\Lv =
+\mathcal{M}(\epath),~\mbox{and}~\sigma = \bigcup_{{\pi}\in \epath} \Lv(x_{\pi})
 \end{eqnarray*}
 \begin{minipage}{0.85\textwidth}
 \infrule[live-define]
@@ -653,7 +693,9 @@ x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
      $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $\mathit{df_1}
 \ldots \mathit{df_k}$}}
 \end{minipage}
-  \caption{Liveness equations and judgement rule}\label{fig:live-judge}
+  \caption{Liveness equations and judgement
+    rule}\label{fig:live-judge}
+}%comment
 \end{figure*}
 
 
@@ -850,245 +892,249 @@ arguments.
 
 \subsection{Correctness of liveness analysis}  
 
-We shall now  outline a proof of correctness of  the liveness analysis
-presented   in    Section~\ref{sec:liveness-analysis}.    This   proof
-technique  is  similar to  the  technique  used in  \cite{asati14lgc}.
+\warning{The (hopefully fool proof) full proof is now being developed
+  in the Appendix.}
 
-The  idea behind  the  proof is  as follows:  We  modify the  standard
-semantics to a semantics called  {\em minefield semantics} that models
-a liveness based  garbage collection at each  transition.  Before each
-transition,  we start  from the  root-set and  insert a  special value
-$\bot$ at each  location in the heap that contains  a reference and is
-reachable but not live. The proof is based on a context-sensitive form
-of    liveness   of    which   our    calculated   liveness    is   an
-over-approximation. The state of the transition system is augmented to
-carry enough information to calculate  the liveness environment at the
-current  evaluation  context  and  each of  the  suspended  evaluation
-contexts on  the stack.   To simulate  garbage collection, before each
-transition,  we start  from the  root-set and  insert a  special value
-$\bot$ at each  location in the heap that contains  a reference and is
-reachable but  not live by  our analysis.  Any attempt  to dereference
-such locations during the transition will result in entering a special
-state denoted \bang.  The main proof is to show that no program enters
-the \bang\ state in the minefield semantics.
+%% We shall now  outline a proof of correctness of  the liveness analysis
+%% presented   in    Section~\ref{sec:liveness-analysis}.    This   proof
+%% technique  is  similar to  the  technique  used in  \cite{asati14lgc}.
+
+%% The  idea behind  the  proof is  as follows:  We  modify the  standard
+%% semantics to a semantics called  {\em minefield semantics} that models
+%% a liveness based  garbage collection at each  transition.  Before each
+%% transition,  we start  from the  root-set and  insert a  special value
+%% $\bot$ at each  location in the heap that contains  a reference and is
+%% reachable but not live. The proof is based on a context-sensitive form
+%% of    liveness   of    which   our    calculated   liveness    is   an
+%% over-approximation. The state of the transition system is augmented to
+%% carry enough information to calculate  the liveness environment at the
+%% current  evaluation  context  and  each of  the  suspended  evaluation
+%% contexts on  the stack.   To simulate  garbage collection, before each
+%% transition,  we start  from the  root-set and  insert a  special value
+%% $\bot$ at each  location in the heap that contains  a reference and is
+%% reachable but  not live by  our analysis.  Any attempt  to dereference
+%% such locations during the transition will result in entering a special
+%% state denoted \bang.  The main proof is to show that no program enters
+%% the \bang\ state in the minefield semantics.
  
 
-\newcommand{\cred}[1]{\psframebox[linestyle=none,
-    fillcolor=lightgray,fillstyle=solid,framesep=0.5pt]{#1}}
+%% \newcommand{\cred}[1]{\psframebox[linestyle=none,
+%%     fillcolor=lightgray,fillstyle=solid,framesep=0.5pt]{#1}}
 
-\comment{
-\begin{enumerate}
-\item Do you need to carry the function body?
-\item Minefield doesn't insert bottom inside closures. Separate rule to
-be inserted.
-\item Examine Proposition 4.1, See that different cases are disjoint
-  and together cover all possible cases
-\item Suppose the statement that we want to prove is this: Every step
-  (step = GC + $\rightsquigarrow$) goes without a bang. How to divide
-  a (n+1)-step transition into 1 and n. What is the exact invariant
-  required before each step. 
-\end{enumerate}
+%% \comment{
+%% \begin{enumerate}
+%% \item Do you need to carry the function body?
+%% \item Minefield doesn't insert bottom inside closures. Separate rule to
+%% be inserted.
+%% \item Examine Proposition 4.1, See that different cases are disjoint
+%%   and together cover all possible cases
+%% \item Suppose the statement that we want to prove is this: Every step
+%%   (step = GC + $\rightsquigarrow$) goes without a bang. How to divide
+%%   a (n+1)-step transition into 1 and n. What is the exact invariant
+%%   required before each step. 
+%% \end{enumerate}
 
-}
-
-
-\section{Minefield semantics for the language}
-\begin{figure*}[ht!]
-\begin{center}\footnotesize
-\begin{tabular}{|c|c|c|}
-\hline
-Premise & Transition & Rule name \\ 
-\hline
-\hline
-          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma', e_f'})\!:\!S,
-  H, \kappa, \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
-    \kappa], e, \cred{\sigma', e_f'}$ }   &  \sc{const}
-\\
-\hline
-          & \makecell{$\rho, (\rho', z, e, \cred{\sigma',
-    e_f'})\!:\!S, H, (\CONS~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
-  \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma', e_f'}$}     &  \sc{cons} \\
-\hline
-$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
-  \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \cred{\sigma, e_f}$ \\ $
-  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma', e_f'}$}      &
-\sc{car-whnf} \\
-\hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-  H, (\CAR~x), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma , \_ }$}      &
-\sc{car-clo}
-\\
-\hline
-$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
- & \makecell{$\rho, (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H,
-  (+~x~y), \cred{\sigma, e_f}$ \\  $\rightsquigarrow \rho', S, H[\rho'(z)
-    := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma', e_f'}$}      &
-\sc{prim-whnf} \\
-\hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-  H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_}$}      &
-\sc{prim-1-clo} \\
-\hline
-$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-  S, H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, y,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_ }$}      &
-\sc{prim-2-clo} \\
-\hline
-{$\mathit{g}~\mbox{defined as}$
-$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
-  (g~\myvec{x}), \cred{\sigma, e_f}$ \\ $\rightsquigarrow [\myvec{y} \mapsto
-    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma, e_g}$}      &
-\sc{funcall} \\
-\hline
-$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
-  s~\IN~e), \cred{\sigma, e_f}$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-  \ell]\rangle], e, \cred{\sigma, e_f}$} &
-\sc{let} \\
-\hline
-$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma, e_f}$} & \sc{if-true} \\
-\hline
-$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma, e_f}$ \\   $\rightsquigarrow
-\rho, S, H,  e_2, \cred{\sigma, e_f}$} & \sc{if-false} \\
-\hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma, e_f})\!:\!S, H, s,
-\cred{\clazy\sigma, e_f}$}
-&
-\sc{if-clo} \\
-\hline
-{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
-  (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \cred{\sigma,
-  e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
-  \cred{\sigma', e_f'}$} &
-\sc{return-whnf}\\
-\hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\psi:\SRETURN~x), \cred{\sigma, e_f}$ \\ $
-  \rightsquigarrow$
-$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
-  \cred{\sigma, e_f}$} &
-\sc{return-clo} \\
-\hline
-\end{tabular}
-\caption{Minefield semantics.\label{fig:minefield-semantics}}
-\end{center}
-\vskip -5mm
-\end{figure*}
+%% }
 
 
-To set up the minefield semantics, we follow these steps:
-\begin{enumerate}
-\item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
-  $\rho,$ $S,$ $H,$ $e,$ $\sigma,$ $e_f$, where $\sigma$ is the demand
-  on the expression $e$, and $e_f$ is the body of the function. As the
-  section on liveness  analysis shows, the entire  function body $e_f$
-  and $\sigma$  are needed  to calculate  the liveness  environment at
-  different program  points. The  demand sigma  is ``dynamic''  in the
-  sense  that it  arises from  the actual  function calls  made during
-  execution.   The  0-CFA  demand  is an  over-approximation  of  this
-  demand.  The information  in a suspended evaluation  context is also
-  similarly augmented with  the demand on it and the  function body of
-  which the suspended evaluation is a  part.  Thus a stacked entry now
-  takes the  form $(\rho, x, e,  \sigma, e_f)$. A modification  of the
-  small step semantics which carries the extra information is shown in
-  Figure~\ref{fig:minefield-semantics}.
-\item Given  the current  evaluation context $\rho,  S, H,  e, \sigma,
-  e_f$ and $\mathcal{LF}$, we can construct a liveness environment as follows:
-  \begin{enumerate}
-  \item If $e$ is an expression, then:  
-  $$ \Lv = \bigcup_{\psi \in \mathcal{P}(e)} \mathcal{M}(\psi),
-    \text{where }
-  \mathcal{M} = \mathcal{L}(e_f, \sigma, \Lfonly)$$
-\item If $e$ is an application, then:  
-  $$ \Lv = ref(e, \sigma, \Lfonly)$$
-  \end{enumerate}
-We can define in the same way the liveness environment for each of the
-suspended  evaluation contexts in  $S$  giving  a  stack of  liveness
-environments that we shall denote $\mathsf{SL}$.
-\item $GC$ models a liveness based garbage collection:
-$GC(\rho,$ $ S,$ $ H,$ $ \mathcal{L},$ $ \mathsf{SL}) = (\rho', S', H')$ 
-  \begin{enumerate}
-  \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
-    \notin \Lv$.
-\item For each stack entry $(\rho,\_,\_,\_,\_)$ in $S$ with $\Lv'$ as
-  the corresponding liveness environment in $\mathsf{SL}$,  and for each $x
-  \in domain(\rho)$,  $\rho'(x)=\bot$
-  iff $x.\epsilon \notin \Lv'$.
-\item For each location $\ell$, $H'(\ell) = \bot$, iff  there is no
-  $x$ in either the current environment or one of the stacked
-  environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
-  \ell$  and $x.\alpha \in \Lv$, .
-  \end{enumerate}
-\end{enumerate}
+%% \section{Minefield semantics for the language}
+%% \begin{figure*}[ht!]
+%% \begin{center}\footnotesize
+%% \begin{tabular}{|c|c|c|}
+%% \hline
+%% Premise & Transition & Rule name \\ 
+%% \hline
+%% \hline
+%%           &\makecell{ $\rho, (\rho', x, e, \cred{\sigma', e_f'})\!:\!S,
+%%   H, \kappa, \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
+%%     \kappa], e, \cred{\sigma', e_f'}$ }   &  \sc{const}
+%% \\
+%% \hline
+%%           & \makecell{$\rho, (\rho', z, e, \cred{\sigma',
+%%     e_f'})\!:\!S, H, (\CONS~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
+%%   \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma', e_f'}$}     &  \sc{cons} \\
+%% \hline
+%% $H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
+%%   \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \cred{\sigma, e_f}$ \\ $
+%%   \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma', e_f'}$}      &
+%% \sc{car-whnf} \\
+%% \hline
+%% $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+%%   H, (\CAR~x), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
+%%   (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma , \_ }$}      &
+%% \sc{car-clo}
+%% \\
+%% \hline
+%% $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
+%%  & \makecell{$\rho, (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H,
+%%   (+~x~y), \cred{\sigma, e_f}$ \\  $\rightsquigarrow \rho', S, H[\rho'(z)
+%%     := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma', e_f'}$}      &
+%% \sc{prim-whnf} \\
+%% \hline
+%% $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+%%   H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
+%%   (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_}$}      &
+%% \sc{prim-1-clo} \\
+%% \hline
+%% $H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+%%   S, H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, y,
+%%   (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_ }$}      &
+%% \sc{prim-2-clo} \\
+%% \hline
+%% {$\mathit{g}~\mbox{defined as}$
+%% $~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
+%%   (g~\myvec{x}), \cred{\sigma, e_f}$ \\ $\rightsquigarrow [\myvec{y} \mapsto
+%%     \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma, e_g}$}      &
+%% \sc{funcall} \\
+%% \hline
+%% $\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
+%%   s~\IN~e), \cred{\sigma, e_f}$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+%%   \ell]\rangle], e, \cred{\sigma, e_f}$} &
+%% \sc{let} \\
+%% \hline
+%% $H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+%%   \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma, e_f}$} & \sc{if-true} \\
+%% \hline
+%% $H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+%%   \cred{\sigma, e_f}$ \\   $\rightsquigarrow
+%% \rho, S, H,  e_2, \cred{\sigma, e_f}$} & \sc{if-false} \\
+%% \hline
+%% $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+%%   (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
+%% \rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma, e_f})\!:\!S, H, s,
+%% \cred{\clazy\sigma, e_f}$}
+%% &
+%% \sc{if-clo} \\
+%% \hline
+%% {$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
+%%   (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \cred{\sigma,
+%%   e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
+%%   \cred{\sigma', e_f'}$} &
+%% \sc{return-whnf}\\
+%% \hline
+%% $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+%%   (\psi:\SRETURN~x), \cred{\sigma, e_f}$ \\ $
+%%   \rightsquigarrow$
+%% $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
+%%   \cred{\sigma, e_f}$} &
+%% \sc{return-clo} \\
+%% \hline
+%% \end{tabular}
+%% \caption{Minefield semantics.\label{fig:minefield-semantics}}
+%% \end{center}
+%% \vskip -5mm
+%% \end{figure*}
 
-Starting   from  the   initial  state   $([\;]_\rho,([\;]_\rho,  \ans,
-(\print~\ans)):[\;]_{S} ,  [\;]_{H}, (\mainpgm)$, every  transition is
-preceded by  a garbage collection  using $GC$.  We consider  a garbage
-collection followed  by a transition as  a step. We show  by induction
-that, for programs  without function calls, starting  from the initial
-state that  has $e_{\main}$  as the first  expression to  be evaluated
-instead  of $\main$,  any transition  of  $n$ steps  occurs without  a
-\bang.
 
-Observe  that  the  transitions  that dereference  and  therefore  can
-potentially lead to \bang\ are those  which have a $H(\ldots)$ term in
-the  transition  rule.   Of  these,  terms  of  the  form  $H(\ldots)$
-dereference a root  variable, and the term $H(l)$  dereferences a heap
-location.  In  both the  cases we show  that the  dereferencing cannot
-lead to a \bang\ state in programs without function calls.
+%% To set up the minefield semantics, we follow these steps:
+%% \begin{enumerate}
+%% \item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
+%%   $\rho,$ $S,$ $H,$ $e,$ $\sigma,$ $e_f$, where $\sigma$ is the demand
+%%   on the expression $e$, and $e_f$ is the body of the function. As the
+%%   section on liveness  analysis shows, the entire  function body $e_f$
+%%   and $\sigma$  are needed  to calculate  the liveness  environment at
+%%   different program  points. The  demand sigma  is ``dynamic''  in the
+%%   sense  that it  arises from  the actual  function calls  made during
+%%   execution.   The  0-CFA  demand  is an  over-approximation  of  this
+%%   demand.  The information  in a suspended evaluation  context is also
+%%   similarly augmented with  the demand on it and the  function body of
+%%   which the suspended evaluation is a  part.  Thus a stacked entry now
+%%   takes the  form $(\rho, x, e,  \sigma, e_f)$. A modification  of the
+%%   small step semantics which carries the extra information is shown in
+%%   Figure~\ref{fig:minefield-semantics}.
+%% \item Given  the current  evaluation context $\rho,  S, H,  e, \sigma,
+%%   e_f$ and $\mathcal{LF}$, we can construct a liveness environment as follows:
+%%   \begin{enumerate}
+%%   \item If $e$ is an expression, then:  
+%%   $$ \Lv = \bigcup_{\psi \in \mathcal{P}(e)} \mathcal{M}(\psi),
+%%     \text{where }
+%%   \mathcal{M} = \mathcal{L}(e_f, \sigma, \Lfonly)$$
+%% \item If $e$ is an application, then:  
+%%   $$ \Lv = ref(e, \sigma, \Lfonly)$$
+%%   \end{enumerate}
+%% We can define in the same way the liveness environment for each of the
+%% suspended  evaluation contexts in  $S$  giving  a  stack of  liveness
+%% environments that we shall denote $\mathsf{SL}$.
+%% \item $GC$ models a liveness based garbage collection:
+%% $GC(\rho,$ $ S,$ $ H,$ $ \mathcal{L},$ $ \mathsf{SL}) = (\rho', S', H')$ 
+%%   \begin{enumerate}
+%%   \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
+%%     \notin \Lv$.
+%% \item For each stack entry $(\rho,\_,\_,\_,\_)$ in $S$ with $\Lv'$ as
+%%   the corresponding liveness environment in $\mathsf{SL}$,  and for each $x
+%%   \in domain(\rho)$,  $\rho'(x)=\bot$
+%%   iff $x.\epsilon \notin \Lv'$.
+%% \item For each location $\ell$, $H'(\ell) = \bot$, iff  there is no
+%%   $x$ in either the current environment or one of the stacked
+%%   environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
+%%   \ell$  and $x.\alpha \in \Lv$, .
+%%   \end{enumerate}
+%% \end{enumerate}
 
-We  need the  following proposition that  connects  liveness analysis  with
-minefield semantics transitions. 
+%% Starting   from  the   initial  state   $([\;]_\rho,([\;]_\rho,  \ans,
+%% (\print~\ans)):[\;]_{S} ,  [\;]_{H}, (\mainpgm)$, every  transition is
+%% preceded by  a garbage collection  using $GC$.  We consider  a garbage
+%% collection followed  by a transition as  a step. We show  by induction
+%% that, for programs  without function calls, starting  from the initial
+%% state that  has $e_{\main}$  as the first  expression to  be evaluated
+%% instead  of $\main$,  any transition  of  $n$ steps  occurs without  a
+%% \bang.
+
+%% Observe  that  the  transitions  that dereference  and  therefore  can
+%% potentially lead to \bang\ are those  which have a $H(\ldots)$ term in
+%% the  transition  rule.   Of  these,  terms  of  the  form  $H(\ldots)$
+%% dereference a root  variable, and the term $H(l)$  dereferences a heap
+%% location.  In  both the  cases we show  that the  dereferencing cannot
+%% lead to a \bang\ state in programs without function calls.
+
+%% We  need the  following proposition that  connects  liveness analysis  with
+%% minefield semantics transitions. 
 
 
-\begin{proposition}
-\label{prop:correctness}
-\begin{enumerate} 
-\item   Consider  a   \LET\  definition:   \linebreak  $\pi\!\!\!:   (\LET~x
-  \leftarrow~\ldots~\IN~e)$, such  that there is  a use of $x$  in $e$,
-  i.e.  an occurrence of $\LET~y~\leftarrow~s~in \ldots$, where $s$ is
-  $(\CAR\ x)$, $(\CDR\ x)$  or $(+\ x\ y)$, or $(\SIF\  x\ e1\ e2)$ or
-  $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null.
-\item    Assume    that    a   \LET\    definition    $\pi:    (\LET~z
-  \leftarrow~(\CONS~x~y)~\IN~e)$  has an  occurrence  of $(\CAR~z)$  in
-  $e$.  Then  the  liveness  of  $x$  at  $\pi$  includes  $\epsilon$.
-  Similarly  if $e$  contains $(\CDR~z)$,  then the  liveness of $y$  at
-  $\pi$ includes $\epsilon$.
-\end{enumerate}
-\end{proposition} 
+%% \begin{proposition}
+%% \label{prop:correctness}
+%% \begin{enumerate} 
+%% \item   Consider  a   \LET\  definition:   \linebreak  $\pi\!\!\!:   (\LET~x
+%%   \leftarrow~\ldots~\IN~e)$, such  that there is  a use of $x$  in $e$,
+%%   i.e.  an occurrence of $\LET~y~\leftarrow~s~in \ldots$, where $s$ is
+%%   $(\CAR\ x)$, $(\CDR\ x)$  or $(+\ x\ y)$, or $(\SIF\  x\ e1\ e2)$ or
+%%   $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null.
+%% \item    Assume    that    a   \LET\    definition    $\pi:    (\LET~z
+%%   \leftarrow~(\CONS~x~y)~\IN~e)$  has an  occurrence  of $(\CAR~z)$  in
+%%   $e$.  Then  the  liveness  of  $x$  at  $\pi$  includes  $\epsilon$.
+%%   Similarly  if $e$  contains $(\CDR~z)$,  then the  liveness of $y$  at
+%%   $\pi$ includes $\epsilon$.
+%% \end{enumerate}
+%% \end{proposition} 
 
-In  the second  case for  example,  the liveness  of $x$  due to  the
-\CONS\ is  $\bcar\sigma$, where $\sigma$  is the demand on  $z$. Since
-$\sigma$  includes  the  demand  $\acar\alpha$   due  to  its  use  in
-$(\CAR~z)$, the liveness on $x$  includes $\epsilon$. We thus have the
-following lemma:
+%% In  the second  case for  example,  the liveness  of $x$  due to  the
+%% \CONS\ is  $\bcar\sigma$, where $\sigma$  is the demand on  $z$. Since
+%% $\sigma$  includes  the  demand  $\acar\alpha$   due  to  its  use  in
+%% $(\CAR~z)$, the liveness on $x$  includes $\epsilon$. We thus have the
+%% following lemma:
 
-\begin{lemma}\label{lemma:no-calls-correctness} 
-A program without function calls cannot  enter the \bang\ state in the
-minefield semantics.
-\end{lemma}
+%% \comment{
+%% \begin{lemma}\label{lemma:no-calls-correctness} 
+%% A program without function calls cannot  enter the \bang\ state in the
+%% minefield semantics.
+%% \end{lemma}
 
-\begin{proof}
-For a program  executing according to {\em minefield  semantics}, if a
-\bang\ occurs then some variable which is  dereferenced must be
-set to  $\bot$, between its  creation and  use points.  This  can only
-happen if  the liveness of  the variable being dereferenced  was null.
-From  the Proposition~\ref{prop:correctness}  it  is clear  that this  cannot
-happen.
-\end{proof}
-
-For   a    program   with   functions,   we    use   the   techniques
-in~\cite{asati14lgc}. We  assume as  a contradiction that  the program
-can enter a \bang\ state  and inline the  functions called to  obtain a
-program that is without functions  but has the same execution behavior
-and    demands    as   the    original    program.     We   then    use
-Lemma~\ref{lemma:no-calls-correctness}  to  show  that  the  resulting
-functionless program cannot enter a bang state.
+%% \begin{proof}
+%% For a program  executing according to {\em minefield  semantics}, if a
+%% \bang\ occurs then some variable which is  dereferenced must be
+%% set to  $\bot$, between its  creation and  use points.  This  can only
+%% happen if  the liveness of  the variable being dereferenced  was null.
+%% From  the Proposition~\ref{prop:correctness}  it  is clear  that this  cannot
+%% happen.
+%% \end{proof}
+%% }
+%% For   a    program   with   functions,   we    use   the   techniques
+%% in~\cite{asati14lgc}. We  assume as  a contradiction that  the program
+%% can enter a \bang\ state  and inline the  functions called to  obtain a
+%% program that is without functions  but has the same execution behavior
+%% and    demands    as   the    original    program.     We   then    use
+%% Lemma~\ref{lemma:no-calls-correctness}  to  show  that  the  resulting
+%% functionless program cannot enter a bang state.
 
 
 \section{Computing liveness and its encoding as DFA}\label{sec:computing}
@@ -1976,29 +2022,39 @@ completeness  only  and   the  numbers  for  it   are  not  considered
 representative of practical programs.
 
 \newcommand{\hgt}{2.9cm}
-\begin{figure*}[p]
+\begin{figure*}[t]
 \renewcommand{\arraystretch}{.1}
 \begin{tabular}{@{}c@{}@{}c@{}}
-   \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
-   & {\epsfig{file=lambda_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
+%%    \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
+%%    & {\epsfig{file=lambda_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
+   \hskip -4mm{\epsfig{file=lambda_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+\\   \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+\\   \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+\\  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
-\\ (a) & (b)
+%\\ (a) & (b)
 \end{tabular}%\vskip -10mm
- \caption{Memory usage.  Column (a) shows complete  usage, column
-   (b) enlarges  a part  of the  usage.  The blue  and the  red curves
+ \caption{Memory usage.  
+%% Column (a) shows complete  usage, column 
+%%    (b) enlarges  a part  of the  usage.  
+The blue  and the  red curves
    indicate the number of cons cells  in the active semi-space for RGC
    and LGC  respectively.  The  black curve  represents the  number of
    reachable cells and  the lightblue curve represents the  number of cells
@@ -2067,7 +2123,6 @@ to our  approach is the  liveness based garbage  collector implemented
 in~\cite{asati14lgc}. We  extend their work to  handle lazy evaluation
 and closures.
  
-
 %% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
 
 
@@ -2128,29 +2183,29 @@ and closures.
 %% traversed  multiple times  with different  sets of  liveness  paths to
 %% explore.  Further work includes  improvements to the classical copying
 %% collector to reduce the cost of this.
-We extended the liveness based garbage collection to lazy
-  languages and shown its benefit  for garbage collection in practical
-  programs. We  defined a context  sensitive liveness analysis  that uses
-  context independent summaries of functions obtained using a symbolic
-  demand. We showed  that obtaining precise solution  to these equations
-  is undecidable in  our formulation, and hence  we safely approximate
-  the result using DFA. These DFA are consulted by the garbage collector
-  to improve  collection.
+We extended  the liveness based  garbage collection to  lazy languages
+and shown its benefit for garbage collection in practical programs. We
+defined  a  context  sensitive  liveness analysis  that  uses  context
+independent  summaries   of  functions   obtained  using   a  symbolic
+demand. We showed  that obtaining precise solution  to these equations
+is undecidable in our formulation, and hence we safely approximate the
+result using DFA. These DFA are  consulted by the garbage collector to
+improve collection.
 
-  Liveness   of   closures   presented  further   challenges   to   our
-  implementation.   We compared  different approximate  strategies for
-  handling   liveness   of   closures,   and  found   that   a   mixed
-  strategy---reachability  based  collection   of  closure  arguments,
-  liveness  based  collection  of   everything  else---works  best  in
-  practice as it  avoids runtime and space  overheads.  With mixed-mode
-  garbage collection scheme,  we were able to collect  more cells than
-  reachability based collectors at a reasonable overhead.
+Liveness   of   closures   presented   further   challenges   to   our
+implementation.   We  compared  different approximate  strategies  for
+handling   liveness   of   closures,    and   found   that   a   mixed
+strategy---reachability   based  collection   of  closure   arguments,
+liveness based collection of  everything else---works best in practice
+as it  avoids runtime  and space  overheads.  With  mixed-mode garbage
+collection  scheme,   we  were  able   to  collect  more   cells  than
+reachability based collectors at a reasonable overhead.
 
-  Although we  provide an  implementation for  a liveness  based garbage
-  collection scheme for lazy language, we  do not provide a formal proof
-  of its correctness.  A formal  proof of correctness would describe how
-  closures  are  handled  during  garbage  collection  and  liveness  is
-  propagated inside closures. 
+Although we  provide an  implementation for  a liveness  based garbage
+collection scheme for lazy language, we  do not provide a formal proof
+of its correctness.  A formal  proof of correctness would describe how
+closures  are  handled  during  garbage  collection  and  liveness  is
+propagated inside closures.
 
   Another interesting exercise is to narrow the gap between the actual
   liveness and  the perceived liveness  of our garbage  collector. Our
@@ -2170,10 +2225,335 @@ We extended the liveness based garbage collection to lazy
   In  summary, we  need to  investigate  ways to  make liveness  based
   garbage collection attractive for practical collectors.  
 
-%\balance
+
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
+
+ 
+\newpage
+
+\section{Appendix: Soundness of liveness analysis}
+ 
+
+\begin{figure*}[t!]
+\begin{center}\footnotesize
+\renewcommand{\arraystretch}{1.5}
+
+
+\begin{tabular}{|c|c|c|}
+\hline
+Premise & Transition & Rule name \\ 
+\hline
+
+\hline
+\makecell[t]{$GC(\rho_1, S, H_1, \sigma) = (\rho, S, H)$,}\\ $H(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
+  H, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
+\sc{car-clo-bang}
+\\
+\hline
+\makecell[t]{$GC(\rho_1, S, H_1, \Lv, \sigma) = (\rho, S, H)$,}\\ $H(\rho(x))
+\mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
+  H, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$         &
+\sc{car-clo}\\
+\hline
+\end{tabular}
+
+\medskip
+
+\begin{tabular}{|c|c|c|}
+\hline
+Premise & Transition & Rule name \\ 
+\hline
+
+\hline
+
+
+          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
+  H, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(x) :=
+    \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
+\\
+\hline
+          & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
+  \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
+\hline
+$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
+  \cred{\sigma'} )\!:\!S, H, (\CAR~x), \cred{\sigma}$  $
+  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma'}$}      &
+\sc{car-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+  H, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$}      &
+\sc{car-clo}
+\\
+
+\hline
+$H(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  H,\,
+(\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
+s, \rho,\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, H,\, s, \, \cred{\sigma}$      &
+\sc{car-1-clo} \\
+
+
+\hline
+$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
+ & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H,
+  (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, H[\rho'(z)
+    := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma'}$}      &
+\sc{prim-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+  H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+  (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+\sc{prim-1-clo} \\
+\hline
+$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+  S, H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
+  (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+\sc{prim-2-clo} \\
+\hline
+{$\mathit{g}~\mbox{defined as}$
+$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
+  (g~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
+    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma}$}      &
+\sc{funcall} \\
+\hline
+$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
+  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+  \ell]\rangle], e, \cred{\sigma}$} &
+\sc{let} \\ 
+\hline
+$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \cred{\sigma}$  $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma}$} & \sc{if-true} \\
+\hline
+$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \cred{\sigma}$   $\rightsquigarrow
+\rho, S, H,  e_2, \cred{\sigma}$} & \sc{if-false} \\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
+\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, H, s,
+\cred{\clazy\sigma}$}
+&
+\sc{if-clo} \\
+\hline
+{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
+  (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
+  \cred{\sigma'}$} &
+\sc{return-whnf}\\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\psi:\SRETURN~x), \cred{\sigma}$  $
+  \rightsquigarrow$
+$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, H,  s,
+  \cred{\sigma}$} &
+\sc{return-clo} \\
+\hline
+\end{tabular}
+\caption{Minefield semantics.\label{fig:minefield-semantics}}
+\end{center}
+\vskip -5mm
+\end{figure*}
+
+
+We shall now  present a proof of soundness of  the liveness analysis
+presented in Section~\ref{sec:liveness-analysis}.   While the proof is
+on the broad lines of \cite{asati14lgc}, there are several differences
+due to  the lazy  semantics of  the language  being 
+analyzed in this paper. Here is the idea behind the proof.
+\begin{enumerate}
+\item       We        enrich       the        standard       semantics
+  (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
+  collection  just  before  each  $\rightsquigarrow$  transition.  The
+  simulated garbage collection starts from  the root-set and inserts a
+  special value  $\bot$ at each location  in the heap that  contains a
+  reference that is reachable but not live. Any attempt to dereference
+  such  locations during  the  transition will  result  in entering  a
+  special state denoted \bang. We call the semantics after
+  augmentation  \emph{minefield semantics}.
+\item \label{inline} Assuming that a  program enters the \bang\ state,
+  we  show  how to  construct,  through  inline expansion,  a  program
+  without function calls which has the same minefield behavior.
+\item  The final  part  of the  proof shows  that  no program  without
+  function calls can enter a \bang\ state. As a consequence no program
+  (with or without function calls) can enter the \bang\ state. 
+\end{enumerate}
+
+\subsection{Minefield semantics}
+
+To set up the minefield semantics, we follow these steps:
+\begin{enumerate}
+\item  We  enrich the  abstract  machine  state $\rho,\,S,\,H,\,e$  to
+  $\rho,\,S,\,H,\,e,\,\sigma$,  where $\sigma$  is the  demand on  the
+  expression $e$. We call such  a state a \emph{minefield state}.  The
+  demand $\sigma$  is ``dynamic''  in that it  arises from  the actual
+  sequence of function  calls that led to the evaluation  of $e$.  The
+  0-CFA   demand   used  during   liveness   analysis   is  a   static
+  over-approximation  of $\sigma$  that  considers \emph{all  possible
+    calls} that could lead to  the evaluation of $e$.  The information
+  in  a  suspended evaluation  context  (on  the  stack $S$)  is  also
+  similarly augmented with its demand.  Thus a stacked entry now takes
+  the form $(\rho,  x, e, \sigma)$.  A modification of  the small step
+  semantics which carries the extra information is shown in the bottom
+  table of Figure~\ref{fig:minefield-semantics}.
+\item $GC$ models a liveness  based garbage collection $GC(\rho, S, H,
+  \sigma)$ returns  $(\rho', S',  H')$, where the  changes are  due to
+  certain references  being replaced  by $\bot$.  This  represents the
+  act of  not retaining  (effectively garbage collecting)  the objects
+  pointed   to  by   these   references  during   an  actual   garbage
+  collection. This is done in the following way:
+  \begin{enumerate}
+  \item Given the  current evaluation context $\rho, S,  H, e, \sigma$
+    and the demand transformers $\Lfonly$, we can construct a liveness
+    environment  \Lv.   If  $e$  is   an  expression,  then  $  \Lv  =
+    \mathcal{L}(e, \sigma,  \Lfonly)$, else if $e$  is an application,
+    then $  \Lv = ref(e,  \sigma, \Lfonly)$.  We can  similarly define
+    the  liveness environment  for  each of  the suspended  evaluation
+    contexts in $S$,  giving a stack of liveness  environments that we
+    shall denote $\mathsf{SL}$.
+  \item \emph{Garbage collection of objects pointed by root set:} For each $x \in domain(\rho)$, $\rho'(x)=\bot$ iff $x.\epsilon
+    \notin \Lv$. Similarly, for  each stack entry $(\rho,\_,\_,\_)$ in
+    $S$  with  $\Lv'$ as  the  corresponding  liveness environment  in
+    $\mathsf{SL}$, and for each  $x \in domain(\rho)$, $\rho'(x)=\bot$
+    iff $x.\epsilon \notin \Lv'$. 
+  \item \emph{Garbage collection of objects in the heap:} For each location $\ell$, $H'(\ell) = \bot$ iff  there is no
+  $x$ in either the current environment or one of the stacked
+  environments $\rho$, such that for some $\alpha$ corresponding to a
+  closure-free path in the heap starting from $x$,  $H[x.\alpha] =
+  \ell$  and $x.\alpha \in \Lv$. Here \Lv\ is the liveness of the
+  variables in the  current environment or the stacked environment.
+
+\warning{We have to tell the reader about closure free paths earlier
+  on. Also, has  $H[x.\alpha]$ been defined?}
+  \end{enumerate}
+Starting   from  the   initial  state   $([\;]_\rho,([\;]_\rho,  \ans,
+(\print~\ans)):[\;]_{S} ,  [\;]_{H}, (\mainpgm)$, every  transition is
+preceded  by a  garbage collection  using  $GC$.  The  details of  the
+transition for  the {\sc car-clo}  rule is shown  in the top  table of
+Figure~\ref{fig:minefield-semantics}. If  this or  an earlier  call to
+$GC$  results  in  $H(\rho(x))$  being   bound  to  $\bot$,  then  the
+$\rightsquigarrow$    step    enters    the    \bang\    state    {\sc
+  car-clo-bang}. Otherwise the  transition is the same  as the earlier
+{\sc car-clo} rule.
+\end{enumerate}
+
+\subsection{Inlining}
+
+Consider a call  tree, each of whose nodes represents  a function that
+was  called (but  did  not  necessarily return  because  of a  \bang).
+Assume that each of  the nodes of the tree is  also annotated with the
+program point where the corresponding call was invoked.  This tree can
+be  used to  inline function  calls  in a  hierarchical fashion.   The
+details of  inlining a  single function  call $(\LET\,\,  x \leftarrow
+(f\,y_1\,\ldots\,y_n)  \,\, \IN\,\,  e)$ is  as follows.   Let $f$  be
+defined (after  renaming its  formals and locals  to be  disjoint from
+existing variables)  by $(\DEFINE\ (f\  z_1\ \ldots\ z_n)\  e_f)$. The
+call is replaced  by a sequence of $\LET$s of  the form $z_i\leftarrow
+(\ID\,\,y_i)$   followed   by   the    body   $e_f$   but   with   its
+$(\SRETURN\,\,w)$  expressions  replaced  by $(\LET\,\,  x  \leftarrow
+(\ID\,\, w) \,\, \IN\,\, e)$.  We  prefer to use the identity function
+$\ID$ as a form of no-op rather than introducing the form $(\LET\,\, x
+\leftarrow w \,\,  \IN\,\, e)$ where the RHS  of the $\LET$-definition
+is a  simple variable.  For  a call-less program, the initial  state of
+the minefield semantics is assumed to be  $([\;]_\rho,([\;]_\rho, \ans,
+(\print~\ans)):[\;]_{S} , [\;]_{H}, (e_{\mainpgm})$.
+
+
+\subsection{Soundness Results}
+
+  We  consider a  garbage collection  followed  by a  transition as  a
+  step.  We show  by  induction that,  for  programs without  function
+  calls, starting from  the initial state that has  $e_{\main}$ as the
+  first expression to be evaluated  instead of $\main$, any transition
+  of $n$ steps occurs without a \bang.
+
+We first need an auxiliary  result about minefield semantics. Consider
+a trace of  a minefield execution.  For every  minefield state $(\rho,
+S, H, e(s),  \sigma)$ that appears on the LHS  of a $\rightsquigarrow$
+step, the demand  $\sigma$ on the expression $e$  (or application $s$)
+is non-null.   This can  be proved  by an induction  on the  number of
+steps leading to the minefield state.  The base step holds because the
+demand $\sigma_{all}$  on $\mainpgm$ is non-null.   The inductive step
+follows  from the  observation that  for  each step  of the  minefield
+semantics, if  the demand $\sigma$ on  the LHS of a  minefield step is
+non-null, the demand  on the RHS is a transformation  of $\sigma$ (for
+example $\clazy\sigma$) which is also non-null.
+
+Let us clarify this observation:  Since the minefield semantics models
+lazy  evaluation,  parts  of  the  program may  not  be  evaluated  at
+all.  However,  if  an  expression  (or  application)  happens  to  be
+evaluated, it  will appear  on the  LHS of a  minefield step,  and the
+context-sensitive demand on it will be non-null.
+
+We  show next  that the  minefield  execution of  a call-less  program
+cannot go \bang. Note that, for  the sake of concreteness, by a single
+minefield  execution we  shall  mean the  evaluation  of $(main)$  (or
+$e_{\mainpgm}$,  for call-less  programs) to  its WHNF  driven by  the
+printing mechanism  represented by \print. With  minor variations, the
+proof  will also  be applicable  for subsequent  evaluations fired  by
+$\print$.
+
+\begin{lemma}
+\label{lemma:call-less-cannot-go-bang}
+Consider the minefield execution of  a program without function calls.
+Such a program cannot enter the \bang\ state.
+\end{lemma}
+\begin{proof}
+Consider a state in the minefield execution of a program $(\rho, S, H,
+e, \sigma)$.   We show  by induction  on the  number $n$  of minefield
+steps  leading to  this state  that  the next  step cannot  lead to  a
+\bang\ state.
+
+When $n$ is 0, the state is $([\;]_\rho,\_, [\;]_{S} ,  [\;]_{H},
+e_{\mainpgm}, \sigma_{all})$. Further, we have to show that a $GC(..)$
+followed by a $\rightsquigarrow$ step cannot lead to a \bang\ state.
+Now, because our programs are in  ANF, $e_{\mainpgm}$ can only be a 
+$\LET$. A {\sc let} step  does not  dereference anything
+and thus cannot  result in a \bang.  
+
+For the inductive step, we shall show that none of the minefield steps
+that involves  dereferencing results in  a \bang. These are  the steps
+which have a  $H(\rho(...))$ in the premise.  Recall  that a minefield
+step  consists of  a GC  step followed  by a  $\rightsquigarrow$.  The
+$\rightsquigarrow$  can go  \bang\  because it  dereferences a  $\bot$
+inserted  by the  immediately preceding  GC or  the GC  of an  earlier
+minefield  step. \warning{However  the  demand $\sigma'$  on basis  of
+  which  an  earlier GC  would  have  inserted  a $\bot$,  would  have
+  included the current demand $\sigma$.}   Thus, if the earlier GC had
+inserted a  $\bot$, so  would the  current GC.  Thus  it is  enough to
+consider the  $\rightsquigarrow$ along  with the  current GC  and show
+that it does not lead to a \bang.
+
+We consider the steps {\sc car-clo} and {\sc car-1-clo} only. The rest
+of the  steps are  similar. For  the {\sc car-clo}  step in  the state
+$\rho,   S,  H,   (\CAR~x),  \sigma$,   we  know   that  $\sigma$   is
+non-null. There for the liveness of $x$ includes $\epsilon$, and the
+dereferencing $H(\rho(x))$ will go without \bang. 
+
+For   the  {\sc   car-1-clo}  step,   observe  that   there  are   two
+dereferences. First  $x$ is dereferenced to  get a cons cell  and then
+the head of the cons cell is dereferenced to obtain a closure.  If the
+demand $\sigma$  on $(\CAR~x)$ is  non-null, then the liveness  of $x$
+will include both  $\epsilon$ and $\acar\epsilon$, and a  GC with this
+liveness will  neither bind $x$ to  a $\bot$, nor insert  $\bot$ at the
+first component of  the cons cell. Thus both  dereferences will happen
+normally and the $\rightsquigarrow$ step will not enter \bang.
+\end{proof} 
+
+Now we are ready to prove the main soundness result.
+
+\begin{theorem}
+The minefield execution of no program can enter a \bang\ state. 
+\end{theorem}
+ 
+\begin{proof}
+Assume to the contrary that a  program $P$ enters the \bang\ state. We
+can transform $P$ to a call-less  program $P'$ such that the minefield
+executions of $P$ and $P'$ are identical except for change of variable
+names. \warning{Check whether the  previous line is correct.} However,
+by  Lemma~\ref{lemma:call-less-cannot-go-bang}  we   know  that   $P'$,  a
+call-less program,  cannot enter the  \bang\ state. Therefor  $P$ also
+cannot enter the \bang\ state.
+\end{proof}
+
 \end{document}
-
-
-
