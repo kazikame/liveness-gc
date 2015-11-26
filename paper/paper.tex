@@ -1,7 +1,8 @@
-\documentclass[9pt]{sigplanconf}
+\documentclass[preprint,9pt]{sigplanconf}
 \usepackage{etex}
 \usepackage{float}
 \usepackage{mathrsfs}
+\usepackage{lineno}
 \usepackage{booktabs}
 \usepackage{boxedminipage}
 \usepackage[T1]{fontenc}
@@ -35,13 +36,15 @@
 \def\concat{\mathrel{\drawplusplus {12pt}{0.4pt}{5pt}}}
       %It would be better to specify these in font-relative measures, but it
       %probably doesn't scale anyway.
-%\newcommand{\mycomment}[1]{}
+%\newcommand{\mycomment}[1]{} 
 \definecolor{Myblue}{rgb}{.2,0,1}
-%\newcommand{\comment}[1]{{\color{Myblue}{(#1)}}}
-%\newcommand{\cblue}[1]{{\color{blue}{#1}}}
+\definecolor{Myred}{rgb}{1,.2,.2}
+
+\newcommand{\comment}[1]{{\color{Myblue}{#1}}}
+\newcommand{\warning}[1]{{\color{Myred}{#1}}}
 %\newcommand{\blankout}[1]{}
 
-
+\newcommand{\cred}[1]{\psframebox[linestyle=none, fillcolor=lightgray,fillstyle=solid,framesep=0.5pt]{#1}}
 %\newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
 \newcommand{\scmin} {\mbox{\sf\em in}}
 \newcommand{\scmnull}{\mbox{\sf\em null?}}
@@ -57,6 +60,7 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{lemma}[theorem]{Lemma}
 \begin{document}
+\linenumbers
 % --- Author Metadata here ---
 %\conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
 %\CopyrightYear{2007} % Allows default copyright year (20XX) to be
@@ -90,66 +94,65 @@
 % These 'additional authors' will be output/set for you
 % without further effort on your part as the last section in
 % the body of your article BEFORE References or any Appendices.
-\cmt{{
-\numberofauthors{3} %  in this sample file, there are a *total*
+%\cmt{{
+%
+%\numberofauthors{3} %  in this sample file, there are a *total*
 % of EIGHT authors. SIX appear on the 'first-page' (for formatting
 % reasons) and the remaining two appear in the \additionalauthors
-section.
+%section.
 %
-\author{
+%\author{
 % 1st. author
-\alignauthor K. Prasanna Kumar \\
-       \affaddr{IIT Bombay,}\\
-       \affaddr{Mumbai 400076, India}
-       \email{prasannak@cse.iitb.ac.in}
+\authorinfo {Prasanna Kumar. K} 
+       {IIT Bombay, Mumbai 400076, India}
+       {prasannak@cse.iitb.ac.in}
 % 2nd. author
-\alignauthor Amey Karkare\\
-       \affaddr{IIT Kanpur}\\
-       \affaddr{Kanpur 208016, India}
-       \email{karkare@cse.iitk.ac.in}
+\authorinfo {Amitabha Sanyal} 
+       {IIT Bombay, Mumbai 400076, India}
+       {as@cse.iitb.ac.in}
 % 3rd. author
-\alignauthor Amitabha Sanyal \\
-       \affaddr{IIT Bombay}\\
-       \affaddr{Mumbai 400076, India}\\
-       \email{as@cse.iitb.ac.in}
-}
-}}
-\authorinfo{Double Blind Review}{}{}
+\authorinfo {Amey Karkare}
+       {IIT Kanpur, Kanpur 208016, India}
+       {karkare@cse.iitk.ac.in}
+% 3rd. author
+%% \alignauthor Amey Karkare\\
+%%        \affaddr{IIT Kanpur}\\
+%%        \affaddr{Kanpur 208016, India}
+%%        \email{karkare@cse.iitk.ac.in}
+%}
+%}}
+%\authorinfo{Double Blind Review}{}{}
 \maketitle
 
-
-
-\begin{abstract}
+\begin{abstract} 
 We consider  the problem of reducing  the memory required to  run lazy
-first-order functional programs.  To do this, we  analyze programs for
-liveness of  heap-allocated data.  The accompanying  garbage collector
-is modified  to use the result  of the analysis to  preserve only live
-data---a subset  of reachable data---during garbage  collection.  This
-results  in an  increase  in the  garbage  reclaimed and  consequently
-reduces the  memory footprint of  programs.  While this  technique has
-already been shown to yield  benefits for eager first-order languages,
-the lack of a statically determinable execution order and the presence
-of closures at runtime pose additional challenges for lazy languages.
-This requires changes  both in the earlier liveness  analysis and also
-in the  garbage collection scheme  required to reclaim memory  that is
-not live.
+first-order functional programs. We  address the problem by analyzing
+programs  for liveness  of  heap-allocated data.   The  result of  the
+analysis is  used to preserve  only live data---a subset  of reachable
+data---during garbage  collection.  The result  is an increase  in the
+garbage reclaimed and  a  reduction in  the peak memory requirement 
+of programs.   While this  technique has already  been shown  to yield
+benefits for  eager first-order  languages, the  lack of  a statically
+determinable execution  order and  the presence  of closures  pose new
+challenges  for lazy  languages.  These  requires changes  both in  the
+liveness analysis itself and in the design of the garbage collector.
 
-The implementation  of our  analysis annotates each  potential garbage
-collection  point  in   the  program  with  a   set  of  deterministic
-finite-state automata (DFA) describing the  liveness at that point. We
-also implement a copying collector that  uses the DFA to preserve live
-objects.   Our  experiments  confirm  that  liveness-based  collection
-always increases  the garbage  reclaimed, consequently  decreasing the
-number of collections.  In addition,  it reduces the execution time of
-several programs.  Experiments  also reveal that the  best results are
-obtained  for   a  mixed  garbage   collection  scheme  that   does  a
-liveness-based    collection   for    fully    evaluated   data    and
-reachability-based   collection  for   closures.   On our benchmark
-programs, we obtain a decrease of up to 45\% in the number of
-collections, and a decrease of up to 88\% in the number of dragged
-cells.  Even though liveness based collector uses an expensive
-traversal scheme, the execution time is competitive (0.2X - 2.1X) when
-compared to a reachability based collector.
+%% We use the  result of the analysis to annotate  each potential garbage
+%% collection  point  in   the  program  with  a   set  of  deterministic
+%% finite-state automata (DFA) describing the liveness at that point.
+We
+implement a copying collector that uses the results of the liveness
+analysis to preserve live
+objects, both evaluated (i.e.  in WHNF) and closures.  Our experiments
+confirm  that  for  programs  running with  a  liveness-based  garbage
+collector,   there  is   a   significant  decrease   in  peak   memory
+requirements.   In  addition,   a  sizable  reduction  in   the  number  of
+collections  ensures that  in spite  of using  a more  complex garbage
+collector,  the execution  time  of  a program  remains comparable  with
+the same program running with a reachabilty-based collector.
+\warning{On our benchmark programs, we obtain a decrease of up to 75\%
+  in the number of collections, and up to 50\% decrease in peak memory
+  requirements.}
 \end{abstract}
 
 \category{D.3.4}{Programming Languages}{Processors}[Memory Management
@@ -165,9 +168,10 @@ compared to a reachability based collector.
 \section{Introduction}
 \label{sec:intro}
 
-Functional programs use dynamically allocated memory extensively.  The
-allocation  is either  explicit (while using  constructors, for example) or
-implicit (as while creating  closures).  Programs  written in  lazy
+Functional programs make extensive use of dynamically allocated
+memory.  The
+allocation  is either  explicit (using  constructors, for example) or
+implicit (creating  closures).  Programs  written in  lazy
 functional languages put additional  demands on memory as they require
 closures to  be carried  from the  point of creation  to the  point of
 evaluation.
@@ -185,47 +189,52 @@ In this paper,  we propose the use of liveness  analysis of heap cells
 for garbage collection in a lazy first-order functional language.  The
 central notion in our analysis  is a generalization of liveness called
 {\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
-expression.   The analysis  has two  parts.  First,  each function  is
-summarized in a context-sensitive manner as a {\em demand transformer}
-that transforms a {\em symbolic} demand  on its body to demands on its
-arguments.  This summary  is then used to step  through function calls
-during analysis.   Second, the concrete  demand on a function  body is
-obtained through a 0-CFA-like conservative approximation that combines
-the  demands on  all the  calls to  the function.   The result  of the
-analysis  is an  annotation of  each program  point with  finite-state
-automata capturing the liveness of  variables at that point. Depending
-on the program point where  garbage collection has been triggered, the
-GC consults a set of  automata to restrict reachability during marking.
-This results in an increase  in the garbage reclaimed and consequently
-in fewer garbage collections.
+expression.   The  analysis has  two  parts.   First, we  calculate  a
+context-sensitive  summary   of  each   function  as  a   {\em  demand
+  transformer} that transforms a {\em  symbolic} demand on its body to
+demands on its  arguments.  This summary is used  to step through
+function  calls during  analysis.  Second,  the concrete  demand on  a
+function   body  is   obtained  through   a  0-CFA-like   conservative
+approximation  that combines  the  demands  on all  the  calls to  the
+function.   The result  of the  analysis is  an annotation  of certain
+program points  with deterministic finite-state  automata (DFA)  capturing the  liveness of
+variables  at  these points.  Depending  on  the program  point  where
+garbage  collection has  been  triggered,  the garbage collector consults  a set  of
+automata to restrict reachability during  marking.  This results in an
+increase in  the garbage reclaimed  and consequently in  fewer garbage
+collections.
 
-While this idea has been shown to be effective~\cite{asati14lgc} for a
-first-order {\em  eager} language, a straightforward  extension of the
-earlier  technique  is  not  possible  for  lazy  languages,  where  a
-heap-allocated   object   may   be  an   unevaluated   expression   or
-closure. Since  data is made  live by  evaluation of closures,  and in
-lazy languages  the place in  the program where this  evaluation takes
-place cannot  be statically determined, laziness  complicates liveness
-analysis itself.   In addition, apart  from evaluated data,  we extend
-liveness-based collection  to closures---closures  with no  future use
-should also  be collected.  This  involves tracking closures  to their
-points of  creation at  runtime from where  we obtain  their liveness.
-This requires significant modification to the earlier GC scheme.
+While this idea has been shown to be effective for a
+first-order {\em  eager} language~\cite{asati14lgc}, a straightforward  extension of the
+technique   is  not   possible  for  lazy   languages,  where
+heap-allocated objects  may include closures  (runtime representations
+of unevaluated expressions). Since data  is made live by evaluation of
+closures, and  in lazy languages the  place in the program  where this
+evaluation  takes  place  cannot be  statically  determined,  laziness
+complicates  liveness  analysis  itself.    In  addition,  apart  from
+evaluated   data,  we  need to  extend   liveness-based  collection   to
+closures i.e. we reclaim the space for closures  which have no future  use.
+Since a closure can  escape the scope in which it  was created, it has
+to carry the liveness information  of its free variables. Moreover, as
+execution  progresses and  possible  future uses  are eliminated,  the
+liveness information is updated with a more precise version.  All this
+requires significant  modification to  the earlier  garbage collection
+scheme for eager languages.
 
-Experiments    with   a    single    generation   copying    collector
-(Section~\ref{sec:experiments})   confirm  the   expected  performance
-benefits.  Liveness-based collection results in an increase in garbage
-reclaimed.  As  a consequence, there  is a  decrease in the  number of
-collections (up to 45\%) and a decrease  (up to 88\%) in the number of
-{\em  dragged}  cells  (cells  that  survive a  GC  after  their  last
-use). Besides, there is a reduction  in the overall execution time for
-some programs.  Our  experiments show that a mixed  strategy, where we
-do liveness based GC up to the closure boundary and reachability based
-GC for the arguments (free variables) of the closure, gives us similar
-benefits as  a fully  liveness based  GC (where  the arguments  of the
-closure  are  also  collected  using liveness)  with  lesser  overhead
-(Section~\ref{sec:strategies}).
-
+\warning{Experiments  with  a   single  generation  copying  collector
+  (Section~\ref{sec:experiments})  confirm  the  expected  performance
+  benefits.   Liveness-based  collection  results in  an  increase  in
+  garbage reclaimed.   As a  consequence, there is  a decrease  in the
+  number of  collections (up to 45\%)  and a decrease (up  to 88\%) in
+  the number  of {\em dragged}  cells (cells  that survive a  GC after
+  their  last use).  Besides,  there  is a  reduction  in the  overall
+  execution time for some programs.  Our experiments show that a mixed
+  strategy, where we  do liveness based GC up to  the closure boundary
+  and reachability based GC for  the arguments (free variables) of the
+  closure,  gives us  similar benefits  as a  fully liveness  based GC
+  (where  the  arguments  of  the closure  are  also  collected  using
+  liveness) with lesser overhead (Section~\ref{sec:strategies}).}
+ 
 
 %------------------------------------------------------------%
 \subsection{Motivating Example}
@@ -243,12 +252,12 @@ closure  are  also  collected  using liveness)  with  lesser  overhead
             \UFL\
             \UNL{0} (\DEFINE\ (\length\  \pl)
 	    \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-            (\PRIM\ 1\ (\length (\CDR\  \pl)))))
+            (\PRIM\ 1\ (\length\  (\CDR\  \pl)))))
             \UNL{0}
 	    \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
 	    \UNL{1}  (\SIF~(\NULLQ \ \lista)
 	    \listb
-	    \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\  \lista) (\append\
+	    \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\ \lista) (\append\
             (\CDR\  \lista)
             \listb))))
             \UNL{0}
@@ -271,7 +280,7 @@ closure  are  also  collected  using liveness)  with  lesser  overhead
         (b) Memory graph at $\pi$.  \scalebox{.7}{\TwoCellsAD{a1}{a2}}
         denotes a closure. Thick edges denote live links. Traversal
         stops at edges marked $\times$ during garbage collection for
-        an ideal collector.
+        a liveness-based collector.
       \end{tabular}
     \end{tabular} 
   \end{pspicture}
@@ -283,65 +292,71 @@ Figure~\ref{fig:mot-example} shows an example program and the state of
 the heap at  the program point $\pi$, i.e. just  before the evaluation
 of $(\length\  \pz)$.  The heap is  represented by a graph  in which a
 node either  represents atomic  values ($\NIL$,  integers etc.),  or a
-\CONS\ cell containing $\CAR$ and $\CDR$  fields, or a chunk of memory
-representing  an  unevaluated  value   also  called  a  {\em  closure}
-(represented  by  hatched  boxes).   Edges   in  the  graph  are  {\em
-  references} and emanate from variables  or fields.  The figure shows
+\CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
+(represented  by  shaded  clouds).   Edges   in  the  graph  are  {\em
+  references} and represent  variables  or fields.  The figure shows
 the  lists \px\  and  \pz\ partially  evaluated.   The evaluation  was
-triggered    by   the    test   (\NULLQ~(\CAR~\pz))    in   the
-\SIF\ expression.
+triggered by the test (\NULLQ~(\CAR~\pz)) in the \SIF\ expression.
 
 
 The edges  shown by thick  arrows are those  which are live  at $\pi$.
-Ideally, a cell should be  preserved during garbage collection only if
-it is reachable from  the root set through a path  of live edges.  All
-other  cells can  be reclaimed.   Thus if  a garbage  collection takes
-place at $\pi$ with the heap shown in Figure~\ref{fig:mot-example}(b),
-an ideal liveness-based  collector (LGC) will preserve  only the cells
-referenced by  $\pz$, $(\CDR~ \pz)$  and (the cells  constituting) the
-closure   referenced   by   $(\CDR~(\CDR~\pz))$.    In   contrast,   a
-reachability-based collector (RGC) would have preserved all cells.
+%% Only those  cell which have a future use  should be preserved
+%% during garbage collection, all other
+%% cells can be  reclaimed.
+Thus if a garbage collection  takes place at
+$\pi$ with the heap shown in Figure~\ref{fig:mot-example}(b), a
+liveness-based collector (LGC) will preserve only the cells referenced
+by  $\pz$,  and the live cells  constituting the  closure
+referenced by $(\CDR~\pz)$.   In contrast, a reachability-based
+collector (RGC) will preserve all cells.
 
-While an ideal garbage collector is  impractical, in this work we show
-that  static analysis  of  heap data  can help  practical garbage
-collectors in reclaiming more  garbage.  The specific contributions of
-this paper are
+In  this work  we show  that  static analysis  of heap  data can  help
+garbage collectors in reclaiming more garbage.  The specific
+contributions of this paper are
 \begin{itemize}
 \item  We  formulate  a  liveness  analysis for  a  lazy  first  order
-  functional language  and prove its correctness.  We show  how to
-  compute  function  summaries  in  a context  independent  manner  to
-  achieve  a  context  sensitive  analysis. We  further  describe  the
-  transformation of the  liveness equations to grammar rules  in a way
-  that the language  accepted by the resulting  grammar describes live
-  heap locations.
-\item We prove  the undecidability of the grammar  that results from
-  the  analysis.   To overcome  this,  we  present an  algorithm  to
-  transform grammars  to finite  state automata  (DFA) such  that the
-  language accepted by the  DFA over-approximates the liveness (and
-  hence a safe approximation).
-\item We have implemented a garbage  collector that can use the DFA
-  to  retain live  cells that  also include  closures. We  have done
-  extensive  experiments with  this garbage  collector and  obtained
-  empirical results  that show  the effectiveness  of liveness-based
-  garbage collection.
+  functional language and  prove its correctness. The correctness
+  proof involves setting up a non-standard semantics as a
+  specification of liveness and then proving that the analysis is
+  correct with respect to the specification.   
+\item Our  analysis results  in a set  of context-free  grammars along
+  with  a fixed  set  of non-context-free  productions.  The  decision
+  regarding  whether   to  copy  a  cell   during  garbage  collection
+  translates  to the  membership problem  of such  grammars.  In  this
+  paper, we  have shown the  undecidability of the  membership problem
+  for  the  class  of  grammars  that result  from  our  analysis.  To
+  circumvent the  problem, we  over-approximate the  grammars generated
+  by the analysis with DFAs.
+\item We  have implemented a garbage  collector that uses the  DFAs to
+  retain live  cells.  Our  experiments reveal  interesting space-time
+  trade-offs  in  the  engineering  of  the  collector---for  example,
+  updating liveness  information carried in closures  during execution
+  results  in   more  garbage  being  collected.    Empirical  results
+  demonstrate the effectiveness of liveness-based garbage collection.
 \end{itemize}
+To the  best of our
+  knowledge, this is the first work on liveness-based garbage
+  collection      for      lazy     languages.       All      previous
+  attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
+    asati14lgc, karkare06effectiveness} have targeted either
+  imperative or  eager functional languages. 
 
 \subsection{Organization of the paper}
 
-Section~\ref{sec:defs}  introduces  the   syntax  of  the  programming
-language  considered  in our  analysis  and  a small-step  operational
-semantics  for it.   We present  our liveness  analysis for  this lazy
-language  in Section~\ref{sec:liveness}.   Section~\ref{sec:computing}
-describes  the  formulation of  the  liveness  as  a grammar  and  its
-approximation  to   DFA.  It  also   contains  a  proof   showing  the
-undecidability  of  the  precise  liveness in  our  formulation  which
-necessitates  the approximation  to DFA.   Section~\ref{sec:GC-scheme}
-discusses different ways of handling closures and their pros and cons.
-We  report our  experimental results  in Section~\ref{sec:experiments}
-along with some observations.  Section~\ref{sec:relatedwork} discusses
-previous  work   related  to  garbage  collection   and  liveness  and
-Section~\ref{sec:conclusion}   discusses   possible   extensions   and
-concludes the paper.
+\warning{Section~\ref{sec:defs}   introduces   the   syntax   of   the
+  programming language  considered and gives a  small-step operational
+  semantics for it.   The liveness analysis for this  language and its
+  soundness   proof   is  presented   in   Section~\ref{sec:liveness}.
+  Section~\ref{sec:computing} describes the formulation of liveness as
+  grammars. We  also give a  proof of undecidability of  such grammars
+  and    show    how   they    can    be    approximated   by    DFAs.
+  Section~\ref{sec:GC-scheme}   discusses  details   of  the   garbage
+  collector,  in  particular the  use  of  liveness DFAs  for  garbage
+  collection.     We    report    our    experimental    results    in
+  Section~\ref{sec:experiments}   along    with   some   observations.
+  Section~\ref{sec:relatedwork}  discusses  previous work  related  to
+  garbage  collection  and liveness  and  Section~\ref{sec:conclusion}
+  discusses possible extensions and concludes the paper.}
 \section{The target language---syntax and semantics}
 \label{sec:defs}
 Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
@@ -350,20 +365,18 @@ to        be        in        Administrative        Normal        Form
 (ANF)~\cite{chakravarty03perspective} where  all actual  parameters to
 functions  are  variables.  While  this  restriction  does not  affect
 expressibility,  this form  has  the benefit  of  making explicit  the
-creation of  closures through  the $\LET$  construct.  $\LET$s  in our
-language  are lazy;  in the  expression $\LET\,\,  x \leftarrow  s\,\,
-\IN\,\, e$, $x$ may occur in  $s$. This enables creation of graph-like
-structures in  a pure language. The  restriction of \LET\ to  a single
+creation of  closures through  the $\LET$  construct.  \warning{ For
+  now, we assume  $\LET$s  in our
+language  are non-recursive;  in the  expression $\LET\,\,  x \leftarrow  s\,\,
+\IN\,\, e$, $x$ should not occur in  $s$}. The  restriction of \LET\ to  a single
 definition  is for  ease  of  exposition---generalization to  multiple
 definitions does not add conceptual difficulties.  We further restrict
 each variable in a program to  be distinct, so that no scope shadowing
-occurs---this  simplifies  the  reasoning   about  the  program.   The
-$\SRETURN$  and   \SIF\  expressions  and  strict   operators  trigger
-evaluation of closures.
+occurs---this  simplifies  reasoning.  
+
 
 The body  of a function ${\mathit  f}$ is denoted  as $e_{\mathit f}$.
-We   shall   extend   this   convention   to   the   main   expression
-$e_\mainpgm$. We assume that each program has a distinguished function
+ We assume that each program has a distinguished function
 \mainpgm\      with      the      definition     $(\DEFINE\      ({\tt
   \mainpgm})\  e_\mainpgm)$ and  the execution  of the  program starts
 with the call to \mainpgm.  We write $\pi\!:\!e$ to associate the label
@@ -373,12 +386,12 @@ before expression $e$.
 \begin{figure}[t]\footnotesize
 \renewcommand{\arraystretch}{1}
 \begin{eqnarray*}
-   p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\, e_\mainpgm
-    \hspace{5em} \mbox{\em --- program}\\
+   p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\,\,\, e_\mainpgm
+   \hspace{5em} \,\,\,\,\,\,\,\,\,\; \mbox{\em --- program}\\
     \mathit{df} \in Fdef & \!\!\!::=\!\!\! & (\DEFINE\,\, (f\,\, x_1 \,\, \ldots
 \,\,x_n)\,\,
     e)
-    \hspace{0.2em} \ \ \ \ \mbox{\em --- function def} \\
+    \hspace{0.2em} \ \ \ \ \ \ \ \ \  \mbox{\em --- function def} \\
 e \in \mathit{Expr} & \!\!\!::=\!\!\! &
 \left\{\begin{array}{@{}ll@{\hspace{1em}}l}
        (\SIF\,\, x\,\, e_1\,\, e_2) && \!\!\!\mbox{\em --- conditional} \\
@@ -405,229 +418,256 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
 
 
 \begin{figure*}[t!]
+%\comment{
+
 \begin{center}\footnotesize
-\renewcommand{\arraystretch}{1}
+\renewcommand{\arraystretch}{1.5}
 \begin{tabular}{|c|c|c|}
 \hline
 Premise & Transition & Rule name \\
 \hline
-\hline
-          & $\rho, (\rho', x, e)\!:\!S, H, \kappa
-  \rightsquigarrow \rho', S, H[\rho'(x) := \kappa], e$    &  \sc{const}
+\hline 
+          & $\rho,\, (\rho', \ell, e)\!:\!S,\, H,\, \kappa
+  \rightsquigarrow \rho',\, S,\, H[\ell := \kappa],\, e$    &  \sc{const}
 \\
 \hline
-          & {$\rho, (\rho', z, e)\!:\!S, H, (\CONS~x~y)
+          & {$\rho, \,(\rho', \ell, e)\!:\!S,\, H,\, (\CONS~x~y)
 \rightsquigarrow
-$  $\rho', S, H[\rho'(z) := (\rho(x), \rho(y))], e$}     &  \sc{cons} \\
+$  $\rho',\, S,\, H[\ell := (\rho(x), \rho(y))],\, e$}     &  \sc{cons} \\
 \hline
-$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & $\rho, (\rho', z, e)\!:\!S, H,
-(\CAR~x)  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e$      &
-\sc{car-whnf} \\
+
+$H(\rho(x)) \mbox{ is } (v, d)$ & $\rho,\, (\rho', \ell, e)\!:\!S,\, H,\,
+(\CAR~x)  \rightsquigarrow \rho',\, S,\, H[\ell := v],\, e$      &
+\sc{car-select} \\
 \hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S, H, (\CAR~x)
+
+
+
+$H(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  H,\,
+(\CAR~x)  \rightsquigarrow \rho', \,(\rho, addr(\langle s, \rho'\rangle), (\CAR~x))\!:\!S,\, H,\, s$      &
+\sc{car-1-clo} \\
+\hline
+
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, H,\, (\CAR~x)
 \rightsquigarrow
-\rho', (\rho, x, (\CAR~x))\!:\!S, H, s$      &
+\rho',\, (\rho, \rho(x), (\CAR~x))\!:\!S, \,H,\, s$      &
 \sc{car-clo}
 \\
 \hline
+
+
+
 $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
- & {$\rho, (\rho', z, e)\!:\!S, H, (+~x~y)  \rightsquigarrow$
-$\rho', S, H[\rho'(z) := H(\rho'(x)) + H(\rho'(y))], e$}      &
-\sc{prim-whnf} \\
+ & {$\rho,\, (\rho', \ell, e)\!:\!S,\, H,\, (+~x~y)  \rightsquigarrow$
+$\rho', \,S,\, H[\ell := H(\rho'(x)) + H(\rho'(y))],\, e$}      &
+\sc{prim-add} \\
 \hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S, H, (+~x~y)
+
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, H,\, (+~x~y)
 \rightsquigarrow
-\rho', (\rho, x, (+~x~y))\!:\!S, H, s$      &
+\rho',\, (\rho, \rho(x), (+~x~y))\!:\!S,\, H,\, s$      &
 \sc{prim-1-clo} \\
 \hline
-$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & $\rho, S, H, (+~x~y)
+$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & $\rho,\, S,\, H,\, (+~x~y)
 \rightsquigarrow
-\rho', (\rho, y, (+~x~y))\!:\!S, H, s$      &
+\rho', (\rho,\, \rho(y),\, (+~x~y))\!:\!S,\, H,\, s$      &
 \sc{prim-2-clo} \\
 \hline
 {$\mathit{f}~\mbox{defined as}$
-$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho, S, H,
+$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho,\, S,\, H,\,
 (f~\myvec{x})  \rightsquigarrow
-[\myvec{y} \mapsto \rho(\myvec{x})], S, H, e_{\mathit{f}}$      &
+[\myvec{y} \mapsto \rho(\myvec{x})],\, S,\, H,\, e_{\mathit{f}}$      &
 \sc{funcall} \\
 \hline
-$\ell$ is a new location& {$\rho, S, H, (\LET~x\leftarrow s~\IN~e)
+$\ell$ is a new location& {$\rho,\, S,\, H,\, (\LET~x\leftarrow s~\IN~e)
   \rightsquigarrow$
-$\rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s,
-    \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-  \ell]\rangle], e$} &
+$\rho\oplus[x \mapsto \ell],\, S,\, H[\ell \mapsto \langle s,
+    \lfloor\rho\rfloor_{FV(s)} %% \oplus [x \mapsto  \ell] -- NO LAZY LETS
+    \rangle],\, e$} &
 \sc{let} \\
 \hline
-$H(\rho(x)) \ne 0$ & $\rho, S, H, (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho, S, H,  e_1$ & \sc{if-true} \\
+$H(\rho(x)) \ne 0$ & $\rho,\, S,\, H,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
+\rho,\, S,\, H,\,  e_1$ & \sc{if-true} \\
 \hline
-$H(\rho(x)) = 0$ & $\rho, S, H, (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho, S, H,  e_2$ & \sc{if-false} \\
+$H(\rho(x)) = 0$ & $\rho,\, S,\, H,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
+\rho,\, S, \,H, \, e_2$ & \sc{if-false} \\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho, S, H,
+$H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, H,\,
   (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2))\!:\!S, H,  s$}
+\rho',\, (\rho, \rho(x), (\SIF~x~e_1~e_2))\!:\!S,\, H, \, s$}
 &
 \sc{if-clo} \\
 \hline
-{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& $\rho, (\rho', z,
-e)\!:\!S, H,
-(\SRETURN~x)  \rightsquigarrow \rho', S, H[\rho'(z) := v], e$ &
+{$H(\rho(x))~\mbox{is in WHNF with value}~v$}& $\rho,\, (\rho', \ell,
+e)\!:\!S,\, H,\,
+(\SRETURN~x)  \rightsquigarrow \rho',\, S,\, H[\ell := v],\, e$ &
 \sc{return-whnf}\\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho, S, H, (\SRETURN~x)
+$H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, H,\, (\SRETURN~x)
   \rightsquigarrow$
-$\rho',~ (\rho, x, (\SRETURN~x))\!:\!S, H,  s$} &
+$\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, H,\,  s$} &
 \sc{return-clo} \\
 \hline
 \end{tabular}
 \caption{The small-step semantics for the language. \label{fig:lang-semantics}}
 \end{center}
+%}\comment
 \end{figure*}
 
 
 
 \subsection{Semantics}
+%\comment{
 We now give  a small-step semantics for our  language.
 We first specify the domains used by the semantics:
 \[
 \renewcommand{\arraystretch}{1}
 \begin{array}{@{}r@{\ }l@{\ \ }c@{\ \ }l@{\hspace{0.5em}}l}
-\rho: & \mathit{Env} &=&\mathit{Var} \rightarrow \mathit{Loc} & \mbox{-- Environment} \\
-v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Data \times Data}& \mbox{-- Values}\\
-c:   & \mathit{Clo} &=& \mathit{(Exp \times Env)}& \mbox{-- Closures}\\
+\heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow (Data + \{empty\}) & \mbox{-- Heap}\\
 d: & \mathit{Data} &=&\mathit{Val} + \mathit{Clo} & \mbox{-- Values \& Closures} \\
-\heap: & \mathit{Heap} & =&\mathit{Loc} \rightarrow Data & \mbox{-- Heap}
+v:   & \mathit{Val} &=& \mathbb{N} + \{\NIL\} + \mathit{Data \times Data}& \mbox{-- Values}\\
+c:   & \mathit{Clo} &=& \mathit{(App \times Env)}& \mbox{-- Closures}\\
+\rho: & \mathit{Env} &=&\mathit{Var} \rightarrow \mathit{Loc} &
+\mbox{-- Environment} \\
 \end{array}
 \]
 
+
 Here  $\mathit{Loc}$ is  a countable  set  of locations  in the  heap.
-Since all data objects are boxed, we model an environment as a mapping
-from the set  of variables of the program  $\mathit{Var}$ to locations
-in the  heap.  These  either contain  a value in  WHNF (a  number, the
-empty  list  $\NIL$,  or  a  \CONS\  cell  with  possibly  unevaluated
+A non-empty location either contains  a value in  \emph{WHNF} (a  number, the
+empty  list  $\NIL$ or  a  \CONS\  cell  with  possibly  unevaluated
 constituents) or  a {\em closure}.   A closure  is a pair  $\langle s,
 \rho\rangle$ in  which $s$ is  an unevaluated application,  and $\rho$
-maps free variables of $s$ to their respective locations.
+maps free variables of $s$ to their respective locations. Since all data objects are boxed, we model an environment as a mapping
+from the set  of variables of the program  $\mathit{Var}$ to locations
+in the  heap.  
+
 
 The  semantics  of   expressions  (and  applications\footnote{In  most
   contexts, we  shall use the  term 'expression' and the  notation $e$
   for both expressions and applications.}) are given by transitions of
 the form $\rho, \stk, \heap,  e \rightarrow \rho', \stk', \heap', e'$.
 Here \stk\ is a stack of continuation frames.  Each continuation frame
-is of the form $(\rho, x, e)$, signifying that the location of $x$ has
-to be updated  with the value of the  currently evaluating expression,
-and $e$ is to be evaluated  next in the environment $\rho$.  Note that
-the state of the transition  system consists of the current evaluation
-context,  given  by  $\rho$  and $e$,  and  the  suspended  evaluation
-contexts recorded  in the stack  $S$.  The heap  $H$ is common  to all
-contexts.
+is of the form $(\rho, \ell,  e)$, signifying that the location $\ell$
+has  to  be  updated  with  the  value  of  the  currently  evaluating
+expression, and $e$ is to be evaluated next in the environment $\rho$.
+Note  that  the  state  of  the  transition  system  consists  of  the
+\emph{current evaluation  context}, given by  $\rho$ and $e$,  and the
+\emph{suspended  evaluation  contexts}  (represented  as  continuation
+frames) in the stack $S$.   \warning{The
+3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
+system will be denoted $\mathcal{S}$.}
 
+The  initial  state  of  the  transition  system  described  above  is
+$([\;]_\rho,\,   ([\;]_\rho,   \,   \rho(\ans),\,   (\print~\ans)):[\;]_{S},
+[\;]_{H},\, (\mainpgm))$,  in which  $[\;]_\rho$ and $[\;]_H$  are the
+empty environment and  the empty heap. The  initial stack consists
+of  a single  continuation frame  in  which \ans\  is a  distinguished
+variable  that  would   eventually  be  updated  with   the  value  of
+(\mainpgm).  In  addition, \print\ is  a function modeling  a printing
+mechanism---a   standard   run-time   support  assumption   for   lazy
+languages---that prints  the value of  (\mainpgm).  The operator $:$
+pushes elements on top of the stack.
 
-The     start      state     is      $([\;]_\rho,([\;]_\rho,     \ans,
-(\print~\ans)):[\;]_{S} , [\;]_{H}, (\mainpgm))$.  In this, the initial
-environment  and  the initial  heap  are  denoted by  $[\;]_\rho$  and
-$[\;]_H$,  and the  initial stack  consists of  a single  continuation
-frame in which \ans\ is a distinguished variable that would be updated
-with  the value  of (\mainpgm).   In addition,  \print\ is  a function
-modeling a printing mechanism---a standard run-time support assumption
-for lazy  languages---that prints  the value of (\mainpgm).   Notice the
-use of the operator $:$ for adding elements to the top of the stack.
-
-
-
-%% In absence of a static type-checking mechanism, programs with other
-%% than syntactic  errors lead to states  not covered by  any rules in
-%% the small-step semantics.
-The notation  $[\myvec{x}   \mapsto  \myvec{\ell}]$   represents  an
-environment that maps variables $x_i$
-%$x_1,  \ldots, x_n$
-to locations $\ell_i$
-%$\ell_1,  \ldots,  \ell_n$,
-and  $\heap[\ell :=  d]$
-indicates the  updating of  a heap \heap\  at $\ell$ with  $d$.  $\rho
-\oplus \rho'$  represents the  environment $\rho$ shadowed  by $\rho'$
-and $\lfloor \rho \rfloor_X$  represents the environment restricted to
-the locations in $X$. Finally $FV(s)$ represents the free variables in
-the application $s$.
+The   notation  $[\myvec{x}   \mapsto  \myvec{\ell}]$   represents  an
+environment  that  maps  variables  $x_i$ to  locations  $\ell_i$  and
+$\heap[\ell := d]$  indicates the updating of a heap  \heap\ at $\ell$
+with  $d$.   $\rho \oplus  \rho'$  represents  the environment  $\rho$
+shadowed  by  $\rho'$  and  $\lfloor \rho  \rfloor_X$  represents  the
+environment  restricted  to  the  variables in  $X$.  Finally  $FV(s)$
+represents the  free variables  in the  application $s$  and $addr(c)$
+gives the address of the closure $c$ in the heap.
 
 The small-step semantics  is shown in Figure~\ref{fig:lang-semantics}.
-As  a sample,  consider  the  rules  for  $(+~x~y)$, an  application
-involving a binary operator strict in both arguments.   When
-both $x$  and $y$ are already  in WHNF ({\sc prim-whnf}),  the heap is
-updated with the  sum of the arguments and  the next expression to be
-evaluated is picked from the continuation on the stack. If either of the
-arguments is not in
-WHNF  ({\sc  prim-1-clo}  and   {\sc  prim-2-clo}),  it  is  sent  for
-evaluation, and a continuation  marks that the evaluation of $(+~x~y)$
-has to be resumed after the argument is evaluated.
+Unlike   an   eager  language,   evaluation   of   a  let   expression
+$(\LET~x\leftarrow  s~\IN~e)$ does  not  result in  the evaluation  of
+$s$. Instead,  as the {\sc let}  rule shows, a closure  is created and
+bound to  $x$. The  program points which  trigger evaluation  of these
+closure   are  the   condition  of   an  $\SIF$   ({\sc  IF-clo})   and
+\SRETURN\ ({\sc  return-clo}).  We  call such  points \emph{evaluation
+  points   $(\epath)$}  and   label  them   with  $\psi$   instead  of
+$\pi$. As an  example of closure  evaluation, we  explain the
+three rules for  $(\CAR~x)$.  If $x$ is a closure,  it is evaluated to
+WHNF, say $(d_1, d_2)$.  This is  given by the rule {\sc car-clo}.  If
+$d_1$ is  not in WHNF,  it is  also evaluated ({\sc  car-1-clo}).  The
+address  to be  updated  with the  evaluated value  is
+recorded  in  a  continuation  frame.    This  is  required  for  lazy
+evaluation, else $d_1$ may  be evaluated more than once
+due to  sharing~\cite{Jones87}.  Only after this  is the actual selection  done ({\sc
+  car-select}).
 
+
+%}\comment
 %==============================================================
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
 \begin{figure*}[t]
+\comment{
 \renewcommand{\arraystretch}{1}
 \begin{eqnarray*}
 \mathit{ref\/}(\kappa,\sigma,\Lfonly)
           &=& \{\,\} \mbox{, for $\kappa$ a constant, including
 $\NIL$}\\
-\mathit{ref\/}((\CONS~x~y),\sigma,\Lfonly)
-          &=& \{x.\alpha \mid \acar\alpha \in \sigma\} \cup \{y.\alpha
+\mathit{ref\/}(\pi:(\CONS~x~y),\sigma,\Lfonly)
+          &=& \{x_{\pi}.\alpha \mid \acar\alpha \in \sigma\} \cup
+  \{y_{\pi}.\alpha 
 \mid \acdr\alpha \in \sigma\} \\
-\mathit{ref\/}((\CAR~x),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\CAR~x),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acar\alpha \mid \alpha \in
+                    \{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acar\alpha \mid \alpha \in
 \sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((\CDR~x),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\CDR~x),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon\} \cup \{x.\acdr\alpha \mid \alpha \in
+                    \{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acdr\alpha \mid \alpha \in
 \sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((\PRIM~x~y),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\PRIM~x~y),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon, y.\epsilon\},  & \mbox{if}~\sigma \ne
+                    \{x_{\pi}.\epsilon, y_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne
 \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((\NULLQ~x),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(\NULLQ~x),\sigma,\Lfonly)
           &=&    \begin{array}{l l}
-                    \{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+                    \{x_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
                     \emptyset  & \mbox{otherwise}
                  \end{array} \\
-\mathit{ref\/}((f~\myvec{x}),\sigma,\Lfonly)
+\mathit{ref\/}(\pi:(f~\myvec{x}),\sigma,\Lfonly)
 %          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
           &=&  \begin{array}{@{}l}  % to discourage \displaystyle
-               \bigcup_{i=1}^n x_i.\Lf{f}{i}{\sigma}
+               \bigcup_{i=1}^n x_{i_{\pi}}.\Lf{f}{i}{\sigma}
                \end{array}
 %          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
 \\[1ex]
-\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{\epath}
-\mapsto
-x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
-  new e-path terminating with $\psi$}\\
+\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& 
+x.\sigma\\
+%% \mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{\epath}
+%% \mapsto
+%% x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
+%%   new e-path terminating with $\psi$}\\
 \mathcal{L}((\SIF~\psi:x~e_1~e_2),\sigma,\Lfonly) &=&
 \begin{array}{l l}
-                    \mathcal{L}(e_1,\sigma,\Lfonly) \uplus
-        \mathcal{L}(e_2,\sigma,\Lfonly) \uplus
-        \lbrack\lbrace \mathit{\epath} \mapsto
-\{x.\epsilon\}\rbrace\rbrack,  & \mbox{if}~\sigma \ne \emptyset\\
-        \emptyset_{\cal{M}}  & \mbox{otherwise}
+                    \mathcal{L}(e_1,\sigma,\Lfonly) \cup
+        \mathcal{L}(e_2,\sigma,\Lfonly) \cup
+\{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+        \emptyset  & \mbox{otherwise}
                  \end{array} \\
-&&\mbox{where $\mathit{\epath}$ is a new e-path
-  terminating with $\psi$}\\
-\mathcal{L}(\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-        \lambda\mathit{\epath}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
-\mbox{where}~\mathcal{M} =
-\mathcal{L}(e,\sigma,\Lfonly),~\Lv =
-\mathcal{M}(\epath),~\mbox{and}~f~\mbox{is the new function}\\
-&& \makebox[0mm]{\hspace*{7cm}
- $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
-           x_2\, \ldots\, x_n)/x]))$,} \\
- \makebox[0mm]{\hspace*{8cm} where
-     $x_1\, \ldots\, x_n$ are the variables in $s$}
+%% \mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+%%         \lambda\mathit{\epath}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
+%% \mbox{where}~\mathcal{M} =
+%% \mathcal{L}(e,\sigma,\Lfonly),~\Lv =
+%% \mathcal{M}(\epath),~\mbox{and}~f~\mbox{is the new function}\\
+%% && \makebox[0mm]{\hspace*{7cm}
+%%  $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
+%%            x_2\, \ldots\, x_n)/x]))$,} \\
+%%  \makebox[0mm]{\hspace*{8cm} where
+%%      $x_1\, \ldots\, x_n$ are the variables in $s$}
+\mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+\mathit{ref\/}(s,\sigma',\Lfonly) \cup \Lv \cup \{x.\sigma'\} 
+~\mbox{where}~ \mathcal{\Lv} = \mathcal{L}(e,\sigma,\Lfonly), ~\mbox{and}~\sigma' = \bigcup_{\pi}  \Lv(x_{\pi})
 \end{eqnarray*}
 \begin{minipage}{0.85\textwidth}
 \infrule[live-define]
@@ -640,7 +680,9 @@ x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
      $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $\mathit{df_1}
 \ldots \mathit{df_k}$}}
 \end{minipage}
-  \caption{Liveness equations and judgement rule}\label{fig:live-judge}
+  \caption{Liveness equations and judgement
+    rule}\label{fig:live-judge}
+}%comment
 \end{figure*}
 
 
@@ -656,433 +698,620 @@ using  $\CAR$  and  $\CDR$  fields,  the  liveness  of  the  structure
 reachable from a  variable can be represented by a  set of {\em access
   paths}     i.e.     prefix-closed     set     of    strings     from
 $\{\acar,\acdr\}^\ast$.  As an example, if $x$ is a list with liveness
-$\{\epsilon, \acdr,  \acdr\acar, \acdr\acdr,  \acdr\acdr\acar\}$, then
-future computations can only refer up  to the second and third members
-of $x$.  A  {\em liveness environment} is a mapping  from variables to
-subsets of $\{\acar,\acdr\}^\ast$,  but often expressed as  a set, for
-example by writing $\{x.\epsilon, x.\acdr, x.\acdr\acdr, y.\epsilon\}$
-instead       of       $[x       \mapsto\{\epsilon,\acdr,\acdr\acdr\},
-  y\mapsto\{\epsilon\}, z\mapsto\{\}]$.  In  this notation, $x \mapsto
-\{\epsilon\}$ represents access using $x$  itself and $x \mapsto \{\}$
-indicates that $x$  is dead.  We associate  liveness environments with
-program points.  The  liveness at $\pi:e$ is the  liveness just before
-executing $e$.
+$\{\epsilon, \acar, \acdr, \acdr\acar, \acdr\acdr, \acdr\acdr\acar\}$,
+then future  computations can only  refer up  to the second  and third
+members  of $x$.   A  {\em  liveness environment}  is  a mapping  from
+variables to access paths, but often expressed as
+a set,  for example  by writing $\{x.\epsilon,  x.\acdr, x.\acdr\acdr,
+y.\epsilon\}$  instead  of  $[x  \mapsto\{\epsilon,\acdr,\acdr\acdr\},
+  y\mapsto\{\epsilon\}, z\mapsto\{\}]$.  In  this notation, $y \mapsto
+\{\epsilon\}$ represents access using $y$  itself and $z \mapsto \{\}$
+indicates that $z$ is dead. 
+In lazy languages, liveness environments are associated with regions of
+programs instead of program points.
 
+A notion that generalizes liveness is {\em demand}.  While liveness 
+gives the patterns of future uses of a  variable, demand
+represents the future  use of the value of an  expression.  The demand
+on an expression  $e$ is again a set of  access paths---that subset of
+$\{\acar,\acdr\}^\ast$ which the  context of $e$ may  explore of $e$'s
+result.   To see  the need  for demands,  consider the  let expression
+$\pi:(\LET~x\leftarrow  (\CDR~y)~\IN~ \pi':\SRETURN~x)$.   Assume that
+the context  of this expression  places the demand  $\lbrace \epsilon,
+\acar \rbrace$. Since the value of the expression is
+the value  of $x$, the demand  translates to the liveness  $[x \mapsto
+  \lbrace   \epsilon,  \acar   \rbrace]$  at   $\pi'$.   Due   to  the
+\LET\ definition which binds $x$ to $(\CDR~y)$, the liveness of $x$ at
+$\pi'$ now becomes the demand on $(\CDR~y)$.  This, in turn, generates
+the liveness  $\lbrace y.\epsilon,  y.\acdr, y.\acdr\acar  \rbrace$ at
+$\pi$.  These are  the set of $y$-rooted accesses  required to explore
+$\lbrace \epsilon, \acar  \rbrace$ paths of the  result of $(\CDR~y)$.
+%% As an analogy  with classical (strong) liveness analysis,  $y$ and $z$
+%% are live  at the entry $\pi:  x:=y+z$, if and  only if $x$ is  live at
+%% exit   of  $\pi$.    In   our  terminology,   the  liveness   $\lbrace
+%% \epsilon\rbrace $ of $x$ at the  exit from $\pi$ becomes the demand on
+%% $y+z$, and this,  in turn generates the  liveness $\lbrace y.\epsilon,
+%% z.\epsilon \rbrace$ at the entry of $\pi$.
 
-A  notion  related  to  liveness  is  {\em  demand}.   While  liveness
-represents the future use of variables, a demand represents the future
-use of the value of an expression.  The demand on an expression $e$ is
-again a  set of  access paths---that subset  of $\{\acar,\acdr\}^\ast$
-which the context of $e$ may explore of $e$'s result.  To see the need
-for  demands,  consider   the  let  expression  $\pi:(\LET~x\leftarrow
-(\CDR~y)~\IN~  \pi':\SRETURN~x)$.  Assume  that  the  context of  this
-expression produces  the liveness $[x \mapsto  \lbrace \epsilon, \acar
-  \rbrace]$ at $\pi'$.  Due to the \LET\ definition which binds $x$ to
-$(\CDR~y)$, the  liveness of $x$ at  $\pi'$ now becomes the  demand on
-$(\CDR~y)$.    This,  in   turn,  generates   the  liveness   $\lbrace
-y.\epsilon, y.\acdr, y.\acdr\acar \rbrace$ at $\pi$. These are the set
-of $y$-rooted  accesses required  to explore $\lbrace  \epsilon, \acar
-\rbrace$  paths  of  the  result of  $(\CDR~y)$.  In  strong  liveness
-analysis       (dual      of       classical      faint       variable
-analysis~\cite{horwitz.faint}),  $y$ and  $z$  are live  at the  entry
-$\pi: x:=y+z$, if  and only if $x$  is live at exit of  $\pi$.  In our
-terminology, the  liveness $\lbrace  \epsilon\rbrace $  of $x$  at the
-exit from $n$ becomes the demand on $y+z$, and this, in turn generates
-the liveness $\lbrace y.\epsilon, z.\epsilon  \rbrace$ at the entry of
-$n$.
+We use $\sigma$
+to  range over  demands,  $\alpha$  to range  over
+access  paths and  $\Lv$  to  range over  liveness
+environments.   The   notation  $\sigma_1\sigma_2$
+denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
+\alpha_1     \in     \sigma_1,    \alpha_2     \in
+\sigma_2\rbrace$.  Often  we shall  abuse notation
+to juxtapose  an edge  label and  a set  of access
+paths;   $\acar\sigma$   is    a   shorthand   for
+$\lbrace\acar\rbrace\sigma$.
 
-We follow the notations appearing in \cite{asati14lgc}. In particular,
-We use $\sigma$  to range over demands, $\alpha$ to  range over access
-paths and  $\Lv$ to  range over  liveness environments.   The notation
-$\sigma_1\sigma_2$  denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
-\alpha_1 \in \sigma_1, \alpha_2  \in \sigma_2\rbrace$.  Often we shall
-abuse notation to  juxtapose an edge label and a  set of access paths:
-$\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
+\input{example-program-and-liveness-maps}
+%%\label{fig:mot-example2}
 
 \subsection{Liveness Analysis for lazy languages}
 \label{sec:liveness-analysis}
+ 
+%\comment{ 
+Consider  the program in  Figure~\ref{fig:mot-example2}.  As
+  mentioned earlier,  a lazy  evaluation of  the $\LET$  expression at
+  $\pi_1$ creates a closure for $(length~x)$ instead of evaluating it.
+  Since the  closure may escape the  scope in which it  is created, it
+  carries a copy  of $x$ within itself.   We treat the copy  of $x$ in
+  the closure as being separate from the $x$ introduced by the $\LET$,
+  and call  it a \emph{closure variable}.   For liveness calculations,
+  such variables are distinguished from variables introduced by \LET s
+  and  function arguments  (called \emph{stack  variables} since  they
+  reside in the activation stack). Notationally, we distinguish
+  closure variables from their corresponding stack variables by
+  subscripting them with their program points of
+  creation.\footnote{Mutiple occurrences of the same variable in an
+    application are further distinguished by their positions in the
+    application.}
+
+
+  Since a  closure is evaluated  only at evaluation points,  a closure
+  variable is attributed  with the same liveness in the  region of the
+  program from the  point of creation to  reachable evaluation points.
+  This is  also true  of stack  variables, because,  as we  shall see,
+  stack variables derive their  liveness from closure variables. Thus,
+  there are  two major differences  in our formulation of  liveness of
+  lazy   languages  with   liveness  of   eager 
+  languages~\cite{asati14lgc}:    (i)  the
+  introduction of  closure variables in the  liveness calculation, and
+  (ii) a  single liveness value  for each variable that  is applicable
+  from its creation point to evaluation points.
+
+
+  Closure  variables get  their  liveness values  through  a chain  of
+  dependences beginning at  a variable at an evaluation  point.  As an
+  example,  the  variable $z$  returned  at  $\psi_2$ depends  on  $y$
+  through  the  expression $(+~y~1)$.   $y$  in  turn depends  on  the
+  closure  variable  $x_{\pi_1}$   through  $(length~x_{\pi_1})$.   We
+  denote  this chain  of dependences  as $\lbrack  \psi_2\!\!\!:\!\!\!z \leftarrow
+  (+~y~1),\,  y  \leftarrow   (length~x_{\pi_1})\rbrack$.   Indeed,  the
+  closures  in  the  heap  are   a  runtime  representation  of  these
+  dependences.  Since  $z$  is  evaluated   at  $\psi_2$  due  to  the
+  expression $\SRETURN~z$,  the demand made by  the calling context(s)
+  of  $f$ places  a demand  on  $z$ which  will impart  a liveness  to
+  $x_{\pi_1}$.  Other dependence chains which result in a liveness for
+  $x_{\pi_1}$       are       $\lbrack       \psi_1\!\!\!:\!\!y       \leftarrow
+  (length~x_{\pi_1})\rbrack$ and $\lbrack \psi_3\!\!\!:\!\!\!w \leftarrow (/~u~y),\,\,
+  y  \leftarrow  (length~x_{\pi_1})\rbrack$.   The  liveness  analysis
+  described in this section declares the liveness of $x_{\pi_1}$ to be
+  a union of the liveness arising  out of these dependence chains.  To
+  be safe, a  garbage collection during evaluation of  $y$ at $\psi_1$
+  has  to  use  this  liveness  to copy  the  heap  from  $x_{\pi_1}$.
+  However,  notice that  if  a garbage  collection  takes place  while
+  evaluating $z$ at $\psi_2$, it can safely consider only the liveness
+  arising  out of  the dependence  chain\linebreak $\lbrack  \psi_2\!\!\!:\!\!\!z \leftarrow
+  (y+1),\,   y  \leftarrow   (length~x_{\pi_1})\rbrack$.   The   garbage
+  collection  scheme described  in Section~\ref{sec:GC-scheme}  uses a
+  generalization  of   this  observation   to  dynamically   select  a
+  evaluation point specific liveness in order to collect more garbage.
+
 
 
 Figure~\ref{fig:live-judge}  describes  our  analysis  which  has  two
-parts. The function $\mathit{ref}$,  takes  an application $s$ and
-a demand $\sigma$, and returns  the incremental liveness generated for the
-free  variables   of  $s$  due  to  the   application.   The  function
-$\mathcal{L}$  uses   $\mathit{ref}$  to  propagate   liveness  across
-expressions.
+parts. The  function $\mathit{ref}$,  takes an  application $s$  and a
+demand $\sigma$ and returns the incremental liveness generated for the
+free variables of $s$ due to  the application.  This will be consulted
+during garbage collection  while exploring the heap  starting from the
+closure  variables.  The function $\mathcal{L}$  uses  $\mathit{ref}$ to  propagate
+liveness across expressions.
 
- Since  in a  lazy language,  an  expression is  not evaluated  unless
- required. The null demand ($\emptyset$) does not generate liveness in
- any  of  the  rules  defining  $\mathit{ref}$  or  $\mathcal{L}$.   A
- non-null  demand of  $\sigma$ on  (\CDR~$x$), is  transformed to  the
- liveness $\{x.\epsilon, x.\acdr\sigma\}$.  In  an opposite sense, the
- demand  of $\acdr\sigma$  on  (\CONS~$y$~$z$) is  transformed to  the
- demand  $\sigma$  on $z$.   Since  \CONS\  does not  dereference  its
- arguments, there  is no $\epsilon$ demand  on $y$ and $z$.  The rules
- for (\PRIM~x~y) and (\NULLQ~x) are similar. Constants do not generate
- any liveness.
+In  a   lazy  language,   an  expression   is  not   evaluated  unless
+required. Therefore  the null  demand ($\emptyset$) does  not generate
+liveness in any of the rules defining $\mathit{ref}$ or $\mathcal{L}$.
+A non-null  demand of  $\sigma$ on (\CDR~$x$),  is transformed  to the
+liveness $\{x.\epsilon,  x.\acdr\sigma\}$.  In an opposite  sense, the
+demand  of  $\acdr\sigma$ on  (\CONS~$y$~$z$)  is  transformed to  the
+demand  $\sigma$  on  $z$.   Since \CONS\  does  not  dereference  its
+arguments, there  is no $\epsilon$ demand  on $y$ and $z$.   The rules
+for (\PRIM~x~y) and (\NULLQ~x) are  similar. Constants do not generate
+any liveness.
 
-For the  case of a  function call we  use a third  parameter $\Lfonly$
+
+
+In case of a  function call, we  use the third  parameter $\Lfonly$
 that  represents  the  summaries  of all  functions  in  the  program.
-$\Lfonly_{\mathit  f}$  (the component  of  $\Lfonly$  for a  specific
-function $f$), expresses  how the demand $\sigma$ on a  call to $f$ is
+$\Lfonly_{\mathit  f}$  (the summary for a  specific
+function $f$) expresses  how the demand $\sigma$ on a  call to $f$ is
 transformed into  the liveness of  its parameters at the  beginning of
-the   call.    $\Lfonly$  is   determined   by   the  judgement 
-$\mathit{Prog} \len \Lfonly$ using inference rule ({\sc live-define}).
-This  rule  describes the  fixed-point  property  to be  satisfied  by
-$\Lfonly$, namely, the demand transformation assumed for each function
-in  the  program should  be  the  same  as the  demand  transformation
-calculated    from    its    body.      As    we    shall    see    in
+the  call.  $\Lfonly$  is determined  by the  judgement $\mathit{Prog}
+\len  \Lfonly$ using  inference rule  ({\sc live-define}).   This rule
+describes  the  fixed-point property  to  be  satisfied by  $\Lfonly$,
+namely, the  demand transformation  assumed for  each function  in the
+program should  be the  same as  the demand  transformation calculated
+from      its      body.       As       we      shall      see      in
 Section~\ref{sec:grammar-formulation},  we  convert  the rule  into  a
 grammar and  the the language generated  by this grammar is  the least
 solution satisfying  the rule. We  prefer the least solution  since it
 ensures the safe collection of the greatest amount of garbage.
 
 We next  describe the function $\mathcal{L}$  that propagates liveness
-across expressions.  Note that,  unlike eager languages, the syntactic
-occurrence  of an expression  in a  program denotes  the point  of
-creation of its closure, not necessarily its evaluation.
-To see the  consequences of this, consider
-Figure~\ref{fig:mot-example2} which shows an analysis  of the body of
-a function $\length$ with a demand $\sigma$.  Clearly, this is also the
-demand on the return value $z$ giving the liveness at the program point
-$\pi_8$ as $\{\pz.\sigma\}$.  The liveness at $\pi_8$ is propagated
-backwards as in traditional liveness analysis.
+across  expressions.   Consider  the $\mathcal{L}$-rules  for  {\LET},
+{\SIF}, and {\SRETURN}.  Since the value of $(\SRETURN~x)$ is the
+value  of  $x$,  a  demand $\sigma$  on  $(\SRETURN~x)$  gives  a
+liveness   of  $\{x.\sigma\}$.    The  liveness   of  the   expression
+$(\SIF~x~e_1~e_2)$  is  a union  of  the  liveness of  $e_1$  and
+$e_2$. In  addition, since  the condition $x$  is also  evaluated, the
+liveness $\{x.\epsilon\}$ is created and  added to the union.  
+%% Also  notice  a  consequence  of laziness:  the  entire  expression
+%% including the  condition is not  evaluated if  the demand on  it is
+%% $\emptyset$.  This results in the empty liveness environment.
+To understand the  liveness rule for $\LET~x \leftarrow~s~\IN~e$, observe that the value of  $\LET$ is the value
+of  its body  $e$.   Thus the  liveness environment  $\Lv$  of $e$  is
+calculated for the given demand $\sigma$. Since the stack variable $x$
+is copied to each of the  closure variable $x_{\pi}$, the liveness of
+$x$ is the union of the
+liveness of the  closure variables.  This liveness,  say $\sigma'$, is
+also the demand on $s$, and the resulting liveness environment $\mathit{ref}(s,
+\sigma', \Lfonly)$  is added  to $\Lv \cup  \{x.\sigma\}$ to  give the
+overall liveness environment for $(\LET~x \leftarrow~s~\IN~e)$.
 
-Since   \pz\  is   $(1  +   \py)$,  the   liveness  of   $\sigma$  for
-\pz\ translates into a demand  of $\sigma$ on $(1+\py)$, which in turn
-generates a  liveness of $\{\py.\epsilon\}$ at  $\pi_7$.  We now make
-the following observations:
+\warning{Note  carefully that  $\Lv_y$ specifies  the liveness  of the
+  reachable heap starting  from $y$ and extending  till closures.  The
+  liveness  of further  heap  contents starting  from  a closure,  say
+  $(\CAR\, x_{\pi})$, is given  by $\Lv_{x_{\pi}}$.  Therefore, in our
+  implementation,   a  closure   carries   the  liveness   environment
+  consisting of its free variables.}
+
+%} %comment
+
+\subsection{Soundness of analysis}  
+
+
+%% \begin{figure*}[t!]
+%% \begin{center}\footnotesize
+%% \renewcommand{\arraystretch}{1.5}
+
+
+%% \begin{tabular}{|c|c|c|}
+%% \hline
+%% Premise & Transition & Rule name \\ 
+%% \hline
+
+%% \hline
+%% \makecell[t]{$GC(\rho_1, S, H_1, \sigma) = (\rho, S, H)$,}\\ $H(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
+%%   H, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
+%% \sc{car-clo-bang}
+%% \\
+%% \hline
+%% \makecell[t]{$GC(\rho_1, S, H_1, \Lv, \sigma) = (\rho, S, H)$,}\\ $H(\rho(x))
+%% \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
+%%   H, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
+%%   (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$         &
+%% \sc{car-clo}\\
+%% \hline
+%% \end{tabular}
+
+%% \medskip
+
+%% \begin{tabular}{|c|c|c|}
+%% \hline
+%% Premise & Transition & Rule name \\ 
+%% \hline
+
+%% \hline
+
+
+%%           &\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
+%%   H, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(x) :=
+%%     \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
+%% \\
+%% \hline
+%%           & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
+%%   \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
+%% \hline
+%% $H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
+%%   \cred{\sigma'} )\!:\!S, H, (\CAR~x), \cred{\sigma}$  $
+%%   \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma'}$}      &
+%% \sc{car-whnf} \\
+%% \hline
+%% $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+%%   H, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+%%   (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$}      &
+%% \sc{car-clo}
+%% \\
+
+%% \hline
+%% $H(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  H,\,
+%% (\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
+%% s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, H,\, s, \, \cred{\sigma}$      &
+%% \sc{car-1-clo} \\
+
+
+%% \hline
+%% $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
+%%  & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H,
+%%   (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, H[\rho'(z)
+%%     := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma'}$}      &
+%% \sc{prim-whnf} \\
+%% \hline
+%% $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+%%   H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+%%   (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+%% \sc{prim-1-clo} \\
+%% \hline
+%% $H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+%%   S, H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
+%%   (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+%% \sc{prim-2-clo} \\
+%% \hline
+%% {$\mathit{g}~\mbox{defined as}$
+%% $~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
+%%   (g~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
+%%     \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma}$}      &
+%% \sc{funcall} \\
+%% \hline
+%% $\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
+%%   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+%%   \ell]\rangle], e, \cred{\sigma}$} &
+%% \sc{let} \\ 
+%% \hline
+%% $H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+%%   \cred{\sigma}$  $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma}$} & \sc{if-true} \\
+%% \hline
+%% $H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+%%   \cred{\sigma}$   $\rightsquigarrow
+%% \rho, S, H,  e_2, \cred{\sigma}$} & \sc{if-false} \\
+%% \hline
+%% $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+%%   (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
+%% \rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, H, s,
+%% \cred{\clazy\sigma}$}
+%% &
+%% \sc{if-clo} \\
+%% \hline
+%% {$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
+%%   (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
+%%   \cred{\sigma'}$} &
+%% \sc{return-whnf}\\
+%% \hline
+%% $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+%%   (\psi:\SRETURN~x), \cred{\sigma}$  $
+%%   \rightsquigarrow$
+%% $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, H,  s,
+%%   \cred{\sigma}$} &
+%% \sc{return-clo} \\
+%% \hline
+%% \end{tabular}
+%% \caption{Minefield semantics.\label{fig:minefield-semantics}}
+%% \end{center}
+%% \vskip -5mm
+%% \end{figure*}
+
+
+We shall now present a proof of soundness of the analysis presented in
+Section~\ref{sec:liveness-analysis}.  \warning{While  the proof  is on
+  the broad lines of  \cite{asati14lgc}, there are several differences
+  due to the  lazy semantics of the language in  this paper.} Here are
+the ideas behind the proof.
 \begin{enumerate}
-\item While the liveness of \py\  should be killed at $\pi_6$ since it
-  is  beyond the scope  of the  definition of  \py, we  do not  do so.
-  However, this  does not cause any  imprecision in the way  of the GC
-  marking more cells as live,  since, during execution, \py\ is yet to
-  come  into  existence at  $\pi_6$,  and  its  liveness will  not  be
-  considered by the garbage collector at this point.
-\item In an  eager language, the heap location referred  by \py\ would
-  not have been live at $\pi_8$,  a program point beyond its last use.
-  In  a  lazy  language,   however,  the  definition  $\pz  \leftarrow
-  (1+\py)$, does not  result in an evaluation of  $(1+\py)$; instead a
-  closure  is  created.  The  evaluation  actually  takes place  while
-  evaluating $(\SRETURN~\pz)$.   We therefore  record the  liveness of
-  $\py$ at  the program point  $\pi_8$, indeed at every  program point
-  from $\pi_8$ up to the beginning of the program $\pi_1$ (since we do
-  not kill liveness).
+\item       We        enrich       the        standard       semantics
+  (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
+  collection  just  before  each  $\rightsquigarrow$  transition.  The
+  simulated garbage collection starts from  the root-set and inserts a
+  special value  $\bot$ at each location  in the heap that  contains a
+  reference that is reachable but not live. Any attempt to dereference
+  such  locations during  the  transition will  result  in entering  a
+  special state denoted \bang. We call the semantics after
+  augmentation,  \emph{minefield semantics}.
+\item \label{inline} Assuming that a  program enters the \bang\ state,
+  we  show  how to  construct,  through  inline expansion,  a  program
+  without function calls which has the same minefield behavior.
+\item  The final  step   shows  that  no program  without
+  function calls can enter a \bang\ state. As a consequence no program
+  (with or without function calls) can enter the \bang\ state. 
 \end{enumerate}
 
 
 
-We thus  regard the  body of  the function as  an expression  tree and
-consider paths from  the root of this tree to  the nodes corresponding
-to the program points which trigger evaluation\footnote{Program points
-  which      trigger      evaluation       are      labeled      with
-  $\psi$.}---\SIF\ conditions and \SRETURN\ expressions.  We call such
-paths {\em e-paths}.  For example, for the function \length, there are
-three  such paths  $\epath_1 =  \langle \pi_1,  \pi_2, \psi_1\rangle$,
-$\epath_2  = \langle\pi_1,  \pi_2,  \pi_3,  \pi_4, \psi_2\rangle$  and
-$\epath_3  =  \langle  \pi_1,   \pi_2,  \pi_5,  \pi_6,  \pi_7,  \pi_8,
-\psi_3\rangle$.
 
-Given  a function  $\mathit{f}$ and  a demand  $\sigma$,  the liveness
-analysis  computes  two   maps:  $\mathcal{L}(e_f,  \sigma,  \Lfonly)$
-computes a  map that takes an  e-path in ${\mathit f}$  and returns the
-liveness environment  arising out of  all uses of variables  along the
-e-path.  A second map $\cal{P}_{\mathit  f}$ maps any program point in
-$\mathit f$  to the set  of e-paths sharing  the point.  If  a program
-point happens to fall on more  than one such e-path, then the liveness
-environment of  the program  point is the  variable-wise union  of the
-liveness  environments  of the  individual  e-paths.   In the  example
-program,  since ${\mathcal P}_{\length}(\pi_1)  = \lbrace  \epath_1, \epath_2,
-\epath_3\rbrace$, the  liveness at $\pi_1$  is ${\cal M}(\epath_1)  \cup {\cal
-  M}(\epath_2) \cup  {\cal M}(\epath_3)$,  where ${\cal M}  = \mathcal{L}(e_f,
-\sigma, \Lfonly)$.  In the  sequel we shall only define $\mathcal{L}$.
-The formulation  of $\cal{P}$ is easy  and we do not  elaborate it any
-further.
-
-Consider the  $\mathcal{L}$-rules for {\LET}, {\SIF},  and {\SRETURN}.
-The expression  $(\SRETURN~\psi:x)$ with  a demand $\sigma$  forces an
-evaluation  of  $x$ and  hence  a  new map  $[\mathit{\epath}  \mapsto
-  \{x.\sigma\}]  $ needs  to be  created,  where $\epath$  is a  fresh
-evaluation path  terminating in  $\psi$.  The  map for  the expression
-$(\SIF~\psi:x~e_1~e_2)$ is a point-wise-union of the maps of $e_1$ and
-$e_2$. In addition, since the condition also triggers an evaluation of
-$x$, the map $[\mathit{\epath} \mapsto \{x.\epsilon\}]$ is created and
-added  to the  union.   Also notice  a  consequence of  laziness: the
-entire  expression including  the condition  is not  evaluated if  the
-demand on it is $\emptyset$.  This  results in the empty map, which is
-denoted by $\emptyset_{\cal{M}}$.
-
-
-
- The liveness  of {\LET} has  an elegant formulation.   Recollect that
- our language permits lazy {\LET}s whose definitions can be recursive,
- i.e.  in the expression $\LET~x \leftarrow~s~\IN~e$, $x$ can occur in
- $s$.   We  model  the  definition  $x  \leftarrow~s$  as  a  possibly
- recursive function (named $\mathit{f}$ in the rule) which captures an
- arbitrary number of ``unrollings'' of the definition\footnote{The $*$
-   in  the definition  of ${\mathit  f}$ represents  non-deterministic
-   choice.  During liveness analysis it  can be assumed to generate no
-   liveness.}.  We  pass to  the demand  transformer $\Lfonly_{\mathit
-   f}$ of this function the demand  arising out of the liveness of $x$
- at the beginning of $e$. This  gives the liveness of the variables of
- $s$.
-
-
-Section~\ref{sec:computing}   shows   how  the   demand   transformers
-$\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
-analysis) can be safely approximated  by a {\em procedure summary} for
-each function.   The summary is  in the  form of a  demand transformer
-that maps a demand on a call to the function to demands on each of its
-arguments.
-
-\subsection{Correctness of liveness analysis}  
-
-We shall now  outline a proof of correctness of  the liveness analysis
-presented   in    Section~\ref{sec:liveness-analysis}.    This   proof
-technique  is  similar to  the  technique  used in  \cite{asati14lgc}.
-
-The idea behind the proof is  as follows: We shall modify the standard
-semantics to a semantics  called {\em minefield semantics} that models
-a liveness based garbage collection  at each transition.  The state of
-the  transition system  is augmented  to carry  enough  information to
-calculate the liveness environment  at the current evaluation context,
-and  each   of  the   suspended  evaluation  contexts.    Before  each
-transition,  we start  from the  root-set and  insert a  special value
-$\bot$ at each  location in the heap that contains  a reference and is
-reachable but  not live by  our analysis.  Any attempt  to dereference
-such locations during the transition will result in entering a special
-state denoted \bang.  The main proof is to show that no program enters
-the \bang\ state in the minefield semantics.
- 
-
-\newcommand{\cred}[1]{\psframebox[linestyle=none,
-    fillcolor=lightgray,fillstyle=solid,framesep=0.5pt]{#1}}
-\section{Minefield semantics for the language}
-\begin{figure*}[ht!]
+\begin{figure*}[t!]
 \begin{center}\footnotesize
-\begin{tabular}{|c|c|c|}
+\renewcommand{\arraystretch}{1.5}
+\begin{tabular}{|@{}c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|}
 \hline
 Premise & Transition & Rule name \\ 
 \hline
+
 \hline
-          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma', e_f'})\!:\!S,
-  H, \kappa, \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(x) :=
-    \kappa], e, \cred{\sigma', e_f'}$ }   &  \sc{const}
+\makecell[t]{$\cred{GC(\rho_1, S, H_1, (\CAR~x), \sigma) = (\rho, S, H)}$,} $H(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
+  H, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
+\sc{car-clo-bang} 
 \\
 \hline
-          & \makecell{$\rho, (\rho', z, e, \cred{\sigma',
-    e_f'})\!:\!S, H, (\CONS~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
-  \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma', e_f'}$}     &  \sc{cons} \\
-\hline
-$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
-  \cred{\sigma', e_f'} )\!:\!S, H, (\CAR~x), \cred{\sigma, e_f}$ \\ $
-  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma', e_f'}$}      &
-\sc{car-whnf} \\
-\hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-  H, (\CAR~x), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (\CAR~x), \cred{\sigma, e_f})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma , \_ }$}      &
-\sc{car-clo}
-\\
-\hline
-$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
- & \makecell{$\rho, (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H,
-  (+~x~y), \cred{\sigma, e_f}$ \\  $\rightsquigarrow \rho', S, H[\rho'(z)
-    := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma', e_f'}$}      &
-\sc{prim-whnf} \\
-\hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-  H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, x,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_}$}      &
-\sc{prim-1-clo} \\
-\hline
-$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-  S, H, (+~x~y), \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho', (\rho, y,
-  (+~x~y), \cred{\sigma, e_f})\!:\!S, H, s, \cred{\clazy\sigma, \_ }$}      &
-\sc{prim-2-clo} \\
-\hline
-{$\mathit{g}~\mbox{defined as}$
-$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
-  (g~\myvec{x}), \cred{\sigma, e_f}$ \\ $\rightsquigarrow [\myvec{y} \mapsto
-    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma, e_g}$}      &
-\sc{funcall} \\
-\hline
-$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
-  s~\IN~e), \cred{\sigma, e_f}$ \\ $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-  \ell]\rangle], e, \cred{\sigma, e_f}$} &
-\sc{let} \\
-\hline
-$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma, e_f}$ \\ $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma, e_f}$} & \sc{if-true} \\
-\hline
-$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma, e_f}$ \\   $\rightsquigarrow
-\rho, S, H,  e_2, \cred{\sigma, e_f}$} & \sc{if-false} \\
-\hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma, e_f}$ \\ $\rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma, e_f})\!:\!S, H, s,
-\cred{\clazy\sigma, e_f}$}
-&
-\sc{if-clo} \\
-\hline
-{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
-  (\rho', z, e, \cred{\sigma', e_f'})\!:\!S, H, (\SRETURN~x), \cred{\sigma,
-  e_f}$ \\ $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
-  \cred{\sigma', e_f'}$} &
-\sc{return-whnf}\\
-\hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\psi:\SRETURN~x), \cred{\sigma, e_f}$ \\ $
-  \rightsquigarrow$
-$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma, e_f})\!:\!S, H,  s,
-  \cred{\sigma, e_f}$} &
-\sc{return-clo} \\
+\makecell[t]{$\cred{GC(\rho_1, S, H_1, (\CAR~x), \sigma) = (\rho, S, H)}$,} $H(\rho(x))
+\mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
+  H, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$         &
+\sc{car-clo}\\
 \hline
 \end{tabular}
-\caption{Minefield semantics.\label{fig:minefield-semantics}}
 \end{center}
-\vskip -5mm
 \end{figure*}
+
+
+
+
+
 
 
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
-\item We enrich  the abstract machine state $\rho,$ $S,$  $ H,$ $e$ to
-  $\rho,$ $S,$ $H,$ $e,$ $\sigma,$ $e_f$, where $\sigma$ is the demand
-  on the expression $e$, and $e_f$ is the body of the function. As the
-  section on liveness  analysis shows, the entire  function body $e_f$
-  and $\sigma$  are needed  to calculate  the liveness  environment at
-  different program  points. The  demand sigma  is ``dynamic''  in the
-  sense  that it  arises from  the actual  function calls  made during
-  execution.   The  0-CFA  demand  is an  over-approximation  of  this
-  demand.  The information  in a suspended evaluation  context is also
-  similarly augmented with  the demand on it and the  function body of
-  which the suspended evaluation is a  part.  Thus a stacked entry now
-  takes the  form $(\rho, x, e,  \sigma, e_f)$. A modification  of the
-  small step semantics which carries the extra information is shown in
-  Figure~\ref{fig:minefield-semantics}.
-\item Given  the current  evaluation context $\rho,  S, H,  e, \sigma,
-  e_f$ and $\mathcal{LF}$, we can construct a liveness environment as follows:
+\item   We   enrich    the   abstract   machine   state
+  $\rho,S,H,e$   to  $\rho,S,H,e,\sigma$. 
+We  call such a state  a \emph{minefield state}.
+Here $\sigma$  is  the  ``dynamic'' demand  on  the  expression
+  $e$, i.e., it arises
+  from the  actual sequence of function  calls that led
+  to  the evaluation  of  $e$.  %% The  0-CFA demand  used
+  %% during    liveness     analysis    is     a    static
+  %% over-approximation   of   $\sigma$   that   considers
+  %% \emph{all  possible calls}  that  could  lead to  the
+  %% evaluation of  $e$.
+  The  information in  a suspended
+  evaluation  context  on  the   stack  $S$  is  also
+  similarly augmented with its  demand.  Thus a stacked
+  entry now takes  the form $(\rho, \ell,  e, \sigma)$.  %% A
+  %% modification  of  the   small  step  semantics  which
+  %% carries the extra information  is shown in the bottom
+  %% table of Figure~\ref{fig:minefield-semantics}.
+\item  $GC(\rho,  S,  \heap,  e, \sigma)$ models  a  liveness  based  garbage
+  collection that returns $(\rho', S', \heap')$, where the changes in
+  $\rho, S$ and  $\heap$ are due
+  to certain references being replaced by $\bot$.  This represents the
+  act of  not retaining  (effectively garbage collecting)  the objects
+  pointed to by these references  during an actual garbage collection.
+  This is done in the following way:
   \begin{enumerate}
-  \item If $e$ is an expression, then:  
-  $$ \Lv = \bigcup_{\psi \in \mathcal{P}(e)} \mathcal{M}(\psi),
-    \text{where }
-  \mathcal{M} = \mathcal{L}(e_f, \sigma, \Lfonly)$$
-\item If $e$ is an application, then:  
-  $$ \Lv = ref(e, \sigma, \Lfonly)$$
-  \end{enumerate}
-We can define in the same way the liveness environment for each of the
-suspended  evaluation contexts in  $S$  giving  a  stack of  liveness
-environments that we shall denote $\mathsf{SL}$.
-\item $GC$ models a liveness based garbage collection:
-$GC(\rho,$ $ S,$ $ H,$ $ \mathcal{L},$ $ \mathsf{SL}) = (\rho', S', H')$ 
-  \begin{enumerate}
-  \item For each $x \in domain(\rho)$,  $\rho'(x)=\bot$ iff $x.\epsilon
-    \notin \Lv$.
-\item For each stack entry $(\rho,\_,\_,\_,\_)$ in $S$ with $\Lv'$ as
-  the corresponding liveness environment in $\mathsf{SL}$,  and for each $x
-  \in domain(\rho)$,  $\rho'(x)=\bot$
-  iff $x.\epsilon \notin \Lv'$.
-\item For each location $\ell$, $H'(\ell) = \bot$, iff  there is no
-  $x$ in either the current environment or one of the stacked
-  environments $\rho$ such that for some $\alpha$, $H[x.\alpha] =
-  \ell$  and $x.\alpha \in \Lv$, .
+  \item Given the current  evaluation context $\rho, S,
+    \heap,   e,  \sigma$   and   the  demand   transformers
+    $\Lfonly$, we construct a liveness environment
+    \Lv.  %%  If  $e$  is  an expression,  then  $  \Lv  =
+    %% \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
+    %% application, then $ \Lv = ref(e, \sigma, \Lfonly)$.
+    We  similarly  define the  liveness environment
+    for each  of the  suspended evaluation  contexts in
+    $S$, giving  a stack of liveness  environments that
+    we shall denote $\mathsf{SL}$.
+  \item \emph{Garbage collection  of objects pointed by
+    root   set:}  For   each   $x  \in   domain(\rho)$,
+    $\rho'(x)=\bot$     iff      $x.\epsilon     \notin
+    \Lv$.    Similarly,    for   each    stack    entry
+    $(\rho,\_,\_,\_)$  in   $S$  with  $\Lv'$   as  the
+    corresponding      liveness     environment      in
+    $\mathsf{SL}$, and  for each $x  \in domain(\rho)$,
+    $\rho'(x)=\bot$ iff $x.\epsilon \notin \Lv'$.
+  \item  \emph{Garbage  collection  of objects  in  the
+    heap:} \warning{ For each location  $\ell$, $\heap'(\ell) = \bot$
+    iff  there   is  no  $x$  in   either  the  current
+    environment  or  one  of the  stacked  environments
+    $\rho$, such  that for some  $\alpha$ corresponding
+    to a  \warning{closure-free path}  in the heap  starting from
+    $x$,  $\heap[x.\alpha]   =  \ell$  and   $x.\alpha  \in
+    \Lv$}. Here \Lv\ is the liveness of the variables in
+    the current environment or the stacked environment.
   \end{enumerate}
 \end{enumerate}
+Starting from the initial state,
+%%  $([\;]_\rho,([\;]_\rho,
+%% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{H}, (\mainpgm)$,
+every transition  is preceded  by a  garbage collection
+using $GC$.  The details of the transition for the {\sc
+  car-clo}  rule   is  shown   in  the  top   table  of
+Figure~\ref{fig:minefield-semantics}.  If  this  or  an
+earlier  call to  $GC$  results  in $H(\rho(x))$  being
+bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
+enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
+the transition is the same as the earlier {\sc car-clo}
+rule.
 
-Starting   from  the   initial  state   $([\;]_\rho,([\;]_\rho,  \ans,
-(\print~\ans)):[\;]_{S} ,  [\;]_{H}, (\mainpgm)$, every  transition is
-preceded by  a garbage collection  using $GC$.  We consider  a garbage
-collection followed  by a transition as  a step. We show  by induction
-that, for programs  without function calls, starting  from the initial
-state that  has $e_{\main}$  as the first  expression to  be evaluated
-instead  of $\main$,  any transition  of  $n$ steps  occurs without  a
-\bang.
 
-Observe  that  the  transitions  that dereference  and  therefore  can
-potentially lead to \bang\ are those  which have a $H(\ldots)$ term in
-the  transition  rule.   Of  these,  terms  of  the  form  $H(\ldots)$
-dereference a root  variable, and the term $H(l)$  dereferences a heap
-location.  In  both the  cases we show  that the  dereferencing cannot
-lead to a \bang\ state in programs without function calls.
 
-We  need the  following proposition that  connects  liveness analysis  with
-minefield semantics transitions. 
-\begin{proposition}
-\label{prop:correctness}
-\begin{enumerate} 
-\item   Consider  a   \LET\  definition:   \linebreak  $\pi\!\!\!:   (\LET~x
-  \leftarrow~\ldots~\IN~e)$, such  that there is  a use of $x$  in $e$,
-  i.e.  an occurrence of $\LET~y~\leftarrow~s~in \ldots$, where $s$ is
-  $(\CAR\ x)$, $(\CDR\ x)$  or $(+\ x\ y)$, or $(\SIF\  x\ e1\ e2)$ or
-  $(\SRETURN\ x)$. Then the demand on $x$ at $\pi$ is non-null.
-\item    Assume    that    a   \LET\    definition    $\pi:    (\LET~z
-  \leftarrow~(\CONS~x~y)~\IN~e)$  has an  occurrence  of $(\CAR~z)$  in
-  $e$.  Then  the  liveness  of  $x$  at  $\pi$  includes  $\epsilon$.
-  Similarly  if $e$  contains $(\CDR~z)$,  then the  liveness of $y$  at
-  $\pi$ includes $\epsilon$.
-\end{enumerate}
-\end{proposition} 
+Consider a trace  of a minefield execution of a  program $p$, possibly
+ending in  a \bang\ state. We  can construct a call-tree  based on the
+trace in  which each node represents  a function that was  called (but
+did not necessarily  return because of a \bang).  Assume  that each of
+the nodes of  the tree is also annotated with  the program point where
+the corresponding call  was invoked.  This tree can be  used to inline
+function calls in a hierarchical fashion.  The details of the inlining
+can be found in~\cite{asati14lgc}.
+%% The details of inlining a single
+%% function      call     $(\LET\,\,      x     \leftarrow
+%% (f\,y_1\,\ldots\,y_n) \,\,  \IN\,\, e)$ is  as follows.
+%% Let  $f$ be  defined  (after renaming  its formals  and
+%% locals  to  be  disjoint from  existing  variables)  by
+%% $(\DEFINE\ (f\  z_1\ \ldots\  z_n)\ e_f)$. The  call is
+%% replaced  by   a  sequence  of  $\LET$s   of  the  form
+%% $z_i\leftarrow (\ID\,\,y_i)$ followed by the body $e_f$
+%% but with its  $(\SRETURN\,\,w)$ expressions replaced by
+%% $(\LET\,\, x  \leftarrow (\ID\,\, w) \,\,  \IN\,\, e)$.
+%% We prefer to use the  identity function $\ID$ as a form
+%% of no-op rather than  introducing the form $(\LET\,\, x
+%% \leftarrow  w \,\,  \IN\,\, e)$  where the  RHS of  the
+%% $\LET$-definition   is  a   simple  variable. 
+For  a
+call-less program,  the initial state of  the minefield
+semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
+\ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{H},
+e_{\mainpgm}$.
 
-In  the second  case for  example,  the liveness  of $x$  due to  the
-\CONS\ is  $\bcar\sigma$, where $\sigma$  is the demand on  $z$. Since
-$\sigma$  includes  the  demand  $\acar\alpha$   due  to  its  use  in
-$(\CAR~z)$, the liveness on $x$  includes $\epsilon$. We thus have the
-following lemma:
+ 
+\subsection{Soundness Results}
 
-\begin{lemma}\label{lemma:no-calls-correctness} 
-A program without function calls cannot  enter the \bang\ state in the
-minefield semantics.
+  %% We  consider  a  round of garbage  collection  followed  by  a
+  %% transition as a step.  We show by induction that, for
+  %% programs  without function  calls, %% starting  from the
+  %% %% initial  state  that has $e_{\main}$  as  the  
+  %% %% expression to  be evaluated,
+  %% any
+  %% transition of $n$ steps occurs without a \bang.
+
+We  first  need  an auxiliary  result  about  minefield
+semantics. Consider  a trace of a  minefield execution.
+For every minefield state  $(\rho, S, H, e(s), \sigma)$
+that appears  on the LHS of  a $\rightsquigarrow$ step,
+the  demand   $\sigma$  on   the  expression   $e$  (or
+application $s$) is non-null.  This can be proved by an
+induction  on  the  number  of  steps  leading  to  the
+minefield  state.   The  base step  holds  because  the
+demand $\sigma_{all}$  on $(\mainpgm)$ is  non-null. For the 
+inductive step  we observe   that for
+each  step of  the minefield  semantics, if  the demand
+$\sigma$ on  the LHS of  a minefield step  is non-null,
+the demand on  the RHS is a  transformation of $\sigma$
+(for example $\clazy\sigma$) which is also non-null.
+
+%% Let  us clarify  this  observation: Since  the minefield  semantics
+%% models lazy evaluation,  parts of the program may  not be evaluated
+%% at all.  However,  if an expression (or application)  happens to be
+%% evaluated, it will  appear on the LHS of a  minefield step, and the
+%% context-sensitive demand on it will be non-null.
+
+Note that our proofs will be for a single round of minefield execution
+i.e.  the evaluation of $(\mainpgm)$ (or $e_{\mainpgm}$, for call-less
+programs) to  its WHNF driven  by the printing mechanism.   With minor
+variations,  the   proof  will  also  be   applicable  for  subsequent
+evaluations initiated by $\print$.
+%% We  show next that  the minefield execution of  a call-less
+%% program cannot go \bang.
+
+\begin{lemma}
+\label{lemma:call-less-cannot-go-bang}
+Consider the minefield execution of  a program without function calls.
+Such a program cannot enter the \bang\ state.
 \end{lemma}
-
 \begin{proof}
-For a program  executing according to {\em minefield  semantics}, if a
-\bang\ occurs then some variable which is  dereferenced must be
-set to  $\bot$, between its  creation and  use points.  This  can only
-happen if  the liveness of  the variable being dereferenced  was null.
-From  the Proposition~\ref{prop:correctness}  it  is clear  that this  cannot
-happen.
-\end{proof}
+Call a $GC(\ldots)$  followed by a $\rightsquigarrow$  transition as a
+step. Consider  a state  $(\rho, S,  H, e,  \sigma)$ in  the minefield
+execution of a  program.  We show by induction on  the number of steps
+$n$ leading  to this  state that  the next  transition cannot  enter a
+\bang\ state.  When $n$ is 0,  the state is $([\;]_\rho,\_, [\;]_{S} ,
+            [\;]_{H}, e_{\mainpgm}, \sigma_{all})$.  Since the call to
+            $GC(\ldots)$ in this state does  nothing, we just have to show
+            that  the  $\rightsquigarrow$  transition cannot  enter  a
+            \bang\   state.    Since   our  programs   are   in   ANF,
+            $e_{\mainpgm}$ can  only be a $\LET$  expression.  A
+                     {\sc let} step does not involve dereferencing,
+                     and thus
+                     cannot result in a \bang.
 
-For   a    program   with   functions,   we    use   the   techniques
-in~\cite{asati14lgc}. We  assume as  a contradiction that  the program
-can enter a \bang\ state  and inline the  functions called to  obtain a
-program that is without functions  but has the same execution behavior
-and    demands    as   the    original    program.     We   then    use
-Lemma~\ref{lemma:no-calls-correctness}  to  show  that  the  resulting
-functionless program cannot enter a bang state.
+For the inductive step, we  shall show that none of the
+minefield steps that  involves dereferencing results in
+a   \bang.   These  are   the   steps   which  have   a
+$H(\rho(...))$ in the premise. %%  Recall that a minefield
+%% step   consists   of   a   GC  step   followed   by   a
+%% $\rightsquigarrow$. 
+Now a  $\rightsquigarrow$ step can  go
+\bang\ because it dereferences a $\bot$ inserted by the
+immediately  preceding  GC  or  the GC  of  an  earlier
+minefield step.  However the  demand $\sigma'$
+  on basis of which an earlier GC would have inserted a
+  $\bot$,  would  have   included  the  current  demand
+  $\sigma$.  Thus,  if the  earlier GC had  inserted a
+$\bot$, so would the current  GC.  Thus it is enough to
+consider the $\rightsquigarrow$  along with the current
+GC and show that it does not lead to a \bang.
+
+We consider the rules {\sc car-clo} and {\sc car-1-clo} only.  
+The rest  of the rules involve similar reasoning. For the {\sc
+  car-clo}  rule in  the state  $\rho, S,  H, (\CAR~x),
+\sigma$, we  know that $\sigma$ is  non-null. Therefore
+the  liveness  of  $x$  includes  $\epsilon$,  and  the
+dereferencing $H(\rho(x))$ will go without \bang.
+
+For the  {\sc car-1-clo}  rule, observe that  there are
+two dereferences.  First $x$  is dereferenced to  get a
+cons  cell  and then  the  head  of  the cons  cell  is
+dereferenced  to  obtain  a  closure.   If  the  demand
+$\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
+of    $x$   will    include    both   $\epsilon$    and
+$\acar\epsilon$,  and  a  GC with  this  liveness  will
+neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
+first   component  of   the   cons   cell.  Thus   both
+dereferences    will    happen   normally    and    the
+$\rightsquigarrow$ step will not enter \bang.
+\end{proof} 
+
+Now we are ready to prove the main soundness result.
+
+\begin{theorem}
+The  minefield  execution of  no  program  can enter  a
+\bang\ state.
+\end{theorem}
+ 
+\begin{proof}
+Assume to  the contrary that  a program $P$  enters the
+\bang\  state.  \warning{We can  transform  $P$  to a  call-less
+program $P'$ such that  the minefield executions of $P$
+and $P'$  are identical  except for change  of variable
+names. }             However,                 by
+Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
+$P'$,   a   call-less   program,   cannot   enter   the
+\bang\  state.  Therefor  $P$  also  cannot  enter  the
+\bang\ state.
+\end{proof}
+ 
+%% Section~\ref{sec:computing}   shows   how  the   demand   transformers
+%% $\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
+%% analysis) can be safely approximated  by a {\em procedure summary} for
+%% each function.   The summary is  in the  form of a  demand transformer
+%% that maps a demand on a call to the function to demands on each of its
+%% arguments.
+
+
 
 
 \section{Computing liveness and its encoding as DFA}\label{sec:computing}
-Section~\ref{sec:liveness} gave a  context-sensitive liveness analysis
-and proved it  correct with reference to a  {\em minefield} semantics.
-In  our  analysis, $\mathcal{L}$  and  \pmap{f}  together described  a
-liveness set for each program point in  a function in terms of a given
-$\sigma$  and \Lfonly.   However, we  still  have to  describe how  to
-obtain demand  transformers \Lfonly\  from the rule  {\sc live-define}
-and how to compute the specific demand $\sigma$ on each function.
-%%
-To  answer these  questions, it  is convenient  to cast  the equations
-arising from  $\mathit{ref}$ and  $\mathcal{L}$ as  the rules  of a
-grammar.   To do  so, we  need  to modify  the rules  themselves to  a
-different form.
+Section~\ref{sec:liveness}  gave   a  fully context-sensitive
+liveness analysis which 
+%$\mathcal{L}$ and $ref$ together
+described the  liveness set for  each variable  in a function  body in
+terms of  a symbolic demand  $\sigma$ and \Lfonly.  However,  we are yet
+to describe  (i) how to obtain demand  transformers \Lfonly\ from
+the  rule {\sc  live-define}, and  (ii)  how to  compute the  concrete
+demand $\sigma$  on each function.   To do so,  we first need to  modify the
+liveness rules to a different form.
 
 \subsection{Modifying liveness rules}
 
-The      $\mathit{ref}$     rule      for     \CONS,      shown     in
-Figure~\ref{fig:live-judge},  requires   us  to  remove   the  leading
-\acar\ and \acdr\  from the access paths in  $\sigma$.  Similarly, the
-rules for  \CAR, \CDR, \PRIM, \NULLQ,  and \SIF\ require  us to return
-$\emptyset$, if  $\sigma$ itself is $\emptyset$ and
-$\lbrace\epsilon\rbrace$ otherwise.  To  realize these rules
-$\sigma$ needs to be known. This creates difficulties since we want to
-solve the equations arising from liveness symbolically.
+The   $\mathit{ref}$   rule   for   \CONS,   shown   in
+Figure~\ref{fig:live-judge}, requires us  to remove the
+leading  \acar\ and  \acdr\  from the  access paths  in
+$\sigma$.  Similarly, the rules  for \CAR, \CDR, \PRIM,
+\NULLQ, and \SIF\ require  us to return $\emptyset$, if
+$\sigma$      itself       is      $\emptyset$      and
+$\lbrace\epsilon\rbrace$  otherwise.  To  realize these
+rules  $\sigma$   needs  to  be  known.   This  creates
+difficulties  since  we  want to  solve  the  equations
+arising from liveness symbolically.
 
-The  solution  is  to  also   treat  the  operations  mentioned  above
-symbolically.  We  introduce three new symbols:  \bcar, \bcdr, \clazy.
-These symbols are defined as a relation $\hookrightarrow$ between sets
-of access paths:
+The solution is to  also treat the operations mentioned
+above  symbolically.  We  introduce three  new symbols:
+\bcar, \bcdr,  \clazy.  These symbols are  defined as a
+relation  $\hookrightarrow$  between   sets  of  access
+paths:
 \begin{align*}
   &\bcar\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acar\alpha \in \sigma\}\\
   &\bcdr\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acdr\alpha \in \sigma\}
@@ -1109,302 +1338,236 @@ and the \Lfunonly\ rule
 for \SIF\ as:
 \begin{align*}
 \mathcal{L}((\SIF~x~e_1~e_2),\sigma,\Lfonly) =
-                    &\mathcal{L}(e_1,\sigma,\Lfonly)~\uplus
-        \mathcal{L}(e_2,\sigma,\Lfonly)~\uplus\\
-        &[\,\mathit{\epath} \mapsto  x.\clazy \sigma]
+                    &\mathcal{L}(e_1,\sigma,\Lfonly)~\cup
+        \mathcal{L}(e_2,\sigma,\Lfonly)~\cup
+          \{x.\clazy \sigma\}
 \end{align*}
-The rules for  \CDR, \PRIM\ and \NULLQ\ are also  modified in a manner
-similar to \CAR. 
+The rules for  \CDR, \PRIM\ and \NULLQ\ are also
+modified similarly.
 
-When  there  are  multiple  occurrences of  \bcar,  \bcdr\  and  \clazy,
-$\hookrightarrow$  is  applied  from  right to  left.   The  reflexive
-transitive   closure  of   $\hookrightarrow$   will   be  denoted   as
-$\stackrel{*}{\hookrightarrow}$.   The  following proposition  relates
-the original and the modified liveness rules.
+
+\warning{When   there  are   multiple   occurrences  of   \bcar,
+\bcdr\  and \clazy,  $\hookrightarrow$ is  applied from
+right  to left.}   The reflexive  transitive closure  of
+$\hookrightarrow$      will      be     denoted      as
+$\stackrel{*}{\hookrightarrow}$.      The     following
+proposition  relates  the  original  and  the  modified
+liveness rules. 
 \begin{proposition}
-Assume that a liveness computation  based on the original set of rules
-gives the liveness  of the variable $x$ at a  program point $\pi_i$ as
-$\sigma$   (symbolically,   $\Lanv{i}{x}=   \sigma$).   Further,   let
-$\Lanv{i}{x}=  \sigma'$ when the  modified rules  are used  instead of
-\Lfunonly.  Then $\sigma' \stackrel{*}{\hookrightarrow} \sigma$.
+Assume  that  a  liveness   computation  based  on  the
+original  set  of  rules  gives  the  liveness  of  the
+variable  $x$   as $\sigma$
+(symbolically,  $\Lanv{x}{}=  \sigma$).  Further,  let
+$\Lanv{x}{}= \sigma'$ when the modified rules are used
+instead      of      \Lfunonly.      Then      $\sigma'
+\stackrel{*}{\hookrightarrow} \sigma$.
 \end{proposition}
 
-For  an explanation  of why  the  proposition holds  for the  modified
-\CONS\  rule,   we  refer   the  reader  to   \cite{asati14lgc}.   The
-proposition also holds for other modified rules for similar reasons.
+An  explanation of  why the  proposition holds  for the
+modified  \CONS\ rule  is  given in  \cite{asati14lgc}.
+The proposition also holds for other modified rules for
+similar reasons.
 
 \newcommand{\emm}[2]{\ensuremath{\mathcal{#1}_{#2}}}
-\subsection{Generating Liveness Equations}
-
-\begin{figure*}[t!]
-\renewcommand{\arraystretch}{1}
-  \begin{tabular}{cc}
-    \begin{minipage}{.40\textwidth}
-        \small
-        \renewcommand{\arraystretch}{1}{
-          \begin{uprogram}
-            \UNL{1} (\DEFINE\ (\length~\xl)
-            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
-(\NULLQ~\xl) \IN
-            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
-$\psi_1\!\!:\,$ \px
-            \UNL{4} \hspace*{.27cm} $\pi_3\!\!:\,
-            $(\LET\ \pv\ $\leftarrow 0$ \IN
-            \UNL{5} \hspace*{.32cm} $\pi_4\!\!:\,
-(\SRETURN~\psi_2:\pv)$
-            \UNL{4} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\
-$\leftarrow$  (\CDR~\xl)  \IN
-            \UNL{5} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\
-$\leftarrow$  (\length~\pu)  \IN
-            \UNL{6} \hspace*{.34cm} $\pi_7\!\!:\,
-            $(\LET~\pz\ $\leftarrow$ (1~+~\py) \IN
-            \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\,
-(\SRETURN~\psi_3:\pz)$)))))))
-        \end{uprogram}}
-        \renewcommand{\arraystretch}{1}{
-	  \begin{uprogram}
-	  \UNL{1} $(\DEFINE\ (\main)$
-           \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
-           (
-           \scalebox{0.8}{\psframebox[framearc=.5,
-	fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
-             \begin{tabular}{@{}c@{}}
-               {a BIG closure}
-             \end{tabular}}}
-           ) \IN  
-          \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
-\IN
-	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
-$\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
-          \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-          $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
-          \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
-(\SRETURN~\psi_4:\pw)))))$
-\end{uprogram}}
-        %%}
-    \end{minipage}
-
-    &
-
-    \begin{minipage}{.51\textwidth}
-
-      \small
-\begin{eqnarray*}
-        \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
-              [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
-\xl.\clazy\sigma\rbrace ,~\epath_2 \mapsto \lbrace 
-\pv.\sigma  \rbrace,\\
- &&          \;\;  \epath_3 \mapsto \lbrace \pz.\sigma,
-                \py.\clazy\sigma,
-\pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
-&&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup
-%%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
-\clazy\Lf{\length}{1}{\clazy\sigma}\}\}
-             \rbrack \\
-            \cal{P_{\mbox{\tiny \length}}} &=&
-                [\;\pi_1 \mapsto \lbrace \epath_1, \epath_2, \epath_3 \rbrace,  \
-                 \pi_2 \mapsto \lbrace \epath_1, \epath_2, \epath_3
-                  \rbrace, \\
-&&\;\;  \pi_3 \mapsto \lbrace \epath_2
-                  \rbrace ,  \pi_4 \mapsto \lbrace \epath_2
-                  \rbrace, \pi_5 \mapsto \lbrace  \epath_3 \rbrace, \\
- &&  \;\;                        \pi_6 \mapsto \lbrace \epath_3 \rbrace,
-\pi_7 \mapsto
-                   \lbrace \epath_3\rbrace, \pi_8 \mapsto \lbrace \epath_3
-\rbrace~\rbrack\\
-              \mathcal{L}(e_{\main},\sigma,\Lfonly) &=&
-                [\;
-                  \epath_4 \mapsto \lbrace \pw.\sigma,
-                                       \pc.\Lf{\length}{\mbox{1}}{\sigma},\\
-&& \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},
-\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma} \rbrace
-                               ] \\
-               \cal{P_{\mbox{\tiny \main}}} &=&
-                  \lbrack~ \pi_9 \mapsto \lbrace \epath_4 \rbrace,  \
-                    \pi_{10} \mapsto \lbrace \epath_4 \rbrace,  \
-                   \pi_{11} \mapsto \lbrace \epath_4 \rbrace, \\
-                   && \;\; \pi_{12} \mapsto \lbrace \epath_4 \rbrace,
-\pi_{13} \mapsto \lbrace \epath_4 \rbrace~\rbrack
-\end{eqnarray*}
-    \end{minipage} \\
-(a)&
-(b)
-    %% \end{ tabular}}
-  \end{tabular}
-%\end{picture}
-\kern -3ex
-%\vspace{0.5in}
-\caption{(a) Example program and (b) its liveness
-maps.}\label{fig:mot-example2}
-\end{figure*}
-%================================================================
-
-Given  a  function  $\mathit{f}$,  we now  describe  how  to  generate
-equations  for the  demand  transformation \Lfonly$_\mathit{f}$.   The
-program in Figure~\ref{fig:mot-example2} serves  as a running example.
-Starting   with    a   symbolic   demand   $\sigma$,    we   determine
-\Lfun{e_{\mathit{f}}}{\sigma}{\Lfonly}.   In  particular, we  consider
-$\Lanv{1}{x_i}$,  the liveness  of  the $i^{\mbox{\footnotesize  th}}$
-parameter   $x_i$  at   the  program   point  at   the  beginning   of
-$e_{\mathit{f}}$   (assumed  to   be  $\pi_1$).   By  the   rule  {\sc
-  live-define},      this     should      be      the     same      as
+\subsection{Generating Equations for \Lfonly$_\mathit{f}$}
+Given a  function $\mathit{f}$, we now  describe how to
+generate  equations   for  the   demand  transformation
+\Lfonly$_\mathit{f}$.        The       program       in
+Figure~\ref{fig:mot-example2}   serves  as   a  running
+example.  Starting with a  symbolic demand $\sigma$, we
+determine  \Lfun{e_{\mathit{f}}}{\sigma}{\Lfonly}.   In
+particular, we  consider $\Lanv{1}{x_i}$,  the liveness
+of the $i^{\mbox{\footnotesize th}}$ parameter $x_i$ at
+the program point at  the beginning of $e_{\mathit{f}}$
+(assumed   to   be   $\pi_1$).   By   the   rule   {\sc
+  live-define},   this   should    be   the   same   as
 $\Lf{f}{i}{\sigma}$. Applying this to \length, we have:
+
 \begin{eqnarray*}
 && \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
   \cup \clazy\Lf{\length}{1}{\clazy\sigma}
 \end{eqnarray*}
-and  the only equation defining \Lfone{\length} is:
-  \begin{eqnarray*}
-   && \Lf{\length}{1}{\sigma}
-    =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup
-\clazy\Lf{\length}{1}{\clazy\sigma}
+%% and  the only equation defining \Lfone{\length} is:
+%%   \begin{eqnarray*}
+%%    && \Lf{\length}{1}{\sigma}
+%%     =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup
+%% \clazy\Lf{\length}{1}{\clazy\sigma}
+%% \end{eqnarray*}
+and  the equation defining \Lfone{\fun} is:
+\begin{eqnarray*}
+  && \Lf{\fun}{1}{\sigma}
+  =  \clazy\sigma \cup \Lf{\length}{1}{\bcar\sigma_{\mathit{\length}}} \cup  \Lf{\length}{1}{\clazy\sigma} 
+  \cup  \acdr\Lf{\fun}{1}{\bcdr\sigma_{\mathit{\fun}}}
 \end{eqnarray*}
 
-In general, the equations for  \Lfonly\ are recursive since, as in the
-case  of  \length,  \Lan{1}\  may   have  been  defined  in  terms  of
-\Lfone{\mathit{f}}.  However,  it is desirable  to have a  closed form
-solution for $\Lfone{\mathit{f}}$.  As mentioned in \cite{asati14lgc},
-each  of the liveness  rules modifies  a demand  by prefixing  it with
-symbols  in the  alphabet  $\lbrace \acar,  \acdr,\bcar, \bcdr,  \clazy
-\rbrace$, and therefore we can assume that $\Lf{f}{i}{\sigma}$ has the
-closed form:
+In general, the equations for \Lfonly\ are recursive as
+in the  case of  \Lfonly$_\mathit{f}$. As  mentioned in
+\cite{asati14lgc},   a   closed   form   solution   for
+$\Lfone{\mathit{f}}$ can  be derived by  observing that
+each of  the liveness rules  modifies a demand  only by
+prefixing  it with  symbols  in  the alphabet  $\lbrace
+\acar, \acdr,\bcar,  \bcdr, \clazy  \rbrace$. Therefore
+we can  assume that $\Lf{f}{i}{\sigma}$ has  the closed
+form:
 \begin{eqnarray}
 \label{eq:LF:DI}
   \Lf{f}{i}{\sigma} = \Df{f}{i}\sigma
 \end{eqnarray}
-where \Df{f}{i} are sets of strings over the alphabet mentioned above.
-Substituting   the   guessed   form   in   the   equation   describing
-\Lfonly$_{\mathit f}$, and factoring  out $\sigma$, we get an equation
-for  \Df{f}{i} that  is  independent of  $\sigma$.   Any solution  for
-\Df{f}{i}  yields a  solution for  \Lfonly$_{\mathit f}$.   Applied to
-\Lfonly$_{\mathit \length}$, we get:
+where \Df{f}{i}  are sets of strings  over the alphabet
+mentioned above.  Substituting the  guessed form in the
+equation   describing    \Lfonly$_{\mathit   f}$,   and
+factoring  out   $\sigma$,  we  get  an   equation  for
+\Df{f}{i}  that   is  independent  of   $\sigma$.   Any
+solution   for   \Df{f}{i}   yields  a   solution   for
+\Lfonly$_{\mathit  f}$.   Applied to  \Lfonly$_{\mathit
+  \length}$, we get:
   \begin{eqnarray*}
-&&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}\sigma,~\mbox{and}\\
-&&   \Df{\length}{1} = \clazy \cup \acdr\Df{\length}{1}\clazy
-       \cup \clazy\Df{\length}{1}{\clazy}
+&&  \Lf{\fun }{1}{\sigma} = \Df{\fun}{1}\sigma,~\mbox{and}\\
+&&   \Df{\fun}{1} =  \clazy \cup \Df{\length}{1}\bcar \cup  \Df{\length}{1}\clazy 
+       \cup  \acdr\Df{\fun}{1}\bcdr
   \end{eqnarray*}
 
-Note that this equation can also be viewed as a CFG with \{\acdr,
-\clazy\} as terminal symbols and \Df{\length}{1} as the sole
-non-terminal.
+Note that this equation can also be viewed as a CFG with \{\acdr, \bcar, \bcdr,
+\clazy\} as terminal symbols and \Df{\length}{1} and \Df{\fun}{1} as the 
+non-terminals.
 
 \subsection{Generating liveness equations \Lv\  for function bodies}
 \label{sec:bodylivenessbodies}
 
-To avoid analyzing the body of a function for each call, we calculated
-the liveness  for the arguments and  the variables in  a function with
-respect to a symbolic demand  $\sigma$.  To get the actual liveness we
-calculate an over-approximation of the  actual demands made by all the
-calls and calculate the liveness at each GC
-point inside the  function based on this approximation.
-The  0-CFA-style  {\em
-  summary demand}  is calculated by taking  a union of  the demands at
-every call site of a function.
+To  avoid analyzing  the body  of a  function for  each
+call, we calculated the  liveness for the arguments and
+the variables in a function  with respect to a symbolic
+demand  $\sigma$.   To  get   the  actual  liveness  we
+calculate an  over-approximation of the  actual demands
+made by  all the  calls and  calculate the  liveness at
+each  GC  point  inside  the  function  based  on  this
+approximation.  The 0-CFA-style {\em summary demand} is
+calculated by  taking a union  of the demands  at every
+call site of a function.
 
-Consider a function $g$ containing a  call to $f$ at a site $\pi$, say
-$\pi\!\!:\!(\LET~x   \leftarrow   (f\,y_1\,\ldots\,y_n)~\IN~\pi_i:e)$.
-Let the  demand on $g$  be $\sigma_g$ and,  based on this  demand, the
-liveness of  $x$ at $\pi_i$ be  $\Lanv{i}{x}$.  By the  $\LET$ rule of
-Figure~\ref{fig:live-judge},    the   call   at    $\pi$   contributes
-$\Lanv{i}{x}$ to the demand $\sigma_f$. Let us denote the contribution
-of a call  site $\pi$ in a  function $g$ to the overall  demand on the
-function $f$  as $\deltacall{f}{\pi}{g}$. Assuming that  there are $k$
-call sites to function $f$, $\pi^1$ (in function $g^1$) \ldots $\pi^k$
-(in   function  $g^k$),  the   over-approximation  of   $\sigma_f$  is
-$\deltacall{f}{\pi^1}{g^1}          \cup          \cdots          \cup
-\deltacall{f}{\pi^k}{g^k}$.  The distinguished function \mainpgm\ is a
-special case.   We assume  it is called  through a  printing mechanism
-with   demand   $\sigma_\mainpgm   =  \{\acar,\acdr\}^\ast$ (denoted
-$\sigma_{\!all}$) if \mainpgm\ returns a structure and $\epsilon$ if
-it returns a base value.
+%% Consider a function  $g$ containing a call to  $f$ at a
+%% site    $\pi$,   say    $\pi\!\!:\!(\LET~x   \leftarrow
+%% (f\,y_1\,\ldots\,y_n)~\IN~\pi_i:e)$.  Let the demand on
+%% $g$  be  $\sigma_g$  and,  based on  this  demand,  the
+%% liveness of  $x$ at  $\pi_i$ be $\Lanv{i}{x}$.   By the
+%% $\LET$ rule of Figure~\ref{fig:live-judge}, the call at
+%% $\pi$   contributes   $\Lanv{i}{x}$   to   the   demand
+%% $\sigma_f$. Let  us denote  the contribution of  a call
+%% site $\pi$ in  a function $g$ to the  overall demand on
+%% the function  $f$ as  $\deltacall{f}{\pi}{g}$. Assuming
+%% that there are $k$ call  sites to function $f$, $\pi^1$
+%% (in function $g^1$) \ldots $\pi^k$ (in function $g^k$),
+%% the     over-approximation     of     $\sigma_f$     is
+%% $\deltacall{f}{\pi^1}{g^1}     \cup     \cdots     \cup
+%% \deltacall{f}{\pi^k}{g^k}$.  The distinguished function
+%% \mainpgm\ is  a special case.   We assume it  is called
+%% through    a    printing    mechanism    with    demand
+%% $\sigma_\mainpgm   =   \{\acar,\acdr\}^\ast$   (denoted
+%% $\sigma_{\!all}$) if \mainpgm\  returns a structure and
+%% $\epsilon$ if it returns a base value.
 
 
-For  the  running  example,   $\length$  has  calls  from  $\main$  at
-$\pi_{12}$ and a recursive call at $\pi_6$.
-So $\sigma_{\length} =
-     \deltacall{\length}{\pi_{12}}{\main}  \cup
-\deltacall{\length}{\pi_6}{\length}$.
+For  the  running  example,   $\fun$  has  calls  from  $\main$  at
+$\pi_{16}$ and a recursive call at $\pi_6$.
+So $\sigma_{\fun} =
+     \deltacall{\fun}{\pi_{16}}{\main}  \cup
+\deltacall{\fun}{\pi_6}{\fun}$.
+
+%% For  the  running  example,   $\length$  has  calls  from  $\main$  at
+%% $\pi_{12}$ and a recursive call at $\pi_6$.
+%% So $\sigma_{\length} =
+%%      \deltacall{\length}{\pi_{12}}{\main}  \cup
+%% \deltacall{\length}{\pi_6}{\length}$.
 Filling in  the values gives:
 \begin{eqnarray*}
-\sigma_{\length}    &=&
- \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
+\sigma_{\fun}    &=&
+ \{\sigma_{\mathit{all}}\}  ~\cup~{\bcdr\sigma_{\mathit{\fun}}}
 \end{eqnarray*}
-As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pa} in terms
-of  $\sigma_{\length}$ are:
+As examples, the liveness of \Lanv{2}{\pl} and \Lanv{1}{\py} in terms
+of  $\sigma_{\fun}$ are:
 \begin{align*}
-\Lanv{1}{\pl} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
-  \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
+\Lanv{2}{\pl} &= \clazy \cup \acar\Lf{\fun}{2}{\bcdr\sigma_{\mathit{\fun}}}
  \\
-\Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
+\Lanv{1}{\py} &= \clazy \cup \bcar\sigma_{\mathit{\fun}}
 \end{align*}
 
-In summary, the equations generated during liveness analysis are:
+In  summary, the  equations  generated during  liveness
+analysis are:
 \begin{enumerate}
-\item For each function $\mathit{f}$, equations defining \Df{f}{i} for
-  use by \Lfonly$_{\mathit f}$.
+\item   For  each   function  $\mathit{f}$,   equations
+  defining \Df{f}{i} for use by \Lfonly$_{\mathit f}$.
 \item For each function $\mathit{f}$, an equation defining the summary
   demand $\sigma_{\mathit f}$ on $e_f$.
-\item  For  each  function   $\mathit{f}$  (including  $\mainpgm$  for
-  $e_\mainpgm$)  an equation  defining liveness  at each  GC point  of
-  $e_{\mathit f}$.
+\item   For  each   function  $\mathit{f}$   (including
+  $\mainpgm$  for  $e_\mainpgm$) an  equation  defining
+  liveness at each GC point of $e_{\mathit f}$.
 \end{enumerate}
 \subsection{Solving liveness equations---the grammar
-interpretation}\label{sec:grammar-formulation}
-The  equations above can now be re-interpreted as a
-context-free grammar (CFG)  on the alphabet $\lbrace\acar, \acdr,
-\bcar, \bcdr, \clazy\rbrace$.  Let  \var{$X$} denote the non-terminal
-for
-a variable  $X$ occurring on  the LHS of the  equations generated
-from the analysis.  We can  think of the resulting productions as
-being associated with several  grammars, one for each non-terminal
-\var{\Lanv{i}{x}} regarded as a start symbol.  As an example, the
-grammar    for   \var{\Lanv{1}{\xl}}   comprises    the   following
+interpretation}\label{sec:grammar-formulation}      The
+equations  above   can  now  be  re-interpreted   as  a
+context-free    grammar   (CFG)    on   the    alphabet
+$\lbrace\acar,  \acdr,  \bcar,  \bcdr,  \clazy\rbrace$.
+Let \var{$X$}  denote the  non-terminal for  a variable
+$X$  occurring on  the LHS  of the  equations generated
+from  the  analysis.  We  can  think  of the  resulting
+productions as being  associated with several grammars,
+one for each non-terminal \var{\Lanv{i}{x}} regarded as
+a  start  symbol.   As  an  example,  the  grammar  for
+\var{\Lanv{1}{\xl}}     comprises     the     following
 productions:
 \begin{eqnarray*}
-  \var{\Lanv{1}{\xl}}  &\rightarrow& 
-  \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\
+  \var{\Lanv{3}{\xl}}  &\rightarrow& 
+  \clazy \mid \var{\Df {\Sum}{1}}{\clazy\var{\sigma_{\length}}}  \\
   & & \mid
-  \clazy\var{\Df{\length}{1}}{\clazy\var{\sigma_{\length}}} \\
+  \clazy\var{\Df{\length}{1}}\clazy \mid \acar\var{\Df{\fun}{2}}\bcdr\var{\sigma_{\mathit{\fun}}} \\
   \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
   \acdr\var{\Df{\length}{1}}\clazy
        \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
 \langle {\sigma_{\length}} \rangle
 &\rightarrow&
-\epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle \\
-\var{\Lanv{9}{\pa}} &\rightarrow& \clazy \bcar \var{\Df{\length}{1}}
+\clazy  \mid \bcar\langle{\sigma_{\Sum}}\rangle \\
+ \var{\Df{\fun}{2}} &\rightarrow& \var{\Df{\makelist}{1}}\clazy \mid \var{\Df{\makelist}{1}}\var{\Df{\Sum}{1}}\clazy \\ 
+& & \mid \var{\Df{\makelist}{1}}\acar\var{\Df{\fun}{2}}\bcdr\var{\sigma_{\mathit{\fun}}} \\
+\langle\sigma_{\mathit{\fun}} \rangle &\rightarrow& \sigma_{all} \mid \bcdr\var{\sigma_{\mathit{\fun}}} \\
+\var{\Df{\Sum}{1}} &\rightarrow& \clazy \mid \acar\clazy \mid \acdr\var{\Df{\Sum}{1}}\clazy
+%% \var{\Lanv{3}{\py}} &\rightarrow& \clazy \mid \bcar\var{\sigma_{\mathit{\fun}}}
 \end{eqnarray*}
-Other equations can be converted similarly.  The language generated by
-\var{\Lanv{i}{x}},  denoted  $\mathscr{L}(\var{\Lanv{i}{x}})$, is  the
-desired solution  of \Lanv{i}{x}.  However,  note that the  strings in
-the  language are  over alphabet  $\lbrace \acar,  \acdr,\bcar, \bcdr,
-\clazy \rbrace$, but  we want {\em forward} access paths  only, i. e.,
-access paths over the alphabet $\lbrace \acar, \acdr \rbrace$. In
-other words,  the decision  problem that we  are interested  in during
-garbage collection at a program point $\pi_i$ is:
+Other  equations  can   be  converted  similarly.   The
+language   generated   by  \var{\Lanv{i}{x}},   denoted
+$\mathscr{L}(\var{\Lanv{i}{x}})$,   is    the   desired
+solution  of  \Lanv{i}{x}.    However,  note  that  the
+strings  in the  language  are  over alphabet  $\lbrace
+\acar, \acdr,\bcar, \bcdr, \clazy \rbrace$, but we want
+     {\em  forward} access  paths only,  i. e.,  access
+     paths  over  the  alphabet $\lbrace  \acar,  \acdr
+     \rbrace$.  In other  words,  the decision  problem
+     that   we  are   interested   in  during   garbage
+     collection at a program point $\pi_i$ is:
 \begin{quote}
-Let  $x.\alpha$ be  a forward  access  path consisting  only of  edges
-\acar\    and   \acdr\    (but    not   \bcar, \bcdr\ or \clazy).     Let
-$\mathscr{L}(\var{\Lanv{i}{x}}) \stackrel{*}{\hookrightarrow} \sigma$,
-where $\sigma$ consists  of forward access paths only. Then  does $\alpha \in
-\sigma$?
+Let $x.\alpha$ be a forward access path consisting only
+of edges  \acar\ and \acdr\  (but not \bcar,  \bcdr\ or
+\clazy).       Let      $\mathscr{L}(\var{\Lanv{i}{x}})
+\stackrel{*}{\hookrightarrow}  \sigma$, where  $\sigma$
+consists  of  forward  access  paths  only.  Then  does
+$\alpha \in \sigma$?
 \end{quote}
 
-We now model the above problem  as one of deciding the membership of a
-context-free  grammar  augmented  with  a fixed  set  of  unrestricted
-productions.
+We now model  the above problem as one  of deciding the
+membership of  a context-free grammar augmented  with a
+fixed set of unrestricted productions.
 
 \begin{definition}\label{def:specialgrammar}
-Consider the  grammar $(N,T, p_1\cup p_2,S)$ in which $N$ is a set of
-non-terminals, $T = \{\acar, \acdr, \bcar, \bcdr, \clazy, \$\}$, $p_1$
-is a set of context-free productions that contains the distinguished
-production $S \rightarrow \alpha\$$, $\alpha$ is a string of grammar
-symbols that does not contain $S$, and $p_2$ is the fixed set of
-unrestricted productions $\bcar\acar \rightarrow \epsilon$,
-$\bcdr\acdr \rightarrow \epsilon$, $\clazy\acar \rightarrow \clazy$,
-$\clazy\acdr \rightarrow \clazy$, and $\clazy\$ \rightarrow
-\epsilon$.
+Consider the  grammar $(N,T,  p_1\cup p_2,S)$  in which
+$N$ is  a set  of non-terminals,  $T =  \{\acar, \acdr,
+\bcar,  \bcdr,  \clazy,  \$\}$,   $p_1$  is  a  set  of
+context-free    productions     that    contains    the
+distinguished  production   $S  \rightarrow  \alpha\$$,
+$\alpha$ is a  string of grammar symbols  that does not
+contain $S$, and $p_2$ is the fixed set of unrestricted
+productions    $\bcar\acar    \rightarrow    \epsilon$,
+$\bcdr\acdr    \rightarrow   \epsilon$,    $\clazy\acar
+\rightarrow \clazy$,  $\clazy\acdr \rightarrow \clazy$,
+and $\clazy\$ \rightarrow \epsilon$.
 \end{definition}
 
 From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
@@ -1428,30 +1591,36 @@ Definition~\ref{def:specialgrammar} and a forward access path $\alpha$
 consisting  of symbols \acar\  and \acdr\  only. The  decision problem
 $\alpha \in \mathscr{L}(G)$ is undecidable.
 \end{lemma} 
-\begin{proof}
-Given a  Turing machine  and an input  $w\in (1+0)^*$, we  construct a
-grammar $G$  such that  the machine will  halt on  $w$ if and  only if
-$\epsilon \in  \mathscr{L}(G)$. The grammar includes the  fixed set of
-unrestricted productions  in Definition~\ref{def:specialgrammar}. 
 
-We  shall   denote  the  configuration   of  the  Turing   machine  as
-$w_l(\state,c)w_r$, where $w_l$ is the string to the left of the head,
-$w_r$ is the string to the right, $c$ is the symbol under the head and
-\state\ is the current state  of the machine.  For each combination of
-state  and   symbol  $(\state,c)$,   the  grammar  will   contain  the
-non-terminal \nont{}{c}. We shall synchronize each move of the machine
-to a  derivation step  using a context  free production,  followed, if
-possible, by  a derivation step  using either $\bcar\acar    \rightarrow
-\epsilon$ or $\bcdr\acdr    \rightarrow
-\epsilon$.
-After each synchronization, we shall establish the following invariant
-relation between the machine configuration and the  sentential form:
+\begin{proof}
+Given a Turing machine and  an input $w\in (1+0)^*$, we
+construct a grammar $G$ such that the machine will halt
+on    $w$    if    and   only    if    $\epsilon    \in
+\mathscr{L}(G)$. The grammar includes  the fixed set of
+unrestricted               productions               in
+Definition~\ref{def:specialgrammar}.
+
+We shall denote the configuration of the Turing machine
+as $w_l(\state,c)w_r$, where $w_l$ is the string to the
+left of the head, $w_r$ is the string to the right, $c$
+is the symbol under the head and \state\ is the current
+state of  the machine.   For each combination  of state
+and symbol  $(\state,c)$, the grammar will  contain the
+non-terminal \nont{}{c}. We shall synchronize each move
+of the  machine to  a derivation  step using  a context
+free production, followed, if possible, by a derivation
+step using either  $\bcar\acar \rightarrow \epsilon$ or
+$\bcdr\acdr   \rightarrow    \epsilon$.    After   each
+synchronization,  we  shall   establish  the  following
+invariant  relation between  the machine  configuration
+and the sentential form:
 
 \begin{quote}
-  If the configuration of the machine is $w_l(\state,c)w_r$, then the
-  sentential form will be $\overline{w}_l\nont{}{c}\,w_r$, where
-  $\overline{w}_l$ is the same as $w_l$ but with each symbol $d$ in $w_l$
-  replaced by $\overline{d}$.
+  If    the   configuration    of   the    machine   is
+  $w_l(\state,c)w_r$, then the  sentential form will be
+  $\overline{w}_l\nont{}{c}\,w_r$,                where
+  $\overline{w}_l$ is  the same as $w_l$  but with each
+  symbol $d$ in $w_l$ replaced by $\overline{d}$.
 \end{quote}
 
 Assume that  the TM starts  in a  state $S_\mathit{init}$ with  a tape
@@ -1471,22 +1640,26 @@ Turing machine moves and the grammar productions are as follows:
   $\nont{i}{c} \rightarrow c \nont{j}{\acar}\bcar$ and $\nont{i}{c}
   \rightarrow c \nont{j}{\acdr}\bcdr$. 
 \end{enumerate}
-The idea behind  the productions is explained with  an example: Assume
-that        the        current        sentential        form        is
-\bcar\bcdr\nont{i}{\acar}\acar\acar.  Assume that  the  machine has  a
-transition  $(S_i,\acar) \rightarrow (S_j,\acdr,  L)$. Since  the next
-corresponding step in the derivation  has to be done without any prior
-knowledge of whether the symbol to the left of the tape is a \acar\ or
-a  \acdr, two  productions are  provided,  and the  invariant will  be
-maintained  only   if  the  production   $\nont{i}{\acar}  \rightarrow
-\acdr\nont{j}{\acdr}\acdr$  is  chosen  for   the  next  step  in  the
-derivation.         This         gives        the        configuration
-\bcar\bcdr\acdr\nont{i}{\acdr}\acdr\acar\acar.    Simplification  with
-the    production    $\bcdr\acdr    \rightarrow    \epsilon$    yields
-\bcar\nont{i}{\acdr}\acdr\acar\acar, which  exactly corresponds to the
-changed configuration  of the machine.  Notice carefully that  a wrong
-choice breaks the invariant and it cannot be recovered subsequently by
-any choice of productions.
+The idea  behind the  productions is explained  with an
+example:  Assume that  the current  sentential form  is
+\bcar\bcdr\nont{i}{\acar}\acar\acar.   Assume that  the
+machine  has  a   transition  $(S_i,\acar)  \rightarrow
+(S_j,\acdr, L)$.  Since the next corresponding  step in
+the  derivation  has  to  be  done  without  any  prior
+knowledge of whether the symbol to the left of the tape
+is a \acar\  or a \acdr, two  productions are provided,
+and  the  invariant  will  be maintained  only  if  the
+production         $\nont{i}{\acar}         \rightarrow
+\acdr\nont{j}{\acdr}\acdr$ is chosen  for the next step
+in  the  derivation.    This  gives  the  configuration
+\bcar\bcdr\acdr\nont{i}{\acdr}\acdr\acar\acar.
+Simplification   with    the   production   $\bcdr\acdr
+\rightarrow               \epsilon$              yields
+\bcar\nont{i}{\acdr}\acdr\acar\acar,    which   exactly
+corresponds  to   the  changed  configuration   of  the
+machine.  Notice  carefully that a wrong  choice breaks
+the invariant  and it cannot be  recovered subsequently
+by any choice of productions.
 
 After  the Turing machine  has halted,  there are  further ``cleanup''
 derivations  that derive  $\epsilon$ only  if the  invariant  has been
@@ -1502,10 +1675,11 @@ the left of the head and $\nont{\mathit{final}}{c} \rightarrow
 right of the tape head. This completes the reduction.
 \end{proof}
 
-We circumvent the problem  of undecidability by over- approximating the
-CFG by non-deterministic finite state automata (NFA). The NFAs are then
-simplified using  the $\hookrightarrow$ rules.  Finally the simplified
-NFAs are converted to DFAs.
+We circumvent  the problem  of undecidability  by over-
+approximating the CFG by non-deterministic finite state
+automata (NFA). The NFAs  are then simplified using the
+$\hookrightarrow$ rules.   Finally the  simplified NFAs
+are converted to DFAs.
 
 %------------------------------------------------------------%
 
@@ -1572,7 +1746,7 @@ NFAs are converted to DFAs.
   \psset{arrows=->}
   \ncline{t0}{t1}
 \end{pspicture}
-\\
+\\ 
 (c) & (d)  \end{tabular}}
 \caption{(a) The  grammar rules for \var{\Df{\length}{1}}
   converted into an automaton, and (b) its DFA. The same for \var{\Lanv{9}{\pa}}
@@ -1630,211 +1804,290 @@ liveness based GC is triggered beyond $\pi_9$.
 
 \section{The Garbage Collection Scheme}
 \label{sec:GC-scheme}
-Our experimental setup consists of  an interpreter for our language, a
-liveness  analyzer, and  a single  generation copying  collector.  The
-garbage collector  can be  easily configured to  work on the  basis of
-reachability (RGC  mode) or use  the liveness DFA (LGC  mode).  While
-exploring the  activation record of a  function, LGC uses  the DFA at
-the latest program  point traversed in the function's  body.  Thus, if
-LGC is invoked  at the program point $\pi$, it  would use the liveness
-DFA  at  $\pi$ itself  for  exploring the  root  set  of the  current
-activation record. For  any other activation record in  the stack, say
-for a function ${\mathit f}$  calling ${\mathit g}$ in the call-chain,
-the evaluation  point in ${\mathit f}$  which resulted in  the call to
-${\mathit g}$ would be used.
 
-We shall call  a unit allocatable memory as a {\em  cell}.  A cell can
-hold  a  basic  value   ($\mathit{bas}$),  the  constructor  \CONS\  $(\mathit{cons~
-arg_1~arg_2}$) or   a closure.  The closure, in  turn, can be  one of
-($\mathit{unop~arg_1}$),  ($\mathit{ binop~arg_1~arg_2}$)  and  function  application
-($\mathit{app~arg_1~arg_2})$.  Here each $\mathit{ arg_i}$ is a reference to another heap
-cell or terminated through the function $\mathit{makenull}$.
+Our experimental setup  consists of an interpreter
+for  our  language,  a liveness  analyzer,  and  a
+single generation copying  collector.  The garbage
+collector can be configured to work on the
+basis  of  reachability  (RGC  mode)  or  use  
+liveness  DFAs  (LGC  mode).  
 
-While exploring the heap, the GC  may encounter closures. In RGC mode,
-the closure  will be explored  as usual  and copied by  traversing the
-references corresponding to the arguments. Since our liveness analysis
-predicts the  liveness of  data in its  evaluated form  only, closures
-present a challenge for LGC. LGC will  need to map the liveness of the
-free variables of the closure to  their evaluation point.  This is not
-straight  forward as  variables may  escape their  creation scope  and
-need to  be handled in an  approximate way.
+\warning{The reader has to be prepared for several, terms and concepts
+  in   this  paragraph}   In  the   liveness  analysis   described  in
+Section~\ref{sec:liveness-analysis},   the   liveness   of   variables
+appearing in an  application $s$ that lies on  e-paths, say $\epath_1$
+and  $\epath_2$, is  derived from  the dependence  chains along  these
+e-paths.  This  is  a   static  approximation  without  any  knowledge
+regarding  which of  these  e-paths will  be  eventually taken  during
+execution. During  GC, we would  like to  use a more  precise liveness
+using  the knowledge  of the  actual e-paths  taken during  execution.
+Thus  we   have  liveness  automata  separately   for  $\epath_1$  and
+$\epath_2$  as  well  as  a  automaton  corresponding  to  both  paths
+$\epath_1$ and  $\epath_2$.  The closure corresponding  to $s$ carries
+the  liveness  environment for  its  free  variables (as  pointers  to
+automata, one for each  variable).  Initially the liveness environment
+is   based   on   the    dependences   along   both   $\epath_1$   and
+$\epath_2$. However, after evaluating an \SIF\ condition, the liveness
+environments  are  updated  to  one  based  on  either  $\epath_1$  or
+$\epath_2$, so that subsequent GCs  are based on more precise liveness
+information.
+
+Based on  the above considerations,  we restrict the  possible garbage
+collection points to the following:
+\begin{enumerate}
+\item We  maintain static estimates  of the memory required  to create
+  the closures for each function body.  On entering a function, if the
+  available memory is  less than this requirement for  the function, a
+  GC is triggered.
+\item \warning{Since the evaluation of a  \SIF\ condition may trigger a garbage
+  collection, the
+  available memory is checked once again against a revised estimate of
+  the memory  required to execute  the program.  A GC is  triggered if
+  required.} 
+\end{enumerate}
 
 
-\subsection{A liveness-based garbage collection scheme}
+
+%% While  exploring  the
+%% activation record of a  function, LGC uses the DFA
+%% at  the  latest  program point  traversed  in  the
+%% function's body.   Thus, if LGC is  invoked at the
+%% program point $\pi$, it would use the liveness DFA
+%% at $\pi$ itself for exploring  the root set of the
+%% current   activation   record.   For   any   other
+%% activation record in the stack, say for a function
+%% ${\mathit  f}$   calling  ${\mathit  g}$   in  the
+%% call-chain, the evaluation  point in ${\mathit f}$
+%% which resulted in the  call to ${\mathit g}$ would
+%% be used.
+
+\warning{We shall call a unit  allocatable memory as a {\em
+  cell}.    A  cell   can  hold   a  basic   value
+($\mathsf{bas}$),          the         constructor
+\CONS\   $(\mathsf{cons~   arg_1~arg_2}$)   or   a
+closure.   The closure,  in  turn, can  be one  of
+($\mathsf{unop~arg}$),                ($\mathsf{
+  binop~arg_1~arg_2}$)  and  function  application
+($\mathsf{f~arg})$.  Here each $\mathsf{
+  arg_i}$ is  a reference to another  heap cell.  In
+addition,  the closure  also carries a pointer to
+an automaton (denoted $\mathsf{arg_i.dfa_i}$) for each $\mathsf{arg_i}$.}
+
+
+%% While  exploring the  heap, the  GC may  encounter
+%% closures.  In  RGC  mode,   the  closure  will  be
+%% copied as usual  by traversing  the
+%% references corresponding  to the  arguments. Since
+%% our  liveness analysis  predicts  the liveness  of
+%% data in its evaluated  form only, closures present
+%% a  challenge for  LGC. LGC  will need  to map  the
+%% liveness of  the free variables of  the closure to
+%% their  evaluation  point.   This is  not  straight
+%% forward  as variables  may  escape their  creation
+%% scope  and need  to be  handled in  an approximate
+%% way.
+
+
+%\subsection{A liveness-based garbage collection scheme}
 \label{sec:live-clo}
   \SetStartEndCondition{ }{}{}%
-  \SetKwProg{Fn}{procedure}{\string:}{}
+  \SetKwProg{Pro}{procedure}{\string:}{}
+  \SetKwProg{Fn}{function}{\string:}{}
   \SetKwFunction{Range}{range}%%
   \SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
   \SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
   \SetKwFor{While}{while}{:}{fintq}%
   \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
-  \SetKwFunction{Lgc}{$lgc$}%
-  \SetKwFunction{Copy}{$lgcCopy$}%
+  \SetKwFunction{Lgc}{$\mathsf{lgc}$}%
+  \SetKwFunction{Copy}{$\mathsf{copy}$}%
   \SetKwFunction{LCopy}{$lgcCopy$}%
   \SetKwFunction{RCopy}{$rgcCopy$}%
-
 \begin{algorithm}[t]
-  \Fn{\Lgc{}}
+  \Pro{\Lgc{}}
      {
-       \For {each reference $\mathit{ref}$ in root set}
-            {\Copy($\mathit{ref}$)\;}
-            $\mathit{copyReferencesOnPrintStack()}$\;  
+       \For {each reference $\mathsf{ref}$ in root set}
+            {$\mathsf{ref}$ = \Copy($\mathsf{ref}, \mathsf{init}(\mathsf{ref.dfa})$)\;}
+            ${\mathsf{copyReferencesOnPrintStack}()}$\;  
      }
-     
-     \Fn{\Copy{$\mathit{ref}$}}
+     \Fn{\Copy{$\mathsf{ref}, \mathsf{state}$}}
         {
-          \If{$\mathit{ref}$ is found live using dfa}
+          \eIf {$\mathsf{final}(\mathsf{state}$)}
              {
-               $\mathit{newRef} = $  $\mathit{dupHeapCell(ref})$\;
-               \If{cellType($\mathit{ref}$) is $cons$}
+               $\mathsf{newRef} = \mathsf{dupHeapCell}(\mathsf{ref})$\;
+               \If{$\mathsf{ref\!.cell}$($\mathsf{ref}$)
+                 is a cons cell $\mathsf{(cons~arg_1~arg_2)}$}
                   {
                     {
-                      $\mathit{newCar}  = $  \Copy($\mathit{ref\!.car})$\;
-                      $\mathit{newRef.car}   =  newCar$\;
+                      $\mathsf{newRef}\!.\mathsf{arg_1}  = \Copy(\mathsf{arg_1}, \mathsf{next}(\mathsf{state}, 0))$\;
+%                      $\mathsf{newRef}\!.\mathsf{arg_1}   =  \mathsf{newCar}$\;
                     }
                     {
-                      $\mathit{newCdr}$ =   \Copy($\mathit{ref.cdr})$\;
-                      $\mathit{newRef.cdr}   = \mathit{newCdr}$\;
+                      $\mathsf{newRef}\!.\mathsf{arg_2} =  \Copy(\mathsf{arg_2},
+                      \mathsf{next}(\mathsf{state} , 1))$\;
+%                      $\mathsf{newRef}\!.\mathsf{arg_2}   = \mathsf{newCdr}$\;
                     }    
                   }
-               \If {cellType($\mathit{ref}$) is closure}
-                   {
-                     $\mathit{newRef.arg1}$ =  \Copy$\mathit{(cell.arg1)}$\;
-                     $\mathit{newRef.arg2}$ =  \Copy$\mathit{(cell.arg2)}$\;
+               \If
+                  {$\mathsf{ref\!.cell}$ is a
+                    closure cell, generically  $\mathsf{(binop~arg_1~arg_2)}$}
+              %      
+                   { 
+                     $\mathsf{newRef}\!.\mathsf{arg_1} = \Copy(\mathsf{arg_1}, \mathsf{init}(\mathsf{arg_1.dfa}))$\;
+                     $\mathsf{newRef}\!.\mathsf{arg_2} = \Copy(\mathsf{arg_2}, \mathsf{init}(\mathsf{arg_2.dfa}))$\;
                    }
              }
+             {$\mathsf{newRef = ref}$}
+\KwRet $\mathsf{newRef}$\;
         }
-
-        \caption{LGC with closure collection based on liveness.\label{algo:lgc-a}}
+        \caption{Liveness-based
+          garbage collection.  \label{algo:lgc-a}}
 \end{algorithm}
-Algorithm~\ref{algo:lgc-a}   describes    a   liveness-based   garbage
-collection scheme.  Starting with the root set, each live reference is
-explored  using   $\mathit{  lgcCopy}$.    Copying  \CONS\   cells  is
-simple---it  just involves  copying  the cell  itself and  recursively
-copying the  \CAR\ and the  \CDR\ fields.   On the other  hand copying
-closures  requires  determining  the  liveness  of  its  arguments  at
-run-time.
+Algorithm~\ref{algo:lgc-a}   describes  the    liveness-based   garbage
+collection scheme.  Starting  with the root set, each  cell pointed by
+each live  reference (i.e. whose associated  DFA state is final)  is copied
+using  $\mathsf{copy}$.   Copying  \CONS\ cells  is  simple---it  just
+involves  copying  the  cell  itself  and  conditionally  copying  the
+\CAR\ and  the \CDR\  fields by  referring to the  next states  of the
+automaton.   If the  reference points  to  a closure,  then, as  noted
+earlier, the closure carries pointers to the liveness automata for its
+arguments.   These automata are  used to  recursively initiate  copying of  the
+arguments.     Note     that      the     copying     strategy     for
+$\mathsf{(unop~arg_1~arg_2)}$  or  $\mathsf{(f~arg_1)}$  are  similar  to
+$\mathsf{(binop~arg_1~arg_2)}$ and have not been shown in the algorithm.
 
-Let   us  consider   determining  the   liveness  of   a  closure   at
-runtime. Consider a closure $(app~f~y)$  has a reference from the root
-set  variable  $x$.  If $x$  is  live,  then  we  know that  the  cell
-$(app~f~y)$ has  to be copied.  To copy  the heap structure  rooted at
-$y$, we need the liveness of  $y$ at the program point which triggered
-the evaluation of  $(app~f~y)$. However, this is only  possible if the
-activation record of the function  which created this closure is still
-on the activation stack. This does  not always happen since a function
-could pack a closure in a \CONS\ cell and return the \CONS\ cell.
+%% Let   us  consider   determining  the   liveness  of   a  closure   at
+%% runtime. Consider a closure $(app~f~y)$  has a reference from the root
+%% set  variable  $x$.  If $x$  is  live,  then  we  know that  the  cell
+%% $(app~f~y)$ has  to be copied.  To copy  the heap structure  rooted at
+%% $y$, we need the liveness of  $y$ at the program point which triggered
+%% the evaluation of  $(app~f~y)$. However, this is only  possible if the
+%% activation record of the function  which created this closure is still
+%% on the activation stack. This does  not always happen since a function
+%% could pack a closure in a \CONS\ cell and return the \CONS\ cell.
 
-An alternative could be to  carry with each closure, extra information
-about the program point which triggered its evaluation.  This gives us
-precise liveness  information of the  free variables of a  closure but
-involves the overhead of updating the program point information during
-execution.  To avoid  this overhead we go for a  safe approximation by
-storing the {\em creation point of  the closure} and using it to check
-liveness.  This  is safe since the  liveness at the creation  point of
-the closure dominates  all possible evaluation points  of the closure,
-but it  might be imprecise  as the actual  liveness might be  way less
-than what is found at the creation point.
+%% An alternative could be to  carry with each closure, extra information
+%% about the program point which triggered its evaluation.  This gives us
+%% precise liveness  information of the  free variables of a  closure but
+%% involves the overhead of updating the program point information during
+%% execution.  To avoid  this overhead we go for a  safe approximation by
+%% storing the {\em creation point of  the closure} and using it to check
+%% liveness.  This  is safe since the  liveness at the creation  point of
+%% the closure dominates  all possible evaluation points  of the closure,
+%% but it  might be imprecise  as the actual  liveness might be  way less
+%% than what is found at the creation point.
 
-Note that  when a reachability-based  collector visits a cell  for the
-first time,  it is  marked.  Explorations starting  from the  cell are
-curtailed if the cell is visited subsequently due to sharing.  Since a
-liveness-based collector may reach the  same cell multiple times, each
-time with a different automaton state, this curtailment cannot be done
-in the case  of LGC. This is an inherent  drawback of a liveness-based
-collector.  This  can be mitigated  by maintaining a list  of liveness
-automata states  that a  particular heap cell  was traversed  with and
-avoid repeated traversals if we reach the cell in one of these states.
-However this also involves storage and run-time penalty.
+%% Note that  when a reachability-based  collector visits a cell  for the
+%% first time,  it is  marked.  Explorations starting  from the  cell are
+%% curtailed if the cell is visited subsequently due to sharing.  Since a
+%% liveness-based collector may reach the  same cell multiple times, each
+%% time with a different automaton state, this curtailment cannot be done
+%% in the case  of LGC. This is an inherent  drawback of a liveness-based
+%% collector.  This  can be mitigated  by maintaining a list  of liveness
+%% automata states  that a  particular heap cell  was traversed  with and
+%% avoid repeated traversals if we reach the cell in one of these states.
+%% However this also involves storage and run-time penalty.
 
-To  avoid  performance  penalty,  we experimented  with  a  mixed-mode
-garbage collection scheme  which uses liveness for  evaluated data and
-reachability for closures.
+%% To  avoid  performance  penalty,  we experimented  with  a  mixed-mode
+%% garbage collection scheme  which uses liveness for  evaluated data and
+%% reachability for closures.
 
-\subsection{Liveness-based collector with reachability-based closure
-  collection}
-\begin{algorithm}[t]
-  \Fn{\Lgc{}}
-     {
-       \For {each reference $\mathit{ref}$ in root set}
-            {\LCopy($\mathit{ref}$)\;}
-            $\mathit{copyReferencesOnPrintStack()}$\;  
-     }
-     \Fn{\LCopy{$\mathit{ref}$}}
-        {
-          \eIf{cellType$(\mathit{ref})$ is $cons$}
-              {
-                \eIf {$\mathit{ref}$ is found live using dfa and has not been copied using
-                  reachability}
-                     {
-                       $\mathit{newRef}$ =  $\mathit{dupHeapcell(ref})$\; 
-                       $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.car)}$\;
-                       $\mathit{ newRef.car}   = \mathit{ newCar}$\;
-                       $\mathit{ newCdr}  =$  \LCopy$\mathit{(ref.cdr)}$\;
-                       $\mathit{ newRef.cdr}   = \mathit{newCdr}$\;
-                     }
-                     { $\mathit{makenull(ref)}$\;}}
-              {
-                \If {cellType$\mathit{(ref)}$ is closure and 
-                  has not been copied}
-                    { 
-                      $\mathit{newRef}$  = \RCopy$(\mathit{ref})$\;
-                    }
-              }
-        }
-        \caption{LGC with reachability-based closure collection.\label{algo:lgc-b}}
-\end{algorithm}
+%% \subsection{Liveness-based collector with reachability-based closure
+%%   collection}
+%% \begin{algorithm}[t]
+%%   \Fn{\Lgc{}}
+%%      {
+%%        \For {each reference $\mathit{ref}$ in root set}
+%%             {\LCopy($\mathit{ref}$)\;}
+%%             $\mathit{copyReferencesOnPrintStack()}$\;  
+%%      }
+%%      \Fn{\LCopy{$\mathit{ref}$}}
+%%         {
+%%           \eIf{cellType$(\mathit{ref})$ is $cons$}
+%%               {
+%%                 \eIf {$\mathit{ref}$ is found live using dfa and has not been copied using
+%%                   reachability}
+%%                      {
+%%                        $\mathit{newRef}$ =  $\mathit{dupHeapcell(ref})$\; 
+%%                        $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.car)}$\;
+%%                        $\mathit{ newRef.car}   = \mathit{ newCar}$\;
+%%                        $\mathit{ newCdr}  =$  \LCopy$\mathit{(ref.cdr)}$\;
+%%                        $\mathit{ newRef.cdr}   = \mathit{newCdr}$\;
+%%                      }
+%%                      { $\mathit{makenull(ref)}$\;}}
+%%               {
+%%                 \If {cellType$\mathit{(ref)}$ is closure and 
+%%                   has not been copied}
+%%                     { 
+%%                       $\mathit{newRef}$  = \RCopy$(\mathit{ref})$\;
+%%                     }
+%%               }
+%%         }
+%%         \caption{LGC with reachability-based closure collection.\label{algo:lgc-b}}
+%% \end{algorithm}
 
-\begin{table}[ht!]
-\caption{Time taken by LGC for different strategies.  The programs are
-  modified (smaller) instances of original benchmarks.}
-\label{tab:compare-live-clo-reach-clo}
-\centering
-\begin{tabular}
-{| l | r | r | r |}
-\hline
-Program        & \#GC & \multicolumn{2}{c|}{Closure collected using} \\ \cline{3-4}
-               &      & Reachability & Liveness                      \\ \hline
-\verb@nqueens@ & 183  & 0.009 sec    & 0.228 sec                     \\\hline
-\verb@lambda@  & 11   & 0.001 sec    & 4.992 sec                     \\ \hline
-\verb@lcss@    & 1    & 0.000 sec    & 34.668 sec                    \\ \hline
-\end{tabular}
-\end{table}
+%% \begin{table}[ht!]
+%% \caption{Time taken by LGC for different strategies.  The programs are
+%%   modified (smaller) instances of original benchmarks.}
+%% \label{tab:compare-live-clo-reach-clo}
+%% \centering
+%% \begin{tabular}
+%% {| l | r | r | r |}
+%% \hline
+%% Program        & \#GC & \multicolumn{2}{c|}{Closure collected using} \\ \cline{3-4}
+%%                &      & Reachability & Liveness                      \\ \hline
+%% \verb@nqueens@ & 183  & 0.009 sec    & 0.228 sec                     \\\hline
+%% \verb@lambda@  & 11   & 0.001 sec    & 4.992 sec                     \\ \hline
+%% \verb@lcss@    & 1    & 0.000 sec    & 34.668 sec                    \\ \hline
+%% \end{tabular}
+%% \end{table}
 
-Algorithm~\ref{algo:lgc-b} describes a garbage collection scheme where
-the liveness automata is consulted  only for \CONS\ cells; and assumes
-everything under  a closure to be  live and copies everything  that is
-reachable.
+%% Algorithm~\ref{algo:lgc-b} describes a garbage collection scheme where
+%% the liveness automata is consulted  only for \CONS\ cells; and assumes
+%% everything under  a closure to be  live and copies everything  that is
+%% reachable.
  
-A consequence of  copying everything under a closure is  that we might
-reach  a non-live  cell that  has been  reclaimed earlier  by liveness
-based GC.   This can  happen if  a \CONS\  cell having  partially live
-sub-structure  is copied  using liveness  during a  collection and  it
-subsequently  becomes part  of a  live closure.   During a  subsequent
-collection, the collector may try to copy everything under the closure
-including the dead  sub-structure of the \CONS\ cell.   To avoid this,
-we ensure  that any non-live  references are not carried  across GC's.
-We do this by scanning the live  part of the buffer after every GC and
-nullifying any  reference which is  not live. This is  correct because
-any reference which  is dead during a collection is  guaranteed not be
-dereferenced any further by the program.
+%% A consequence of  copying everything under a closure is  that we might
+%% reach  a non-live  cell that  has been  reclaimed earlier  by liveness
+%% based GC.   This can  happen if  a \CONS\  cell having  partially live
+%% sub-structure  is copied  using liveness  during a  collection and  it
+%% subsequently  becomes part  of a  live closure.   During a  subsequent
+%% collection, the collector may try to copy everything under the closure
+%% including the dead  sub-structure of the \CONS\ cell.   To avoid this,
+%% we ensure  that any non-live  references are not carried  across GC's.
+%% We do this by scanning the live  part of the buffer after every GC and
+%% nullifying any  reference which is  not live. This is  correct because
+%% any reference which  is dead during a collection is  guaranteed not be
+%% dereferenced any further by the program.
 
-Another advantage of  this mixed garbage collection scheme  is that it
-avoids the problem of multiple  explorations from the same cell.  This
-is done by maintaining a flag in  each cell to indicate whether it was
-copied using reachability.
+%% Another advantage of  this mixed garbage collection scheme  is that it
+%% avoids the problem of multiple  explorations from the same cell.  This
+%% is done by maintaining a flag in  each cell to indicate whether it was
+%% copied using reachability.
 
-\subsection{Garbage collection for references on print stack}
-In lazy  languages the evaluation of  closures is driven  by the print
+
+\begin{table*}[t!]
+\caption{Statistics for liveness analysis and garbage collection}
+\label{tab:exp-results}
+\centering
+\include{data-liveness-analysis}
+\include{autotable}
+\vskip -5mm
+\end{table*} 
+
+
+
+
+
+%\subsection{Garbage collection for references on print stack}
+In lazy  languages the evaluation of the top-level expression is driven  by the print
 function~\cite{Jones87}.  Printing of  atomic values is
 simple  and  does  not  trigger  a garbage  collection.   In  case  of
 \CONS\ cells, the \CAR\ is first  printed followed by \CDR.  In a lazy
 language, both \CAR\ and \CDR\ could be closures requiring evaluation,
-and this  may trigger  a garbage collection.   When this  happens.  we
+and this  may trigger  more garbage collections.   When this  happens.  we
 have to consider  any references that might be on  the print stack and
 copy them. We extend the liveness analysis to the print function and
-use its result during garbage collection.
+use its result during garbage collection. \warning{Is this enough?}
 
 \section{Experimental Evaluation}
 \label{sec:experiments}
@@ -1860,53 +2113,36 @@ All cells that are live are copied to the live semi-space. In case of
 live the copied \CONS\ cell will get the updated addresses of its 
 \CAR\ and \CDR\ fields.
 
-\subsection{Copying closure using liveness vs copying closures using reachability}\label{sec:strategies}
+%% \subsection{Copying closure using liveness vs copying closures using reachability}\label{sec:strategies}
 
-To compare the  effect of using reachability to  copy closures instead
-of liveness  we take some  representative programs from  our benchmark
-suite    and    execute    them    with    both.     As    shown    in
-Table~\ref{tab:compare-live-clo-reach-clo},  the   number  of  garbage
-collections in both cases are same but copying closures using liveness
-takes a lot more time compared to reachability based copying.
+%% To compare the  effect of using reachability to  copy closures instead
+%% of liveness  we take some  representative programs from  our benchmark
+%% suite    and    execute    them    with    both.     As    shown    in
+%% Table~\ref{tab:compare-live-clo-reach-clo},  the   number  of  garbage
+%% collections in both cases are same but copying closures using liveness
+%% takes a lot more time compared to reachability based copying.
 
-The number  of garbage  collections is the same  since we  approximate the
-liveness of  a closure  to the  liveness at  its creation  point.  The
-liveness  we get  is usually  grossly over  approximated.  Using  this
-liveness may not  give too much of a benefit  compared to reachability
-as nearly everything would be live at its point of creation.
+%% The number  of garbage  collections is the same  since we  approximate the
+%% liveness of  a closure  to the  liveness at  its creation  point.  The
+%% liveness  we get  is usually  grossly over  approximated.  Using  this
+%% liveness may not  give too much of a benefit  compared to reachability
+%% as nearly everything would be live at its point of creation.
 
-As  mentioned   in  Section~\ref{sec:live-clo},  using   liveness  for
-closures  may  entail  multiple  traversals over  the  same  structure
-consuming more  time.  The  advantage of avoiding  multiple traversals
-can be clearly seen from the lcss example where a single GC takes less
-than a millisecond for reachability  based closure collection where as
-the  liveness  based collection  is  of  the  order of  seconds.  Lazy
-languages tend  to have a  lot of sharing  and hence using  a liveness
-based collection for closures is impractical.
+%% As  mentioned   in  Section~\ref{sec:live-clo},  using   liveness  for
+%% closures  may  entail  multiple  traversals over  the  same  structure
+%% consuming more  time.  The  advantage of avoiding  multiple traversals
+%% can be clearly seen from the lcss example where a single GC takes less
+%% than a millisecond for reachability  based closure collection where as
+%% the  liveness  based collection  is  of  the  order of  seconds.  Lazy
+%% languages tend  to have a  lot of sharing  and hence using  a liveness
+%% based collection for closures is impractical.
 
-Therefore we believe  that using reachability for closures  is a sweet
-spot   in   terms   of   performance  for   liveness   based   garbage
-collectors.  For the  remainder  of  the section  all  LGC results  we
-discuss uses  a mixed-mode collector--liveness for  evaluated data and
-reachability for closures.
+%% Therefore we believe  that using reachability for closures  is a sweet
+%% spot   in   terms   of   performance  for   liveness   based   garbage
+%% collectors.  For the  remainder  of  the section  all  LGC results  we
+%% discuss uses  a mixed-mode collector--liveness for  evaluated data and
+%% reachability for closures.
 
-
-\begin{table*}[ht!]
-\caption{Statistics for liveness analysis and garbage collection}
-\label{tab:exp-results}
-\centering
- \begin{tabular}{|l||c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|@{\ }c|} \hline
-   \multicolumn{1}{|r||}{Program} & \verb@lambda@ & \verb@nperm@ & \verb@treejoin@ & \verb@lcss@ & \verb@sudoku@ & \verb@fibheap@ & \verb@nqueens@ & \verb@knightstour@ & \verb@gc_bench@ \\ \hline\hline
-   \#CFG Nonterminals            & 1078          & 794          & 709             & 839         & 1758          & 780            & 529            & 659                & 417             \\ \hline
-   \#CFG Rules                   & 1823          & 1038         & 1610            & 1752        & 2509          & 1358           & 748            & 909                & 486             \\  \hline 
-   \#DFA States                  & 3312          & 2055         & 2332            & 2340        & 5672          & 2254           & 1229           & 1742               & 729             \\\hline
-   \#DFA Transitions             & 5792          & 3632         & 4235            & 4261        & 10857         & 4076           & 2078           & 3101               & 1124            \\\hline
-   DFA Generation Time (sec)      & 14.7          & 1.1          & 2690.5          & 13.3        & 798.5         & 49.8           & 0.5            & 5.1                & 0.1             \\\hline
- \end{tabular}\\
- (a) Data for Liveness Analysis \\[1pt]
-\include{autotable}
-\vskip -5mm
-\end{table*}
 
 \subsection{Results}
 
@@ -1938,118 +2174,147 @@ completeness  only  and   the  numbers  for  it   are  not  considered
 representative of practical programs.
 
 \newcommand{\hgt}{2.9cm}
-\begin{figure*}[p]
+\begin{figure*}[t]
 \renewcommand{\arraystretch}{.1}
 \begin{tabular}{@{}c@{}@{}c@{}}
-   \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
-   & {\epsfig{file=lambda_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
+%%    \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
+%%    & {\epsfig{file=lambda_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
+   \hskip -4mm{\epsfig{file=lambda_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+\\   \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+\\   \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+\\  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
-\\ (a) & (b)
+%\\ (a) & (b)
 \end{tabular}%\vskip -10mm
- \caption{Memory usage.  Column (a) shows complete  usage, column
-   (b) enlarges  a part  of the  usage.  The blue  and the  red curves
-   indicate the number of cons cells  in the active semi-space for RGC
-   and LGC  respectively.  The  black curve  represents the  number of
-   reachable cells and  the lightblue curve represents the  number of cells
-   that are  actually live (of  which liveness analysis does  a static
-   approximation).   x-axis   is  the  time  measured   in  number  of
-   cons-cells allocated (scaled down by  factor $10^5$). y-axis is the
-   number of cons-cells (scaled down by  $10^3$).}
+ \caption{Memory usage.  
+%% Column (a) shows complete  usage, column 
+%%    (b) enlarges  a part  of the  usage.  
+The blue and the red curves indicate the number of cons
+cells  in  the  active   semi-space  for  RGC  and  LGC
+respectively.  The black curve represents the number of
+reachable cells and the  lightblue curve represents the
+number  of  cells  that  are actually  live  (of  which
+liveness analysis does a static approximation).  x-axis
+is the time measured  in number of cons-cells allocated
+(scaled down by factor $10^5$). y-axis is the number of
+cons-cells (scaled down by $10^3$).}
 \label{fig:memory-usage} \figrule
 \end{figure*}
  
-Memory   usage   graphs   for   select   benchmarks    are   shown
-Figure~\ref{fig:memory-usage}, Column  (a).  As the number  of garbage
-collections tend to  be very large, for each benchmark  we also show a
-window which  is representative  of the  behavior for  that particular
-benchmark (Column (b)).  In all the programs we can see that the curve
-corresponding to  LGC (red  line) regularly dips  below the  RGC curve
-(blue line), the dip is specially visible for the benchmarks where LGC
-outperforms  RGC substantially.   The  graphs also  include curve  for
-reachable cells (black,  obtained approximately by forcing  RGC to run
-at a very high frequency) and the live cells for particular run (lightblue,
-obtained by post processing the heap access at the end of a program).
+Memory  usage graphs  for select  benchmarks are  shown
+Figure~\ref{fig:memory-usage},  Column   (a).   As  the
+number of  garbage collections  tend to be  very large,
+for  each benchmark  we  also show  a  window which  is
+representative  of  the  behavior for  that  particular
+benchmark (Column (b)).  In all the programs we can see
+that  the   curve  corresponding  to  LGC   (red  line)
+regularly dips below the RGC curve (blue line), the dip
+is  specially  visible  for the  benchmarks  where  LGC
+outperforms RGC substantially.  The graphs also include
+curve    for   reachable    cells   (black,    obtained
+approximately  by forcing  RGC to  run at  a very  high
+frequency)  and  the  live  cells  for  particular  run
+(lightblue, obtained by post processing the heap access
+at the end of a program).
 
-One area  of concern is the  huge gap between the  actual liveness and
-the liveness  perceived by our  collector.  In  case of LGC  for eager
-languages~\cite{asati14lgc} the gap was  very narrow and almost touched
-the actual  liveness curve.  In  case of  lazy languages, this  gap is
-largely   due  to   approximate  reachability   based  collection   of
-closures. To implement liveness based  collection of closures, we need
-to  record liveness  data  for  each closure  and  update  it at  each
-evaluation  point.   These  space  and  run  time  overheads  make  it
-infeasible  to  incorporate  liveness  based  GC  for  closures  in  a
-practical garbage collector.
+One area of concern is  the huge gap between the actual
+liveness and  the liveness perceived by  our collector.
+In  case of  LGC for  eager languages~\cite{asati14lgc}
+the gap was  very narrow and almost  touched the actual
+liveness curve.  In case of lazy languages, this gap is
+largely   due   to   approximate   reachability   based
+collection  of closures.  To  implement liveness  based
+collection of closures, we need to record liveness data
+for  each  closure and  update  it  at each  evaluation
+point.   These space  and  run time  overheads make  it
+infeasible  to   incorporate  liveness  based   GC  for
+closures in a practical garbage collector.
 
 
 \section{Related Work} 
 \label{sec:relatedwork}
-Although augmenting  garbage collection with liveness  information has
-been  studied earlier,  it was  mainly  in the  context of  imperative
-languages~\cite{Albert, Hirzel,  khedker07heap}.  Due to  the presence
-of global variables and mutation, practical utility of simple liveness
-based techniques are found to be inefficient.
+Although  augmenting garbage  collection with  liveness
+information has been studied  earlier, it was mainly in
+the   context  of   imperative  languages~\cite{Albert,
+  Hirzel,  khedker07heap}.   Due  to  the  presence  of
+global  variables and  mutation,  practical utility  of
+simple  liveness  based  techniques  are  found  to  be
+inefficient.
 
-In the space  of functional languages, improving  space efficiency has
-been  mainly  studied as  a  compile  time activity.   Either  through
-rewriting                methods                such                as
+In the  space of functional languages,  improving space
+efficiency has  been mainly  studied as a  compile time
+activity.   Either through  rewriting  methods such  as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
-sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based analysis~\cite{tofte98region},  or through insertion  of compile
-time              nullifying              statements              such
-as~\cite{inoue88analysis,lee05static,Hamilton}.    The  compile   time
-marking approaches all rely on an efficient and precise alias analysis
-and in the  absence of it cannot provide  notable improvement. Another
-important approach  advocated by  Hofmann~\cite{HofmannJ03} is  to use
-linear  typing to  analyze  first-order programs  for  heap usage  and
-annotated  them. The  system  then uses  these  annotations to  re-use
-allocated memory  cells instead  of requesting  for newer  cells. This
-requires the  user to write programs  in a specific way  and hence may
-not be practical
+sharing                  analysis                 based
+reallocation~\cite{jones89compile},     region    based
+analysis~\cite{tofte98region}, or  through insertion of
+compile     time     nullifying     statements     such
+as~\cite{inoue88analysis,lee05static,Hamilton}.     The
+compile  time   marking  approaches  all  rely   on  an
+efficient and precise alias analysis and in the absence
+of  it  cannot  provide  notable  improvement.  Another
+important         approach         advocated         by
+Hofmann~\cite{HofmannJ03}  is to  use linear  typing to
+analyze  first-order   programs  for  heap   usage  and
+annotated them. The system  then uses these annotations
+to re-use allocated memory  cells instead of requesting
+for  newer  cells.  This  requires the  user  to  write
+programs  in  a  specific  way and  hence  may  not  be
+practical
 
-Simplifiers~\cite{ONeill}, described as lightweight daemons, 
-improve the efficiency of the program in general and the garbage
-collector in particular. Most of the simplifications mentioned in this
-work are subsumed by a liveness  based collector. We feel this work is
-orthogonal and can augment our  liveness based collector.  The closest
-to our  approach is the  liveness based garbage  collector implemented
-in~\cite{asati14lgc}. We  extend their work to  handle lazy evaluation
-and closures.
+Simplifiers~\cite{ONeill},  described   as  lightweight
+daemons,  improve  the  efficiency of  the  program  in
+general and  the garbage collector in  particular. Most
+of  the  simplifications  mentioned in  this  work  are
+subsumed by  a liveness  based collector. We  feel this
+work is  orthogonal and can augment  our liveness based
+collector.  The closest to our approach is the liveness
+based        garbage       collector        implemented
+in~\cite{asati14lgc}.  We extend  their work  to handle
+lazy evaluation and closures.
  
-
 %% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
 
 
 
-%% Previous  attempts  to increase  the  space  efficiency of  functional
-%% programs  by  additional  reclamation  of memory  fall  in  two  broad
-%% categories. In the first, the program itself is instrumented to manage
-%% reclamation and reallocation without the aid of the garbage collector.
-%% Such      attempts      include:      sharing      analysis      based
-%% reallocation~\cite{jones89compile},                      deforestation
+%% Previous attempts  to increase the  space efficiency
+%% of functional programs  by additional reclamation of
+%% memory fall  in two broad categories.  In the first,
+%% the  program   itself  is  instrumented   to  manage
+%% reclamation and reallocation without  the aid of the
+%% garbage collector.   Such attempts  include: sharing
+%% analysis  based  reallocation~\cite{jones89compile},
+%% deforestation
 %% techniques~\cite{wadler88deforest,gill93ashort,chitil99deforest},
-%% methods  based  on   linear  logic~\cite{hofmann00linear}  and  region
-%% analysis~\cite{tofte98region}.   Closer  to  our approach,  there  are
-%% methods   that  enable   the   garbage  collector   to  collect   more
-%% garbage~\cite{inoue88analysis,lee05static}  by  explicitly  nullifying
-%% pointers  that are  not  live.  However,  the  nullification, done  at
-%% compile  time,  requires sharing  (alias)  analysis.   Our method,  in
-%% contrast, does not require sharing  because of the availability of the
-%% heap itself  at runtime.  To  the best of  our knowledge, this  is the
-%% first attempt  at liveness-based  marking of  the heap  during garbage
+%% methods based on linear logic~\cite{hofmann00linear}
+%% and region analysis~\cite{tofte98region}.  Closer to
+%% our  approach, there  are  methods  that enable  the
+%% garbage      collector      to     collect      more
+%% garbage~\cite{inoue88analysis,lee05static}        by
+%% explicitly  nullifying pointers  that are  not live.
+%% However,  the nullification,  done at  compile time,
+%% requires sharing  (alias) analysis.  Our  method, in
+%% contrast, does  not require  sharing because  of the
+%% availability of the heap  itself at runtime.  To the
+%% best of our knowledge, this  is the first attempt at
+%% liveness-based  marking of  the heap  during garbage
 %% collection.
 
 %% \begin{figure}[t]
@@ -2061,81 +2326,451 @@ and closures.
 \vskip -5mm
 \section{Conclusions and Future Work}
 \label{sec:conclusion}
-%% We  have  defined  a  notion  of liveness  on  structured  data;  this
-%% generalizes classical liveness and strong liveness.  We started with a
-%% general fully context-sensitive analysis  which we proved correct with
-%% respect to  a minefield semantics  (this models the effect  of garbage
-%% collection between every evaluation step).
+%% We have  defined a notion of  liveness on structured
+%% data; this generalizes classical liveness and strong
+%% liveness.    We  started   with   a  general   fully
+%% context-sensitive analysis  which we  proved correct
+%% with respect  to a minefield semantics  (this models
+%% the  effect  of  garbage  collection  between  every
+%% evaluation step).
 
-%% To  avoid scalability  issues (and  to  avoid performing  part of  the
-%% liveness computation at run time)  we defined an 0-CFA version of this
-%% liveness analysis  in which  demands for function  $f$ at  all calling
-%% contexts are conflated into  a single demand $\sigma_f$.  This enabled
-%% us to treat the liveness equations symbolically obtaining context-free
-%% grammars for liveness at each GC point (calls to user functions and to
-%% $\CONS$).  These were then converted to DFA for run-time consultation
-%% by  the garbage collector.  Experiments confirm  the precision  of the
-%% analysis.
+%% To avoid scalability issues (and to avoid performing
+%% part  of the  liveness computation  at run  time) we
+%% defined an  0-CFA version of this  liveness analysis
+%% in  which demands  for function  $f$ at  all calling
+%% contexts   are  conflated   into  a   single  demand
+%% $\sigma_f$.  This  enabled us to treat  the liveness
+%% equations   symbolically    obtaining   context-free
+%% grammars  for liveness  at each  GC point  (calls to
+%% user  functions and  to $\CONS$).   These were  then
+%% converted to  DFA for  run-time consultation  by the
+%% garbage   collector.     Experiments   confirm   the
+%% precision of the analysis.
 
-%% To obtain performance figures we compared a reachability-based garbage
-%% collector with a liveness-based  collector.  This showed a decrease in
-%% the  number  of  GCs,   more  garbage  collected  per  invocation.   A
-%% significant benefit of LGC is  that programs can run in smaller memory
-%% when compared to  RGC. This is potentially useful  in situations where
-%% memory  is  limited---as with  embedded  systems.  For  a majority  of
-%% programs, the garbage collection times were reduced.
+%% To   obtain  performance   figures  we   compared  a
+%% reachability-based   garbage    collector   with   a
+%% liveness-based collector.  This showed a decrease in
+%% the  number  of  GCs,  more  garbage  collected  per
+%% invocation.  A  significant benefit  of LGC  is that
+%% programs can run in  smaller memory when compared to
+%% RGC. This is potentially  useful in situations where
+%% memory is limited---as with embedded systems.  For a
+%% majority of  programs, the garbage  collection times
+%% were reduced.
 
-%% One issue we  highlighted was that while fewer  nodes were marked (and
-%% more garbage collected), sometimes  cons cells could be visited and
-%% traversed  multiple times  with different  sets of  liveness  paths to
-%% explore.  Further work includes  improvements to the classical copying
-%% collector to reduce the cost of this.
-We extended the liveness based garbage collection to lazy
-  languages and shown its benefit  for garbage collection in practical
-  programs. We  defined a context  sensitive liveness analysis  that uses
-  context independent summaries of functions obtained using a symbolic
-  demand. We showed  that obtaining precise solution  to these equations
-  is undecidable in  our formulation, and hence  we safely approximate
-  the result using DFA. These DFA are consulted by the garbage collector
-  to improve  collection.
+%% One issue we highlighted  was that while fewer nodes
+%% were marked (and  more garbage collected), sometimes
+%% cons cells  could be visited and  traversed multiple
+%% times  with  different  sets of  liveness  paths  to
+%% explore.  Further work  includes improvements to the
+%% classical copying  collector to  reduce the  cost of
+%% this.
+We extended  the liveness  based garbage  collection to
+lazy  languages  and  shown  its  benefit  for  garbage
+collection in practical programs.  We defined a context
+sensitive   liveness   analysis   that   uses   context
+independent  summaries of  functions  obtained using  a
+symbolic  demand.  We  showed  that  obtaining  precise
+solution  to  these  equations is  undecidable  in  our
+formulation, and hence we safely approximate the result
+using  DFA.  These DFA  are  consulted  by the  garbage
+collector to improve collection.
 
-  Liveness   of   closures   presented  further   challenges   to   our
-  implementation.   We compared  different approximate  strategies for
-  handling   liveness   of   closures,   and  found   that   a   mixed
-  strategy---reachability  based  collection   of  closure  arguments,
-  liveness  based  collection  of   everything  else---works  best  in
-  practice as it  avoids runtime and space  overheads.  With mixed-mode
-  garbage collection scheme,  we were able to collect  more cells than
-  reachability based collectors at a reasonable overhead.
+Liveness  of closures  presented further  challenges to
+our implementation.  We  compared different approximate
+strategies for handling liveness of closures, and found
+that a  mixed strategy---reachability  based collection
+of  closure  arguments,  liveness based  collection  of
+everything else---works  best in practice as  it avoids
+runtime and  space overheads.  With  mixed-mode garbage
+collection scheme,  we were able to  collect more cells
+than  reachability  based  collectors at  a  reasonable
+overhead.
 
-  Although we  provide an  implementation for  a liveness  based garbage
-  collection scheme for lazy language, we  do not provide a formal proof
-  of its correctness.  A formal  proof of correctness would describe how
-  closures  are  handled  during  garbage  collection  and  liveness  is
-  propagated inside closures. 
+Although we  provide an  implementation for  a liveness
+based garbage  collection scheme for lazy  language, we
+do not  provide a formal  proof of its  correctness.  A
+formal proof of correctness would describe how closures
+are handled  during garbage collection and  liveness is
+propagated inside closures.
 
-  Another interesting exercise is to narrow the gap between the actual
-  liveness and  the perceived liveness  of our garbage  collector. Our
-  experiments (not  reported here) show  that a significant  number of
-  dead cells  get trapped inside closures.   Using strictness analysis
-  to eagerly evaluate closures might  release more of these dead cells
-  to be  garbage collected.   Since our  garbage collector  can handle
-  closures  (suspended evaluations),  another  major  challenge is  to
-  extend it to support higher order programs.
+  Another  interesting exercise  is to  narrow the  gap
+  between  the   actual  liveness  and   the  perceived
+  liveness  of our  garbage collector.  Our experiments
+  (not reported here) show that a significant number of
+  dead  cells  get   trapped  inside  closures.   Using
+  strictness  analysis  to  eagerly  evaluate  closures
+  might release more of these  dead cells to be garbage
+  collected.   Since our  garbage collector  can handle
+  closures   (suspended  evaluations),   another  major
+  challenge  is to  extend it  to support  higher order
+  programs.
 
-  Orthogonally,  we plan  to improve  the efficiency  of the  liveness
-  based garbage collector using heuristics  such as limiting the depth
-  of  DFA,   merging  nearly-equivalent   states  and   using  better
-  representation  and algorithms  for automata  manipulation. We  also
-  need  to   investigate  the  interaction  of   liveness  with  other
-  collection schemes, such as incremental and generational collection.
-  In  summary, we  need to  investigate  ways to  make liveness  based
-  garbage collection attractive for practical collectors.  
+  Orthogonally, we  plan to  improve the  efficiency of
+  the liveness based garbage collector using heuristics
+  such   as  limiting   the  depth   of  DFA,   merging
+  nearly-equivalent    states    and    using    better
+  representation    and    algorithms   for    automata
+  manipulation.  We   also  need  to   investigate  the
+  interaction   of  liveness   with  other   collection
+  schemes,   such  as   incremental  and   generational
+  collection.  In summary, we  need to investigate ways
+  to make liveness  based garbage collection attractive
+  for practical collectors.
 
-%\balance
+
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
+
+\newpage
+\ 
+\newpage
+
+
+\section{Appendix: Soundness of liveness analysis}
+ 
+
+\begin{figure*}[t!]
+\begin{center}\footnotesize
+\renewcommand{\arraystretch}{1.5}
+
+
+\begin{tabular}{|c|c|c|}
+\hline
+Premise & Transition & Rule name \\ 
+\hline
+
+\hline
+
+
+          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
+  H, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(x) :=
+    \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
+\\
+\hline
+          & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
+  \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
+\hline
+$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
+  \cred{\sigma'} )\!:\!S, H, (\CAR~x), \cred{\sigma}$  $
+  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma'}$}      &
+\sc{car-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+  H, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$}      &
+\sc{car-clo}
+\\
+
+\hline
+$H(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  H,\,
+(\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
+s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, H,\, s, \, \cred{\sigma}$      &
+\sc{car-1-clo} \\
+
+
+\hline
+$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
+ & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H,
+  (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, H[\rho'(z)
+    := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma'}$}      &
+\sc{prim-whnf} \\
+\hline
+$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+  H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+  (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+\sc{prim-1-clo} \\
+\hline
+$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+  S, H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
+  (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+\sc{prim-2-clo} \\
+\hline
+{$\mathit{g}~\mbox{defined as}$
+$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
+  (g~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
+    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma}$}      &
+\sc{funcall} \\
+\hline
+$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
+  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+  \ell]\rangle], e, \cred{\sigma}$} &
+\sc{let} \\ 
+\hline
+$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \cred{\sigma}$  $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma}$} & \sc{if-true} \\
+\hline
+$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+  \cred{\sigma}$   $\rightsquigarrow
+\rho, S, H,  e_2, \cred{\sigma}$} & \sc{if-false} \\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
+\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, H, s,
+\cred{\clazy\sigma}$}
+&
+\sc{if-clo} \\
+\hline
+{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
+  (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
+  \cred{\sigma'}$} &
+\sc{return-whnf}\\
+\hline
+$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+  (\psi:\SRETURN~x), \cred{\sigma}$  $
+  \rightsquigarrow$
+$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, H,  s,
+  \cred{\sigma}$} &
+\sc{return-clo} \\
+\hline
+\end{tabular}
+\caption{Minefield semantics.\label{fig:minefield-semantics}}
+\end{center}
+\vskip -5mm
+\end{figure*}
+
+
+We shall now  present a proof of soundness of  the liveness analysis
+presented in Section~\ref{sec:liveness-analysis}.   While the proof is
+on the broad lines of \cite{asati14lgc}, there are several differences
+due to  the lazy  semantics of  the language  being 
+analyzed in this paper. Here is the idea behind the proof.
+\begin{enumerate}
+\item       We        enrich       the        standard       semantics
+  (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
+  collection  just  before  each  $\rightsquigarrow$  transition.  The
+  simulated garbage collection starts from  the root-set and inserts a
+  special value  $\bot$ at each location  in the heap that  contains a
+  reference that is reachable but not live. Any attempt to dereference
+  such  locations during  the  transition will  result  in entering  a
+  special state denoted \bang. We call the semantics after
+  augmentation  \emph{minefield semantics}.
+\item \label{inline} Assuming that a  program enters the \bang\ state,
+  we  show  how to  construct,  through  inline expansion,  a  program
+  without function calls which has the same minefield behavior.
+\item  The final  part  of the  proof shows  that  no program  without
+  function calls can enter a \bang\ state. As a consequence no program
+  (with or without function calls) can enter the \bang\ state. 
+\end{enumerate}
+
+\subsection{Minefield semantics}
+
+To set up the minefield semantics, we follow these steps:
+\begin{enumerate}
+\item   We   enrich    the   abstract   machine   state
+  $\rho,\,S,\,H,\,e$   to  $\rho,\,S,\,H,\,e,\,\sigma$,
+  where  $\sigma$  is  the  demand  on  the  expression
+  $e$. We  call such a state  a \emph{minefield state}.
+  The demand $\sigma$ is  ``dynamic'' in that it arises
+  from the  actual sequence of function  calls that led
+  to  the evaluation  of  $e$.  The  0-CFA demand  used
+  during    liveness     analysis    is     a    static
+  over-approximation   of   $\sigma$   that   considers
+  \emph{all  possible calls}  that  could  lead to  the
+  evaluation of  $e$.  The  information in  a suspended
+  evaluation  context  (on  the   stack  $S$)  is  also
+  similarly augmented with its  demand.  Thus a stacked
+  entry now takes  the form $(\rho, x,  e, \sigma)$.  A
+  modification  of  the   small  step  semantics  which
+  carries the extra information  is shown in the bottom
+  table of Figure~\ref{fig:minefield-semantics}.
+\item $GC$  models a liveness based  garbage collection
+  $GC(\rho, S,  H, \sigma)$ returns $(\rho',  S', H')$,
+  where the changes are due to certain references being
+  replaced by  $\bot$.  This represents the  act of not
+  retaining   (effectively   garbage  collecting)   the
+  objects  pointed to  by  these  references during  an
+  actual  garbage  collection.  This  is  done  in  the
+  following way:
+  \begin{enumerate}
+  \item Given the current  evaluation context $\rho, S,
+    H,   e,  \sigma$   and   the  demand   transformers
+    $\Lfonly$, we can  construct a liveness environment
+    \Lv.   If  $e$  is  an expression,  then  $  \Lv  =
+    \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
+    application, then $ \Lv = ref(e, \sigma, \Lfonly)$.
+    We  can similarly  define the  liveness environment
+    for each  of the  suspended evaluation  contexts in
+    $S$, giving  a stack of liveness  environments that
+    we shall denote $\mathsf{SL}$.
+  \item \emph{Garbage collection  of objects pointed by
+    root   set:}  For   each   $x  \in   domain(\rho)$,
+    $\rho'(x)=\bot$     iff      $x.\epsilon     \notin
+    \Lv$.    Similarly,    for   each    stack    entry
+    $(\rho,\_,\_,\_)$  in   $S$  with  $\Lv'$   as  the
+    corresponding      liveness     environment      in
+    $\mathsf{SL}$, and  for each $x  \in domain(\rho)$,
+    $\rho'(x)=\bot$ iff $x.\epsilon \notin \Lv'$.
+  \item  \emph{Garbage  collection  of objects  in  the
+    heap:} For each location  $\ell$, $H'(\ell) = \bot$
+    iff  there   is  no  $x$  in   either  the  current
+    environment  or  one  of the  stacked  environments
+    $\rho$, such  that for some  $\alpha$ corresponding
+    to a  closure-free path  in the heap  starting from
+    $x$,  $H[x.\alpha]   =  \ell$  and   $x.\alpha  \in
+    \Lv$. Here \Lv\ is the liveness of the variables in
+    the current environment or the stacked environment.
+
+\warning{We have to tell  the reader about closure free
+  paths  earlier  on.   Also,  has  $H[x.\alpha]$  been
+  defined?}
+  \end{enumerate}
+Starting from the initial state $([\;]_\rho,([\;]_\rho,
+\ans, (\print~\ans)):[\;]_{S}  , [\;]_{H}, (\mainpgm)$,
+every transition  is preceded  by a  garbage collection
+using $GC$.  The details of the transition for the {\sc
+  car-clo}  rule   is  shown   in  the  top   table  of
+Figure~\ref{fig:minefield-semantics}.  If  this  or  an
+earlier  call to  $GC$  results  in $H(\rho(x))$  being
+bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
+enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
+the transition is the same as the earlier {\sc car-clo}
+rule.
+\end{enumerate}
+
+\subsection{Inlining} 
+
+Consider a call tree, each  of whose nodes represents a
+function  that  was  called (but  did  not  necessarily
+return because  of a \bang).   Assume that each  of the
+nodes of  the tree is  also annotated with  the program
+point where  the corresponding call was  invoked.  This
+tree  can  be  used  to  inline  function  calls  in  a
+hierarchical fashion.  The details of inlining a single
+function      call     $(\LET\,\,      x     \leftarrow
+(f\,y_1\,\ldots\,y_n) \,\,  \IN\,\, e)$ is  as follows.
+Let  $f$ be  defined  (after renaming  its formals  and
+locals  to  be  disjoint from  existing  variables)  by
+$(\DEFINE\ (f\  z_1\ \ldots\  z_n)\ e_f)$. The  call is
+replaced  by   a  sequence  of  $\LET$s   of  the  form
+$z_i\leftarrow (\ID\,\,y_i)$ followed by the body $e_f$
+but with its  $(\SRETURN\,\,w)$ expressions replaced by
+$(\LET\,\, x  \leftarrow (\ID\,\, w) \,\,  \IN\,\, e)$.
+We prefer to use the  identity function $\ID$ as a form
+of no-op rather than  introducing the form $(\LET\,\, x
+\leftarrow  w \,\,  \IN\,\, e)$  where the  RHS of  the
+$\LET$-definition   is  a   simple  variable.    For  a
+call-less program,  the initial state of  the minefield
+semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
+\ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{H},
+(e_{\mainpgm})$.
+
+ 
+\subsection{Soundness Results}
+
+  We  consider  a  garbage  collection  followed  by  a
+  transition as a step.  We show by induction that, for
+  programs  without function  calls, starting  from the
+  initial  state  that  has $e_{\main}$  as  the  first
+  expression to  be evaluated  instead of  $\main$, any
+  transition of $n$ steps occurs without a \bang.
+
+We  first  need  an auxiliary  result  about  minefield
+semantics. Consider  a trace of a  minefield execution.
+For every minefield state  $(\rho, S, H, e(s), \sigma)$
+that appears  on the LHS of  a $\rightsquigarrow$ step,
+the  demand   $\sigma$  on   the  expression   $e$  (or
+application $s$) is non-null.  This can be proved by an
+induction  on  the  number  of  steps  leading  to  the
+minefield  state.   The  base step  holds  because  the
+demand $\sigma_{all}$  on $\mainpgm$ is  non-null.  The
+inductive step  follows from  the observation  that for
+each  step of  the minefield  semantics, if  the demand
+$\sigma$ on  the LHS of  a minefield step  is non-null,
+the demand on  the RHS is a  transformation of $\sigma$
+(for example $\clazy\sigma$) which is also non-null.
+
+Let us clarify this observation:  Since the minefield semantics models
+lazy  evaluation,  parts  of  the  program may  not  be  evaluated  at
+all.  However,  if  an  expression  (or  application)  happens  to  be
+evaluated, it  will appear  on the  LHS of a  minefield step,  and the
+context-sensitive demand on it will be non-null.
+
+We  show  next  that   the  minefield  execution  of  a
+call-less program  cannot go \bang. Note  that, for the
+sake of  concreteness, by a single  minefield execution
+we   shall  mean   the  evaluation   of  $(main)$   (or
+$e_{\mainpgm}$,  for call-less  programs)  to its  WHNF
+driven  by   the  printing  mechanism   represented  by
+\print. With  minor variations, the proof  will also be
+applicable   for   subsequent  evaluations   fired   by
+$\print$.
+
+\begin{lemma}
+\label{lemma:call-less-cannot-go-bang}
+Consider the minefield execution of  a program without function calls.
+Such a program cannot enter the \bang\ state.
+\end{lemma}
+\begin{proof}
+Consider a state in the minefield execution of a program $(\rho, S, H,
+e, \sigma)$.   We show  by induction  on the  number $n$  of minefield
+steps  leading to  this state  that  the next  step cannot  lead to  a
+\bang\ state.
+
+When $n$ is 0, the  state is $([\;]_\rho,\_, [\;]_{S} ,
+[\;]_{H},  e_{\mainpgm},  \sigma_{all})$.  Further,  we
+have   to  show   that   a  $GC(..)$   followed  by   a
+$\rightsquigarrow$ step cannot lead  to a \bang\ state.
+Now, because  our programs  are in  ANF, $e_{\mainpgm}$
+can  only  be a  $\LET$.  A  {\sc  let} step  does  not
+dereference anything and thus cannot result in a \bang.
+
+For the inductive step, we  shall show that none of the
+minefield steps that  involves dereferencing results in
+a   \bang.   These  are   the   steps   which  have   a
+$H(\rho(...))$ in the premise.  Recall that a minefield
+step   consists   of   a   GC  step   followed   by   a
+$\rightsquigarrow$.   The   $\rightsquigarrow$  can  go
+\bang\ because it dereferences a $\bot$ inserted by the
+immediately  preceding  GC  or  the GC  of  an  earlier
+minefield step.  \warning{However the  demand $\sigma'$
+  on basis of which an earlier GC would have inserted a
+  $\bot$,  would  have   included  the  current  demand
+  $\sigma$.}  Thus,  if the  earlier GC had  inserted a
+$\bot$, so would the current  GC.  Thus it is enough to
+consider the $\rightsquigarrow$  along with the current
+GC and show that it does not lead to a \bang.
+
+We consider the steps {\sc car-clo} and {\sc car-1-clo}
+only. The rest  of the steps are similar.  For the {\sc
+  car-clo}  step in  the state  $\rho, S,  H, (\CAR~x),
+\sigma$, we  know that $\sigma$ is  non-null. There for
+the  liveness  of  $x$  includes  $\epsilon$,  and  the
+dereferencing $H(\rho(x))$ will go without \bang.
+
+For the  {\sc car-1-clo}  step, observe that  there are
+two dereferences.  First $x$  is dereferenced to  get a
+cons  cell  and then  the  head  of  the cons  cell  is
+dereferenced  to  obtain  a  closure.   If  the  demand
+$\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
+of    $x$   will    include    both   $\epsilon$    and
+$\acar\epsilon$,  and  a  GC with  this  liveness  will
+neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
+first   component  of   the   cons   cell.  Thus   both
+dereferences    will    happen   normally    and    the
+$\rightsquigarrow$ step will not enter \bang.
+\end{proof} 
+
+Now we are ready to prove the main soundness result.
+
+\begin{theorem}
+The  minefield  execution of  no  program  can enter  a
+\bang\ state.
+\end{theorem}
+ 
+\begin{proof}
+Assume to  the contrary that  a program $P$  enters the
+\bang\  state.  We can  transform  $P$  to a  call-less
+program $P'$ such that  the minefield executions of $P$
+and $P'$  are identical  except for change  of variable
+names.  \warning{Check  whether  the previous  line  is
+  correct.}                 However,                 by
+Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
+$P'$,   a   call-less   program,   cannot   enter   the
+\bang\  state.  Therefor  $P$  also  cannot  enter  the
+\bang\ state.
+\end{proof}
+ 
 \end{document}
 
-
-
+%%  LocalWords:  dependences subscripting
