@@ -2446,87 +2446,84 @@ propagated inside closures.
 \hline
 Premise & Transition & Rule name \\ 
 \hline
-
 \hline
-
-
-&\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
-  H, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(x) :=
+&\makecell{ $\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S,
+  \heap, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\ell :=
     \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
 \\
 \hline
-& \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
-  \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
+& \makecell{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
+  \rho', S, \heap[\ell := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
 \hline
-$H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
-  \cred{\sigma'} )\!:\!S, H, (\CAR~x), \cred{\sigma}$  $
-  \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma'}$}      &
-\sc{car-whnf} \\
+$\heap(\rho(x)) \mbox{ is } (v, d)$ & \makecell{$\rho, (\rho', \ell, e,
+  \cred{\sigma'} )\!:\!S, \heap, (\CAR~x), \cred{\sigma}$  $
+  \rightsquigarrow \rho', S, \heap[\ell := v], e, \cred{\sigma'}$}      &
+\sc{car-select} \\
 \hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-  H, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
-  (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$}      &
-\sc{car-clo}
-\\
-
-\hline
-$H(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  H,\,
+$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  \heap,\,
 (\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
-s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, H,\, s, \, \cred{\sigma}$      &
+s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$      &
 \sc{car-1-clo} \\
 
 
 \hline
-$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
- & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H,
-  (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, H[\rho'(z)
-    := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma'}$}      &
-\sc{prim-whnf} \\
+
+$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+  \heap, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$}      &
+\sc{car-clo}
+\\
+
 \hline
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-  H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
-  (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+$\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$
+ & \makecell{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap,
+  (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, \heap[\ell
+    := \heap(\rho'(x)) + \heap(\rho'(y))], e, \cred{\sigma'}$}      &
+\sc{prim-add} \\
+\hline
+$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+  \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+  (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 \sc{prim-1-clo} \\
 \hline
-$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-  S, H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
-  (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+$\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+  S, \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
+  (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 \sc{prim-2-clo} \\
 \hline
-{$\mathit{g}~\mbox{defined as}$
-$~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
-  (g~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
-    \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma}$}      &
+{$\mathit{f}~\mbox{defined as}$
+$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell{$\rho, S, \heap,
+  (f~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
+    \rho(\myvec{x})], S, \heap, e_{\mathit{f}}, \cred{\sigma}$}      &
 \sc{funcall} \\
 \hline
-$\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
-  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-  \ell]\rangle], e, \cred{\sigma}$} &
+$\ell$ is a new location& \makecell{$\rho, S, \heap, (\LET~x\leftarrow
+  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, \heap[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}\rangle], e, \cred{\sigma}$} &
 \sc{let} \\ 
 \hline
-$H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma}$  $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma}$} & \sc{if-true} \\
+$\heap(\rho(x)) \ne 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
+  \cred{\sigma}$  $\rightsquigarrow \rho, S, \heap,  e_1, \cred{\sigma}$} & \sc{if-true} \\
 \hline
-$H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+$\heap(\rho(x)) = 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
   \cred{\sigma}$   $\rightsquigarrow
-\rho, S, H,  e_2, \cred{\sigma}$} & \sc{if-false} \\
+\rho, S, \heap,  e_2, \cred{\sigma}$} & \sc{if-false} \\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+$\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
   (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, H, s,
+\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, \heap, s,
 \cred{\clazy\sigma}$}
 &
 \sc{if-clo} \\
 \hline
-{$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
-  (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
+{$\heap(\rho(x))~\mbox{is in WHNF with value}~v$}& \makecell{$\rho,
+  (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\ell := v], e, 
   \cred{\sigma'}$} &
 \sc{return-whnf}\\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
-  (\psi:\SRETURN~x), \cred{\sigma}$  $
+$\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
+  (\SRETURN~x), \cred{\sigma}$  $
   \rightsquigarrow$
-$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, H,  s,
+$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
   \cred{\sigma}$} &
 \sc{return-clo} \\
 \hline
