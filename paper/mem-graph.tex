@@ -7,9 +7,9 @@
   \putnode{o}{origin}{13}{40}{\TwoCells{o1}{o2}}
   \putnode{a}{o}{-10}{-15}{\psframebox{5}}
   \ncline[offsetB=-.5,nodesepB=.1]{*->}{o1}{a}
-  \putnode{y}{o}{-10}{10}{\psframebox[linestyle=none,framesep=.5]{$x$}}
+  \putnode{y}{o}{-10}{10}{\psframebox[linestyle=none,framesep=.5]{$\px$}}
   \nccurve[nodesepB=-.2,angleA=330,angleB=120]{->}{y}{o}
-  \aput[-3.5](.4){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
+  \aput[-2.5](.4){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
 	fillcolor=white]{$\times$}}}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \putnode{c}{o}{25}{4}{\TwoCells{c1}{c2}}
@@ -27,8 +27,8 @@
 	fillcolor=white]{$\times$}}}
   \ncline[angleA=300,angleB=110]{*->}{d2}{f}
   \ncline[angleA=300,angleB=110,linewidth=.7]{->}{d2}{f}
-  \putnode{w}{c}{-8}{11}{\psframebox[linestyle=none,framesep=.2]{$z$}}
-  \putnode{ww}{c}{30}{-5}{\psframebox[linestyle=none,framesep=.2]{$y$}}
+  \putnode{w}{c}{-8}{11}{\psframebox[linestyle=none,framesep=.2]{$\pz$}}
+  \putnode{ww}{c}{30}{-5}{\psframebox[linestyle=none,framesep=.2]{$\py$}}
   \nccurve[nodesepB=-.2,angleA=330,angleB=120,linewidth=.7]{->}{w}{c}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \ncline[offsetB=-.5,nodesepB=.1]{*->}{o2}{e}
