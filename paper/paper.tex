@@ -4,6 +4,7 @@
 \usepackage{mathrsfs}
 \usepackage{lineno}
 \usepackage{booktabs}
+\usepackage{stmaryrd}
 \usepackage{boxedminipage}
 \usepackage[T1]{fontenc}
 \usepackage{epsfig}
@@ -43,7 +44,8 @@
 \newcommand{\comment}[1]{{\color{Myblue}{#1}}}
 \newcommand{\warning}[1]{{\color{Myred}{#1}}}
 %\newcommand{\blankout}[1]{}
-
+\newcommand{\oxlb}{\ensuremath{[\!|}}
+\newcommand{\oxrb}{\ensuremath{|\!]}}
 \newcommand{\cred}[1]{\psframebox[linestyle=none, fillcolor=lightgray,fillstyle=solid,framesep=0.5pt]{#1}}
 %\newcommand{\deltacall}[3]{\delta_{#1}({#2},{#3})}
 \newcommand{\scmin} {\mbox{\sf\em in}}
@@ -52,7 +54,7 @@
 \newcommand{\scmprim}{\ensuremath{\mathsf{+}}}
 \newcommand{\sh}[1]{{\colorbox{gray!20}{\framebox{$#1$}}}}
 \def\myvec{\mathaccent"017E } 
-\newcommand{\stk}{\mbox{S}}   
+\newcommand{\stk}{{S}}      
 \newcommand{\ID}{\mbox{$\mathbf{ id}$}}
 \newcommand{\bang}{\mbox{\sc bang}}
 \newtheorem{theorem}{Theorem}[section]
@@ -60,13 +62,13 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{lemma}[theorem]{Lemma}
 \begin{document}
-\linenumbers
+\linenumbers 
 % --- Author Metadata here ---
 %\conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
 %\CopyrightYear{2007} % Allows default copyright year (20XX) to be
 %over-ridden - IF NEED BE.
 %\crdata{0-12345-67-8/90/01}  % Allows default copyright data
-%(0-89791-88-6/97/05) to be over-ridden - IF NEED BE.
+%(0-89791-88-6/97/05) to be over-ridden - IF NEED BE. 
 % --- End of Author Metadata ---
 
 \title{Liveness-Based Garbage Collection for Lazy Languages}
@@ -204,24 +206,22 @@ collector consults a  set of automata to  restrict reachability during
 marking.  This  results in  an increase in  the garbage  reclaimed and
 consequently in fewer garbage collections.
 
-While this idea has been shown to be effective for a
-first-order {\em  eager} language~\cite{asati14lgc}, a straightforward  extension of the
-technique   is  not   possible  for  lazy   languages,  where
-heap-allocated objects  may include closures  (runtime representations
-of unevaluated expressions). Since data  is made live by evaluation of
+While this idea has been shown  to be effective for a first-order {\em
+  eager}  language~\cite{asati14lgc}, a  straightforward extension  of
+the technique is not possible for lazy languages, where heap-allocated
+objects may  include closures (runtime representations  of unevaluated
+expressions).   Firstly, since  data  is made  live  by evaluation  of
 closures, and  in lazy languages the  place in the program  where this
 evaluation  takes  place  cannot be  statically  determined,  laziness
-complicates  liveness  analysis  itself.    In  addition, laziness
-also complicates garbage collection, since, 
- apart  from
-evaluated   data,  we  need to extend   liveness-based  collection   to
-closures.
-Since a closure can  escape the scope in which it  was created, it has
-to carry the liveness information  of its free variables. Moreover, as
-execution  progresses and  possible  future uses  are eliminated,  the
-liveness information is updated with more precise versions.  All this
-requires significant  modification to  the earlier  garbage collection
-scheme for eager languages.
+complicates  liveness analysis  itself.  Secondly,  for liveness-based
+garbage collection to  be effective, we need  to extend liveness-based
+collection to closures apart from evaluated data.  Since a closure can
+escape the scope in which it was created, it has to carry the liveness
+information of  its free variables. Moreover,  as execution progresses
+and  possible  future uses  are  eliminated,  we update  the  liveness
+information  in a  closure with  a more  precise version.   Because of
+these reasons,  the garbage collector also  becomes significantly more
+complicated than a liveness-based collector for a eager language.
 
 \warning{Experiments  with  a   single  generation  copying  collector
   (Section~\ref{sec:experiments})  confirm  the  expected  performance
@@ -340,7 +340,7 @@ To the  best of our
   knowledge, this is the first work on liveness-based garbage
   collection      for      lazy     languages.       All      previous
   attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
-    asati14lgc, karkare06effectiveness} have targeted either
+    asati14lgc, karkare06effectiveness} have involved either
   imperative or  eager functional languages. 
 
 \subsection{Organization of the paper}
@@ -545,9 +545,11 @@ from the set  of variables of the program  $\mathit{Var}$ to locations
 in the  heap.  
 
 
-The  semantics  of   expressions  (and  applications\footnote{In  most
-  contexts, we  shall use the  term 'expression' and the  notation $e$
-  for both expressions and applications.}) are given by transitions of
+The  semantics  of   expressions  (and  applications)
+%% \footnote{In  most
+%%   contexts, we  shall use the  term 'expression' and the  notation $e$
+%%   for both expressions and applications.} 
+are given by transitions of
 the form $\rho, \stk, \heap,  e \rightarrow \rho', \stk', \heap', e'$.
 Here \stk\ is a stack of continuation frames.  Each continuation frame
 is of the form $(\rho, \ell,  e)$, signifying that the location $\ell$
@@ -556,19 +558,23 @@ expression, and $e$ is to be evaluated next in the environment $\rho$.
 Note  that  the  state  of  the  transition  system  consists  of  the
 \emph{current evaluation  context}, given by  $\rho$ and $e$,  and the
 \emph{suspended  evaluation  contexts}  (represented  as  continuation
-frames) in the stack $S$.   \warning{The
-3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
-system will be denoted $\mathcal{S}$.}
+frames) in the stack $S$.   
+%% \warning{The
+%% 3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
+%% system will be denoted $\mathcal{S}$.}
 
 The  initial  state  of  the  transition  system  described  above  is
-$([\;]_\rho,\,   ([\;]_\rho,   \,   \rho(\ans),\,   (\print~\ans)):[\;]_{S},
-[\;]_{\heap},\, (\mainpgm))$,  in which  $[\;]_\rho$ and $[\;]_{\heap}$  are the
-empty environment and  the empty heap. The  initial stack consists
+$([\;]_\rho,\,   (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
+(\print~\ans)):[\;]_{S}, 
+[\;]_{\heap},\, (\mainpgm))$,  in which  $[\;]_\rho$,
+$[\;]_{\mbox \footnotesize {H}}$
+and $[\;]_{S}$ are    are the
+empty environment, heap and stack respectively. The  initial stack consists
 of  a single  continuation frame  in  which \ans\  is a  distinguished
 variable  that  would   eventually  be  updated  with   the  value  of
-(\mainpgm).  In  addition, \print\ is  a function modeling  a printing
+(\mainpgm) and $\rho_\mathit{init}$ maps \ans\ to a location $\ell_{\ans}$.   In  addition, \print\ is  a function modeling  a printing
 mechanism---a   standard   run-time   support  assumption   for   lazy
-languages---that prints  the value of  (\mainpgm).  The operator $:$
+languages~\cite{Jones87}---that prints  the value of  (\mainpgm).  The operator $:$
 pushes elements on top of the stack.
 
 The   notation  $[\myvec{x}   \mapsto  \myvec{\ell}]$   represents  an
@@ -694,57 +700,63 @@ x.\sigma\\
 
 A variable is {\em live} if there  is a possibility of its value being
 used in  future computations and  dead if  it is definitely  not used.
-Heap-allocated data needs a richer model of liveness which talks about
-liveness of  references.  Using  $\acar$, $\acdr$ to  represent access
-using  $\CAR$  and  $\CDR$  fields,  the  liveness  of  the  structure
-reachable from a  variable can be represented by a  set of {\em access
-  paths}     i.e.     prefix-closed     set     of    strings     from
-$\{\acar,\acdr\}^\ast$.  As an example, if $x$ is a list with liveness
-$\{\epsilon, \acar, \acdr, \acdr\acar, \acdr\acdr, \acdr\acdr\acar\}$,
-then future  computations can only  refer up  to the second  and third
-members  of $x$.   A  {\em  liveness environment}  is  a mapping  from
-variables to access paths, but often expressed as
-a set,  for example  by writing $\{x.\epsilon,  x.\acdr, x.\acdr\acdr,
-y.\epsilon\}$  instead  of  $[x  \mapsto\{\epsilon,\acdr,\acdr\acdr\},
-  y\mapsto\{\epsilon\}, z\mapsto\{\}]$.  In  this notation, $y \mapsto
-\{\epsilon\}$ represents access using $y$  itself and $z \mapsto \{\}$
-indicates that $z$ is dead. 
-In lazy languages, liveness environments are associated with regions of
-programs instead of program points.
+Heap-allocated data  needs a richer model  than classical liveness---a
+model  which  talks  about  liveness of  references.   Using  $\acar$,
+$\acdr$  to  represent access  using  $\CAR$  and $\CDR$  fields,  the
+liveness of the structure reachable from a variable can be represented
+by a set of {\em access paths} i.e.  prefix-closed set of strings from
+$\{\acar,\acdr\}^\ast$.  Given an initial location $\ell$ (typically a
+variable  reference) and  a heap  \heap, semantically  an access  path
+$\alpha$ represents  a reference, denoted $\heap\oxlb\ell,  \alpha\oxrb$, in
+the heap  that is  obtained by  starting with  $\ell$ and  chasing the
+\CAR\ or  \CDR\ fields  as specified  by the  access path.  
+$\heap\oxlb\ell, \alpha\oxrb$  is defined only  if the path followed  in the
+heap  is \emph{closure-free}  (does not  cross closures),  else it  is
+undefined.
 
-A notion that generalizes liveness is {\em demand}.  While liveness 
-gives the patterns of future uses of a  variable, demand
-represents the future  use of the value of an  expression.  The demand
-on an expression  $e$ is again a set of  access paths---that subset of
+Access paths can be used to  represent liveness. As an example, if $x$
+is  a  list  with  liveness  $\{\epsilon,  \acar,  \acdr,  \acdr\acar,
+\acdr\acdr,  \acdr\acdr\acar\}$,  then  future computations  can  only
+refer up  to the  second and  third members of  $x$.  A  {\em liveness
+  environment} is a mapping from  variables to access paths, but often
+expressed as  a set,  for example  by writing  $\{x.\epsilon, x.\acdr,
+x.\acdr\acdr,        y.\epsilon\}$        instead        of        $[x
+  \mapsto\{\epsilon,\acdr,\acdr\acdr\},          y\mapsto\{\epsilon\},
+  z\mapsto\{\}]$.    In  this   notation,  $y   \mapsto  \{\epsilon\}$
+represents access using $y$ itself and $z \mapsto \{\}$ indicates that
+$z$ is dead.  In lazy  languages, liveness environments are associated
+with regions of programs instead of program points.
+
+A notion  that generalizes liveness  is {\em demand}.   While liveness
+gives the patterns of future uses of a variable, demand represents the
+future use of the value of an expression.  The demand on an expression
+$e$   is   again   a   set    of   access   paths---that   subset   of
 $\{\acar,\acdr\}^\ast$ which the  context of $e$ may  explore of $e$'s
 result.   To see  the need  for demands,  consider the  let expression
-$\pi:(\LET~x\leftarrow  (\CDR~y)~\IN~ \pi':\SRETURN~x)$.   Assume that
-the context  of this expression  places the demand  $\lbrace \epsilon,
-\acar \rbrace$. Since the value of the expression is
-the value  of $x$, the demand  translates to the liveness  $[x \mapsto
-  \lbrace   \epsilon,  \acar   \rbrace]$  at   $\pi'$.   Due   to  the
-\LET\ definition which binds $x$ to $(\CDR~y)$, the liveness of $x$ at
-$\pi'$ now becomes the demand on $(\CDR~y)$.  This, in turn, generates
-the liveness  $\lbrace y.\epsilon,  y.\acdr, y.\acdr\acar  \rbrace$ at
-$\pi$.  These are  the set of $y$-rooted accesses  required to explore
-$\lbrace \epsilon, \acar  \rbrace$ paths of the  result of $(\CDR~y)$.
-%% As an analogy  with classical (strong) liveness analysis,  $y$ and $z$
-%% are live  at the entry $\pi:  x:=y+z$, if and  only if $x$ is  live at
-%% exit   of  $\pi$.    In   our  terminology,   the  liveness   $\lbrace
-%% \epsilon\rbrace $ of $x$ at the  exit from $\pi$ becomes the demand on
-%% $y+z$, and this,  in turn generates the  liveness $\lbrace y.\epsilon,
-%% z.\epsilon \rbrace$ at the entry of $\pi$.
+$(\LET~x\leftarrow  (\CDR~y)~\IN~   \SRETURN~x)$.   Assume   that  the
+context of this expression places  the demand $\lbrace \epsilon, \acar
+\rbrace$. Since the  value of the expression is the  value of $x$, the
+demand translates to the liveness  $[x \mapsto \lbrace \epsilon, \acar
+  \rbrace]$.   Due  to  the  \LET\   definition  which  binds  $x$  to
+$(\CDR~y)$, the liveness of $x$  now becomes the demand on $(\CDR~y)$.
+This, in  turn, generates  the liveness $\lbrace  y.\epsilon, y.\acdr,
+y.\acdr\acar  \rbrace$.   These are  the  set  of $y$-rooted  accesses
+required to  explore $\lbrace  \epsilon, \acar  \rbrace$ paths  of the
+result of $(\CDR~y)$.
+%% As an  analogy with classical  (strong) liveness analysis,  $y$ and
+%% $z$ are live at the entry $\pi: x:=y+z$, if and only if $x$ is live
+%% at  exit  of $\pi$.   In  our  terminology, the  liveness  $\lbrace
+%% \epsilon\rbrace $ of $x$ at the  exit from $\pi$ becomes the demand
+%% on  $y+z$,  and  this,  in turn  generates  the  liveness  $\lbrace
+%% y.\epsilon, z.\epsilon \rbrace$ at the entry of $\pi$.
 
-We use $\sigma$
-to  range over  demands,  $\alpha$  to range  over
-access  paths and  $\Lv$  to  range over  liveness
-environments.   The   notation  $\sigma_1\sigma_2$
-denotes  the  set $\lbrace  \alpha_1\alpha_2  \mid
-\alpha_1     \in     \sigma_1,    \alpha_2     \in
-\sigma_2\rbrace$.  Often  we shall  abuse notation
-to juxtapose  an edge  label and  a set  of access
-paths;   $\acar\sigma$   is    a   shorthand   for
-$\lbrace\acar\rbrace\sigma$.
+We use $\sigma$  to range over demands, $\alpha$ to  range over access
+paths  and $\Lv$  to range  over liveness  environments. $\Lv_y$  will
+denote  the liveness  of an  individual  variable $y$  in $\Lv$.   The
+notation $\sigma_1\sigma_2$ denotes  the set $\lbrace \alpha_1\alpha_2
+\mid \alpha_1  \in \sigma_1, \alpha_2 \in  \sigma_2\rbrace$.  Often we
+shall abuse  notation to juxtapose an  edge label and a  set of access
+paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 
 \input{example-program-and-liveness-maps}
 %%\label{fig:mot-example2}
@@ -860,22 +872,23 @@ liveness $\{x.\epsilon\}$ is created and  added to the union.
 %% Also  notice  a  consequence  of laziness:  the  entire  expression
 %% including the  condition is not  evaluated if  the demand on  it is
 %% $\emptyset$.  This results in the empty liveness environment.
-To understand the  liveness rule for $\LET~x \leftarrow~s~\IN~e$, observe that the value of  $\LET$ is the value
-of  its body  $e$.   Thus the  liveness environment  $\Lv$  of $e$  is
-calculated for the given demand $\sigma$. Since the stack variable $x$
-is copied to each of the  closure variable $x_{\pi}$, the liveness of
-$x$ is the union of the
+To  understand  the  liveness rule  for  $\LET~x  \leftarrow~s~\IN~e$,
+observe that the value  of $\LET$ is the value of  its body $e$.  Thus
+the  liveness environment  $\Lv$ of  $e$ is  calculated for  the given
+demand $\sigma$. Since the stack variable $x$ is copied to each of the
+closure variable  $x_{\pi}$, the liveness of  $x$ is the union  of the
 liveness of the  closure variables.  This liveness,  say $\sigma'$, is
-also the demand on $s$, and the resulting liveness environment $\mathit{ref}(s,
-\sigma', \Lfonly)$  is added  to $\Lv \cup  \{x.\sigma\}$ to  give the
-overall liveness environment for $(\LET~x \leftarrow~s~\IN~e)$.
+also  the  demand  on  $s$, and  the  resulting  liveness  environment
+$\mathit{ref}(s,   \sigma',   \Lfonly)$   is  added   to   $\Lv   \cup
+\{x.\sigma\}$ to  give the  overall liveness environment  for $(\LET~x
+\leftarrow~s~\IN~e)$.
 
-\warning{Note  carefully that  $\Lv_y$ specifies  the liveness  of the
-  reachable heap starting  from $y$ and extending  till closures.  The
-  liveness  of further  heap  contents starting  from  a closure,  say
-  $(\CAR\, x_{\pi})$, is given  by $\Lv_{x_{\pi}}$.  Therefore, in our
-  implementation,   a  closure   carries   the  liveness   environment
-  consisting of its free variables.}
+As noted earlier, $x.\alpha \in  \Lv_y$ specifies the liveness  of the
+reference $\heap\oxlb\rho(x), \alpha\oxrb$  only if $\alpha$ corresponds to  a closure-free path
+in \heap\   starting from $\rho(x)$.  If this  path is intercepted  by a
+closure,  say  $\CAR~{x_{\pi}}$, then  the  liveness  of further  heap
+contents starting from $x_{\pi}$ is given by $\Lv_{x_{\pi}}$.
+
 
 %} %comment
 
@@ -1004,12 +1017,13 @@ overall liveness environment for $(\LET~x \leftarrow~s~\IN~e)$.
 
 
 We shall now present a proof of soundness of the analysis presented in
-Section~\ref{sec:liveness-analysis}.  \warning{While  the proof  is on
-  the broad lines of  \cite{asati14lgc}, there are several differences
-  due to the  lazy semantics of the language in  this paper.} Here are
+Section~\ref{sec:liveness-analysis}.  %% \warning{While  the proof  is on
+  %% the broad lines of  \cite{asati14lgc}, there are several differences
+  %% due to the  lazy semantics of the language in  this paper.}
+Here are
 the ideas behind the proof.
 \begin{enumerate}
-\item       We        enrich       the        standard       semantics
+\item       We   augment     the        standard       semantics
   (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
   collection  just  before  each  $\rightsquigarrow$  transition.  The
   simulated garbage collection starts from  the root-set and inserts a
@@ -1051,6 +1065,8 @@ Premise & Transition & Rule name \\
 \hline
 \end{tabular}
 \end{center}
+\caption{Minefield semantics for \sc{car-clo-bang} and
+  \sc{car-clo-bang} \label{fig:minefield-semantics-for-some}}
 \end{figure*}
 
 
@@ -1061,7 +1077,8 @@ Premise & Transition & Rule name \\
 
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
-\item   We   enrich    the   abstract   machine   state
+
+\item   We   extend    the   abstract   machine   state
   $\rho,S,\heap,e$   to  $\rho,S,\heap,e,\sigma$. 
 We  call such a state  a \emph{minefield state}.
 Here $\sigma$  is  the  ``dynamic'' demand  on  the  expression
@@ -1086,34 +1103,33 @@ Here $\sigma$  is  the  ``dynamic'' demand  on  the  expression
   act of  not retaining  (effectively garbage collecting)  the objects
   pointed to by these references  during an actual garbage collection.
   This is done in the following way:
-  \begin{enumerate}
-  \item Given the current  evaluation context $\rho, S,
+  \begin{enumerate} 
+  \item \label{gc-1}Using the current  evaluation context $\rho, \stk,
     \heap,   e,  \sigma$   and   the  demand   transformers
-    $\Lfonly$, we construct a liveness environment
-    \Lv.  %%  If  $e$  is  an expression,  then  $  \Lv  =
+    $\Lfonly$, we construct a liveness environment \Lv\ for the
+    expression $e$.
+      %%  If  $e$  is  an expression,  then  $  \Lv  =
     %% \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
-    %% application, then $ \Lv = ref(e, \sigma, \Lfonly)$.
-    We  similarly  define the  liveness environment
-    for each  of the  suspended evaluation  contexts in
-    $S$, giving  a stack of liveness  environments that
-    we shall denote $\mathsf{SL}$.
-  \item \emph{Garbage collection  of objects pointed by
-    root   set:}  For   each   $x  \in   domain(\rho)$,
-    $\rho'(x)=\bot$     iff      $x.\epsilon     \notin
-    \Lv$.    Similarly,    for   each    stack    entry
-    $(\rho,\_,\_,\_)$  in   $S$  with  $\Lv'$   as  the
-    corresponding      liveness     environment      in
-    $\mathsf{SL}$, and  for each $x  \in domain(\rho)$,
-    $\rho'(x)=\bot$ iff $x.\epsilon \notin \Lv'$.
-  \item  \emph{Garbage  collection  of objects  in  the
-    heap:} \warning{ For each location  $\ell$, $\heap'(\ell) = \bot$
-    iff  there   is  no  $x$  in   either  the  current
-    environment  or  one  of the  stacked  environments
-    $\rho$, such  that for some  $\alpha$ corresponding
-    to a  \warning{closure-free path}  in the heap  starting from
-    $x$,  $\heap[x.\alpha]   =  \ell$  and   $x.\alpha  \in
-    \Lv$}. Here \Lv\ is the liveness of the variables in
-    the current environment or the stacked environment.
+    %% application,  then  $  \Lv  =  ref(e,  \sigma,  \Lfonly)$.  
+ We  similarly  define  the  liveness  environment  for  the
+ expressions $e$ in each of the suspended evaluation contexts $(\rho, \ell,  e, \sigma)$ in $S$, giving
+ a stack of liveness environments that we shall denote $\mathsf{SL}$.
+  \item \emph{Garbage collection of objects pointed by root sets:} For
+    the environment $\rho$ in the current  context and for each $x \in
+    domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
+    \Lv$.  Similarly,  for each  stack entry $(\rho,\ell,e,\sigma)$
+    in $S$ 
+    with  $\Lv'$   as  the   corresponding  liveness   environment  in
+    $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
+    to $\bot$ iff $x.\epsilon \notin \Lv'$.
+  \item \emph{Garbage  collection of  objects in  the heap:}  For each
+    location $\ell$,  we set $\heap(\ell)$  to $\bot$ iff there  is no
+    variable  $x$  in either  the  current  environment or  a  stacked
+    environment,  say  $\rho$,  such   that  $x.\alpha$  is  live  and
+    corresponds  to   $\ell$ in \heap.  More  formally,  there   are  no  $x\in
+    domain(\rho)$ and  $\alpha$, such that  $\heap\oxlb\rho(x), \alpha
+    \oxrb = \ell$  and $x.\alpha \in \Lv$, where \Lv\  is the liveness
+    environment corresponding to $\rho$ mentioned in step~\ref{gc-1}.
   \end{enumerate}
 \end{enumerate}
 Starting from the initial state,
@@ -1121,13 +1137,13 @@ Starting from the initial state,
 %% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
 every transition  is preceded  by a  garbage collection
 using $GC$.  The details of the transition for the {\sc
-  car-clo}  rule   is  shown   in  the  top   table  of
-Figure~\ref{fig:minefield-semantics}.  If  this  or  an
+  car-clo}  rule   is  shown   in
+Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
 earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
-enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
+enters the  \bang\ state ({\sc  car-clo-bang}). Otherwise
 the transition is the same as the earlier {\sc car-clo}
-rule.
+rule. 
 
 
 
@@ -1819,38 +1835,38 @@ collector can be configured to work on the
 basis  of  reachability  (RGC  mode)  or  use  
 liveness  DFAs  (LGC  mode).  
 
-\warning{The reader has to be prepared for several, terms and concepts
-  in   this  paragraph}   In  the   liveness  analysis   described  in
-Section~\ref{sec:liveness-analysis},   the   liveness   of   variables
-appearing in an  application $s$ that lies on  e-paths, say $\epath_1$
-and  $\epath_2$, is  derived from  the dependence  chains along  these
-e-paths.  This  is  a   static  approximation  without  any  knowledge
-regarding  which of  these  e-paths will  be  eventually taken  during
-execution. During  GC, we would  like to  use a more  precise liveness
-using  the knowledge  of the  actual e-paths  taken during  execution.
-Thus  we   have  liveness  automata  separately   for  $\epath_1$  and
-$\epath_2$  as  well  as  a  automaton  corresponding  to  both  paths
-$\epath_1$ and  $\epath_2$.  The closure corresponding  to $s$ carries
-the  liveness  environment for  its  free  variables (as  pointers  to
-automata, one for each  variable).  Initially the liveness environment
-is   based   on   the    dependences   along   both   $\epath_1$   and
-$\epath_2$. However, after evaluating an \SIF\ condition, the liveness
-environments  are  updated  to  one  based  on  either  $\epath_1$  or
-$\epath_2$, so that subsequent GCs  are based on more precise liveness
-information.
+In        the       liveness        analysis       described        in
+Section~\ref{sec:liveness-analysis}, the liveness of closure variables
+in  an application  $s$ is  derived from  dependence chains  along all
+paths from the program point where the closure is created to reachable
+evaluation  points.  Assume,  for   the  sake  of  concreteness,  that
+$\epath_1$  and $\epath_2$  two  such evaluation  points.   This is  a
+static approximation  without any  knowledge regarding which  of these
+paths will be  eventually taken during execution. During  GC, we would
+like to use a more precise  liveness based on the  actual
+paths  taken  during  execution.    Therefore we create  liveness  automata
+separately  for the dependences in   $\epath_1$ and  $\epath_2$  as  well as  a  automaton
+corresponding to  both paths  $\epath_1$ and $\epath_2$.   The closure
+corresponding to  $s$ carries  the liveness  environment for  its free
+variables (as pointers to automata, one for each variable).  Initially
+the  liveness  environment is  based  on  the dependences  along  both
+$\epath_1$    and   $\epath_2$.    However,   after    evaluating   an
+\SIF\ condition, the liveness environments are updated to one based on
+either $\epath_1$ or  $\epath_2$, so that subsequent GCs  are based on
+more precise liveness information. 
 
 Based on  the above considerations,  we restrict the  possible garbage
-collection points to the following:
+collection points in a function body to the following:
 \begin{enumerate}
 \item We  maintain static estimates  of the memory required  to create
   the closures for each function body.  On entering a function, if the
   available memory is  less than this requirement for  the function, a
   GC is triggered.
-\item \warning{Since the evaluation of a  \SIF\ condition may trigger a garbage
-  collection, the
-  available memory is checked once again against a revised estimate of
-  the memory  required to execute  the program.  A GC is  triggered if
-  required.} 
+\item Since the evaluation of a  \SIF\ condition may trigger a 
+  collection, after evaluating the condition   the available memory
+  is  checked once  again against  a  revised estimate  of the  memory
+  (based on  value of the condition)  required to execute the  rest of
+  the program.  A GC is triggered if enough memory is unavailable.
 \end{enumerate}
 
 
@@ -1868,31 +1884,14 @@ collection points to the following:
 %% which resulted in the  call to ${\mathit g}$ would
 %% be used.
 
-\warning{We shall call a unit  allocatable memory as a {\em
-  cell}.    A  cell   can  hold   a  basic   value
-($\mathsf{bas}$),          the         constructor
-\CONS\   $(\mathsf{cons~   arg_1~arg_2}$)   or   a
-closure.   The closure,  in  turn, can  be one  of
-($\mathsf{unop~arg}$),                ($\mathsf{
-  binop~arg_1~arg_2}$)  and  function  application
-($\mathsf{f~arg})$.  Here each $\mathsf{
-  arg_i}$ is  a reference to another  heap cell.  In
-addition,  the closure  also carries a pointer to
-an automaton (denoted $\mathsf{arg_i.dfa_i}$) for each $\mathsf{arg_i}$.}
-
-
-%% While  exploring the  heap, the  GC may  encounter
-%% closures.  In  RGC  mode,   the  closure  will  be
-%% copied as usual  by traversing  the
-%% references corresponding  to the  arguments. Since
-%% our  liveness analysis  predicts  the liveness  of
-%% data in its evaluated  form only, closures present
-%% a  challenge for  LGC. LGC  will need  to map  the
-%% liveness of  the free variables of  the closure to
-%% their  evaluation  point.   This is  not  straight
-%% forward  as variables  may  escape their  creation
-%% scope  and need  to be  handled in  an approximate
-%% way.
+We shall call a  unit allocatable memory as a {\em  cell}.  A cell can
+hold    a    basic    value    ($\mathsf{bas}$),    the    constructor
+\CONS\ $(\mathsf{cons~  arg_1~arg_2}$) or a closure.   The closure, in
+turn,    can    be    one   of    ($\mathsf{unop~arg}$),    ($\mathsf{
+  binop~arg_1~arg_2}$)  and  function application  ($\mathsf{f~arg})$.
+Here each $\mathsf{  arg_i}$ is a reference to another  heap cell.  In
+addition, the closure also carries  a pointer to a DFA (denoted
+$\mathsf{arg_i.dfa_i}$) for each $\mathsf{arg_i}$.
 
 
 %\subsection{A liveness-based garbage collection scheme}
@@ -1949,127 +1948,19 @@ an automaton (denoted $\mathsf{arg_i.dfa_i}$) for each $\mathsf{arg_i}$.}
         \caption{Liveness-based
           garbage collection.  \label{algo:lgc-a}}
 \end{algorithm}
-Algorithm~\ref{algo:lgc-a}   describes  the    liveness-based   garbage
-collection scheme.  Starting  with the root set, each  cell pointed by
-each live  reference (i.e. whose associated  DFA state is final)  is copied
-using  $\mathsf{copy}$.   Copying  \CONS\ cells  is  simple---it  just
-involves  copying  the  cell  itself  and  conditionally  copying  the
-\CAR\ and  the \CDR\  fields by  referring to the  next states  of the
-automaton.   If the  reference points  to  a closure,  then, as  noted
-earlier, the closure carries pointers to the liveness automata for its
-arguments.   These automata are  used to  recursively initiate  copying of  the
-arguments.     Note     that      the     copying     strategy     for
-$\mathsf{(unop~arg_1~arg_2)}$  or  $\mathsf{(f~arg_1)}$  are  similar  to
-$\mathsf{(binop~arg_1~arg_2)}$ and have not been shown in the algorithm.
+Algorithm~\ref{algo:lgc-a}   describes   the   garbage
+collection scheme.  Starting with the root set, each cell pointed by a
+live reference  (i.e. whose associated  DFA state is final)  is copied
+using $\mathsf{copy}$.   Copying a \CONS\ cells  just involves copying
+the  cell  itself   and  conditionally  copying  the   \CAR\  and  the
+\CDR\ fields after referring to the  next states of the DFA.  If
+the reference points to a closure, then, as noted earlier, the closure
+carries pointers  to the liveness  DFAs of its  arguments.  These
+are  used to recursively  initiate copying of  the arguments.
+Note that  the copying  strategy for  $\mathsf{(unop~arg_1~arg_2)}$ or
+$\mathsf{(f~arg_1)}$ are similar to $\mathsf{(binop~arg_1~arg_2)}$ and
+have not been shown.
 
-%% Let   us  consider   determining  the   liveness  of   a  closure   at
-%% runtime. Consider a closure $(app~f~y)$  has a reference from the root
-%% set  variable  $x$.  If $x$  is  live,  then  we  know that  the  cell
-%% $(app~f~y)$ has  to be copied.  To copy  the heap structure  rooted at
-%% $y$, we need the liveness of  $y$ at the program point which triggered
-%% the evaluation of  $(app~f~y)$. However, this is only  possible if the
-%% activation record of the function  which created this closure is still
-%% on the activation stack. This does  not always happen since a function
-%% could pack a closure in a \CONS\ cell and return the \CONS\ cell.
-
-%% An alternative could be to  carry with each closure, extra information
-%% about the program point which triggered its evaluation.  This gives us
-%% precise liveness  information of the  free variables of a  closure but
-%% involves the overhead of updating the program point information during
-%% execution.  To avoid  this overhead we go for a  safe approximation by
-%% storing the {\em creation point of  the closure} and using it to check
-%% liveness.  This  is safe since the  liveness at the creation  point of
-%% the closure dominates  all possible evaluation points  of the closure,
-%% but it  might be imprecise  as the actual  liveness might be  way less
-%% than what is found at the creation point.
-
-%% Note that  when a reachability-based  collector visits a cell  for the
-%% first time,  it is  marked.  Explorations starting  from the  cell are
-%% curtailed if the cell is visited subsequently due to sharing.  Since a
-%% liveness-based collector may reach the  same cell multiple times, each
-%% time with a different automaton state, this curtailment cannot be done
-%% in the case  of LGC. This is an inherent  drawback of a liveness-based
-%% collector.  This  can be mitigated  by maintaining a list  of liveness
-%% automata states  that a  particular heap cell  was traversed  with and
-%% avoid repeated traversals if we reach the cell in one of these states.
-%% However this also involves storage and run-time penalty.
-
-%% To  avoid  performance  penalty,  we experimented  with  a  mixed-mode
-%% garbage collection scheme  which uses liveness for  evaluated data and
-%% reachability for closures.
-
-%% \subsection{Liveness-based collector with reachability-based closure
-%%   collection}
-%% \begin{algorithm}[t]
-%%   \Fn{\Lgc{}}
-%%      {
-%%        \For {each reference $\mathit{ref}$ in root set}
-%%             {\LCopy($\mathit{ref}$)\;}
-%%             $\mathit{copyReferencesOnPrintStack()}$\;  
-%%      }
-%%      \Fn{\LCopy{$\mathit{ref}$}}
-%%         {
-%%           \eIf{cellType$(\mathit{ref})$ is $cons$}
-%%               {
-%%                 \eIf {$\mathit{ref}$ is found live using dfa and has not been copied using
-%%                   reachability}
-%%                      {
-%%                        $\mathit{newRef}$ =  $\mathit{dupHeapcell(ref})$\; 
-%%                        $\mathit{ newCar}  =$  \LCopy$\mathit{(ref.car)}$\;
-%%                        $\mathit{ newRef.car}   = \mathit{ newCar}$\;
-%%                        $\mathit{ newCdr}  =$  \LCopy$\mathit{(ref.cdr)}$\;
-%%                        $\mathit{ newRef.cdr}   = \mathit{newCdr}$\;
-%%                      }
-%%                      { $\mathit{makenull(ref)}$\;}}
-%%               {
-%%                 \If {cellType$\mathit{(ref)}$ is closure and 
-%%                   has not been copied}
-%%                     { 
-%%                       $\mathit{newRef}$  = \RCopy$(\mathit{ref})$\;
-%%                     }
-%%               }
-%%         }
-%%         \caption{LGC with reachability-based closure collection.\label{algo:lgc-b}}
-%% \end{algorithm}
-
-%% \begin{table}[ht!]
-%% \caption{Time taken by LGC for different strategies.  The programs are
-%%   modified (smaller) instances of original benchmarks.}
-%% \label{tab:compare-live-clo-reach-clo}
-%% \centering
-%% \begin{tabular}
-%% {| l | r | r | r |}
-%% \hline
-%% Program        & \#GC & \multicolumn{2}{c|}{Closure collected using} \\ \cline{3-4}
-%%                &      & Reachability & Liveness                      \\ \hline
-%% \verb@nqueens@ & 183  & 0.009 sec    & 0.228 sec                     \\\hline
-%% \verb@lambda@  & 11   & 0.001 sec    & 4.992 sec                     \\ \hline
-%% \verb@lcss@    & 1    & 0.000 sec    & 34.668 sec                    \\ \hline
-%% \end{tabular}
-%% \end{table}
-
-%% Algorithm~\ref{algo:lgc-b} describes a garbage collection scheme where
-%% the liveness automata is consulted  only for \CONS\ cells; and assumes
-%% everything under  a closure to be  live and copies everything  that is
-%% reachable.
- 
-%% A consequence of  copying everything under a closure is  that we might
-%% reach  a non-live  cell that  has been  reclaimed earlier  by liveness
-%% based GC.   This can  happen if  a \CONS\  cell having  partially live
-%% sub-structure  is copied  using liveness  during a  collection and  it
-%% subsequently  becomes part  of a  live closure.   During a  subsequent
-%% collection, the collector may try to copy everything under the closure
-%% including the dead  sub-structure of the \CONS\ cell.   To avoid this,
-%% we ensure  that any non-live  references are not carried  across GC's.
-%% We do this by scanning the live  part of the buffer after every GC and
-%% nullifying any  reference which is  not live. This is  correct because
-%% any reference which  is dead during a collection is  guaranteed not be
-%% dereferenced any further by the program.
-
-%% Another advantage of  this mixed garbage collection scheme  is that it
-%% avoids the problem of multiple  explorations from the same cell.  This
-%% is done by maintaining a flag in  each cell to indicate whether it was
-%% copied using reachability.
 
 
 \begin{table*}[t!]
@@ -2086,69 +1977,37 @@ $\mathsf{(binop~arg_1~arg_2)}$ and have not been shown in the algorithm.
 
 
 %\subsection{Garbage collection for references on print stack}
-In lazy  languages the evaluation of the top-level expression is driven  by the print
-function~\cite{Jones87}.  Printing of  atomic values is
-simple  and  does  not  trigger  a garbage  collection.   In  case  of
-\CONS\ cells, the \CAR\ is first  printed followed by \CDR.  In a lazy
-language, both \CAR\ and \CDR\ could be closures requiring evaluation,
-and this  may trigger  more garbage collections.   When this  happens.  we
-have to consider  any references that might be on  the print stack and
-copy them. We extend the liveness analysis to the print function and
-use its result during garbage collection. \warning{Is this enough?}
+The evaluation of  the top-level expression in a program  is driven by
+the \print\  function.  Printing of  atomic values is simple  and does
+not  trigger a  garbage  collection.   In case  of  \CONS\ cells,  the
+\CAR\ is  first printed followed  by \CDR.   In a lazy  language, both
+\CAR\ and \CDR\  could be closures requiring evaluation,  and this may
+trigger  more garbage  collections.  When  this happens.   we have  to
+consider any  references that  might be  on the  print stack  and copy
+them.  We extend liveness-based  garbage  collection  to
+the function \print.
 
 \section{Experimental Evaluation}
 \label{sec:experiments}
-To   test  the   utility  of   our  method   we  have   implemented  a
-garbage-collector for a simple scheme-like first order language having
-non-strict semantics. It consists of an interpreter, liveness analyzer
-and  a  garbage-collector  that  can optionally  use  reachability  or
-liveness.  Our benchmark consists  of programs from nofib~\cite{nofib}
-suite and some  external programs manually converted to  ANF.  All our
+  Our benchmark mostly consists  of programs from nofib~\cite{nofib}
+suite.  All our
 benchmarks were executed on a  machine having 8 core Intel(R) Core(TM)
 i7-4770 3.40GHz  CPU ,  8192 KB  L2 cache,  16 GB  RAM running  64 bit
 Ubuntu 14.04.
 
 
-The process of liveness-based garbage collection involves going through 
-each activation record on the stack and exploring each variable in the 
-current activation record (root set). The liveness of each variable is 
-determined using the program point and the variable name. The liveness 
-of all variables are stored as DFA. These DFA are then encoded as a 
-table. A variable is live only if an entry is found in this table.
-All cells that are live are copied to the live semi-space. In case of 
-\CONS\ cells the \CAR\ and \CDR\ pointers are chased and if they are 
-live the copied \CONS\ cell will get the updated addresses of its 
-\CAR\ and \CDR\ fields.
+%% The  process  of  liveness-based  garbage  collection  involves  going
+%% through  each  activation  record  on the  stack  and  exploring  each
+%% variable in the current activation  record (root set). The liveness of
+%% each variable is  determined using the program point  and the variable
+%% name. The liveness  of all variables are stored as  DFA. These DFA are
+%% then encoded as a table. A variable  is live only if an entry is found
+%% in  this table.   All  cells that  are  live are  copied  to the  live
+%% semi-space. In case  of \CONS\ cells the \CAR\ and  \CDR\ pointers are
+%% chased  and if  they are  live  the copied  \CONS\ cell  will get  the
+%% updated addresses of its \CAR\ and \CDR\ fields.
 
-%% \subsection{Copying closure using liveness vs copying closures using reachability}\label{sec:strategies}
 
-%% To compare the  effect of using reachability to  copy closures instead
-%% of liveness  we take some  representative programs from  our benchmark
-%% suite    and    execute    them    with    both.     As    shown    in
-%% Table~\ref{tab:compare-live-clo-reach-clo},  the   number  of  garbage
-%% collections in both cases are same but copying closures using liveness
-%% takes a lot more time compared to reachability based copying.
-
-%% The number  of garbage  collections is the same  since we  approximate the
-%% liveness of  a closure  to the  liveness at  its creation  point.  The
-%% liveness  we get  is usually  grossly over  approximated.  Using  this
-%% liveness may not  give too much of a benefit  compared to reachability
-%% as nearly everything would be live at its point of creation.
-
-%% As  mentioned   in  Section~\ref{sec:live-clo},  using   liveness  for
-%% closures  may  entail  multiple  traversals over  the  same  structure
-%% consuming more  time.  The  advantage of avoiding  multiple traversals
-%% can be clearly seen from the lcss example where a single GC takes less
-%% than a millisecond for reachability  based closure collection where as
-%% the  liveness  based collection  is  of  the  order of  seconds.  Lazy
-%% languages tend  to have a  lot of sharing  and hence using  a liveness
-%% based collection for closures is impractical.
-
-%% Therefore we believe  that using reachability for closures  is a sweet
-%% spot   in   terms   of   performance  for   liveness   based   garbage
-%% collectors.  For the  remainder  of  the section  all  LGC results  we
-%% discuss uses  a mixed-mode collector--liveness for  evaluated data and
-%% reachability for closures.
 
 
 \subsection{Results}
