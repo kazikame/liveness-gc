@@ -235,6 +235,7 @@
 %\psframe(0,-5)(36,15)
 %\psline(18,-4)(18,15)
 \putnode{z}{origin}{9}{5}{\rnode{#1}{}}
+\putnode{z}{origin}{29}{5}{\rnode{#2}{}}
 \putnode{z}{origin}{9}{5}{%
    \psframebox[linestyle=none,fillstyle=solid,framesep=8,
    fillcolor=lightgray]{}}
@@ -383,7 +384,7 @@
 \newcommand{\multireduct}{\ensuremath{\stackrel{+}{\longrightarrow}}}
 \newcommand{\avrightarrow}{\ensuremath{\longrightarrow}}
 \newcommand{\multireductav}{\ensuremath{\stackrel{+}{\avrightarrow}}}
-\newcommand{\heap}{\mbox{H}}       % heap
+\newcommand{\heap}{\ensuremath{H}}       % heap
 \newcommand{\ppn}[2]{\ensuremath{#2}} % prog point
 \newcommand{\pp}[2]{\ensuremath{#2}} % prog point
 \newcommand{\lvintp}{\ensuremath{\zeta}}

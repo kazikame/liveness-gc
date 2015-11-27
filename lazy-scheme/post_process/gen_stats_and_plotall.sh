@@ -116,8 +116,8 @@ fi
 
 for bm in $BMs
 do
-    #for opt in gc-plain gc-live gc-freq=${freq[$bm]}
-    for opt in gc-plain gc-live
+    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    #for opt in gc-plain gc-live
     do 
       	echo "Processing $bm [$opt]"
       	$DIR/gen_gc_stats.sh $OPTARG \
