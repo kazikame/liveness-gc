@@ -241,55 +241,7 @@ complicated than a liveness-based collector for a eager language.
 %------------------------------------------------------------%
 \subsection{Motivating Example}
 \label{sec:motiv}
-\begin{figure}[t!]
-  \psset{unit=1mm}
-  \begin{pspicture}(90,52)(0,-52)
-    %\psframe(90,48)(0,-48)
-    \renewcommand{\arraystretch}{1}
-    \begin{tabular}{@{}c@{}}
-      %\psframebox
-          {\sf
-	\renewcommand{\arraystretch}{1}{
-	  \begin{uprogram}
-            \UFL\
-            \UNL{0} (\DEFINE\ (\length\  \pl)
-	    \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-            (\PRIM\ 1\ (\length\  (\CDR\  \pl)))))
-            \UNL{0}
-	    \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
-	    \UNL{1}  (\SIF~(\NULLQ \ \lista)
-	    \listb
-	    \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\ \lista) (\append\
-            (\CDR\  \lista)
-            \listb))))
-            \UNL{0}
-            \UNL{0} (\LET\ \px\
-            $\leftarrow$\ (\CONS\ $5$
-            (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
-	    \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
-	    \UNL{2}
-            (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
-            \UNL{3} (\SIF~(\NULLQ~(\CAR~\pz))~$0$~$\pi$:\
-            (\length\ \pz))))))
-	  \end{uprogram}
-      }}
-      \\ \\
-      (a) Example program. \\  \\
-%      \includegraphics[width=.45\textwidth]{motiv-example}
-      \input{mem-graph} \\ \\
-      \renewcommand{\arraystretch}{.9}
-      \begin{tabular}[t]{p{0.9\columnwidth}}
-        (b) Memory graph at $\pi$.  \scalebox{.7}{\TwoCellsAD{a1}{a2}}
-        denotes a closure. Thick edges denote live links. Traversal
-        stops at edges marked $\times$ during garbage collection for
-        a liveness-based collector.
-      \end{tabular}
-    \end{tabular} 
-  \end{pspicture}
-%  \vspace*{-3ex}
-  \caption{Example Program and its Memory Graph}\label{fig:mot-example}
-\end{figure}
-
+\input{fig_motiv}
 Figure~\ref{fig:mot-example} shows an example program and the state of
 the heap at  the program point $\pi$, i.e. just  before the evaluation
 of $(\length\  \pz)$.  The heap is  represented by a graph  in which a
@@ -2288,11 +2240,7 @@ propagated inside closures.
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
-\newpage
-\ 
-\newpage
-
-
+\clearpage
 \section{Appendix: Soundness of liveness analysis}
  
 
