@@ -173,34 +173,54 @@
                                (let ((_var92 0))
                                     _var92)))))))
 
-(let ((_var93 "+"))
-     (let ((_var95 "*"))
-          (let ((_var97 3))
-               (let ((_var99 "x"))
-                    (let ((_var101 "x"))
-                         (let ((_var96 (list4 _var95
-                                              _var97
-                                              _var99
-                                              _var101)))
-                              (let ((_var104 "*"))
-                                   (let ((_var106 "a"))
-                                        (let ((_var108 "x"))
-                                             (let ((_var110 "x"))
-                                                  (let ((_var105 (list4 _var104
-                                                                        _var106
-                                                                        _var108
-                                                                        _var110)))
-                                                       (let ((_var113 "*"))
-                                                            (let ((_var115 "b"))
-                                                                 (let ((_var117 "x"))
-                                                                      (let ((_var114 (list3 _var113
-                                                                                            _var115
-                                                                                            _var117)))
-                                                                           (let ((_var120 5))
-                                                                                (let ((_var94 (list5 _var93
-                                                                                                     _var96
-                                                                                                     _var105
-                                                                                                     _var114
-                                                                                                     _var120)))
-                                                                                     (let ((_var122 (deriv _var94)))
-                                                                                          _var122))))))))))))))))))
+(define (make-expr e k)
+        (let ((_var93 1))
+             (let ((_var94 (= k
+                              _var93)))
+                  (if _var94
+                      e
+                      (let ((_var95 "+"))
+                           (let ((_var97 1))
+                                (let ((_var98 (- k
+                                                 _var97)))
+                                     (let ((_var99 (make-expr e
+                                                              _var98)))
+                                          (let ((_var96 (list3 _var95
+                                                               e
+                                                               _var99)))
+                                               _var96)))))))))
+
+(let ((_var101 "+"))
+     (let ((_var103 "*"))
+          (let ((_var105 3))
+               (let ((_var107 "x"))
+                    (let ((_var109 "x"))
+                         (let ((_var104 (list4 _var103
+                                               _var105
+                                               _var107
+                                               _var109)))
+                              (let ((_var112 "*"))
+                                   (let ((_var114 "a"))
+                                        (let ((_var116 "x"))
+                                             (let ((_var118 "x"))
+                                                  (let ((_var113 (list4 _var112
+                                                                        _var114
+                                                                        _var116
+                                                                        _var118)))
+                                                       (let ((_var121 "*"))
+                                                            (let ((_var123 "b"))
+                                                                 (let ((_var125 "x"))
+                                                                      (let ((_var122 (list3 _var121
+                                                                                            _var123
+                                                                                            _var125)))
+                                                                           (let ((_var128 5))
+                                                                                (let ((exp1 (list5 _var101
+                                                                                                   _var104
+                                                                                                   _var113
+                                                                                                   _var122
+                                                                                                   _var128)))
+                                                                                     (let ((_var130 100))
+                                                                                          (let ((expr (make-expr exp1
+                                                                                                                 _var130)))
+                                                                                               (let ((ans (deriv expr)))
+                                                                                                    ans))))))))))))))))))))

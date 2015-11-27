@@ -98,5 +98,17 @@
 	  1 
 	  0)))
 
-(deriv (list5 "+" (list4 "*" 3 "x" "x") (list4 "*" "a" "x" "x") (list3 "*" "b" "x") 5)) 
-;(deriv (list3 "+" "x" "x"))
+
+(define (make-expr e k)
+  (if (= k 1) e
+      (list3 "+" e (make-expr e (- k 1)))))
+
+(let ((exp1 (list5 "+" (list4 "*" 3 "x" "x") (list4 "*" "a" "x" "x") (list3 "*" "b" "x") 5)))
+  (let ((expr (make-expr exp1 100)))
+    (let ((ans (deriv expr)))
+      ans)))
+  
+;(define exp5 (list5 "+" (list4 "*" 3 "x" "x") (list4 "*" "a" "x" "x") (list3 "*" "b" "x") 5)) 
+;(define exp (list3 "+" "x" "x"))
+;(define exp2 (list3 "+" exp exp)) 
+;(define exp4 (list3 "*" exp2 exp5))
