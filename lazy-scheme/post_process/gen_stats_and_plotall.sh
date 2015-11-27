@@ -74,6 +74,7 @@ freq["knightstour"]=8500;
 freq["treejoin"]=1300;
 freq["nqueens"]=3000;
 freq["lambda"]=100;
+freq["huffman"]=100;
 
 declare -A xtics
 declare -A ytics
@@ -90,6 +91,7 @@ xtics["knightstour"]=8.5e5	; ytics["knightstour"]=40e3
 xtics["treejoin"]=13e5  	; ytics["treejoin"]=330e3
 xtics["nqueens"]=3.5e5    	; ytics["nqueens"]=4.6e3
 xtics["lambda"]=19e5		; ytics["lambda"]=3e3
+xtics["huffman"]=19e5		; ytics["huffman"]=3e3
 
 declare -A xlimit
 declare -A ylimit
@@ -106,6 +108,7 @@ xlimit["knightstour"]=850000	; ylimit["knightstour"]=40000
 xlimit["treejoin"]=3.9e6:4.5e6	; ylimit["treejoin"]=1320e3:1650e3
 xlimit["nqueens"]=3e5:4e5	; ylimit["nqueens"]=0:23e3
 xlimit["lambda"]=50e5:56e5	; ylimit["lambda"]=:
+xlimit["huffman"]=:             ; ylimit["huffman"]=:
 
 if [ "x$BMs" = "x" ]; then
     BMs=$AllBMs
@@ -121,10 +124,10 @@ do
       	    -bmdir ../benchmarks/programs/$bm \
       	    -gcopt $opt -heap ${limit[$bm]}
      done
-    #bash $DIR/val.plot $bm ${xtics[$bm]} ${ytics[$bm]}
-    #bash $DIR/window.plot $bm ${xlimit[$bm]} ${ylimit[$bm]} 
-    # gnuplot $DIR/plots/${bm}.gnu
-    # gnuplot $DIR/plots/${bm}_win.gnu
+    bash $DIR/val.plot $bm ${xtics[$bm]} ${ytics[$bm]}
+    bash $DIR/window.plot $bm ${xlimit[$bm]} ${ylimit[$bm]} 
+    gnuplot $DIR/plots/${bm}.gnu
+    gnuplot $DIR/plots/${bm}_win.gnu
 
     echo "$bm Done"
 done
