@@ -429,85 +429,85 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
 Premise & Transition & Rule name \\
 \hline
 \hline 
-          & $\rho,\, (\rho', \ell, e)\!:\!S,\, H,\, \kappa
-  \rightsquigarrow \rho',\, S,\, H[\ell := \kappa],\, e$    &  \sc{const}
+          & $\rho,\, (\rho', \ell, e)\!:\!S,\, \heap,\, \kappa
+  \rightsquigarrow \rho',\, S,\, \heap[\ell := \kappa],\, e$    &  \sc{const}
 \\
 \hline
-          & {$\rho, \,(\rho', \ell, e)\!:\!S,\, H,\, (\CONS~x~y)
+          & {$\rho, \,(\rho', \ell, e)\!:\!S,\, \heap,\, (\CONS~x~y)
 \rightsquigarrow
-$  $\rho',\, S,\, H[\ell := (\rho(x), \rho(y))],\, e$}     &  \sc{cons} \\
+$  $\rho',\, S,\, \heap[\ell := (\rho(x), \rho(y))],\, e$}     &  \sc{cons} \\
 \hline
 
-$H(\rho(x)) \mbox{ is } (v, d)$ & $\rho,\, (\rho', \ell, e)\!:\!S,\, H,\,
-(\CAR~x)  \rightsquigarrow \rho',\, S,\, H[\ell := v],\, e$      &
+$\heap(\rho(x)) \mbox{ is } (v, d)$ & $\rho,\, (\rho', \ell, e)\!:\!S,\, \heap,\,
+(\CAR~x)  \rightsquigarrow \rho',\, S,\, \heap[\ell := v],\, e$      &
 \sc{car-select} \\
 \hline
 
 
 
-$H(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  H,\,
-(\CAR~x)  \rightsquigarrow \rho', \,(\rho, addr(\langle s, \rho'\rangle), (\CAR~x))\!:\!S,\, H,\, s$      &
+$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  \heap,\,
+(\CAR~x)  \rightsquigarrow \rho', \,(\rho, addr(\langle s, \rho'\rangle), (\CAR~x))\!:\!S,\, \heap,\, s$      &
 \sc{car-1-clo} \\
 \hline
 
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, H,\, (\CAR~x)
+$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, \heap,\, (\CAR~x)
 \rightsquigarrow
-\rho',\, (\rho, \rho(x), (\CAR~x))\!:\!S, \,H,\, s$      &
+\rho',\, (\rho, \rho(x), (\CAR~x))\!:\!S, \,\heap,\, s$      &
 \sc{car-clo}
 \\
 \hline
 
 
 
-$H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
- & {$\rho,\, (\rho', \ell, e)\!:\!S,\, H,\, (+~x~y)  \rightsquigarrow$
-$\rho', \,S,\, H[\ell := H(\rho'(x)) + H(\rho'(y))],\, e$}      &
+$\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$
+ & {$\rho,\, (\rho', \ell, e)\!:\!S,\, \heap,\, (+~x~y)  \rightsquigarrow$
+$\rho', \,S,\, \heap[\ell := \heap(\rho'(x)) + \heap(\rho'(y))],\, e$}      &
 \sc{prim-add} \\
 \hline
 
-$H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, H,\, (+~x~y)
+$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, \heap,\, (+~x~y)
 \rightsquigarrow
-\rho',\, (\rho, \rho(x), (+~x~y))\!:\!S,\, H,\, s$      &
+\rho',\, (\rho, \rho(x), (+~x~y))\!:\!S,\, \heap,\, s$      &
 \sc{prim-1-clo} \\
 \hline
-$H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & $\rho,\, S,\, H,\, (+~x~y)
+$\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & $\rho,\, S,\, \heap,\, (+~x~y)
 \rightsquigarrow
-\rho', (\rho,\, \rho(y),\, (+~x~y))\!:\!S,\, H,\, s$      &
+\rho', (\rho,\, \rho(y),\, (+~x~y))\!:\!S,\, \heap,\, s$      &
 \sc{prim-2-clo} \\
 \hline
 {$\mathit{f}~\mbox{defined as}$
-$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho,\, S,\, H,\,
+$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho,\, S,\, \heap,\,
 (f~\myvec{x})  \rightsquigarrow
-[\myvec{y} \mapsto \rho(\myvec{x})],\, S,\, H,\, e_{\mathit{f}}$      &
+[\myvec{y} \mapsto \rho(\myvec{x})],\, S,\, \heap,\, e_{\mathit{f}}$      &
 \sc{funcall} \\
 \hline
-$\ell$ is a new location& {$\rho,\, S,\, H,\, (\LET~x\leftarrow s~\IN~e)
+$\ell$ is a new location& {$\rho,\, S,\, \heap,\, (\LET~x\leftarrow s~\IN~e)
   \rightsquigarrow$
-$\rho\oplus[x \mapsto \ell],\, S,\, H[\ell \mapsto \langle s,
+$\rho\oplus[x \mapsto \ell],\, S,\, \heap[\ell \mapsto \langle s,
     \lfloor\rho\rfloor_{FV(s)} %% \oplus [x \mapsto  \ell] -- NO LAZY LETS
     \rangle],\, e$} &
 \sc{let} \\
 \hline
-$H(\rho(x)) \ne 0$ & $\rho,\, S,\, H,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho,\, S,\, H,\,  e_1$ & \sc{if-true} \\
+$\heap(\rho(x)) \ne 0$ & $\rho,\, S,\, \heap,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
+\rho,\, S,\, \heap,\,  e_1$ & \sc{if-true} \\
 \hline
-$H(\rho(x)) = 0$ & $\rho,\, S,\, H,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho,\, S, \,H, \, e_2$ & \sc{if-false} \\
+$\heap(\rho(x)) = 0$ & $\rho,\, S,\, \heap,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
+\rho,\, S, \,\heap, \, e_2$ & \sc{if-false} \\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, H,\,
+$\heap(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, \heap,\,
   (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho',\, (\rho, \rho(x), (\SIF~x~e_1~e_2))\!:\!S,\, H, \, s$}
+\rho',\, (\rho, \rho(x), (\SIF~x~e_1~e_2))\!:\!S,\, \heap, \, s$}
 &
 \sc{if-clo} \\
 \hline
-{$H(\rho(x))~\mbox{is in WHNF with value}~v$}& $\rho,\, (\rho', \ell,
-e)\!:\!S,\, H,\,
-(\SRETURN~x)  \rightsquigarrow \rho',\, S,\, H[\ell := v],\, e$ &
+{$\heap(\rho(x))~\mbox{is in WHNF with value}~v$}& $\rho,\, (\rho', \ell,
+e)\!:\!S,\, \heap,\,
+(\SRETURN~x)  \rightsquigarrow \rho',\, S,\, \heap[\ell := v],\, e$ &
 \sc{return-whnf}\\
 \hline
-$H(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, H,\, (\SRETURN~x)
+$\heap(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, \heap,\, (\SRETURN~x)
   \rightsquigarrow$
-$\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, H,\,  s$} &
+$\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, \heap,\,  s$} &
 \sc{return-clo} \\
 \hline
 \end{tabular}
@@ -562,7 +562,7 @@ system will be denoted $\mathcal{S}$.}
 
 The  initial  state  of  the  transition  system  described  above  is
 $([\;]_\rho,\,   ([\;]_\rho,   \,   \rho(\ans),\,   (\print~\ans)):[\;]_{S},
-[\;]_{H},\, (\mainpgm))$,  in which  $[\;]_\rho$ and $[\;]_H$  are the
+[\;]_{\heap},\, (\mainpgm))$,  in which  $[\;]_\rho$ and $[\;]_{\heap}$  are the
 empty environment and  the empty heap. The  initial stack consists
 of  a single  continuation frame  in  which \ans\  is a  distinguished
 variable  that  would   eventually  be  updated  with   the  value  of
@@ -893,15 +893,15 @@ overall liveness environment for $(\LET~x \leftarrow~s~\IN~e)$.
 %% \hline
 
 %% \hline
-%% \makecell[t]{$GC(\rho_1, S, H_1, \sigma) = (\rho, S, H)$,}\\ $H(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
-%%   H, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
+%% \makecell[t]{$GC(\rho_1, S, \heap_1, \sigma) = (\rho, S, \heap)$,}\\ $\heap(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
+%%   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
 %% \sc{car-clo-bang}
 %% \\
 %% \hline
-%% \makecell[t]{$GC(\rho_1, S, H_1, \Lv, \sigma) = (\rho, S, H)$,}\\ $H(\rho(x))
+%% \makecell[t]{$GC(\rho_1, S, \heap_1, \Lv, \sigma) = (\rho, S, \heap)$,}\\ $\heap(\rho(x))
 %% \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
-%%   H, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
-%%   (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$         &
+%%   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
+%%   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$         &
 %% \sc{car-clo}\\
 %% \hline
 %% \end{tabular}
@@ -917,82 +917,82 @@ overall liveness environment for $(\LET~x \leftarrow~s~\IN~e)$.
 
 
 %%           &\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
-%%   H, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(x) :=
+%%   \heap, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\rho'(x) :=
 %%     \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
 %% \\
 %% \hline
-%%           & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
-%%   \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
+%%           & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, \heap, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
+%%   \rho', S, \heap[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
 %% \hline
-%% $H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
-%%   \cred{\sigma'} )\!:\!S, H, (\CAR~x), \cred{\sigma}$  $
-%%   \rightsquigarrow \rho', S, H[\rho'(z) := H(l_1)], e, \cred{\sigma'}$}      &
+%% $\heap(\rho(x)) \mbox{ is } (\ell_1, \ell_2)$ & \makecell{$\rho, (\rho', z, e,
+%%   \cred{\sigma'} )\!:\!S, \heap, (\CAR~x), \cred{\sigma}$  $
+%%   \rightsquigarrow \rho', S, \heap[\rho'(z) := \heap(\ell_1)], e, \cred{\sigma'}$}      &
 %% \sc{car-whnf} \\
 %% \hline
-%% $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-%%   H, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
-%%   (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$}      &
+%% $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+%%   \heap, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+%%   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$}      &
 %% \sc{car-clo}
 %% \\
 
 %% \hline
-%% $H(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  H,\,
+%% $\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  \heap,\,
 %% (\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
-%% s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, H,\, s, \, \cred{\sigma}$      &
+%% s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$      &
 %% \sc{car-1-clo} \\
 
 
 %% \hline
-%% $H(\rho(x)), H(\rho(y)) \in \mathbb{N}$
-%%  & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H,
-%%   (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, H[\rho'(z)
-%%     := H(\rho'(x)) + H(\rho'(y))], e, \cred{\sigma'}$}      &
+%% $\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$
+%%  & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, \heap,
+%%   (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, \heap[\rho'(z)
+%%     := \heap(\rho'(x)) + \heap(\rho'(y))], e, \cred{\sigma'}$}      &
 %% \sc{prim-whnf} \\
 %% \hline
-%% $H(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-%%   H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
-%%   (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+%% $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
+%%   \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+%%   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 %% \sc{prim-1-clo} \\
 %% \hline
-%% $H(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-%%   S, H, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
-%%   (+~x~y), \cred{\sigma})\!:\!S, H, s, \cred{\clazy\sigma}$}      &
+%% $\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
+%%   S, \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
+%%   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 %% \sc{prim-2-clo} \\
 %% \hline
 %% {$\mathit{g}~\mbox{defined as}$
-%% $~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, H,
+%% $~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, \heap,
 %%   (g~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
-%%     \rho(\myvec{x})], S, H, e_{\mathit{g}}, \cred{\sigma}$}      &
+%%     \rho(\myvec{x})], S, \heap, e_{\mathit{g}}, \cred{\sigma}$}      &
 %% \sc{funcall} \\
 %% \hline
-%% $\ell$ is a new location& \makecell{$\rho, S, H, (\LET~x\leftarrow
-%%   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, H[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
+%% $\ell$ is a new location& \makecell{$\rho, S, \heap, (\LET~x\leftarrow
+%%   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, \heap[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
 %%   \ell]\rangle], e, \cred{\sigma}$} &
 %% \sc{let} \\ 
 %% \hline
-%% $H(\rho(x)) \ne 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
-%%   \cred{\sigma}$  $\rightsquigarrow \rho, S, H,  e_1, \cred{\sigma}$} & \sc{if-true} \\
+%% $\heap(\rho(x)) \ne 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
+%%   \cred{\sigma}$  $\rightsquigarrow \rho, S, \heap,  e_1, \cred{\sigma}$} & \sc{if-true} \\
 %% \hline
-%% $H(\rho(x)) = 0$ & \makecell{$\rho, S, H, (\pi:\SIF~\psi:x~e_1~e_2),
+%% $\heap(\rho(x)) = 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
 %%   \cred{\sigma}$   $\rightsquigarrow
-%% \rho, S, H,  e_2, \cred{\sigma}$} & \sc{if-false} \\
+%% \rho, S, \heap,  e_2, \cred{\sigma}$} & \sc{if-false} \\
 %% \hline
-%% $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+%% $\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
 %%   (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
-%% \rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, H, s,
+%% \rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, \heap, s,
 %% \cred{\clazy\sigma}$}
 %% &
 %% \sc{if-clo} \\
 %% \hline
-%% {$H(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
-%%   (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(z) := v], e,
+%% {$\heap(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
+%%   (\rho', z, e, \cred{\sigma'})\!:\!S, \heap, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\rho'(z) := v], e,
 %%   \cred{\sigma'}$} &
 %% \sc{return-whnf}\\
 %% \hline
-%% $H(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, H,
+%% $\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
 %%   (\psi:\SRETURN~x), \cred{\sigma}$  $
 %%   \rightsquigarrow$
-%% $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, H,  s,
+%% $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
 %%   \cred{\sigma}$} &
 %% \sc{return-clo} \\
 %% \hline
@@ -1038,15 +1038,15 @@ Premise & Transition & Rule name \\
 \hline
 
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, H_1, (\CAR~x), \sigma) = (\rho, S, H)}$,} $H(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
-  H, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,} $\heap(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
 \sc{car-clo-bang} 
 \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, H_1, (\CAR~x), \sigma) = (\rho, S, H)}$,} $H(\rho(x))
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,} $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
-  H, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
-  (\CAR~x), \cred{\sigma})\!:\!S, H, s, \cred{(\clazy \cup \acar)\sigma }$         &
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
+  (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$         &
 \sc{car-clo}\\
 \hline
 \end{tabular}
@@ -1062,7 +1062,7 @@ Premise & Transition & Rule name \\
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
 \item   We   enrich    the   abstract   machine   state
-  $\rho,S,H,e$   to  $\rho,S,H,e,\sigma$. 
+  $\rho,S,\heap,e$   to  $\rho,S,\heap,e,\sigma$. 
 We  call such a state  a \emph{minefield state}.
 Here $\sigma$  is  the  ``dynamic'' demand  on  the  expression
   $e$, i.e., it arises
@@ -1118,12 +1118,12 @@ Here $\sigma$  is  the  ``dynamic'' demand  on  the  expression
 \end{enumerate}
 Starting from the initial state,
 %%  $([\;]_\rho,([\;]_\rho,
-%% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{H}, (\mainpgm)$,
+%% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
 every transition  is preceded  by a  garbage collection
 using $GC$.  The details of the transition for the {\sc
   car-clo}  rule   is  shown   in  the  top   table  of
 Figure~\ref{fig:minefield-semantics}.  If  this  or  an
-earlier  call to  $GC$  results  in $H(\rho(x))$  being
+earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
 enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
 the transition is the same as the earlier {\sc car-clo}
@@ -1156,7 +1156,7 @@ can be found in~\cite{asati14lgc}.
 For  a
 call-less program,  the initial state of  the minefield
 semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
-\ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{H},
+\ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
 e_{\mainpgm}$.
 
  
@@ -1172,7 +1172,7 @@ e_{\mainpgm}$.
 
 We  first  need  an auxiliary  result  about  minefield
 semantics. Consider  a trace of a  minefield execution.
-For every minefield state  $(\rho, S, H, e(s), \sigma)$
+For every minefield state  $(\rho, S, \heap, e(s), \sigma)$
 that appears  on the LHS of  a $\rightsquigarrow$ step,
 the  demand   $\sigma$  on   the  expression   $e$  (or
 application $s$) is non-null.  This can be proved by an
@@ -1206,11 +1206,11 @@ Such a program cannot enter the \bang\ state.
 \end{lemma}
 \begin{proof}
 Call a $GC(\ldots)$  followed by a $\rightsquigarrow$  transition as a
-step. Consider  a state  $(\rho, S,  H, e,  \sigma)$ in  the minefield
+step. Consider  a state  $(\rho, S,  \heap, e,  \sigma)$ in  the minefield
 execution of a  program.  We show by induction on  the number of steps
 $n$ leading  to this  state that  the next  transition cannot  enter a
 \bang\ state.  When $n$ is 0,  the state is $([\;]_\rho,\_, [\;]_{S} ,
-            [\;]_{H}, e_{\mainpgm}, \sigma_{all})$.  Since the call to
+            [\;]_{\heap}, e_{\mainpgm}, \sigma_{all})$.  Since the call to
             $GC(\ldots)$ in this state does  nothing, we just have to show
             that  the  $\rightsquigarrow$  transition cannot  enter  a
             \bang\   state.    Since   our  programs   are   in   ANF,
@@ -1222,7 +1222,7 @@ $n$ leading  to this  state that  the next  transition cannot  enter a
 For the inductive step, we  shall show that none of the
 minefield steps that  involves dereferencing results in
 a   \bang.   These  are   the   steps   which  have   a
-$H(\rho(...))$ in the premise. %%  Recall that a minefield
+$\heap(\rho(...))$ in the premise. %%  Recall that a minefield
 %% step   consists   of   a   GC  step   followed   by   a
 %% $\rightsquigarrow$. 
 Now a  $\rightsquigarrow$ step can  go
@@ -1238,10 +1238,10 @@ GC and show that it does not lead to a \bang.
 
 We consider the rules {\sc car-clo} and {\sc car-1-clo} only.  
 The rest  of the rules involve similar reasoning. For the {\sc
-  car-clo}  rule in  the state  $\rho, S,  H, (\CAR~x),
+  car-clo}  rule in  the state  $\rho, S,  \heap, (\CAR~x),
 \sigma$, we  know that $\sigma$ is  non-null. Therefore
 the  liveness  of  $x$  includes  $\epsilon$,  and  the
-dereferencing $H(\rho(x))$ will go without \bang.
+dereferencing $\heap(\rho(x))$ will go without \bang.
 
 For the  {\sc car-1-clo}  rule, observe that  there are
 two dereferences.  First $x$  is dereferenced to  get a
@@ -2562,7 +2562,7 @@ analyzed in this paper. Here is the idea behind the proof.
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
 \item   We   enrich    the   abstract   machine   state
-  $\rho,\,S,\,H,\,e$   to  $\rho,\,S,\,H,\,e,\,\sigma$,
+  $\rho,\,S,\,\heap,\,e$   to  $\rho,\,S,\,\heap,\,e,\,\sigma$,
   where  $\sigma$  is  the  demand  on  the  expression
   $e$. We  call such a state  a \emph{minefield state}.
   The demand $\sigma$ is  ``dynamic'' in that it arises
@@ -2579,7 +2579,7 @@ To set up the minefield semantics, we follow these steps:
   carries the extra information  is shown in the bottom
   table of Figure~\ref{fig:minefield-semantics}.
 \item $GC$  models a liveness based  garbage collection
-  $GC(\rho, S,  H, \sigma)$ returns $(\rho',  S', H')$,
+  $GC(\rho, S,  \heap, \sigma)$ returns $(\rho',  S', \heap')$,
   where the changes are due to certain references being
   replaced by  $\bot$.  This represents the  act of not
   retaining   (effectively   garbage  collecting)   the
@@ -2588,7 +2588,7 @@ To set up the minefield semantics, we follow these steps:
   following way:
   \begin{enumerate}
   \item Given the current  evaluation context $\rho, S,
-    H,   e,  \sigma$   and   the  demand   transformers
+    \heap,   e,  \sigma$   and   the  demand   transformers
     $\Lfonly$, we can  construct a liveness environment
     \Lv.   If  $e$  is  an expression,  then  $  \Lv  =
     \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
@@ -2606,26 +2606,26 @@ To set up the minefield semantics, we follow these steps:
     $\mathsf{SL}$, and  for each $x  \in domain(\rho)$,
     $\rho'(x)=\bot$ iff $x.\epsilon \notin \Lv'$.
   \item  \emph{Garbage  collection  of objects  in  the
-    heap:} For each location  $\ell$, $H'(\ell) = \bot$
+    heap:} For each location  $\ell$, $\heap'(\ell) = \bot$
     iff  there   is  no  $x$  in   either  the  current
     environment  or  one  of the  stacked  environments
     $\rho$, such  that for some  $\alpha$ corresponding
     to a  closure-free path  in the heap  starting from
-    $x$,  $H[x.\alpha]   =  \ell$  and   $x.\alpha  \in
+    $x$,  $\heap[x.\alpha]   =  \ell$  and   $x.\alpha  \in
     \Lv$. Here \Lv\ is the liveness of the variables in
     the current environment or the stacked environment.
 
 \warning{We have to tell  the reader about closure free
-  paths  earlier  on.   Also,  has  $H[x.\alpha]$  been
+  paths  earlier  on.   Also,  has  $\heap[x.\alpha]$  been
   defined?}
   \end{enumerate}
 Starting from the initial state $([\;]_\rho,([\;]_\rho,
-\ans, (\print~\ans)):[\;]_{S}  , [\;]_{H}, (\mainpgm)$,
+\ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
 every transition  is preceded  by a  garbage collection
 using $GC$.  The details of the transition for the {\sc
   car-clo}  rule   is  shown   in  the  top   table  of
 Figure~\ref{fig:minefield-semantics}.  If  this  or  an
-earlier  call to  $GC$  results  in $H(\rho(x))$  being
+earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
 enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
 the transition is the same as the earlier {\sc car-clo}
@@ -2656,7 +2656,7 @@ of no-op rather than  introducing the form $(\LET\,\, x
 $\LET$-definition   is  a   simple  variable.    For  a
 call-less program,  the initial state of  the minefield
 semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
-\ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{H},
+\ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
 (e_{\mainpgm})$.
 
  
@@ -2671,7 +2671,7 @@ semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
 
 We  first  need  an auxiliary  result  about  minefield
 semantics. Consider  a trace of a  minefield execution.
-For every minefield state  $(\rho, S, H, e(s), \sigma)$
+For every minefield state  $(\rho, S, \heap, e(s), \sigma)$
 that appears  on the LHS of  a $\rightsquigarrow$ step,
 the  demand   $\sigma$  on   the  expression   $e$  (or
 application $s$) is non-null.  This can be proved by an
@@ -2706,13 +2706,13 @@ Consider the minefield execution of  a program without function calls.
 Such a program cannot enter the \bang\ state.
 \end{lemma}
 \begin{proof}
-Consider a state in the minefield execution of a program $(\rho, S, H,
+Consider a state in the minefield execution of a program $(\rho, S, \heap,
 e, \sigma)$.   We show  by induction  on the  number $n$  of minefield
 steps  leading to  this state  that  the next  step cannot  lead to  a
 \bang\ state.
 
 When $n$ is 0, the  state is $([\;]_\rho,\_, [\;]_{S} ,
-[\;]_{H},  e_{\mainpgm},  \sigma_{all})$.  Further,  we
+[\;]_{\heap},  e_{\mainpgm},  \sigma_{all})$.  Further,  we
 have   to  show   that   a  $GC(..)$   followed  by   a
 $\rightsquigarrow$ step cannot lead  to a \bang\ state.
 Now, because  our programs  are in  ANF, $e_{\mainpgm}$
@@ -2722,7 +2722,7 @@ dereference anything and thus cannot result in a \bang.
 For the inductive step, we  shall show that none of the
 minefield steps that  involves dereferencing results in
 a   \bang.   These  are   the   steps   which  have   a
-$H(\rho(...))$ in the premise.  Recall that a minefield
+$\heap(\rho(...))$ in the premise.  Recall that a minefield
 step   consists   of   a   GC  step   followed   by   a
 $\rightsquigarrow$.   The   $\rightsquigarrow$  can  go
 \bang\ because it dereferences a $\bot$ inserted by the
@@ -2737,10 +2737,10 @@ GC and show that it does not lead to a \bang.
 
 We consider the steps {\sc car-clo} and {\sc car-1-clo}
 only. The rest  of the steps are similar.  For the {\sc
-  car-clo}  step in  the state  $\rho, S,  H, (\CAR~x),
+  car-clo}  step in  the state  $\rho, S,  \heap, (\CAR~x),
 \sigma$, we  know that $\sigma$ is  non-null. There for
 the  liveness  of  $x$  includes  $\epsilon$,  and  the
-dereferencing $H(\rho(x))$ will go without \bang.
+dereferencing $\heap(\rho(x))$ will go without \bang.
 
 For the  {\sc car-1-clo}  step, observe that  there are
 two dereferences.  First $x$  is dereferenced to  get a
