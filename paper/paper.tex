@@ -1018,7 +1018,7 @@ the ideas behind the proof.
   such  locations during  the  transition will  result  in entering  a
   special state denoted \bang. We call the semantics after
   augmentation,  \emph{minefield semantics}.
-\item \label{inline} Assuming that a  program enters the \bang\ state,
+\item \label{inline1} Assuming that a  program enters the \bang\ state,
   we  show  how to  construct,  through  inline expansion,  a  program
   without function calls which has the same minefield behavior.
 \item  The final  step   shows  that  no program  without
@@ -2450,12 +2450,12 @@ Premise & Transition & Rule name \\
 \hline
 
 
-          &\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
+&\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
   H, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, H[\rho'(x) :=
     \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
 \\
 \hline
-          & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
+& \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, H, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
   \rho', S, H[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
 \hline
 $H(\rho(x)) \mbox{ is } (l_1, l_2)$ & \makecell{$\rho, (\rho', z, e,
@@ -2552,7 +2552,7 @@ analyzed in this paper. Here is the idea behind the proof.
   such  locations during  the  transition will  result  in entering  a
   special state denoted \bang. We call the semantics after
   augmentation  \emph{minefield semantics}.
-\item \label{inline} Assuming that a  program enters the \bang\ state,
+\item \label{inline2} Assuming that a  program enters the \bang\ state,
   we  show  how to  construct,  through  inline expansion,  a  program
   without function calls which has the same minefield behavior.
 \item  The final  part  of the  proof shows  that  no program  without
@@ -2704,7 +2704,7 @@ applicable   for   subsequent  evaluations   fired   by
 $\print$.
 
 \begin{lemma}
-\label{lemma:call-less-cannot-go-bang}
+\label{lemma:call-less-cannot-go-bang-app}
 Consider the minefield execution of  a program without function calls.
 Such a program cannot enter the \bang\ state.
 \end{lemma}
@@ -2772,7 +2772,7 @@ program $P'$ such that  the minefield executions of $P$
 and $P'$  are identical  except for change  of variable
 names.  \warning{Check  whether  the previous  line  is
   correct.}                 However,                 by
-Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
+Lemma~\ref{lemma:call-less-cannot-go-bang-app} we know that
 $P'$,   a   call-less   program,   cannot   enter   the
 \bang\  state.  Therefor  $P$  also  cannot  enter  the
 \bang\ state.
