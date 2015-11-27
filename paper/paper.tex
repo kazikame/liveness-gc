@@ -126,7 +126,7 @@
 
 \begin{abstract} 
 We consider  the problem of reducing  the memory required to  run lazy
-first-order functional programs. We  address the problem by analyzing
+first-order functional programs. Our approach is to analyze
 programs  for liveness  of  heap-allocated data.   The  result of  the
 analysis is  used to preserve  only live data---a subset  of reachable
 data---during garbage  collection.  The result  is an increase  in the
@@ -140,9 +140,9 @@ liveness analysis itself and in the design of the garbage collector.
 %% We use the  result of the analysis to annotate  each potential garbage
 %% collection  point  in   the  program  with  a   set  of  deterministic
 %% finite-state automata (DFA) describing the liveness at that point.
-We
+To show the effectiveness of our method, we
 implement a copying collector that uses the results of the liveness
-analysis to preserve live
+analysis to preserve live 
 objects, both evaluated (i.e.  in WHNF) and closures.  Our experiments
 confirm  that  for  programs  running with  a  liveness-based  garbage
 collector,   there  is   a   significant  decrease   in  peak   memory
@@ -192,17 +192,17 @@ central notion in our analysis  is a generalization of liveness called
 expression.   The  analysis has  two  parts.   First, we  calculate  a
 context-sensitive  summary   of  each   function  as  a   {\em  demand
   transformer} that transforms a {\em  symbolic} demand on its body to
-demands on its  arguments.  This summary is used  to step through
+demands  on its  arguments.   This  summary is  used  to step  through
 function  calls during  analysis.  Second,  the concrete  demand on  a
-function   body  is   obtained  through   a  0-CFA-like   conservative
-approximation  that combines  the  demands  on all  the  calls to  the
-function.   The result  of the  analysis is  an annotation  of certain
-program points  with deterministic finite-state  automata (DFA)  capturing the  liveness of
-variables  at  these points.  Depending  on  the program  point  where
-garbage  collection has  been  triggered,  the garbage collector consults  a set  of
-automata to restrict reachability during  marking.  This results in an
-increase in  the garbage reclaimed  and consequently in  fewer garbage
-collections.
+function  body is  obtained through  a conservative approximation
+similar to 0-CFA~\cite{Shivers:1988} that combines the  demands on all the calls
+to  the function.   The result  of the  analysis is  an annotation  of
+certain program points with  deterministic finite-state automata (DFA)
+capturing the liveness of variables at these points.  Depending on the
+program point where garbage collection has been triggered, the garbage
+collector consults a  set of automata to  restrict reachability during
+marking.  This  results in  an increase in  the garbage  reclaimed and
+consequently in fewer garbage collections.
 
 While this idea has been shown to be effective for a
 first-order {\em  eager} language~\cite{asati14lgc}, a straightforward  extension of the
@@ -211,13 +211,15 @@ heap-allocated objects  may include closures  (runtime representations
 of unevaluated expressions). Since data  is made live by evaluation of
 closures, and  in lazy languages the  place in the program  where this
 evaluation  takes  place  cannot be  statically  determined,  laziness
-complicates  liveness  analysis  itself.    In  addition,  apart  from
-evaluated   data,  we  need to  extend   liveness-based  collection   to
-closures i.e. we reclaim the space for closures  which have no future  use.
+complicates  liveness  analysis  itself.    In  addition, laziness
+also complicates garbage collection, since, 
+ apart  from
+evaluated   data,  we  need to extend   liveness-based  collection   to
+closures.
 Since a closure can  escape the scope in which it  was created, it has
 to carry the liveness information  of its free variables. Moreover, as
 execution  progresses and  possible  future uses  are eliminated,  the
-liveness information is updated with a more precise version.  All this
+liveness information is updated with more precise versions.  All this
 requires significant  modification to  the earlier  garbage collection
 scheme for eager languages.
 
