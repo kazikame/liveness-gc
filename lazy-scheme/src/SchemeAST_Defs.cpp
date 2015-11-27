@@ -1115,7 +1115,7 @@ cons* UnaryPrimExprNode::evaluatePairqExpr()
 		update_heap_refs.pop();
 
 		assert(is_valid_address(arg1));
-		assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
+		//assert(arg1->typecell == consExprClosure || arg1->typecell == nilExprClosure);
         GC_STAT_UPDATE_LAST_USE(arg1);
 		cons* heap_cell = update_heap_refs.top();
 		heap_cell->inWHNF = true;
@@ -1711,9 +1711,11 @@ cons* FuncExprNode::evaluate()
 
 	cons* heap_cell = update_heap_refs.top();
 	DefineNode* funcDef = (DefineNode*)pgm->getFunction(this->getFunction());
-
-//	cout << "Looking up function " << this->getFunction() << endl;
-	assert(funcDef);
+	if (!funcDef)
+	  {
+	    cout << "Looking up function " << this->getFunction() << endl;
+	    assert(funcDef);
+	  }
 //	cout << "Creating activation record for func " << funcDef->getFuncName() << " with ret address " << curr_return_addr << endl;
 	make_environment(funcDef->getFuncName().c_str(), curr_return_addr);
 
