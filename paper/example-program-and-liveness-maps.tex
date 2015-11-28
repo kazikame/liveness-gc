@@ -52,43 +52,13 @@ $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
 
       \small
 \begin{eqnarray*}
-        \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
-              [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
-\xl.\clazy\sigma\rbrace ,~\epath_2 \mapsto \lbrace 
-\pv.\sigma  \rbrace,\\
- &&          \;\;  \epath_3 \mapsto \lbrace \pz.\sigma,
-                \py.\clazy\sigma,
-\pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
-&&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup
-%%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
-\clazy\Lf{\length}{1}{\clazy\sigma}\}\}
-             \rbrack \\
-            \cal{P_{\mbox{\tiny \length}}} &=&
-                [\;\pi_1 \mapsto \lbrace \epath_1, \epath_2, \epath_3 \rbrace,  \
-                 \pi_2 \mapsto \lbrace \epath_1, \epath_2, \epath_3
-                  \rbrace, \\
-&&\;\;  \pi_3 \mapsto \lbrace \epath_2
-                  \rbrace ,  \pi_4 \mapsto \lbrace \epath_2
-                  \rbrace, \pi_5 \mapsto \lbrace  \epath_3 \rbrace, \\
- &&  \;\;                        \pi_6 \mapsto \lbrace \epath_3 \rbrace,
-\pi_7 \mapsto
-                   \lbrace \epath_3\rbrace, \pi_8 \mapsto \lbrace \epath_3
-\rbrace~\rbrack\\
-              \mathcal{L}(e_{\main},\sigma,\Lfonly) &=&
-                [\;
-                  \epath_4 \mapsto \lbrace \pw.\sigma,
-                                       \pc.\Lf{\length}{\mbox{1}}{\sigma},\\
-&& \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},
-\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma} \rbrace
-                               ] \\
-               \cal{P_{\mbox{\tiny \main}}} &=&
-                  \lbrack~ \pi_9 \mapsto \lbrace \epath_4 \rbrace,  \
-                    \pi_{10} \mapsto \lbrace \epath_4 \rbrace,  \
-                   \pi_{11} \mapsto \lbrace \epath_4 \rbrace, \\
-                   && \;\; \pi_{12} \mapsto \lbrace \epath_4 \rbrace,
-\pi_{13} \mapsto \lbrace \epath_4 \rbrace~\rbrack
+ \Lv_{\xl} &=& \{\clazy\sigma\} \cup \{\acdr\Lf{\length}{\acdr}{\clazy\sigma}\} \cup \{\clazy\Lf{\length}{\acdr}{\clazy\sigma}\}\\
+ \Lv_{\xl_{\pi_1}} &=& \{\clazy\sigma\} \\
+ \Lv_{\xl_{\pi_5}} &=&  \{\acdr\Lf{\length}{\acdr}{\clazy\sigma}\} \cup \{\clazy\Lf{\length}{\acdr}{\clazy\sigma}\} \\
+  &&     \mbox{where } \Lv = \mathcal{L}(e_{\length},\sigma,\Lfonly) \\
+ \Lv_a &=& \{\clazy\bcar\Lf{\length}{\acdr}{\sigma}\}\\
+\Lv_{a_{\pi_{10}}} &=&  \{\clazy\bcar\Lf{\length}{\acdr}{\sigma}\}\\
+ &&       \mbox{where }  \Lv =  \mathcal{L}(e_{\main},\sigma,\Lfonly) 
 \end{eqnarray*}
     \end{minipage} \\
 (a)&
