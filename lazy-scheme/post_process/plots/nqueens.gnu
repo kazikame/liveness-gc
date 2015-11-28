@@ -6,7 +6,7 @@ set terminal postscript dashed color portrait "Helvetica" 16
 #set terminal postscript portrait butt "Helvetica" 16
 #set terminal size 1300,600
 
-set size ratio 0 1, .25
+set size ratio 0 1, .33
 
 set xlabel "nqueens"
 set border 3 lw 0
