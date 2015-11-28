@@ -588,82 +588,82 @@ cons* IfExprNode::evaluate()
 {
 
 	curr_return_addr = getLabel();
-//	DBG(cout << "At If updating curr_return_address to " << curr_return_addr << endl);
+	//	DBG(cout << "At If updating curr_return_address to " << curr_return_addr << endl);
 
 	if (gc_status == gc_live)
 	{
 		updateEvaluationPoint(this);
 	}
 
-//	for(vector<var_heap>::iterator vhit = actRecStack.begin()->heapRefs.begin(); vhit != actRecStack.begin()->heapRefs.end(); ++vhit)
-//	{
-//
-//		cons* heap_cell = (cons*)vhit->ref;
-////		DBG(cout << "Processing variable " << vhit->varname <<  " is_param " << vhit-> is_param << endl);
-//		if (vhit->is_param)
-//		{
-////			DBG(cout << "Processing a parameter, not updating prog point" << endl);
-//			continue;
-//		}
-//
-//		if (heap_cell && !heap_cell->inWHNF)
-//		{
-//			switch(heap_cell->typecell)
-//			{
-//			case constIntExprClosure:
-//			case constBoolExprClosure:
-//			case constStringExprClosure:
-//			case nilExprClosure:
-//				break;
-//			case unaryprimopExprClosure:
-//			{
-////				cout << "Unaryprimop" << endl;
-//				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
-////				cout << "Updating argument prg_pt " << *(heap_cell->val.closure.arg1_name)  << " to " << this->getLabel() + "/" + arg_num <<
-////						" for " << vhit->varname << endl;
-//				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
-//				break;
-//			}
-//			case binaryprimopExprClosure:
-//			{
-//				assert(!heap_cell->inWHNF);
-////				cout << "Binaryprimop" << endl;
-//				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
-//				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
-////				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
-//				arg_num = heap_cell->val.closure.arg2_name->substr(heap_cell->val.closure.arg2_name->rfind("/")+1);
-//				heap_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
-////				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
-//				break;
-//			}
-//			case funcApplicationExprClosure:
-//			{
-////				cout << "FuncApp" << endl;
-//				auto funcCallExpr = (FuncExprNode*)heap_cell->val.closure.expr;
-//				auto num_args = funcCallExpr->getNumArgs();
-//				if (num_args > 0)
-//				{
-//					auto curr_cell = heap_cell;
-//					while (num_args > 0)
-//					{
-////						cout << "Processing arg" << (funcCallExpr->getArgs().size() - num_args + 1) << endl;
-//						auto arg_num = curr_cell->val.closure.arg2_name->substr(curr_cell->val.closure.arg2_name->rfind("/")+1);
-//						curr_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
-////						cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
-//						--num_args;
-//						curr_cell = curr_cell->val.closure.arg1;
-//					}
-//				}
-//				break;
-//			}
-//
-//			break;
-//			default : cout << "Should not have come to this point"<<endl;
-//			cout << "Processing " << heap_cell << " with type " << heap_cell->typecell << endl;
-//			break;
-//			}
-//		}
-//	}
+	//	for(vector<var_heap>::iterator vhit = actRecStack.begin()->heapRefs.begin(); vhit != actRecStack.begin()->heapRefs.end(); ++vhit)
+	//	{
+	//
+	//		cons* heap_cell = (cons*)vhit->ref;
+	////		DBG(cout << "Processing variable " << vhit->varname <<  " is_param " << vhit-> is_param << endl);
+	//		if (vhit->is_param)
+	//		{
+	////			DBG(cout << "Processing a parameter, not updating prog point" << endl);
+	//			continue;
+	//		}
+	//
+	//		if (heap_cell && !heap_cell->inWHNF)
+	//		{
+	//			switch(heap_cell->typecell)
+	//			{
+	//			case constIntExprClosure:
+	//			case constBoolExprClosure:
+	//			case constStringExprClosure:
+	//			case nilExprClosure:
+	//				break;
+	//			case unaryprimopExprClosure:
+	//			{
+	////				cout << "Unaryprimop" << endl;
+	//				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
+	////				cout << "Updating argument prg_pt " << *(heap_cell->val.closure.arg1_name)  << " to " << this->getLabel() + "/" + arg_num <<
+	////						" for " << vhit->varname << endl;
+	//				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
+	//				break;
+	//			}
+	//			case binaryprimopExprClosure:
+	//			{
+	//				assert(!heap_cell->inWHNF);
+	////				cout << "Binaryprimop" << endl;
+	//				auto arg_num = heap_cell->val.closure.arg1_name->substr(heap_cell->val.closure.arg1_name->rfind("/")+1);
+	//				heap_cell->val.closure.arg1_name = new string(this->getLabel() + "/" + arg_num);
+	////				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+	//				arg_num = heap_cell->val.closure.arg2_name->substr(heap_cell->val.closure.arg2_name->rfind("/")+1);
+	//				heap_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
+	////				cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+	//				break;
+	//			}
+	//			case funcApplicationExprClosure:
+	//			{
+	////				cout << "FuncApp" << endl;
+	//				auto funcCallExpr = (FuncExprNode*)heap_cell->val.closure.expr;
+	//				auto num_args = funcCallExpr->getNumArgs();
+	//				if (num_args > 0)
+	//				{
+	//					auto curr_cell = heap_cell;
+	//					while (num_args > 0)
+	//					{
+	////						cout << "Processing arg" << (funcCallExpr->getArgs().size() - num_args + 1) << endl;
+	//						auto arg_num = curr_cell->val.closure.arg2_name->substr(curr_cell->val.closure.arg2_name->rfind("/")+1);
+	//						curr_cell->val.closure.arg2_name = new string(this->getLabel() + "/" + arg_num);
+	////						cout << "Updating argument prg_pt to " << this->getLabel() + "/" + arg_num << endl;
+	//						--num_args;
+	//						curr_cell = curr_cell->val.closure.arg1;
+	//					}
+	//				}
+	//				break;
+	//			}
+	//
+	//			break;
+	//			default : cout << "Should not have come to this point"<<endl;
+	//			cout << "Processing " << heap_cell << " with type " << heap_cell->typecell << endl;
+	//			break;
+	//			}
+	//		}
+	//	}
 
 	IdExprNode* i = (IdExprNode*)this->pCond;
 	cons* cond_heap_ref = (cons*)lookup_addr(i->getIDStr().c_str());
@@ -675,7 +675,7 @@ cons* IfExprNode::evaluate()
 	update_heap_refs.push(cond_heap_ref);
 
 	cons* cond_resultValue = this->pCond->evaluate();
-    GC_STAT_UPDATE_LAST_USE(cond_resultValue);
+	GC_STAT_UPDATE_LAST_USE(cond_resultValue);
 
 	cons* temp = update_heap_refs.top();
 	temp->inWHNF = cond_resultValue->inWHNF;
@@ -687,41 +687,34 @@ cons* IfExprNode::evaluate()
 	assert(cond_resultValue->typecell == constBoolExprClosure);
 	cons* retval;
 
-    auto cond_val = cond_resultValue->val.boolval;
+	auto cond_val = cond_resultValue->val.boolval;
 
-    if (gc_status != gc_disable && (gc_status == gc_live || gc_status == gc_freq))
-    {
+	if (gc_status == gc_live)
+	{
 
-    	auto num_cells_required = cond_val ? func_heap_cell_reqd[pThen->getLabel()]:func_heap_cell_reqd[pElse->getLabel()];
-//    	DBG(cout << "Num heap cells required for the rest of the branch is " << num_cells_required << endl);
+		auto num_cells_required = cond_val ? func_heap_cell_reqd[pThen->getLabel()]
+			: func_heap_cell_reqd[pElse->getLabel()];
+		DBG(cout << "Num heap cells required for the rest of the branch is "
+				<< num_cells_required << endl);
 
-    	if (current_heap() < num_cells_required)
-    	{
-    		liveness_gc();
-    		detail_gc();
-    		GC_STAT_DUMP_GARBAGE_STATS();
+		if (current_heap() < num_cells_required)
+		{
+			liveness_gc();
+			detail_gc();
+			GC_STAT_DUMP_GARBAGE_STATS();
 
-    		if (current_heap() < num_cells_required)
-    		{
+			if (current_heap() < num_cells_required)
+			{
 
-    			cout << "heap cells required " << num_cells_required << endl;
-    			cout << "current heap size " << current_heap() << endl;
+				cout << "heap cells required " << num_cells_required << endl;
+				cout << "current heap size " << current_heap() << endl;
 
-    			fprintf(stderr,"No Sufficient Memory - cons\n");
-    			throw bad_alloc();
-    		}
+				fprintf(stderr,"No Sufficient Memory - cons\n");
+				throw bad_alloc();
+			}
 
-    	}
-    }
-
-//	if (cond_resultValue->val.boolval)
-//	{
-//		retval = this->pThen->evaluate();
-//	}
-//	else
-//	{
-//		retval = this->pElse->evaluate();
-//	}
+		}
+	}
 
 	auto resExpr = cond_val ? pThen : pElse;
 	retval = resExpr->evaluate();
@@ -804,47 +797,51 @@ cons* LetExprNode::evaluate()
      //This is where we do the GC. Can this be made independent of ExprNode class?
     static clock_tick last_gc_clock = 0;
 
-	if (gc_status != gc_disable && (gc_status == gc_plain || gc_status == gc_freq))
+    if (gc_status == gc_plain || gc_status == gc_freq)
     {
 
-		if (gc_status == gc_freq && (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD())) {
-			reachability_gc();
-			//return_stack().return_point = curr_let_pgmpt;
-			GC_STAT_DUMP_GARBAGE_STATS();
-			last_gc_clock = GC_STAT_GET_CLOCK();
-		}
+	    if (gc_status == gc_freq && (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD())) {
+		    reachability_gc();
+		    detail_gc();
+		    //return_stack().return_point = curr_let_pgmpt;
+		    GC_STAT_DUMP_GARBAGE_STATS();
+		    last_gc_clock = GC_STAT_GET_CLOCK();
+	    }
 
-        if (gc_status == gc_plain && ((!isFunctionCall && (current_heap() < 1))
-                 || (isFunctionCall && (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size())))))
-        {
+	    if ((!isFunctionCall && (current_heap() < 1))
+	         || (isFunctionCall &&
+                      (current_heap() < (0 + ((FuncExprNode*)(getVarExpr()))->pListArgs->size()))))
+	    {
 
-        	// cerr << "DOING RGC"<<endl;
-        	//TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
-        	//std::string curr_let_pgmpt = return_stack().return_point;
-        	//return_stack().return_point = getLabel();
-        	reachability_gc();
-        	detail_gc();
-        	//return_stack().return_point = curr_let_pgmpt;
-        	GC_STAT_DUMP_GARBAGE_STATS();
+		    // cerr << "DOING RGC"<<endl;
+		    //TODO : Add #define for the following code, they are not needed for RGC. Added only to dump graphviz files
+		    //std::string curr_let_pgmpt = return_stack().return_point;
+		    //return_stack().return_point = getLabel();
+		    reachability_gc();
+		    detail_gc();
+		    //return_stack().return_point = curr_let_pgmpt;
+		    GC_STAT_DUMP_GARBAGE_STATS();
+		    last_gc_clock = GC_STAT_GET_CLOCK();
 
 
-            //We have to check for this condition here for lazy languages
-            int num_cells_reqd = 0;
-            if (!isFunctionCall )
-                num_cells_reqd = 1;
-            else // (isFunctionCall)
-            {
-                num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
-                //We need to handle 0-ary functions. We need at least one cons cell even for a 0-ary function call.
-                num_cells_reqd = (num_cells_reqd == 0) ? 1 : num_cells_reqd;
-            }
-            //		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
-            if (check_space(num_cells_reqd * sizeof(cons)) == 0)
-            {
-                fprintf(stderr,"No Sufficient Memory - cons\n");
-                throw bad_alloc();
-            }
-        }
+		    //We have to check for this condition here for lazy languages
+		    int num_cells_reqd = 0;
+		    if (!isFunctionCall )
+			    num_cells_reqd = 1;
+		    else // (isFunctionCall)
+		    {
+			    num_cells_reqd = ((FuncExprNode*)(getVarExpr()))->pListArgs->size();
+			    //We need to handle 0-ary functions. We need at least one cons cell even for a 0-ary function call.
+			    num_cells_reqd = (num_cells_reqd == 0) ? 1 : num_cells_reqd;
+		    }
+		    //		cerr << "Num of cons cells required is " << num_cells_reqd<<endl;
+		    if (check_space(num_cells_reqd * sizeof(cons)) == 0)
+		    {
+			    fprintf(stderr,"No Sufficient Memory - cons\n");
+			    throw bad_alloc();
+		    }
+	    }
+
     }
     /* End of GC related stuff */
     /* -------------------------------------------------------------------------------------------------------------*/
@@ -1664,31 +1661,12 @@ cons* FuncExprNode::evaluate()
 	if (update_heap_refs.top()->inWHNF)
 		return update_heap_refs.top();
 
-	if (gc_status != gc_disable && (gc_status == gc_live || gc_status == gc_freq))
+	if (gc_status == gc_live)
 	{
-		static clock_tick last_gc_clock = 0;
 		auto num_cells_reqd = func_heap_cell_reqd[getFunction()];
-
-		if (gc_status == gc_freq)
-		{
-			if (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD())
-			{
-
-				reachability_gc();
-
-				GC_STAT_DUMP_GARBAGE_STATS();
-				last_gc_clock = GC_STAT_GET_CLOCK();
-			}
-		}
 
 		if (current_heap() < num_cells_reqd)
 		{
-
-			assert(gc_status == gc_live);
-			//DBG(cerr << "Updating curr_let_pgmpt to " );
-			//DBG(cerr << return_stack().return_point << endl);
-			//std::string curr_let_pgmpt = return_stack().return_point;
-			//				return_stack().return_point = getLabel();
 
 			liveness_gc();
 			detail_gc();

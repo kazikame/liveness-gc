@@ -3,6 +3,7 @@ alpha           [a-zA-Z]
 special         [?_-]
 
 comment         ;.*\n
+racketmacro     #lang.*\n
 
 str_const       \"(\\.|[^"])*\"
 int_const       -?{digit}+
@@ -70,6 +71,7 @@ identifier      [_a-zA-Z!&*/:<=>?^][_a-zA-Z!0&*/:<=>?^0-9.+-]*
 {identifier}            { yylval->sval = new std::string(yytext);    return( token::ID ); }
 
 {comment}               /* ignore all comments   */;
+{racketmacro}			/* ignore all comments   */;
 [\n\t ]+                /* ignore all whitespace */;
 
 .                       /* ignore bad characters */

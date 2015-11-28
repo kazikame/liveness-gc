@@ -6,7 +6,7 @@ set terminal postscript dashed color portrait "Helvetica" 16
 #set terminal postscript portrait butt "Helvetica" 16
 #set terminal size 1300,600
 
-set size ratio 0 1, .25
+set size ratio 0 1, .33
 
 set xlabel "knightstour"
 set xtics nomirror ("300" 300e5, "320" 320e5, "340" 340e5, "360" 360e5,"380" 380e5,  "400" 400e5)
