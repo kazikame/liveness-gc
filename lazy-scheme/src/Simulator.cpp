@@ -258,8 +258,8 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 		filepath = outdir + "live.txt";
 	else if (gc_type == gc_plain)
 		filepath = outdir + "plain.txt";
-    else if (gc_type == gc_freq)
-        filepath = outdir + "freq.txt";
+	else if (gc_type == gc_freq)
+		filepath = outdir + "freq.txt";
 
 
 	std::ofstream outfile(filepath, ios::out);
@@ -294,14 +294,14 @@ clock_tick gc_freq_threshold = 20; // some random value
 GCStatus getGCType(string gctypestr)
 {
 	GCStatus gc_type;
-    std::string gc_freq_prefix("gc-freq=");
-    if (!gctypestr.compare(0, gc_freq_prefix.size(), gc_freq_prefix)) {
-        gc_freq_threshold = atoi(gctypestr.substr(gc_freq_prefix.size()).c_str());
-        gc_type = gc_freq;
-    }
-    else if (gctypestr == "gc-freq")
+	std::string gc_freq_prefix("gc-freq=");
+	if (!gctypestr.compare(0, gc_freq_prefix.size(), gc_freq_prefix)) {
+		gc_freq_threshold = atoi(gctypestr.substr(gc_freq_prefix.size()).c_str());
 		gc_type = gc_freq;
-    else if (gctypestr == "gc-plain")
+	}
+	else if (gctypestr == "gc-freq")
+		gc_type = gc_freq;
+	else if (gctypestr == "gc-plain")
 		gc_type = gc_plain;
 	else if (gctypestr == "gc-live")
 		gc_type = gc_live;
@@ -322,8 +322,8 @@ int main(int argc, char ** argv)
 		cerr << endl;
 		cerr << "\t<gc-type> is one of: gc-live, gc-plain, gc-freq[=<threshold>]" << endl;
 		cerr << endl;
-		 //printHelp(); //TODO: implement printhelp() method
-		 return(EXIT_FAILURE);
+		//printHelp(); //TODO: implement printhelp() method
+		return(EXIT_FAILURE);
 	}
 	vector<string> cmdline_args;
 	int optind = 1;
@@ -331,9 +331,9 @@ int main(int argc, char ** argv)
 	string filepath = argv[1];
 	long heapsize = stol(argv[2]);
 	GCStatus gctype = getGCType(argv[3]);
-//	cout << "Calling " << prog_name << " with " << filepath << " " << heapsize << " " << gctype;
-    if (gctype == gc_freq) cout << "=" << gc_freq_threshold;
-    cout << endl;
+	//	cout << "Calling " << prog_name << " with " << filepath << " " << heapsize << " " << gctype;
+	if (gctype == gc_freq) cout << "=" << gc_freq_threshold;
+	cout << endl;
 
 	Simulator s(gctype);
 	try

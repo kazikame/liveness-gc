@@ -8,12 +8,13 @@ set terminal postscript dashed color portrait "Helvetica" 16
 
 set size ratio 0 1, .33
 
-set xlabel "nqueens"
+set xlabel "huffman"
 set border 3 lw 0
 
-set output "nqueens.eps"
-set xtics nomirror ("0" 0, "2.5" 2.5e5, "5.0" 5e5, "7.5" 7.5e5, "10.0" 10e5, "12.5" 12.5e5, "15.0" 15e5, "17.5" 17.5e5)
-set ytics nomirror ("0" 0, "4.5" 4.5e3, "9.0" 9.0e3, "13.5" 13.5e3, "18.0" 18e3, "22.5" 22.5e3)
+set output "huffman_win.eps"
+set xtics nomirror ("0" 0, "7" 7e5, "14" 14e5, "21" 21e5, "28" 28e5, "35" 35e5, "39" 39e5)
+set ytics nomirror ("0" 0, "85" 85e3, "170" 170e3, "255" 255e3, "340" 340e3, "425" 425e3)
+
 set autoscale
 set grid noxtics
 
@@ -29,6 +30,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [:17.5e5] "output/nqueens_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/nqueens_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/nqueens_gc-freq_output/rch.sort"  w l ls 3 notitle,           "output/nqueens_gc-live_output/use.sort"  w l ls 5 notitle
+plot [:] [:] "output/huffman_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/huffman_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/huffman_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/huffman_gc-live_output/rgc.sort"  w l ls 5 notitle,      "output/huffman_gc-live_output/use.sort"  w l ls 4 notitle
 
 #    EOF

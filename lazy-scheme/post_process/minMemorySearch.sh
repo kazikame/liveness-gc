@@ -4,7 +4,7 @@ MIN=${3-0}
 MAX=$2
 FULLTEST=../benchmarks/programs/$TEST/$TEST.scm
 LOG=run.out.$$
-GCOPT=gc-live
+GCOPT=gc-plain
 
 
 RANGE=`expr $MAX - $MIN`
