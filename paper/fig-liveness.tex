@@ -1,0 +1,84 @@
+\begin{figure}[t]
+  \renewcommand{\arraystretch}{1.6}
+  \small
+\hspace*{-6pt}
+$\begin{array}{@{}r@{\ }c@{\ }l@{}}
+\mathit{ref\/}(\kappa,\sigma,\Lfonly) &=& \emptyset \mbox{, for $\kappa$ a constant, including \NIL} \\
+
+\mathit{ref\/}(\pp{\pi}{(\CONS~x~y)},\sigma,\Lfonly)
+&=& \{x_{\pi}.\alpha \mid \acar\alpha \in \sigma\} \cup
+\{y_{\pi}.\alpha 
+\mid \acdr\alpha \in \sigma\} \\
+
+\mathit{ref\/}(\pp{\pi}{(\CAR~x)},\sigma,\Lfonly)
+&=&\!\left\{\!\!\!\!\begin{array}{l@{\ }l}
+  \{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acar\alpha \mid \alpha \in
+  \sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
+  \emptyset  & \mbox{otherwise}
+\end{array}\right. \\
+
+\mathit{ref\/}(\pp{\pi}{(\CDR~x)},\sigma,\Lfonly)
+&=&\!\left\{\!\!\!\!\begin{array}{l@{\ }l}
+\{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acdr\alpha \mid \alpha \in
+\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
+\emptyset  & \mbox{otherwise}
+\end{array}\right. \\
+
+\mathit{ref\/}(\pp{\pi}{(\PRIM~x~y)},\sigma,\Lfonly)
+&=&\!\left\{\!\!\!\!\begin{array}{l@{\ }l}
+\{x_{\pi}.\epsilon, y_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne
+\emptyset\\
+\emptyset  & \mbox{otherwise}
+\end{array}\right.\\
+
+\mathit{ref\/}(\pp{\pi}{(\NULLQ~x)},\sigma,\Lfonly)
+&=&\!\left\{\!\!\!\!\begin{array}{l@{\ }l}
+\{x_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
+\emptyset  & \mbox{otherwise}
+\end{array}\right. \\
+
+\mathit{ref\/}(\pp{\pi}{(f~\myvec{x})},\sigma,\Lfonly)
+%          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
+&=&  \begin{array}{@{}l}  % to discourage \displaystyle
+  \bigcup_{i=1}^n x_{i_{\pi}}.\Lf{f}{i}{\sigma}
+\end{array}
+%          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
+\\
+
+\mathcal{L}((\SRETURN~\pp{\psi\ }{x}),\sigma,\Lfonly) &=& 
+x.\sigma\\
+
+\mathcal{L}((\SIF~\pp{\psi\ }{x~e_1~e_2}),\sigma,\Lfonly) &=&
+\!\left\{\!\!\!\!\begin{array}{l@{\ }l}
+  \mathcal{L}(e_1,\sigma,\Lfonly) \cup
+  \mathcal{L}(e_2,\sigma,\Lfonly) \cup
+  \{x.\epsilon\},  & \\ 
+  \qquad\qquad\qquad\qquad\qquad\qquad\mbox{if}~\sigma \ne \emptyset & \\
+  \emptyset  \qquad\qquad\qquad\qquad\qquad\quad\; \mbox{otherwise} &\\
+\end{array}\right. \\
+
+\mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+\mathit{ref\/}(s,\sigma',\Lfonly) \cup \Lv \cup \{x.\sigma'\} 
+\\
+&&~\mbox{where}~ \mathcal{\Lv} = \mathcal{L}(e,\sigma,\Lfonly),\\
+&&~\mbox{and}~\sigma' = \bigcup_{\pi}  \Lv(x_{\pi})
+\\ & \\
+\end{array}$
+\begin{center}
+\begin{minipage}{0.95\columnwidth}
+
+  \infrule[live-define]
+          {\mathcal{L}(e_f,\sigma,\Lfonly) =
+            \bigcup_{i=1}^n z_i.\Lf{f}{i}{\sigma}
+            \mbox{ for each $f$ and $\sigma$}
+          }
+          { \mathit{df_1} \ldots \mathit{df_k} \len \Lfonly
+            \\ \makebox[20mm]{\rule{15mm}{0pt}where
+              $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ 
+              is a member of $\mathit{df_1}
+              \ldots \mathit{df_k}$}}
+\end{minipage}
+
+\end{center}
+\caption{Liveness equations and judgement rule}\label{fig:live-judge}
+\end{figure}

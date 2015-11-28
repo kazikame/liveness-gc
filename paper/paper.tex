@@ -241,55 +241,7 @@ complicated than a liveness-based collector for a eager language.
 %------------------------------------------------------------%
 \subsection{Motivating Example}
 \label{sec:motiv}
-\begin{figure}[t!]
-  \psset{unit=1mm}
-  \begin{pspicture}(90,52)(0,-52)
-    %\psframe(90,48)(0,-48)
-    \renewcommand{\arraystretch}{1}
-    \begin{tabular}{@{}c@{}}
-      %\psframebox
-          {\sf
-	\renewcommand{\arraystretch}{1}{
-	  \begin{uprogram}
-            \UFL\
-            \UNL{0} (\DEFINE\ (\length\  \pl)
-	    \UNL{1}  (\SIF~(\NULLQ \ \pl) $0$
-            (\PRIM\ 1\ (\length\  (\CDR\  \pl)))))
-            \UNL{0}
-	    \UNL{0}  (\DEFINE\ (\append\  \lista\ \listb)
-	    \UNL{1}  (\SIF~(\NULLQ \ \lista)
-	    \listb
-	    \UNL{2} \hspace*{-0.1cm}(\CONS\ (\CAR\ \lista) (\append\
-            (\CDR\  \lista)
-            \listb))))
-            \UNL{0}
-            \UNL{0} (\LET\ \px\
-            $\leftarrow$\ (\CONS\ $5$
-            (\CONS\ (\CONS\ $6$ \NIL) \NIL) \IN
-	    \UNL{1} (\LET\ \py\   $\leftarrow$\  (\CONS\ $3$ \NIL) \IN
-	    \UNL{2}
-            (\LET\ \pz\  $\leftarrow$\  (\append\ \px\  \py)\ \IN\
-            \UNL{3} (\SIF~(\NULLQ~(\CAR~\pz))~$0$~$\pi$:\
-            (\length\ \pz))))))
-	  \end{uprogram}
-      }}
-      \\ \\
-      (a) Example program. \\  \\
-%      \includegraphics[width=.45\textwidth]{motiv-example}
-      \input{mem-graph} \\ \\
-      \renewcommand{\arraystretch}{.9}
-      \begin{tabular}[t]{p{0.9\columnwidth}}
-        (b) Memory graph at $\pi$.  \scalebox{.7}{\TwoCellsAD{a1}{a2}}
-        denotes a closure. Thick edges denote live links. Traversal
-        stops at edges marked $\times$ during garbage collection for
-        a liveness-based collector.
-      \end{tabular}
-    \end{tabular} 
-  \end{pspicture}
-%  \vspace*{-3ex}
-  \caption{Example Program and its Memory Graph}\label{fig:mot-example}
-\end{figure}
-
+\input{fig_motiv}
 Figure~\ref{fig:mot-example} shows an example program and the state of
 the heap at  the program point $\pi$, i.e. just  before the evaluation
 of $(\length\  \pz)$.  The heap is  represented by a graph  in which a
@@ -609,90 +561,7 @@ due to  sharing~\cite{Jones87}.  Only after this  is the actual selection  done 
 %==============================================================
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
-\begin{figure*}[t]
-\comment{
-\renewcommand{\arraystretch}{1}
-\begin{eqnarray*}
-\mathit{ref\/}(\kappa,\sigma,\Lfonly)
-          &=& \{\,\} \mbox{, for $\kappa$ a constant, including
-$\NIL$}\\
-\mathit{ref\/}(\pi:(\CONS~x~y),\sigma,\Lfonly)
-          &=& \{x_{\pi}.\alpha \mid \acar\alpha \in \sigma\} \cup
-  \{y_{\pi}.\alpha 
-\mid \acdr\alpha \in \sigma\} \\
-\mathit{ref\/}(\pi:(\CAR~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acar\alpha \mid \alpha \in
-\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}(\pi:(\CDR~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x_{\pi}.\epsilon\} \cup \{x_{\pi}.\acdr\alpha \mid \alpha \in
-\sigma\}, & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}(\pi:(\PRIM~x~y),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x_{\pi}.\epsilon, y_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne
-\emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}(\pi:(\NULLQ~x),\sigma,\Lfonly)
-          &=&    \begin{array}{l l}
-                    \{x_{\pi}.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
-                    \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-\mathit{ref\/}(\pi:(f~\myvec{x}),\sigma,\Lfonly)
-%          &=& \bigcup_{i=1}^n y_i.\Lf{f}{i}{\sigma}
-          &=&  \begin{array}{@{}l}  % to discourage \displaystyle
-               \bigcup_{i=1}^n x_{i_{\pi}}.\Lf{f}{i}{\sigma}
-               \end{array}
-%          &=& \bigcup \{y_i.\Lf{f}{i}{\sigma} \mid i=1,\ldots, n\}
-\\[1ex]
-\mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& 
-x.\sigma\\
-%% \mathcal{L}((\SRETURN~\psi:x),\sigma,\Lfonly) &=& \lbrack \mathit{\epath}
-%% \mapsto
-%% x.\sigma\rbrack, \mbox{ where $\mathit{\epath}$ is a
-%%   new e-path terminating with $\psi$}\\
-\mathcal{L}((\SIF~\psi:x~e_1~e_2),\sigma,\Lfonly) &=&
-\begin{array}{l l}
-                    \mathcal{L}(e_1,\sigma,\Lfonly) \cup
-        \mathcal{L}(e_2,\sigma,\Lfonly) \cup
-\{x.\epsilon\},  & \mbox{if}~\sigma \ne \emptyset\\
-        \emptyset  & \mbox{otherwise}
-                 \end{array} \\
-%% \mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-%%         \lambda\mathit{\epath}.\; \Lfonly_f(\Lv(x)) \cup \Lv~~
-%% \mbox{where}~\mathcal{M} =
-%% \mathcal{L}(e,\sigma,\Lfonly),~\Lv =
-%% \mathcal{M}(\epath),~\mbox{and}~f~\mbox{is the new function}\\
-%% && \makebox[0mm]{\hspace*{7cm}
-%%  $(\DEFINE~(f\,x_1\,x_2\, \ldots \, x_n)~(\SIF\,*~x~s[(f\,x_1\,
-%%            x_2\, \ldots\, x_n)/x]))$,} \\
-%%  \makebox[0mm]{\hspace*{8cm} where
-%%      $x_1\, \ldots\, x_n$ are the variables in $s$}
-\mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
-\mathit{ref\/}(s,\sigma',\Lfonly) \cup \Lv \cup \{x.\sigma'\} 
-~\mbox{where}~ \mathcal{\Lv} = \mathcal{L}(e,\sigma,\Lfonly), ~\mbox{and}~\sigma' = \bigcup_{\pi}  \Lv(x_{\pi})
-\end{eqnarray*}
-\begin{minipage}{0.85\textwidth}
-\infrule[live-define]
-        {\mathcal{L}(e_f,\sigma,\Lfonly) =
-           \bigcup_{i=1}^n z_i.\Lf{f}{i}{\sigma}
-              \mbox{ for each $f$ and $\sigma$}
-        }
-        { \mathit{df_1} \ldots \mathit{df_k} \len \Lfonly
-\\ \makebox[0mm]{where
-     $(\DEFINE\ (f\ z_1\ \ldots\ z_n)\ \ e_f)$ is a member of $\mathit{df_1}
-\ldots \mathit{df_k}$}}
-\end{minipage}
-  \caption{Liveness equations and judgement
-    rule}\label{fig:live-judge}
-}%comment
-\end{figure*}
-
+\input{fig-liveness}
 
 
 \section{Liveness}
@@ -2313,11 +2182,7 @@ propagated inside closures.
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
-\newpage
-\ 
-\newpage
-
-
+\clearpage
 \section{Appendix: Soundness of liveness analysis}
  
 
