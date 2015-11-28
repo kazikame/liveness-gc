@@ -1174,32 +1174,27 @@ call-less program,  the initial state of  the minefield
 semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
 \ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
 e_{\mainpgm}$.
-
+  
  
 \subsection{Soundness Results}
 
-  %% We  consider  a  round of garbage  collection  followed  by  a
-  %% transition as a step.  We show by induction that, for
-  %% programs  without function  calls, %% starting  from the
-  %% %% initial  state  that has $e_{\main}$  as  the  
-  %% %% expression to  be evaluated,
-  %% any
-  %% transition of $n$ steps occurs without a \bang.
+%% We consider a round of  garbage collection followed by a transition
+%% as  a  step.  We  show  by  induction  that, for  programs  without
+%% function  calls, %%  starting from  the %%  initial state  that has
+%% $e_{\main}$ as the %% expression to be evaluated, any transition of
+%% $n$ steps occurs without a \bang.
 
-We  first  need  an auxiliary  result  about  minefield
-semantics. Consider  a trace of a  minefield execution.
-For every minefield state  $(\rho, S, \heap, e(s), \sigma)$
-that appears  on the LHS of  a $\rightsquigarrow$ step,
-the  demand   $\sigma$  on   the  expression   $e$  (or
-application $s$) is non-null.  This can be proved by an
-induction  on  the  number  of  steps  leading  to  the
-minefield  state.   The  base step  holds  because  the
-demand $\sigma_{all}$  on $(\mainpgm)$ is  non-null. For the 
-inductive step  we observe   that for
-each  step of  the minefield  semantics, if  the demand
-$\sigma$ on  the LHS of  a minefield step  is non-null,
-the demand on  the RHS is a  transformation of $\sigma$
-(for example $\clazy\sigma$) which is also non-null.
+We first need an auxiliary  result about minefield semantics. Consider
+a trace of  a minefield execution.  For every  minefield state $(\rho,
+S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
+$\rightsquigarrow$ step, the demand $\sigma$ on the expression $e$ (or
+application $s$) is  non-null.  This can be proved by  an induction on
+the number  of steps leading  to the  minefield state.  The  base step
+holds   because  the   demand   $\sigma_{all}$   on  $(\mainpgm)$   is
+non-null. For the inductive step we  observe that for each step of the
+minefield semantics, if the demand $\sigma$  on the LHS of a minefield
+step  is non-null,  the  demand  on the  RHS  is  a transformation  of
+$\sigma$ (for example $\clazy\sigma$) which is also non-null.
 
 %% Let  us clarify  this  observation: Since  the minefield  semantics
 %% models lazy evaluation,  parts of the program may  not be evaluated
@@ -1212,8 +1207,8 @@ i.e.  the evaluation of $(\mainpgm)$ (or $e_{\mainpgm}$, for call-less
 programs) to  its WHNF driven  by the printing mechanism.   With minor
 variations,  the   proof  will  also  be   applicable  for  subsequent
 evaluations initiated by $\print$.
-%% We  show next that  the minefield execution of  a call-less
-%% program cannot go \bang.
+%% We show  next that the  minefield execution of a  call-less program
+%% cannot go \bang.
 
 \begin{lemma}
 \label{lemma:call-less-cannot-go-bang}
@@ -1222,25 +1217,21 @@ Such a program cannot enter the \bang\ state.
 \end{lemma}
 \begin{proof}
 Call a $GC(\ldots)$  followed by a $\rightsquigarrow$  transition as a
-step. Consider  a state  $(\rho, S,  \heap, e,  \sigma)$ in  the minefield
+step. Consider a state $(\rho, S,  \heap, e, \sigma)$ in the minefield
 execution of a  program.  We show by induction on  the number of steps
 $n$ leading  to this  state that  the next  transition cannot  enter a
 \bang\ state.  When $n$ is 0,  the state is $([\;]_\rho,\_, [\;]_{S} ,
-            [\;]_{\heap}, e_{\mainpgm}, \sigma_{all})$.  Since the call to
-            $GC(\ldots)$ in this state does  nothing, we just have to show
-            that  the  $\rightsquigarrow$  transition cannot  enter  a
-            \bang\   state.    Since   our  programs   are   in   ANF,
-            $e_{\mainpgm}$ can  only be a $\LET$  expression.  A
-                     {\sc let} step does not involve dereferencing,
-                     and thus
-                     cannot result in a \bang.
+            [\;]_{\heap},  e_{\mainpgm},  \sigma_{all})$.   Since  the
+            call to $GC(\ldots)$  in this state does  nothing, we just
+            have to show that the $\rightsquigarrow$ transition cannot
+            enter  a \bang\  state.  Since  our programs  are in  ANF,
+            $e_{\mainpgm}$ can  only be  a $\LET$ expression.   A {\sc
+              let}  step  does  not involve  dereferencing,  and  thus
+            cannot result in a \bang.
 
-For the inductive step, we  shall show that none of the
-minefield steps that  involves dereferencing results in
-a   \bang.   These  are   the   steps   which  have   a
-$\heap(\rho(...))$ in the premise. %%  Recall that a minefield
-%% step   consists   of   a   GC  step   followed   by   a
-%% $\rightsquigarrow$. 
+For the inductive step, we shall show that none of the minefield steps
+that involves dereferencing  results in a \bang.  These  are the steps
+which  have a  $\heap(\rho(...))$ in  the  premise. 
 Now a  $\rightsquigarrow$ step can  go
 \bang\ because it dereferences a $\bot$ inserted by the
 immediately  preceding  GC  or  the GC  of  an  earlier
@@ -1558,14 +1549,18 @@ productions:
 Other  equations  can   be  converted  similarly.   The
 language   generated   by  \var{\Lanv{i}{x}},   denoted
 $\mathscr{L}(\var{\Lanv{i}{x}})$,   is    the   desired
-solution  of  \Lanv{i}{x}.    However,  note  that  the
-strings  in the  language  are  over alphabet  $\lbrace
-\acar, \acdr,\bcar, \bcdr, \clazy \rbrace$, but we want
-     {\em  forward} access  paths only,  i. e.,  access
-     paths  over  the  alphabet $\lbrace  \acar,  \acdr
-     \rbrace$.  In other  words,  the decision  problem
-     that   we  are   interested   in  during   garbage
-     collection at a program point $\pi_i$ is:
+solution  of  \Lanv{i}{x}. 
+
+\warning{
+\hrule
+\medskip
+Fixing from here
+\medskip
+\hrule
+}
+
+However, recall that the decision problem that we are interested in
+during garbage collection is the following:
 \begin{quote}
 Let $x.\alpha$ be a forward access path consisting only
 of edges  \acar\ and \acdr\  (but not \bcar,  \bcdr\ or
@@ -1593,26 +1588,27 @@ $\bcdr\acdr    \rightarrow   \epsilon$,    $\clazy\acar
 and $\clazy\$ \rightarrow \epsilon$.
 \end{definition}
 
-From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
-that the results of liveness analysis of any program can be modeled by
-the kind  of grammar described above. The  following proposition shows
-that the converse also holds.
-\begin{proposition}
-Given    a     grammar    $G$    of    the     form    described    in
-Definition~\ref{def:specialgrammar},  it is  possible  to construct  a
-program $p$  with program points  $\pi_i$ and variables $x$  such that
-the liveness  analysis of $p$  is same as  $G$ except for a  change in
-non-terminal names which now have the form \var{\Lanv{i}{x}}.
-\end{proposition}
-We now show that the decision  problem that is required to be answered
-at       garbage      collection       time       is      undecidable.
+%% From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
+%% that the results of liveness analysis of any program can be modeled by
+%% the kind  of grammar described above. The  following proposition shows
+%% that the converse also holds.
+%% \begin{proposition}
+%% Given    a     grammar    $G$    of    the     form    described    in
+%% Definition~\ref{def:specialgrammar},  it is  possible  to construct  a
+%% program $p$  with program points  $\pi_i$ and variables $x$  such that
+%% the liveness  analysis of $p$  is same as  $G$ except for a  change in
+%% non-terminal names which now have the form \var{\Lanv{i}{x}}.
+%% \end{proposition}
+We first show that membership problem of the class of grammars in
+Definition~\ref{def:specialgrammar} is undecidable. However note that
+the grammar may not be necessarily generated from liveness analysis.
 \newcommand{\state}{\ensuremath{\mathsf{S}}}
 \newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}  
-\begin{lemma}
-Consider    a    grammar    $G$    of   the    kind    described    in
-Definition~\ref{def:specialgrammar} and a forward access path $\alpha$
-consisting  of symbols \acar\  and \acdr\  only. The  decision problem
-$\alpha \in \mathscr{L}(G)$ is undecidable.
+\begin{lemma}\label{lemma:grammar-undecidable}
+Consider a grammar    $G$    of   the    kind    described    in
+Definition~\ref{def:specialgrammar}  and a forward access path $\alpha$
+consisting  of symbols \acar\  and \acdr\  only. The membership problem
+$\alpha\$ \in \mathscr{L}(G)$ is undecidable.
 \end{lemma} 
 
 \begin{proof}
@@ -1623,23 +1619,23 @@ on    $w$    if    and   only    if    $\epsilon    \in
 unrestricted               productions               in
 Definition~\ref{def:specialgrammar}.
 
-We shall denote the configuration of the Turing machine
+We shall represent a Turing machine (TM) configuration 
 as $w_l(\state,c)w_r$, where $w_l$ is the string to the
 left of the head, $w_r$ is the string to the right, $c$
 is the symbol under the head and \state\ is the current
-state of  the machine.   For each combination  of state
+state of  the TM.   For each combination  of state
 and symbol  $(\state,c)$, the grammar will  contain the
 non-terminal \nont{}{c}. We shall synchronize each move
-of the  machine to  a derivation  step using  a context
+of the TM to  a derivation  step using  a context
 free production, followed, if possible, by a derivation
 step using either  $\bcar\acar \rightarrow \epsilon$ or
 $\bcdr\acdr   \rightarrow    \epsilon$.    After   each
 synchronization,  we  shall   establish  the  following
-invariant  relation between  the machine  configuration
+invariant  relation between  the TM  configuration
 and the sentential form:
 
 \begin{quote}
-  If    the   configuration    of   the    machine   is
+  If    the   configuration    of   the    TM   is
   $w_l(\state,c)w_r$, then the  sentential form will be
   $\overline{w}_l\nont{}{c}\,w_r$,                where
   $\overline{w}_l$ is  the same as $w_l$  but with each
@@ -1649,10 +1645,10 @@ and the sentential form:
 Assume that  the TM starts  in a  state $S_\mathit{init}$ with  a tape
 $cw$ and  the head positioned on  the symbol $c$. Then  the sentential
 form    corresponding     to    the    initial     configuration    is
-$\nont{\mathit{init}}{c}w$ (we  can assume that there  is a production
-$\nont{}{} \rightarrow  \nont{\mathit{init}}{c}w$, where  \nont{}{} is
+$\nont{\mathit{init}}{c}w\$$ (we  can assume that there  is a production
+$\nont{}{} \rightarrow  \nont{\mathit{init}}{c}w\$$, where  \nont{}{} is
 the start symbol of the  grammar). Further correspondences between the
-Turing machine moves and the grammar productions are as follows:
+TM moves and the grammar productions are as follows:
 
 \begin{enumerate}
 \item For each transition  $(S_i, c) \rightarrow (S_j,c',L)$, there are
@@ -1665,8 +1661,8 @@ Turing machine moves and the grammar productions are as follows:
 \end{enumerate}
 The idea  behind the  productions is explained  with an
 example:  Assume that  the current  sentential form  is
-\bcar\bcdr\nont{i}{\acar}\acar\acar.   Assume that  the
-machine  has  a   transition  $(S_i,\acar)  \rightarrow
+\bcar\bcdr\nont{i}{\acar}\acar\acar. Also  assume that  the
+TM  has  a   transition  $(S_i,\acar)  \rightarrow
 (S_j,\acdr, L)$.  Since the next corresponding  step in
 the  derivation  has  to  be  done  without  any  prior
 knowledge of whether the symbol to the left of the tape
@@ -1680,23 +1676,50 @@ Simplification   with    the   production   $\bcdr\acdr
 \rightarrow               \epsilon$              yields
 \bcar\nont{i}{\acdr}\acdr\acar\acar,    which   exactly
 corresponds  to   the  changed  configuration   of  the
-machine.  Notice  carefully that a wrong  choice breaks
+TM.  Notice  carefully that a wrong  choice breaks
 the invariant  and it cannot be  recovered subsequently
 by any choice of productions.
 
-After  the Turing machine  has halted,  there are  further ``cleanup''
+After  the TM  has halted,  there are  further ``cleanup''
 derivations  that derive  $\epsilon$ only  if the  invariant  has been
 maintained  so far.  For every  symbol  $c$, we introduce  a  non-terminal
 $\nont{\mathit{final}}{c}$ where $\nont{\mathit{final}}{}$ is the
-final state of the Turing machine. We add
+final state of the TM. We add
 productions $\nont{\mathit{final}}{c} \rightarrow \acar
 \nont{\mathit{final}}{c}$ and $\nont{\mathit{final}}{c} \rightarrow \acdr
 \nont{\mathit{final}}{c}$ for cleaning up the \bcar\ and \bcdr\ symbols on
 the left of the head and $\nont{\mathit{final}}{c} \rightarrow 
 \nont{\mathit{final}}{c}\bcar$ and $\nont{\mathit{final}}{c} \rightarrow 
 \nont{\mathit{final}}{c}\bcdr$ for cleaning up \acar\ and \acdr\ on the
-right of the tape head. This completes the reduction.
+right of the tape head. Finally the production $\clazy\$ \rightarrow
+\epsilon$ is used to derive $\epsilon$.This completes the reduction.
 \end{proof}
+
+We now show that the proof can be replayed for the class of grammars
+generated from liveness analysis of programs. 
+
+\begin{lemma}
+Consider a grammar    $G$    of   the    kind    described    in
+Definition~\ref{def:specialgrammar} that is generated by liveness analysis
+of a program and a forward access path $\alpha$. The membership problem
+$\alpha\$ \in \mathscr{L}(G)$ is also undecidable.
+\end{lemma} 
+
+Given a Turing machine and an input string, we now give program fragments whose liveness
+analysis generate the same productions as in
+Lemma~\ref{lemma:grammar-undecidable}, but with  extra productions
+that necessarily contain the \clazy\ symbol. For instance,
+corresponding to the production $\nont{i}{c} \rightarrow c
+\nont{j}{\acar}\bcar$, with $c$ as \acar\ for concreteness, we have
+the program (define ($\nont{i}{c}$ a) (let b <- (car a) in (let c <-
+($\nont{j}{\acar}$ b) in (let d <- 5 in (let e <- (cons c d) in (let f
+<- (null? e) in return f)))))). The reader can check that this
+produces the grammar fragment ...
+
+It is obvious that if the TM halts on the input, then the grammar will
+produce the $\epsilon$ string. However, if the TM does not halt on the
+input, then the productions containg
+
 
 We circumvent  the problem  of undecidability  by over-
 approximating the CFG by non-deterministic finite state
@@ -1777,7 +1800,7 @@ are converted to DFAs.
 \figrule
 \end{figure}
 
-\subsubsection{From CFGs to GC-ready DFA}
+\subsubsection{From CFGs to GC-ready DFAs}
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
  approximate a CFG by a {\em strongly regular\/} grammar.  For
@@ -1810,7 +1833,7 @@ labeled  \clazy\  and  convert  the automaton  into  a  deterministic
 automaton.    This   effectively  implements   the   $\hookrightarrow$
 simplification rules for  \bcar, \bcdr, and \clazy\  to obtain forward
 paths. While  checking for liveness  during GC, a  forward access-path
-is valid only if it can reach a final state.
+is valid only if it can reach a final state. 
 Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
 from the grammar for \var{\Df{\length}{1}}.  The final DFA is shown in
 Figure~\ref{fig:example-automata}(b).  This expectedly says that given
@@ -1978,14 +2001,16 @@ have not been shown.
 
 %\subsection{Garbage collection for references on print stack}
 The evaluation of  the top-level expression in a program  is driven by
-the \print\  function.  Printing of  atomic values is simple  and does
-not  trigger a  garbage  collection.   In case  of  \CONS\ cells,  the
-\CAR\ is  first printed followed  by \CDR.   In a lazy  language, both
-\CAR\ and \CDR\  could be closures requiring evaluation,  and this may
-trigger  more garbage  collections.  When  this happens.   we have  to
-consider any  references that  might be  on the  print stack  and copy
-them.  We extend liveness-based  garbage  collection  to
-the function \print.
+a printing function.  
+%% Printing of  atomic values is simple  and does
+%% not  trigger a  garbage  collection.   In case  of  \CONS\ cells,  the
+%% \CAR\ is  first printed followed  by \CDR.   In a lazy  language, both
+%% \CAR\ and \CDR\  could be closures requiring evaluation,  and this may
+%% trigger  more garbage  collections.  When  this happens.   we have  to
+%% consider any  references that  might be  on the  print stack  and copy
+%% them.
+We extend liveness-based  garbage  collection  to
+this function.
 
 \section{Experimental Evaluation}
 \label{sec:experiments}
