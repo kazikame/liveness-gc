@@ -644,11 +644,10 @@ Consider  the program in  Figure~\ref{fig:mot-example2}.  As
   such variables are distinguished from variables introduced by \LET s
   and  function arguments  (called \emph{stack  variables} since  they
   reside in the activation stack). Notationally, we distinguish
-  closure variables from their corresponding stack variables by
-  subscripting them with their program points of
-  creation.\footnote{Mutiple occurrences of the same variable in an
+  a closure variable from its corresponding stack variable by
+  subscripting it with the program point where the closure was created\footnote{Mutiple occurrences of the same variable in an
     application are further distinguished by their positions in the
-    application.}
+    application.}. 
 
 
   Since a  closure is evaluated  only at evaluation points,  a closure
