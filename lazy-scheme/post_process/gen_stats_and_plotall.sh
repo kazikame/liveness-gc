@@ -1,8 +1,8 @@
 #!/bin/bash 
 DIR=`dirname $0`
 PROGNAME=`basename $0`
-TestBMs="  test testsmall small paraffins deriv"
-SmallBMs=" nperm fibheap lambda sudoku lcss nqueens deriv"
+TestBMs="  test testsmall small "
+SmallBMs=" nperm fibheap lambda sudoku lcss nqueens paraffins deriv"
 LargeBMs=" treejoin knightstour "
 AllBMs="$SmallBMs $LargeBMs"
 help()
@@ -54,7 +54,7 @@ limit["knightstour"]=677800
 limit["fft"]=172762
 limit["huffman"]=100070
 limit["paraffins"]=425476
-limit["deriv"]=425476
+limit["deriv"]=11124
 ## UNUSED BMs
 limit["small"]=17
 limit["test"]=247
@@ -76,7 +76,7 @@ freq["treejoin"]=1300;
 freq["nqueens"]=3000;
 freq["lambda"]=100;
 freq["huffman"]=100;
-freq["deriv"]=100;
+freq["deriv"]=20;
 freq["paraffins"]=100;
 
 declare -A xtics
@@ -95,7 +95,7 @@ xtics["treejoin"]=13e5          ; ytics["treejoin"]=330e3
 xtics["nqueens"]=3.5e5          ; ytics["nqueens"]=4.6e3
 xtics["lambda"]=19e5            ; ytics["lambda"]=3e3
 xtics["huffman"]=19e5           ; ytics["huffman"]=3e3
-xtics["deriv"]=19e5             ; ytics["deriv"]=3e3
+xtics["deriv"]=100             ; ytics["deriv"]=100
 xtics["paraffins"]=19e5         ; ytics["paraffins"]=3e3
 
 declare -A xlimit
@@ -123,9 +123,9 @@ fi
 
 for bm in $BMs
 do
+    for opt in gc-plain gc-live gc-freq=${freq[$bm]}
+    #for opt in gc-freq=${freq[$bm]}
     #for opt in gc-plain gc-live
-    #for opt in gc-plain gc-live gc-freq=${freq[$bm]}
-    for opt in gc-freq=${freq[$bm]}
     do 
         echo "Processing $bm [$opt]"
         $DIR/gen_gc_stats.sh $OPTARG \
