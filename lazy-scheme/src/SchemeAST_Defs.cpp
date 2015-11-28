@@ -807,7 +807,8 @@ cons* LetExprNode::evaluate()
 	if (gc_status != gc_disable && (gc_status == gc_plain || gc_status == gc_freq))
     {
 
-		if (gc_status == gc_freq && (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD())) {
+		if (gc_status == gc_freq && (GC_STAT_GET_CLOCK() - last_gc_clock > GC_FREQ_THRESHOLD()))
+		{
 			reachability_gc();
 			//return_stack().return_point = curr_let_pgmpt;
 			GC_STAT_DUMP_GARBAGE_STATS();

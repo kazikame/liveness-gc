@@ -192,7 +192,7 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 
 		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
 		Scheme::Demands::printNFAToFile(nfa, outdir + pgmname + "/program-nfa.txt");
-
+//		exit(1);
 		std::unordered_set<std::string> start_states;
 		for (auto nt:gLivenessData)
 			start_states.insert(nt.first);
