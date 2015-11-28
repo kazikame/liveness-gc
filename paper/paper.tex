@@ -497,26 +497,24 @@ from the set  of variables of the program  $\mathit{Var}$ to locations
 in the  heap.  
 
 
-\warning{The  semantics  of   expressions  (and  applications)
-%% \footnote{In  most
-%%   contexts, we  shall use the  term 'expression' and the  notation $e$
-%%   for both expressions and applications.} 
-are given by transitions of the form $\rho, \stk, \heap, e \rightarrow
+The  semantics  of   expressions  (and  applications\footnote{In  most
+ contexts, we  shall use the  term 'expression' and the  notation $e$
+  for both expressions and applications.}) 
+are given by transitions of the form $\rho, \stk, \heap, e \rightsquigarrow
 \rho',  \stk', \heap',  e'$.  Here  \stk\ is  a stack  of continuation
 frames.  Each  continuation frame  is of the  form $(\rho,  \ell, e)$,
 signifying that the  location $\ell$ has to be updated  with the value
 of the  currently evaluating  expression, and $e$  is to  be evaluated
-next  in the  environment $\rho$.   We shall call the $\rho$ and
-the $e$ on the LHS of a $ \stk,
-\heap,  e$ is the state of  the  transition system, then we shall there is a   \emph{current
-  evaluation  context}, given  by  $\rho$, $\heap$  and  $e$, and  
-\emph{suspended  evaluation  contexts}  (represented  by the
-environment, heap and expression in each   continuation
-frame) in the stack $S$.}
-%% \warning{The
+next  in the  environment $\rho$.  
+%% Given a state $\rho, \stk, \heap,
+%% e$  of  the  transition system, we shall call the pair $(\rho, e)$ as
+%% the    \emph{current
+%%   evaluation  context}, and for a continuation frame $(\rho',  \ell, e')$ in
+%% \stk, we shall call the pair $(\rho', e')$ as a   
+%% \emph{suspended  evaluation  context}.}
+%% %% \warning{The
 %% 3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
 %% system will be denoted $\mathcal{S}$.}
-
 The  initial  state  of  the  transition  system  described  above  is
 $([\;]_\rho,\,   (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
 (\print~\ans)):[\;]_{S}, 
@@ -600,7 +598,7 @@ with regions of programs instead of program points.
 
 A notion  that generalizes liveness  is {\em demand}.   While liveness
 gives the patterns of future uses of a variable, demand represents the
-future use of the value of an expression.  The demand on an expression
+future uses of the value of an expression.  The demand on an expression
 $e$   is   again   a   set    of   access   paths---that   subset   of
 $\{\acar,\acdr\}^\ast$ which the  context of $e$ may  explore of $e$'s
 result.   To see  the need  for demands,  consider the  let expression
@@ -1591,10 +1589,11 @@ any non-terminals.
 It is clear that if the TM given as an instance of the halting problem
 accepts the input string, then the earlier derivation can be replayed,
 replacing   $\nont{\mathit{all}}{}$   in   the  sentential   form   by
-$\epsilon$. However, if the TM does  not accept the input string, then
-any  sentential  form derived  from  the  start  symbol would  have  a
-non-terminal different from $\nont{\mathit{final}}{c}$. Thus the empty
-string would not be derivable from the grammar.
+$\epsilon$. Conversely,  if the TM  does not accept the  input string,
+then  any sentential  form derived  from the  start symbol  would have
+exactly one non-terminal, and this non-terminal will be different from
+$\nont{\mathit{final}}{c}$.  Thus  the  empty   string  would  not  be
+derivable from the grammar.
 \end{proof}
 
 
