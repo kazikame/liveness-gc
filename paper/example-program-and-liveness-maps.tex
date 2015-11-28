@@ -1,196 +1,64 @@
-%% \begin{figure*}[t!]
-%% \renewcommand{\arraystretch}{1}
-%%   \begin{tabular}{cc}
-%%     \begin{minipage}{.40\textwidth}
-%%         \small
-%%         \renewcommand{\arraystretch}{1}{
-%%           \begin{uprogram}
-%%             \UNL{1} (\DEFINE\ (\length~\xl)
-%%             \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
-%% (\NULLQ~\xl) \IN
-%%             \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
-%% $\psi_1\!\!:\,$ \px
-%%             \UNL{4} \hspace*{.27cm} $\pi_3\!\!:\,
-%%             $(\LET\ \pv\ $\leftarrow 0$ \IN
-%%             \UNL{5} \hspace*{.32cm} $\pi_4\!\!:\,
-%% (\SRETURN~\psi_2:\pv)$
-%%             \UNL{4} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\
-%% $\leftarrow$  (\CDR~\xl)  \IN
-%%             \UNL{5} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\
-%% $\leftarrow$  (\length~\pu)  \IN
-%%             \UNL{6} \hspace*{.34cm} $\pi_7\!\!:\,
-%%             $(\LET~\pz\ $\leftarrow$ (1~+~\py) \IN
-%%             \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\,
-%% (\SRETURN~\psi_3:\pz)$)))))))
-%%         \end{uprogram}}
-%%         \renewcommand{\arraystretch}{1}{
-%% 	  \begin{uprogram}
-%% 	  \UNL{1} $(\DEFINE\ (\main)$
-%%            \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
-%%            (
-%%            \scalebox{0.8}{\psframebox[framearc=.5,
-%% 	fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
-%%              \begin{tabular}{@{}c@{}}
-%%                {a BIG closure}
-%%              \end{tabular}}}
-%%            ) \IN  
-%%           \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
-%% \IN
-%% 	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
-%% $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
-%%           \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-%%           $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
-%%           \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
-%% (\SRETURN~\psi_4:\pw)))))$
-%% \end{uprogram}}
-%%         %%}
-%%     \end{minipage}
-
-%%     &
-
-%%     \begin{minipage}{.51\textwidth}
-
-%%       \small
-%% \begin{eqnarray*}
-%%         \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
-%%               [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
-%% \xl.\clazy\sigma\rbrace ,~\epath_2 \mapsto \lbrace 
-%% \pv.\sigma  \rbrace,\\
-%%  &&          \;\;  \epath_3 \mapsto \lbrace \pz.\sigma,
-%%                 \py.\clazy\sigma,
-%% \pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
-%% &&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-%% \xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup
-%% %%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
-%% \clazy\Lf{\length}{1}{\clazy\sigma}\}\}
-%%              \rbrack \\
-%%             \cal{P_{\mbox{\tiny \length}}} &=&
-%%                 [\;\pi_1 \mapsto \lbrace \epath_1, \epath_2, \epath_3 \rbrace,  \
-%%                  \pi_2 \mapsto \lbrace \epath_1, \epath_2, \epath_3
-%%                   \rbrace, \\
-%% &&\;\;  \pi_3 \mapsto \lbrace \epath_2
-%%                   \rbrace ,  \pi_4 \mapsto \lbrace \epath_2
-%%                   \rbrace, \pi_5 \mapsto \lbrace  \epath_3 \rbrace, \\
-%%  &&  \;\;                        \pi_6 \mapsto \lbrace \epath_3 \rbrace,
-%% \pi_7 \mapsto
-%%                    \lbrace \epath_3\rbrace, \pi_8 \mapsto \lbrace \epath_3
-%% \rbrace~\rbrack\\
-%%               \mathcal{L}(e_{\main},\sigma,\Lfonly) &=&
-%%                 [\;
-%%                   \epath_4 \mapsto \lbrace \pw.\sigma,
-%%                                        \pc.\Lf{\length}{\mbox{1}}{\sigma},\\
-%% && \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-%% \pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},
-%% \pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma} \rbrace
-%%                                ] \\
-%%                \cal{P_{\mbox{\tiny \main}}} &=&
-%%                   \lbrack~ \pi_9 \mapsto \lbrace \epath_4 \rbrace,  \
-%%                     \pi_{10} \mapsto \lbrace \epath_4 \rbrace,  \
-%%                    \pi_{11} \mapsto \lbrace \epath_4 \rbrace, \\
-%%                    && \;\; \pi_{12} \mapsto \lbrace \epath_4 \rbrace,
-%% \pi_{13} \mapsto \lbrace \epath_4 \rbrace~\rbrack
-%% \end{eqnarray*}
-%%     \end{minipage} \\
-%% (a)&
-%% (b)
-%%     %% \end{ tabular}}
-%%   \end{tabular}
-%% %\end{picture}
-%% \kern -3ex
-%% %\vspace{0.5in}
-%% \caption{(a) Example program and (b) its liveness
-%% maps.}\label{fig:mot-example2}
-%% \end{figure*}
-%% %================================================================
-
 \begin{figure*}[t!]
 \renewcommand{\arraystretch}{1}
   \begin{tabular}{cc}
-    \begin{minipage}{.50\textwidth}
+    \begin{minipage}{.40\textwidth}
         \small
         \renewcommand{\arraystretch}{1}{
           \begin{uprogram}
-            \UNL{1} (\DEFINE\ (\fun~\px\ \pn)
-            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \py\ $\leftarrow $\
-(\length~\px) \IN
-            \UNL{3} $\pi_2\!\!:\, $(\LET\ \pl\ $\leftarrow $\
-(\makelist~\pn) \IN
-            \UNL{4} \hspace*{.05cm} $\pi_3\!\!:\,$(\SIF\
-$\psi_1\!\!:\,$ \py
-            \UNL{5} \hspace*{.27cm} $\pi_4\!\!:\, $(\LET\ \xhd\ $\leftarrow$\ (\CAR\ \pl) \IN
-            \UNL{6} \hspace*{.27cm} $\pi_5\!\!:\, $(\LET\ \xtl\ $\leftarrow$\ (\CDR\ \px) \IN
-            \UNL{7} \hspace*{.27cm} $\pi_6\!\!:\, $(\LET\ \rest\ $\leftarrow$\ (\fun~ \xtl\ \xhd) \IN
-            \UNL{8} \hspace*{.27cm} $\pi_7\!\!:\, $(\LET\ \ret\ $\leftarrow$\ (\CONS\ \py\ \rest) \IN
-            \UNL{9} \hspace*{.32cm} $\pi_8\!\!:\,
-(\SRETURN~\psi_2:\ret)))))$
-            \UNL{5} \hspace*{.29cm}    $\pi_9\!\!:\, $(\LET~\ps\
-$\leftarrow$  (\Sum~\pl)  \IN
-            \UNL{6} \hspace*{.34cm}   $\pi_{10}\!\!:\, $(\LET~\pu\
-$\leftarrow$  (+~1~\py)  \IN
-            \UNL{7} \hspace*{.34cm} $\pi_{11}\!\!:\,
-            $(\LET~\pr\ $\leftarrow$ ($/$~\ps~\pu) \IN
-            \UNL{8} \hspace*{.27cm} $\pi_{12}\!\!:\, $(\LET\ \res\ $\leftarrow$\ (\CONS\ \pr\ \NIL) \IN
-            \UNL{9} \hspace*{.34cm} $\pi_{13}\!\!:\,
-(\SRETURN~\psi_3:\res)$)))))))))
+            \UNL{1} (\DEFINE\ (\length~\xl)
+            \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
+(\NULLQ~\xl) \IN
+            \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
+$\psi_1\!\!:\,$ \px
+            \UNL{4} \hspace*{.27cm} $\pi_3\!\!:\,
+            $(\LET\ \pv\ $\leftarrow 0$ \IN
+            \UNL{5} \hspace*{.32cm} $\pi_4\!\!:\,
+(\SRETURN~\psi_2:\pv)$
+            \UNL{4} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\
+$\leftarrow$  (\CDR~\xl)  \IN
+            \UNL{5} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\
+$\leftarrow$  (\length~\pu)  \IN
+            \UNL{6} \hspace*{.34cm} $\pi_7\!\!:\,
+            $(\LET~\pz\ $\leftarrow$ (+~1~\py) \IN
+            \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\,
+(\SRETURN~\psi_3:\pz)$)))))))
         \end{uprogram}}
         \renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
 	  \UNL{1} $(\DEFINE\ (\main)$
-           \UNL{2} \!\!$\pi_{14}\!\!:\, (\LET\  \pa\  \leftarrow$
-           (\CONS\ $1$\ (\CONS\ $2$\ \NIL) \IN  
-          \UNL{3} \!\!$\pi_{15}\!\!:\, (\LET\  \pb\  \leftarrow $5$)$
+           \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
+           (
+           \scalebox{0.8}{\psframebox[framearc=.5,
+	fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
+             \begin{tabular}{@{}c@{}}
+               {a BIG closure}
+             \end{tabular}}}
+           ) \IN  
+          \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
 \IN
-	  \UNL{4}   \hspace*{.05cm}$\pi_{16}\!\!:\,      $ (\LET\ \pc\
-$\leftarrow  (\fun\ \pa\ \pb)$ \IN
-          \UNL{5}   \hspace*{.15cm}    $\pi_{17}\!\!:\,
-          (\SRETURN~\psi_4:\pc)))))$
+	  \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
+$\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
+          \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
+          $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
+          \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
+(\SRETURN~\psi_4:\pw)))))$
 \end{uprogram}}
         %%}
     \end{minipage}
 
     &
 
-    \begin{minipage}{.48\textwidth}
+    \begin{minipage}{.51\textwidth}
 
       \small
 \begin{eqnarray*}
-        \mathcal{L}(e_{\length},\sigma,\Lfonly) &=&
-              [\;\epath_1 \mapsto \lbrace \px.\clazy \sigma,
-\xl.\clazy\sigma\rbrace ,~\epath_2 \mapsto \lbrace 
-\pv.\sigma  \rbrace,\\
- &&          \;\;  \epath_3 \mapsto \lbrace \pz.\sigma,
-                \py.\clazy\sigma,
-\pu.\Lf{\length}{\mbox{1}}{\clazy\sigma},\\
-&&            \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\xl.\{ \acdr\Lf{\length}{\mbox{1}}{\clazy\sigma} \cup
-%%\;\;\;\;\;\;\; \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\\
-\clazy\Lf{\length}{1}{\clazy\sigma}\}\}
-             \rbrack \\
-            \cal{P_{\mbox{\tiny \length}}} &=&
-                [\;\pi_1 \mapsto \lbrace \epath_1, \epath_2, \epath_3 \rbrace,  \
-                 \pi_2 \mapsto \lbrace \epath_1, \epath_2, \epath_3
-                  \rbrace, \\
-&&\;\;  \pi_3 \mapsto \lbrace \epath_2
-                  \rbrace ,  \pi_4 \mapsto \lbrace \epath_2
-                  \rbrace, \pi_5 \mapsto \lbrace  \epath_3 \rbrace, \\
- &&  \;\;                        \pi_6 \mapsto \lbrace \epath_3 \rbrace,
-\pi_7 \mapsto
-                   \lbrace \epath_3\rbrace, \pi_8 \mapsto \lbrace \epath_3
-\rbrace~\rbrack\\
-              \mathcal{L}(e_{\main},\sigma,\Lfonly) &=&
-                [\;
-                  \epath_4 \mapsto \lbrace \pw.\sigma,
-                                       \pc.\Lf{\length}{\mbox{1}}{\sigma},\\
-&& \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;
-\pb.\bcar\Lf{\length}{\mbox{1}}{\sigma},
-\pa.\clazy\bcar\Lf{\length}{\mbox{1}}{\sigma} \rbrace
-                               ] \\
-               \cal{P_{\mbox{\tiny \main}}} &=&
-                  \lbrack~ \pi_9 \mapsto \lbrace \epath_4 \rbrace,  \
-                    \pi_{10} \mapsto \lbrace \epath_4 \rbrace,  \
-                   \pi_{11} \mapsto \lbrace \epath_4 \rbrace, \\
-                   && \;\; \pi_{12} \mapsto \lbrace \epath_4 \rbrace,
-\pi_{13} \mapsto \lbrace \epath_4 \rbrace~\rbrack
+ \Lv_{\xl} &=& \{\clazy\sigma\} \cup \{\acdr\Lf{\length}{\acdr}{\clazy\sigma}\} \cup \{\clazy\Lf{\length}{\acdr}{\clazy\sigma}\}\\
+ \Lv_{\xl_{\pi_1}} &=& \{\clazy\sigma\} \\
+ \Lv_{\xl_{\pi_5}} &=&  \{\acdr\Lf{\length}{\acdr}{\clazy\sigma}\} \cup \{\clazy\Lf{\length}{\acdr}{\clazy\sigma}\} \\
+  &&     \mbox{where } \Lv = \mathcal{L}(e_{\length},\sigma,\Lfonly) \\
+ \Lv_a &=& \{\clazy\bcar\Lf{\length}{\acdr}{\sigma}\}\\
+\Lv_{a_{\pi_{10}}} &=&  \{\clazy\bcar\Lf{\length}{\acdr}{\sigma}\}\\
+ &&       \mbox{where }  \Lv =  \mathcal{L}(e_{\main},\sigma,\Lfonly) 
 \end{eqnarray*}
     \end{minipage} \\
 (a)&
@@ -204,3 +72,4 @@ $\leftarrow  (\fun\ \pa\ \pb)$ \IN
 maps.}\label{fig:mot-example2}
 \end{figure*}
 %================================================================
+

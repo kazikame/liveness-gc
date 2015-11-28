@@ -16,7 +16,7 @@
 using namespace Scheme::Demands;
 
 
-//#define __DEBUG__GC
+#define __DEBUG__GC
 #undef __DEBUG__GC
 #ifdef __DEBUG__GC
 #define DBG(stmt) stmt
@@ -370,11 +370,14 @@ void simplifyWithoutEpsilonEdges(const std::string & start, automaton * nfa) {
 void removeXbEdgesFrom(automaton * nfa)
 {
 
+	DBG(std::cerr << "Removing Xb edges"<<std::endl);
 	//This is not correct. Need to re-write.
+
 	std::string prev_nt = E;
 	for(auto & non_terminal : nfa->second)
     {
 		auto Xb_transition = non_terminal.second.find(TXb);
+		DBG(std::cerr << "Processing " << non_terminal.first << std::endl);
 //
 //        if(Xb_transition != non_terminal.second.end())
 //        {
@@ -404,8 +407,10 @@ void removeXbEdgesFrom(automaton * nfa)
 			  (non_terminal.second[E]).insert(dest_states.begin(), dest_states.end());
 			  non_terminal.second.erase(TXb);
 			  nfa->first.insert(non_terminal.first);
+
 		  }
     }
+
 
 }
 
@@ -479,6 +484,7 @@ automaton* Scheme::Demands::getNFAsFromRegularGrammar(const demand_grammar* gram
 
     DBG(std::cout << "Completed creating NFAs"<<std::endl);
     removeXbEdgesFrom(nfa);
+
 
 	return nfa;
 }

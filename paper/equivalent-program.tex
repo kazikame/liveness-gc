@@ -1,0 +1,18 @@
+\newcommand{\makeNT}[2]{\mbox{$\mathbf{S_{#2}^{#1}}$}}
+%\begin{figure*}[h!]
+    \begin{minipage}{.50\textwidth}
+        \small
+        \renewcommand{\arraystretch}{1}{
+          \begin{uprogram}
+            \UNL{1} (\DEFINE\ (\makeNT{0}{i}~\pa)
+            \UNL{2} (\LET\ \pb\ $\leftarrow $\
+(\CAR~\pa) \IN
+            \UNL{3} (\LET\ \pc\ $\leftarrow $\
+(\makeNT{0}{j}~\pb) \IN
+            
+            \UNL{4} (\LET\ \pd\ $\leftarrow$\ $5$) \IN
+            \UNL{5} (\LET\ \pe\ $\leftarrow$\ (\CONS\ \pc\ \pd)) \IN
+            \UNL{6} (\SRETURN~\ret))))))
+        \end{uprogram}}
+\end{minipage}
+%\end{figure*}

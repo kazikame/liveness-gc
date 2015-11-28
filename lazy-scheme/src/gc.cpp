@@ -1984,6 +1984,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  DBG(out << "Copied cdr part from " << getCdr(loc, 1) << " to " << addr << endl);
 		  set_cdr(loccopy, addr);
 	  }
+	  DBG(out << "Completed processing cons cell " << loc << endl);
   }
 
   break;
@@ -1994,7 +1995,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 	  	  	  	  	  	  	  	  if (index > 0)
 	  	  	  	  	  	  	  	  {
 	  	  	  	  	  	  	  		  loccopy = copy(loc, out);
-//	  	  	  	  	  	  	  		  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
+	  	  	  	  	  	  	  		  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
 	  	  	  	  	  	  	  	  }
 	  	  	  	  	  	  	  	  break;
   	  	  	  	  	  	  	  	 }
@@ -2059,9 +2060,12 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   case funcApplicationExprClosure:
   case funcArgClosure:
   {
-	  DBG(out << "Processing FuncApp/FuncArg " << endl);
+	  DBG(out << "Processing FuncApp/FuncArg " << loc << endl);
 	  if (loc->forward != NULL)
+	  {
+		  DBG(out << "Already Copied location " << loc->forward << endl);
 		  return static_cast<cons*>(loc->forward);
+	  }
 
 	  loccopy = copy(loc, out);
 
@@ -2094,6 +2098,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 		  loccopy->val.closure.arg1 = new_arg1;
 
 	  }
+	  DBG(out << "Completed processing func app cell " << loc << endl);
   }
   break;
   default : cerr << "Should have never come here " << loc << endl;
