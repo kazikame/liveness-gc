@@ -1540,7 +1540,7 @@ reduction.
 We now show that the proof can be replayed for the class of grammars
 generated from liveness analysis of programs. 
 
-\begin{lemma}\ref{lemma:grammar-from-analysis-undecidable}
+\begin{lemma}\label{lemma:grammar-from-analysis-undecidable}
 Consider    a    grammar    $G$    of   the    kind    described    in
 Definition~\ref{def:specialgrammar}  that  is  generated  by  liveness
 analysis  of a  program,  and  a forward  access  path $\alpha$.   The
@@ -1557,15 +1557,23 @@ Lemma~\ref{lemma:grammar-undecidable}.
 For instance, corresponding to the production $\nont{i}{c} \rightarrow
 c \nont{j}{\acar}\bcar$, with $c$ as \acar\ for concreteness, consider
 the program:
-
+ 
+\input{equivalent-program}
 
 If there more than one productions with the same LHS, then the
 corresponding function creates joins them with a $\SIF$.   If there
 are $n$ such functions,  then \mainpgm\  creates  a $n$-way
 branch  and inserts  a  single call  to a  distinct  function in  each
-branch. It can  be verified that the relevant part  of the grammar for
-the production $\nont{i}{c} \rightarrow
-c \nont{j}{\acar}\bcar$ shown earlier is:
+branch. It can  be verified that the grammar for the function shown
+above, includes the productions:
+\begin{align*}
+\nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{all}{} \\
+\nont{i}{\acar} &\rightarrow \clazy\nont{i}{\acar}\bcar\nont{all}{} \\
+\nont{all}{} &\rightarrow \epsilon \mid \acar\nont{all}{} \mid
+\acdr\nont{all}{}
+\end{align*}
+
+
 
 Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
 had a single non-terminal on the RHS. There are two characteristics of
