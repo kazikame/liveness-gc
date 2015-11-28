@@ -1,1 +1,1 @@
-gcbench.gnu
+gc_bench.gnu

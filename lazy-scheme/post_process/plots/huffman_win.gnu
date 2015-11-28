@@ -8,12 +8,13 @@ set terminal postscript dashed color portrait "Helvetica" 16
 
 set size ratio 0 1, .33
 
-set xlabel "knightstour"
-set xtics nomirror ("300" 300e5, "320" 320e5, "340" 340e5, "360" 360e5,"380" 380e5,  "400" 400e5)
-set ytics nomirror ("400" 400e3, "500" 500e3, "600" 600e3, "7000" 700e3)
+set xlabel "huffman"
 set border 3 lw 0
 
-set output "knightstour_win.eps"
+set output "huffman_win.eps"
+set xtics nomirror ("0" 0, "7" 7e5, "14" 14e5, "21" 21e5, "28" 28e5, "35" 35e5, "39" 39e5)
+set ytics nomirror ("0" 0, "85" 85e3, "170" 170e3, "255" 255e3, "340" 340e3, "425" 425e3)
+
 set autoscale
 set grid noxtics
 
@@ -29,6 +30,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [300e5:400e5] [400e3:] "output/knightstour_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/knightstour_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/knightstour_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/knightstour_gc-live_output/use.sort"  w l ls 5 notitle
+plot [:] [:] "output/huffman_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/huffman_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/huffman_gc-freq_output/rch.sort"  w l ls 3 notitle,      "output/huffman_gc-live_output/rgc.sort"  w l ls 5 notitle,      "output/huffman_gc-live_output/use.sort"  w l ls 4 notitle
 
 #    EOF
