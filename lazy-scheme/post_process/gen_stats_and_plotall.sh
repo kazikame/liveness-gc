@@ -53,7 +53,7 @@ limit["lambda"]=20466
 limit["knightstour"]=677800
 limit["fft"]=172762
 limit["huffman"]=100070
-limit["paraffins"]=425476
+limit["paraffins"]=5185
 limit["deriv"]=11124
 ## UNUSED BMs
 limit["small"]=17
@@ -77,7 +77,7 @@ freq["nqueens"]=3000;
 freq["lambda"]=100;
 freq["huffman"]=100;
 freq["deriv"]=20;
-freq["paraffins"]=100;
+freq["paraffins"]=2;
 
 declare -A xtics
 declare -A ytics
@@ -96,7 +96,7 @@ xtics["nqueens"]=3.5e5          ; ytics["nqueens"]=4.6e3
 xtics["lambda"]=19e5            ; ytics["lambda"]=3e3
 xtics["huffman"]=19e5           ; ytics["huffman"]=3e3
 xtics["deriv"]=100             ; ytics["deriv"]=100
-xtics["paraffins"]=19e5         ; ytics["paraffins"]=3e3
+xtics["paraffins"]=100         ; ytics["paraffins"]=100
 
 declare -A xlimit
 declare -A ylimit
