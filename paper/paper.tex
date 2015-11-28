@@ -497,20 +497,22 @@ from the set  of variables of the program  $\mathit{Var}$ to locations
 in the  heap.  
 
 
-The  semantics  of   expressions  (and  applications)
+\warning{The  semantics  of   expressions  (and  applications)
 %% \footnote{In  most
 %%   contexts, we  shall use the  term 'expression' and the  notation $e$
 %%   for both expressions and applications.} 
-are given by transitions of
-the form $\rho, \stk, \heap,  e \rightarrow \rho', \stk', \heap', e'$.
-Here \stk\ is a stack of continuation frames.  Each continuation frame
-is of the form $(\rho, \ell,  e)$, signifying that the location $\ell$
-has  to  be  updated  with  the  value  of  the  currently  evaluating
-expression, and $e$ is to be evaluated next in the environment $\rho$.
-Note  that  the  state  of  the  transition  system  consists  of  the
-\emph{current evaluation  context}, given by  $\rho$ and $e$,  and the
-\emph{suspended  evaluation  contexts}  (represented  as  continuation
-frames) in the stack $S$.   
+are given by transitions of the form $\rho, \stk, \heap, e \rightarrow
+\rho',  \stk', \heap',  e'$.  Here  \stk\ is  a stack  of continuation
+frames.  Each  continuation frame  is of the  form $(\rho,  \ell, e)$,
+signifying that the  location $\ell$ has to be updated  with the value
+of the  currently evaluating  expression, and $e$  is to  be evaluated
+next  in the  environment $\rho$.   We shall call the $\rho$ and
+the $e$ on the LHS of a $ \stk,
+\heap,  e$ is the state of  the  transition system, then we shall there is a   \emph{current
+  evaluation  context}, given  by  $\rho$, $\heap$  and  $e$, and  
+\emph{suspended  evaluation  contexts}  (represented  by the
+environment, heap and expression in each   continuation
+frame) in the stack $S$.}
 %% \warning{The
 %% 3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
 %% system will be denoted $\mathcal{S}$.}
@@ -632,8 +634,8 @@ paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 
 \subsection{Liveness Analysis for lazy languages}
 \label{sec:liveness-analysis}
- 
-%\comment{ 
+  
+%\comment{  
 Consider  the program in  Figure~\ref{fig:mot-example2}.  As
   mentioned earlier,  a lazy  evaluation of  the $\LET$  expression at
   $\pi_1$ creates a closure for $(length~x)$ instead of evaluating it.
@@ -1246,9 +1248,8 @@ modified  \CONS\ rule  is  given in  \cite{asati14lgc}.
 The proposition also holds for other modified rules for
 similar reasons.
 
-\newcommand{\emm}[2]{\ensuremath{\mathcal{#1}_{#2}}}
 
-\subsection{Generating Equations for \Lfonly$_\mathit{f}$}
+\subsection{Generating Equations for $\Lfonly_{\mathit f}$}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
 \Lfonly$_\mathit{f}$.        The       program       in
@@ -1261,24 +1262,16 @@ the program point at  the beginning of $e_{\mathit{f}}$
 (assumed   to   be   $\pi_1$).   By   the   rule   {\sc
   live-define},   this   should    be   the   same   as
 $\Lf{f}{i}{\sigma}$. Applying this to \length, we have:
-
-\begin{eqnarray*}
-&& \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
+$$
+ \Lf{\length}{1}{\sigma} = \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
   \cup \clazy\Lf{\length}{1}{\clazy\sigma}
-\end{eqnarray*}
-
+$$
 %% and  the only equation defining \Lfone{\length} is:
 %%   \begin{eqnarray*}
 %%    && \Lf{\length}{1}{\sigma}
 %%     =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup
 %% \clazy\Lf{\length}{1}{\clazy\sigma}
 %% \end{eqnarray*}
-and  the equation defining \Lfone{\fun} is:
-\begin{eqnarray*}
-  && \Lf{\fun}{1}{\sigma}
-  =  \clazy\sigma \cup \Lf{\length}{1}{\bcar\sigma_{\mathit{\length}}} \cup  \Lf{\length}{1}{\clazy\sigma} 
-  \cup  \acdr\Lf{\fun}{1}{\bcdr\sigma_{\mathit{\fun}}}
-\end{eqnarray*}
 
 In general, the equations for \Lfonly\ are recursive as
 in the  case of  \Lfonly$_\mathit{f}$. As  mentioned in
@@ -1293,7 +1286,6 @@ form:
 \label{eq:LF:DI}
   \Lf{f}{i}{\sigma} = \Df{f}{i}\sigma
 \end{eqnarray}
-
 where \Df{f}{i}  are sets of strings  over the alphabet
 mentioned above.  Substituting the  guessed form in the
 equation   describing    \Lfonly$_{\mathit   f}$,   and
@@ -1303,18 +1295,17 @@ solution   for   \Df{f}{i}   yields  a   solution   for
 \Lfonly$_{\mathit  f}$.   Applied to  \Lfonly$_{\mathit
   \length}$, we get:
   \begin{eqnarray*}
-&&  \Lf{\fun }{1}{\sigma} = \Df{\fun}{1}\sigma,~\mbox{and}\\
-&&   \Df{\fun}{1} =  \clazy \cup \Df{\length}{1}\bcar \cup  \Df{\length}{1}\clazy 
-       \cup  \acdr\Df{\fun}{1}\bcdr
+&&  \Lf{\length }{1}{\sigma} = \Df{\length}{1}\sigma,~\mbox{and}\\
+&&   \Df{\length}{1} = \clazy \cup \acdr\Df{\length}{1}\clazy
+       \cup \clazy\Df{\length}{1}{\clazy}
   \end{eqnarray*}
 
-Note that this equation can also be viewed as a CFG with \{\acdr, \bcar, \bcdr,
-\clazy\} as terminal symbols and \Df{\length}{1} and \Df{\fun}{1} as the 
-non-terminals.
+Note that this equation can also be viewed as a CFG with \{\acdr,
+\clazy\} as terminal symbols and \Df{\length}{1} as the sole
+non-terminal.
 
 \subsection{Generating liveness equations \Lv\  for function bodies}
 \label{sec:bodylivenessbodies}
-
 
 To  avoid analyzing  the body  of a  function for  each
 call, we calculated the  liveness for the arguments and
@@ -1349,29 +1340,23 @@ call site of a function.
 %% $\epsilon$ if it returns a base value.
 
 
-For  the  running  example,   $\fun$  has  calls  from  $\main$  at
-$\pi_{16}$ and a recursive call at $\pi_6$.
-So $\sigma_{\fun} =
-     \deltacall{\fun}{\pi_{16}}{\main}  \cup
-\deltacall{\fun}{\pi_6}{\fun}$.
-
-%% For  the  running  example,   $\length$  has  calls  from  $\main$  at
-%% $\pi_{12}$ and a recursive call at $\pi_6$.
-%% So $\sigma_{\length} =
-%%      \deltacall{\length}{\pi_{12}}{\main}  \cup
-%% \deltacall{\length}{\pi_6}{\length}$.
-
+For  the  running  example,   $\length$  has  calls  from  $\main$  at
+$\pi_{12}$ and a recursive call at $\pi_6$.
+So $\sigma_{\length} =
+     \deltacall{\length}{\pi_{12}}{\main}  \cup
+\deltacall{\length}{\pi_6}{\length}$.
 Filling in  the values gives:
 \begin{eqnarray*}
-\sigma_{\fun}    &=&
- \{\sigma_{\mathit{all}}\}  ~\cup~{\bcdr\sigma_{\mathit{\fun}}}
+\sigma_{\length}    &=&
+ \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
 \end{eqnarray*}
-As examples, the liveness of \Lanv{2}{\pl} and \Lanv{1}{\py} in terms
-of  $\sigma_{\fun}$ are:
+As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pa} in terms
+of  $\sigma_{\length}$ are:
 \begin{align*}
-\Lanv{2}{\pl} &= \clazy \cup \acar\Lf{\fun}{2}{\bcdr\sigma_{\mathit{\fun}}}
+\Lanv{1}{\pl} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
+  \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
  \\
-\Lanv{1}{\py} &= \clazy \cup \bcar\sigma_{\mathit{\fun}}
+\Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
 \end{align*}
 
 In  summary, the  equations  generated during  liveness
@@ -1399,37 +1384,24 @@ a  start  symbol.   As  an  example,  the  grammar  for
 \var{\Lanv{1}{\xl}}     comprises     the     following
 productions:
 \begin{eqnarray*}
-  \var{\Lanv{3}{\xl}}  &\rightarrow& 
-  \clazy \mid \var{\Df {\Sum}{1}}{\clazy\var{\sigma_{\length}}}  \\
+  \var{\Lanv{1}{\xl}}  &\rightarrow& 
+  \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\
   & & \mid
-  \clazy\var{\Df{\length}{1}}\clazy \mid \acar\var{\Df{\fun}{2}}\bcdr\var{\sigma_{\mathit{\fun}}} \\
+  \clazy\var{\Df{\length}{1}}{\clazy\var{\sigma_{\length}}} \\
   \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
   \acdr\var{\Df{\length}{1}}\clazy
        \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
 \langle {\sigma_{\length}} \rangle
 &\rightarrow&
-\clazy  \mid \bcar\langle{\sigma_{\Sum}}\rangle \\
- \var{\Df{\fun}{2}} &\rightarrow& \var{\Df{\makelist}{1}}\clazy \mid \var{\Df{\makelist}{1}}\var{\Df{\Sum}{1}}\clazy \\ 
-& & \mid \var{\Df{\makelist}{1}}\acar\var{\Df{\fun}{2}}\bcdr\var{\sigma_{\mathit{\fun}}} \\
-\langle\sigma_{\mathit{\fun}} \rangle &\rightarrow& \sigma_{all} \mid \bcdr\var{\sigma_{\mathit{\fun}}} \\
-\var{\Df{\Sum}{1}} &\rightarrow& \clazy \mid \acar\clazy \mid \acdr\var{\Df{\Sum}{1}}\clazy
-%% \var{\Lanv{3}{\py}} &\rightarrow& \clazy \mid \bcar\var{\sigma_{\mathit{\fun}}}
+\epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle \\
+\var{\Lanv{9}{\pa}} &\rightarrow& \clazy \bcar \var{\Df{\length}{1}}
 \end{eqnarray*}
 Other  equations  can   be  converted  similarly.   The
 language   generated   by  \var{\Lanv{i}{x}},   denoted
 $\mathscr{L}(\var{\Lanv{i}{x}})$,   is    the   desired
-solution  of  \Lanv{i}{x}. 
-
-\warning{
-\hrule
-\medskip
-Fixing from here
-\medskip
-\hrule
-}
-
+solution  of  \Lanv{i}{x}.    
 However, recall that the decision problem that we are interested in
-during garbage collection is the following:
+during garbage collection is the following: 
 \begin{quote}
 Let $x.\alpha$ be a forward access path consisting only
 of edges  \acar\ and \acdr\  (but not \bcar,  \bcdr\ or
@@ -1470,7 +1442,7 @@ and $\clazy\$ \rightarrow \epsilon$.
 %% \end{proposition}
 We first show that membership problem of the class of grammars in
 Definition~\ref{def:specialgrammar} is undecidable. However note that
-the grammar may not be necessarily generated from liveness analysis.
+the grammars may not be necessarily generated from liveness analysis.
 \newcommand{\state}{\ensuremath{\mathsf{S}}}
 \newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}  
 \begin{lemma}\label{lemma:grammar-undecidable}
@@ -1549,45 +1521,73 @@ TM.  Notice  carefully that a wrong  choice breaks
 the invariant  and it cannot be  recovered subsequently
 by any choice of productions.
 
-After  the TM  has halted,  there are  further ``cleanup''
-derivations  that derive  $\epsilon$ only  if the  invariant  has been
-maintained  so far.  For every  symbol  $c$, we introduce  a  non-terminal
-$\nont{\mathit{final}}{c}$ where $\nont{\mathit{final}}{}$ is the
-final state of the TM. We add
-productions $\nont{\mathit{final}}{c} \rightarrow \acar
-\nont{\mathit{final}}{c}$ and $\nont{\mathit{final}}{c} \rightarrow \acdr
-\nont{\mathit{final}}{c}$ for cleaning up the \bcar\ and \bcdr\ symbols on
-the left of the head and $\nont{\mathit{final}}{c} \rightarrow 
-\nont{\mathit{final}}{c}\bcar$ and $\nont{\mathit{final}}{c} \rightarrow 
-\nont{\mathit{final}}{c}\bcdr$ for cleaning up \acar\ and \acdr\ on the
-right of the tape head. Finally the production $\clazy\$ \rightarrow
-\epsilon$ is used to derive $\epsilon$.This completes the reduction.
+After the  TM has  halted, there  are further  ``cleanup'' derivations
+that derive  $\epsilon$ only if  the invariant has been  maintained so
+far.    For   every   symbol   $c$,  we   introduce   a   non-terminal
+$\nont{\mathit{final}}{c}$  where   $\nont{\mathit{final}}{}$  is  the
+final state  of the  TM. We add  productions $\nont{\mathit{final}}{c}
+\rightarrow         \acar        \nont{\mathit{final}}{c}$         and
+$\nont{\mathit{final}}{c} \rightarrow  \acdr \nont{\mathit{final}}{c}$
+for cleaning up the \bcar\ and \bcdr\  symbols on the left of the head
+and                $\nont{\mathit{final}}{c}               \rightarrow
+\nont{\mathit{final}}{c}\bcar$      and      $\nont{\mathit{final}}{c}
+\rightarrow \nont{\mathit{final}}{c}\bcdr$ for  cleaning up \acar\ and
+\acdr\ on the right of the tape head. Finally the production $\clazy\$
+\rightarrow \epsilon$ is used  to derive $\epsilon$.This completes the
+reduction.
 \end{proof}
 
 We now show that the proof can be replayed for the class of grammars
 generated from liveness analysis of programs. 
 
-\begin{lemma}
-Consider a grammar    $G$    of   the    kind    described    in
-Definition~\ref{def:specialgrammar} that is generated by liveness analysis
-of a program and a forward access path $\alpha$. The membership problem
-$\alpha\$ \in \mathscr{L}(G)$ is also undecidable.
+\begin{lemma}\ref{lemma:grammar-from-analysis-undecidable}
+Consider    a    grammar    $G$    of   the    kind    described    in
+Definition~\ref{def:specialgrammar}  that  is  generated  by  liveness
+analysis  of a  program,  and  a forward  access  path $\alpha$.   The
+membership problem $\alpha\$ \in \mathscr{L}(G)$ is undecidable.
 \end{lemma} 
 
-Given a Turing machine and an input string, we now give program fragments whose liveness
-analysis generate the same productions as in
-Lemma~\ref{lemma:grammar-undecidable}, but with  extra productions
-that necessarily contain the \clazy\ symbol. For instance,
-corresponding to the production $\nont{i}{c} \rightarrow c
-\nont{j}{\acar}\bcar$, with $c$ as \acar\ for concreteness, we have
-the program (define ($\nont{i}{c}$ a) (let b <- (car a) in (let c <-
-($\nont{j}{\acar}$ b) in (let d <- 5 in (let e <- (cons c d) in (let f
-<- (null? e) in return f)))))). The reader can check that this
-produces the grammar fragment ...
+\begin{proof}
+Given a Turing machine and an input string, we shall define a function
+for   each  of   the  non-terminals   introduced  in   the  proof   of
+Lemma~\ref{lemma:grammar-undecidable}.
+%% Liveness  analysis  of  $f$  will  result in  not  only  contain  a
+%% production  $P$ itself,  but could  also contain  extra productions
+%% that necessarily contain the \clazy\ symbol.
+For instance, corresponding to the production $\nont{i}{c} \rightarrow
+c \nont{j}{\acar}\bcar$, with $c$ as \acar\ for concreteness, consider
+the program:
 
-It is obvious that if the TM halts on the input, then the grammar will
-produce the $\epsilon$ string. However, if the TM does not halt on the
-input, then the productions containg
+
+If there more than one productions with the same LHS, then the
+corresponding function creates joins them with a $\SIF$.   If there
+are $n$ such functions,  then \mainpgm\  creates  a $n$-way
+branch  and inserts  a  single call  to a  distinct  function in  each
+branch. It can  be verified that the relevant part  of the grammar for
+the production $\nont{i}{c} \rightarrow
+c \nont{j}{\acar}\bcar$ shown earlier is:
+
+Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
+had a single non-terminal on the RHS. There are two characteristics of
+the grammar produced from liveness-analysis  that are are relevant for
+replaying the  earlier proof:  (a) If $\mathsf{S}  \rightarrow \beta_1
+\mathsf{S'}  \beta_2$  was a  production  in  the earlier  proof,  the
+grammar  generated from  liveness  analysis of the constructed program
+will  have the  production
+$\mathsf{S}      \rightarrow      \beta_1     \mathsf{S'}      \beta_2
+\nont{\mathit{all}}{}$,  and (b)  other  productions are  of the  form
+$\mathsf{S}       \rightarrow       \beta_1'\mathsf{S'}       \beta_2'
+\nont{\mathit{all}}{}$, where $\beta_1'$ and $\beta_2'$ do not contain
+any non-terminals.
+
+It is clear that if the TM given as an instance of the halting problem
+accepts the input string, then the earlier derivation can be replayed,
+replacing   $\nont{\mathit{all}}{}$   in   the  sentential   form   by
+$\epsilon$. However, if the TM does  not accept the input string, then
+any  sentential  form derived  from  the  start  symbol would  have  a
+non-terminal different from $\nont{\mathit{final}}{c}$. Thus the empty
+string would not be derivable from the grammar.
+\end{proof}
 
 
 We circumvent  the problem  of undecidability  by over-
