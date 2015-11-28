@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import subprocess
 import sys,os
 import os.path
