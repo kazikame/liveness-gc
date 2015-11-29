@@ -22,7 +22,7 @@ do
    cfgrl=`expr $cfgrl + $cfgnt`
    dfast=`wc -l $OUTDIR/$bm/fsmdump-$bm-state-map | cut -d' ' -f1`
    dfatr=`wc -l $OUTDIR/$bm/fsmdump-$bm-state-transition-table | cut -d' ' -f1`
-   gentm=`grep "Program.Exec" ../benchmarks/programs/$bm/results/$bm-gc-live | cut -d'=' -f2 | cut -d' ' -f1`
+   gentm=`grep "DFA.Gen" ../benchmarks/programs/$bm/results/$bm-gc-live | cut -d'=' -f2 | cut -d' ' -f1`
    gentm=`printf "%.2f\n" $gentm`
    bmdata[$bm]="\\rot{\\tt $bmname};$cfgnt;$cfgrl;$dfast;$dfatr;$gentm" 
 done
