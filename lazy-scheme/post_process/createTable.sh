@@ -12,7 +12,7 @@ cat <<EOF
   &   \multicolumn{2}{c@{}|}{\#Cells touched/GC}
   &   \multicolumn{2}{c@{}|}{\#GCs}
   &   \multicolumn{2}{c@{}|}{Min. Cells Required}
-  &   \multicolumn{2}{c@{}|}{GC time (sec)} &Speedup \\\\
+  &   \multicolumn{2}{c@{}|}{GC time (sec)} & Ratio \\\\
 \cline{2-12}
 {Program}&RGC&LGC&RGC&LGC&RGC&LGC&RGC&LGC&RGC&LGC&\rlratio\\\\
 \hline
