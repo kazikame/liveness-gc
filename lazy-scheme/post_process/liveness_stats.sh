@@ -12,7 +12,7 @@ for bm in $AllBMs
 do 
   echo -n "|c@{\\ }"
 done
-echo "|} \\\\ \hline"
+echo "|} \hline"
 
 for bm in $AllBMs
 do 
