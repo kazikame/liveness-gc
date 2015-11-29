@@ -47,10 +47,10 @@ cons* reduceParamToWHNF(cons* cell)
 {
 	cons* heap_cell = update_heap_refs.top();
 //    DBG(
-//	if (!is_valid_address(heap_cell))
-//		cout << "!!!Address may be invalid for " << heap_cell << endl;
-//	//Removed assertion, to test passing unused parameters. Need to confirm if it works.
-//	//assert(is_valid_address(heap_cell));
+	if (!is_valid_address(heap_cell))
+		cout << "!!!Address may be invalid for " << heap_cell << endl;
+	//Removed assertion, to test passing unused parameters. Need to confirm if it works.
+	assert(is_valid_address(heap_cell));
 //    return heap_cell;
 //	)
 	if (heap_cell->inWHNF)

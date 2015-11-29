@@ -50,6 +50,7 @@ actRec *stack_start, *stack_top;
 GCStatus gc_status = gc_plain;
 extern int gccount;
 extern unordered_map<string, unsigned int> func_heap_cell_reqd;
+unordered_map<cons* , unordered_set<state_index>> heap_dfa_map;
 
 //ofstream gout("gc_addr.txt", ios::app);
 
@@ -1887,6 +1888,8 @@ void liveness_gc()
 #endif
 	  DBG(pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl);
 	  swap_buffer();
+	  DBG(pre << "Number of unique cons cells " << heap_dfa_map.size()<<endl);
+	  heap_dfa_map.clear();
 
   for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
     {
@@ -1899,6 +1902,7 @@ void liveness_gc()
     	  DBG(pre << "Looking up " << nodeName << endl);
     	  if (got != statemap.end())
     	  {
+
     		  DBG(pre << "Processing var " << vhit->varname << endl);
     		  DBG(pre << "Index is " << ((cons*)vhit->ref - (cons*)buffer_dead) << endl);
     		  cons *addr   = followpaths(static_cast<cons*>(vhit->ref), got->second, pre);
@@ -1962,6 +1966,24 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
   {
 	  DBG(out << "Copying cell from " << loc << " with type " << loc->typecell << endl);
  	  DBG(out << "state index is " << index << endl);
+
+ 	  if (heap_dfa_map.find(loc) != heap_dfa_map.end() &&
+ 			  heap_dfa_map[loc].find(index) != heap_dfa_map[loc].end())
+ 	  {
+ 		  //Already copied using the same liveness state
+ 		  assert(loc->forward);
+ 		  loccopy = (cons*)loc->forward;
+ 		  DBG(out << "REVISITING LOC " << loc << " with index " << index << endl);
+ 		  return loccopy;
+
+ 	  }
+ 	  else
+ 	  {
+ 		  auto &visited_set = heap_dfa_map[loc];
+ 		  visited_set.insert(index);
+ 		  DBG(out << "FIRST visit to cons cell " << loc << " with state " << index << endl);
+ 	  }
+
  	  loccopy = copy(loc, out);
  	  DBG(out << "Copied location from " << loc << " to " << loccopy << endl);
 	  state_index a0 = state_transition_table[index][0]; //get_target_dfastate(index, 0);
