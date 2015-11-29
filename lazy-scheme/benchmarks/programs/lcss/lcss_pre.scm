@@ -1,3 +1,4 @@
+#lang racket
 (define ( or a b)
  (if a a 
  b 
@@ -25,7 +26,7 @@ a
 
 (define (take n lst ) 
 (if (eq? 0 n ) 
-() 
+'() 
 (cons (car lst ) (take (- n 1 ) (cdr lst ) ) ) 
 ) 
 ) 
@@ -38,14 +39,14 @@ lst
 
 (define (reverse lst ) 
 (if (null? lst ) 
-() 
-(append (reverse (cdr lst ) ) (cons (car lst ) () ) ) 
+'() 
+(append (reverse (cdr lst ) ) (cons (car lst ) '() ) ) 
 ) 
 ) 
 
 (define (zip xs ys ) 
 (if (or (null? xs ) (null? ys ) ) 
-() 
+'() 
 (cons (cons (car xs ) (car ys ) ) (zip (cdr xs ) (cdr ys ) ) ) 
 ) 
 ) 
@@ -80,14 +81,14 @@ km
 
 (define (zip0 lst ) 
 (if (null? lst ) 
-() 
+'() 
 (cons (cons (car lst ) 0 ) (zip0 (cdr lst ) ) ) 
 ) 
 ) 
 
 (define (mapsnd pairs ) 
 (if (null? pairs ) 
-() 
+'() 
 (cons (cdr (car pairs ) ) (mapsnd (cdr pairs ) ) ) 
 ) 
 ) 
@@ -100,7 +101,7 @@ b
 
 (define (algb2 k0j1 k1j1 pairs x ) 
 (if (null? pairs ) 
-() 
+'() 
 (let ((k0j (cdr (car pairs ) ) ) ) 
 (let ((y (car (car pairs ) ) ) ) 
 (let ((kjcurr (if (eq? x y ) 
@@ -149,19 +150,24 @@ lst
 ) 
 
 (define (lcss xs ys ) 
-(algc (getLength xs ) (getLength ys ) xs ys () ) 
+(algc (getLength xs ) (getLength ys ) xs ys '() ) 
 ) 
 
 (define (makeList n ) 
 (if (eq? 0 n ) 
-	 () 
+	 '() 
 	 (cons n (makeList (- n 1 ) ) ) 
 ) 
 ) 
 
 
+(define  (run-in-loop a b n)
+  (if (= n 0) '()
+      (cons (lcss a b) (run-in-loop a b (- n 1)))))
+
+
 (let ((a (makeList 1000 ) ) ) 
 	 (let ((b (makeList 50 ) ) ) 
-	 (lcss a b ) 
+	 (run-in-loop a b 100)
 ) 
 ) 
