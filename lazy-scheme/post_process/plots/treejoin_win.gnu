@@ -8,7 +8,7 @@ set terminal postscript dashed color portrait "Helvetica" 16
 
 set size ratio 0 1, .33
 
-set xlabel "treejoin"
+set xlabel "treejoin*"
 set border 3 lw 0
 
 set output "treejoin_win.eps"
@@ -17,7 +17,7 @@ set ytics nomirror ("1430" 1430e3, "1480" 1480e3, "1530" 1530e3, "1580" 1580e3, 
 set autoscale
 set grid noxtics
 
-# clolored ... blue, red, black, gray
+# colored ... blue, red, black, gray
 set style line 1 lt 1 lc  3 lw 1.0 
 set style line 2 lt 1 lc  1 lw 1.0
 set style line 3 lt 1 lc -1 lw .4
@@ -29,6 +29,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [3.9e6:4.5e6] [1430e3:1630e3] "output/treejoin_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/treejoin_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/treejoin_gc-freq_output/rch.sort"  w l ls 3 notitle,           "output/treejoin_gc-live_output/use.sort"  w l ls 5 notitle
+plot [3.9e6:4.5e6] [1430e3:1630e3] "output/treejoin_gc-live_output/rch.sort"  w l ls 1 notitle,     "output/treejoin_gc-plain_output/rch.sort" w l ls 2 notitle,     "output/treejoin_gc-freq_output/rch.sort"  w l ls 3 notitle,           "output/treejoin_gc-live_output/use.sort"  w l ls 5 notitle
 
 #    EOF
