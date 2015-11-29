@@ -4,7 +4,7 @@ SCRIPT1=$DIR/touchedAndCopied.awk
 AllBMs="lambda nperm treejoin lcss sudoku fibheap nqueens gc_bench"
 AllBMs="fibheap sudoku nperm paraffins lcss huffman knightstour nqueens deriv treejoin lambda gc_bench "
 #AllBMs="sudoku"
-echo "\\newcommand{\\rlratio}{$\\frac{RGC}{LGC}$}"
+echo "\\newcommand{\\rlratio}{$\\frac{LGC}{RGC}$}"
 cat <<EOF
 \begin{tabular}{|@{\ }c@{\ }| @{\ }r@{\ }|@{\ }r@{\ }| @{\ }r@{\ }|@{\ }r@{\ }|r@{\ }| r@{\ }|r@{\ }|r@{\ }| r@{\ }|r@{\ }|r@{\ }|}
 \hline
@@ -83,7 +83,7 @@ do
     r2=`grep "GC Time" $FILE | cut -d= -f3`
     ratio=`bc -l << EOF                                                  
 scale=2
-$r1/$r2
+$r2/$r1
 EOF
 `
     if [ "x$ratio" = "x" ]; then
