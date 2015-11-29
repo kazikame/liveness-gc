@@ -195,14 +195,14 @@ expression.   The  analysis  has  two parts.   We  first  calculate  a
 context-sensitive  summary   of  each   function  as  a   {\em  demand
   transformer} that transforms a {\em  symbolic} demand on its body to
 demands  on its  arguments.   This  summary is  used  to step  through
-function  calls  during analysis.   Next,  the  concrete demand  on  a
+function  calls  during analysis.   The  concrete demand  on  a
 function body is obtained through a conservative approximation similar
 to  0-CFA~\cite{Shivers:1988} that  combines  the demands  on all  the
 calls to the function.  The result of the analysis is an annotation of
 certain program points with  deterministic finite-state automata (DFA)
 capturing the liveness of variables at these points.  Depending on the
-program  point where  garbage collection  has been  triggered, the
-garbage collector
+where  garbage collection  has been  triggered, the
+collector
 consults a  set of automata  to restrict reachability  during marking.
 This results in an increase  in the garbage reclaimed and consequently
 in fewer garbage collections.
@@ -245,8 +245,7 @@ node either  represents atomic  values ($\NIL$,  integers etc.),  or a
 \CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
 (represented  by  shaded  clouds).   Edges   in  the  graph  are  {\em
   references} and represent values of  variables  or fields.  The figure shows
-the  lists \px\  and  \pz\ partially  evaluated.   The evaluation  was
-triggered by the test (\NULLQ~(\CAR~\pz)) in the \SIF\ expression.
+the  lists \px\  and  \pz\ partially  evaluated due to  the test (\NULLQ~(\CAR~\pz)) in the \SIF\ expression.
 
 
 The edges  shown by thick  arrows are those  which are live  at $\pi$.
@@ -264,28 +263,25 @@ In  this work  we show  that  static analysis  of heap  data can  help
 garbage collectors in reclaiming more garbage.  The specific
 contributions of this paper are
 \begin{itemize}
-\item  We  formulate  a  liveness  analysis for  a  lazy  first  order
-  functional language and  prove its correctness. The correctness
-  proof involves setting up a non-standard semantics as a
-  specification of liveness and then proving that the analysis is
+\item  We  formulate  a  liveness  analysis for  a  lazy  first-order
+  functional language and  prove its correctness. The 
+  proof involves specifying liveness through a non-standard semantics  and then proving the analysis 
   correct with respect to the specification.   
-\item Our  analysis results  in a set  of context-free  grammars along
+\item The analysis results  in a set  of context-free  grammars along
   with  a fixed  set  of non-context-free  productions.  The  decision
-  regarding  whether   to  copy  a  cell   during  garbage  collection
-  translates  to the  membership problem  of such  grammars.  In  this
-  paper, we  have shown the  undecidability of the  membership problem
-  for  the  class  of  grammars  that result  from  our  analysis.  To
-  circumvent the  problem, we  over-approximate the  grammars generated
-  by the analysis with DFAs.
+  whether   to  copy  a  cell   during  garbage  collection
+  translates  to a  membership problem  for such  grammars.  In  this
+  paper, we  have shown the  undecidability of this problem and 
+  circumvent the  problem by over-approximating the  grammars
+  with DFAs.
 \item We  have implemented a garbage  collector that uses the  DFAs to
   retain live  cells.  Our  experiments reveal  interesting space-time
   trade-offs  in  the  engineering  of  the  collector---for  example,
   updating liveness  information carried in closures  during execution
   results  in   more  garbage  being  collected.    Empirical  results
-  demonstrate the effectiveness of liveness-based garbage collection.
+  show the effectiveness of liveness-based garbage collection.
 \end{itemize}
-To the  best of our
-  knowledge, this is the first work on liveness-based garbage
+As far as we know,  this is the first work on liveness-based garbage
   collection      for      lazy     languages.       All      previous
   attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
     asati14lgc, karkare06effectiveness} have involved either
@@ -325,12 +321,12 @@ each variable in a program to  be distinct, so that no scope shadowing
 occurs---this  simplifies  reasoning.  
 
 
-The body  of a function ${\mathit  f}$ is denoted  as $e_{\mathit f}$.
+We denote the body of a function ${\mathit  f}$   as $e_{\mathit f}$.
  We assume that each program has a distinguished function
-\mainpgm\      with      the      definition     $(\DEFINE\      ({\tt
-  \mainpgm})\  e_\mainpgm)$ and  the execution  of the  program starts
+\mainpgm,    defined as    $(\DEFINE\      ({\tt
+  \mainpgm})\  e_\mainpgm)$,  and  the program begins execution
 with the call to \mainpgm.  We write $\pi\!:\!e$ to associate the label
-$\pi$ (not  part of the language  syntax) with the  program point just
+$\pi$ (not  part of the syntax) with the  program point just
 before expression $e$.
 
 \begin{figure}[t]\footnotesize
@@ -527,7 +523,7 @@ pushes elements on top of the stack.
 
 The   notation  $[\myvec{x}   \mapsto  \myvec{\ell}]$   represents  an
 environment  that  maps  variables  $x_i$ to  locations  $\ell_i$  and
-$\heap[\ell := d]$  indicates the updating of a heap  \heap\ at $\ell$
+$\heap[\ell := d]$  indicates updation of  \heap\ at $\ell$
 with  $d$.   $\rho \oplus  \rho'$  represents  the environment  $\rho$
 shadowed  by  $\rho'$  and  $\lfloor \rho  \rfloor_X$  represents  the
 environment  restricted  to  the  variables in  $X$.  Finally  $FV(s)$
@@ -570,18 +566,19 @@ model  which  talks  about  liveness of  references.   Using  $\acar$,
 $\acdr$  to  represent access  using  $\CAR$  and $\CDR$  fields,  the
 liveness of the structure reachable from a variable can be represented
 by a set of {\em access paths} i.e.  prefix-closed set of strings from
-$\{\acar,\acdr\}^\ast$.  Given an initial location $\ell$ (typically a
-variable  reference) and  a heap  \heap, semantically  an access  path
-$\alpha$ represents  a reference, denoted $\heap\oxlb\ell,  \alpha\oxrb$, in
+$\{\acar,\acdr\}^\ast$.  Given an initial location $\ell$ (usually a 
+reference corresponding to a variable) and  a heap  \heap, semantically  an access  path
+$\alpha$ represents  a reference, denoted $\heap\llbracket\ell,  \alpha\rrbracket$, in
 the heap  that is  obtained by  starting with  $\ell$ and  chasing the
-\CAR\ or  \CDR\ fields  as specified  by the  access path.  
-$\heap\oxlb\ell, \alpha\oxrb$  is defined only  if the path followed  in the
+\CAR\ or  \CDR\ fields in the heap as specified  by the  access path.  
+$\heap\llbracket\ell, \alpha\rrbracket$  is defined only  if the path followed  in the
 heap  is \emph{closure-free}  (does not  cross closures),  else it  is
 undefined.
 
-Access paths can be used to  represent liveness. As an example, if $x$
-is  a  list  with  liveness  $\{\epsilon,  \acar,  \acdr,  \acdr\acar,
-\acdr\acdr,  \acdr\acdr\acar\}$,  then  future computations  can  only
+Access paths are used to  represent liveness. As an example, a list
+$x$ with 
+liveness  $\{\epsilon,  \acar,  \acdr,  \acdr\acar,
+\acdr\acdr,  \acdr\acdr\acar\}$ means that future computations    only
 refer up  to the  second and  third members of  $x$.  A  {\em liveness
   environment} is a mapping from  variables to access paths, but often
 expressed as  a set,  for example  by writing  $\{x.\epsilon, x.\acdr,
@@ -597,7 +594,7 @@ gives the patterns of future uses of a variable, demand represents the
 future uses of the value of an expression.  The demand on an expression
 $e$   is   again   a   set    of   access   paths---that   subset   of
 $\{\acar,\acdr\}^\ast$ which the  context of $e$ may  explore of $e$'s
-result.   To see  the need  for demands,  consider the  let expression
+result.   To see  the need  for demands,  consider the expression
 $(\LET~x\leftarrow  (\CDR~y)~\IN~   \SRETURN~x)$.   Assume   that  the
 context of this expression places  the demand $\lbrace \epsilon, \acar
 \rbrace$. Since the  value of the expression is the  value of $x$, the
@@ -648,15 +645,15 @@ program   point  where   the   closure  was   created\footnote{Mutiple
 
   Since a  closure is evaluated  only at evaluation points,  a closure
   variable is attributed  with the same liveness in the  region of the
-  program from the  point of creation to  reachable evaluation points.
-  This is  also true  of stack  variables, because,  as we  shall see,
-  stack variables derive their  liveness from closure variables. Thus,
-  there are  two major differences  in our formulation of  liveness of
-  lazy   languages  with   liveness  of   eager 
-  languages~\cite{asati14lgc}:    (i)  the
-  introduction of  closure variables in the  liveness calculation, and
-  (ii) a  single liveness value  for each variable that  is applicable
-  from its creation point to evaluation points.
+  program  from the  point of  creation  of the  closure to  reachable
+  evaluation points.  This  is also true of  stack variables, because,
+  as we shall see, stack  variables derive their liveness from closure
+  variables. Thus, there are two  major differences in our formulation
+  of   liveness   of   lazy   languages   with   liveness   of   eager
+  languages~\cite{asati14lgc}:   (i)  the   introduction  of   closure
+  variables in  the liveness calculation,  and (ii) a  single liveness
+  value for each  variable that is applicable from  its creation point
+  to evaluation points.
 
 
   Closure  variables get  their  liveness values  through  a chain  of
@@ -667,9 +664,9 @@ program   point  where   the   closure  was   created\footnote{Mutiple
   
 The  variable \pz\   returned  at  $\psi_2$ depends  on  \py\ 
   through  the  expression $(+~\py~1)$.   $\py$  in  turn depends  on  the
-  closure  variable  $\px_{\pi_1}$   through  $(\length~\px_{\pi_1})$.   We
+  closure  variable  $\px_{\mathit{\pi}_1}$   through  $(\length~\px_{\mathit{\pi}_1})$.   We
   denote  this chain  of dependences  as $\lbrack  \psi_2\!\!\!:\!\!\!\pz \leftarrow
-  (+~\py~1),\,  \py  \leftarrow   (\length~\px_{\pi_1})\rbrack$.   Indeed,  the
+  (+~\py~1),\,  \py  \leftarrow   (\length~\px_{\mathit{\pi}_1})\rbrack$.   Indeed,  the
   closures  in  the  heap  are   a  runtime  representation  of  these
   dependences.  Since  $\pz$  is  evaluated   at  $\psi_2$  due  to  the
   expression $\SRETURN~\pz$,  the demand made by  the calling context(s)
@@ -737,28 +734,25 @@ liveness   of  $\{x.\sigma\}$.    The  liveness   of  the   expression
 $(\SIF~x~e_1~e_2)$  is  a union  of  the  liveness of  $e_1$  and
 $e_2$. In  addition, since  the condition $x$  is also  evaluated, the
 liveness $\{x.\epsilon\}$ is created and  added to the union.  
-%% Also  notice  a  consequence  of laziness:  the  entire  expression
-%% including the  condition is not  evaluated if  the demand on  it is
-%% $\emptyset$.  This results in the empty liveness environment.
 To  understand  the  liveness rule  for  $\LET~x  \leftarrow~s~\IN~e$,
 observe that the value  of $\LET$ is the value of  its body $e$.  Thus
 the  liveness environment  $\Lv$ of  $e$ is  calculated for  the given
 demand $\sigma$. Since the stack variable $x$ is copied to each of the
 closure variable  $x_{\pi}$, the liveness of  $x$ is the union  of the
 liveness of the  closure variables.  This liveness,  say $\sigma'$, is
-also  the  demand  on  $s$, and  the  resulting  liveness  environment
+also  the  demand  on  $s$, thus the  liveness  environment
 $\mathit{ref}(s,   \sigma',   \Lfonly)$   is  added   to   $\Lv   \cup
 \{x.\sigma\}$ to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
 
 As noted earlier, $x.\alpha \in  \Lv_y$ specifies the liveness  of the
-reference $\heap\oxlb\rho(x), \alpha\oxrb$  only if $\alpha$ corresponds to  a closure-free path
+reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$ corresponds to  a closure-free path
 in \heap\   starting from $\rho(x)$.  If this  path is intercepted  by a
-closure,  say  $\CAR~{x_{\pi}}$, then  the  liveness  of further  heap
-contents starting from $x_{\pi}$ is given by $\Lv_{x_{\pi}}$.
+closure,  say  $(\CAR~{x_{\pi}})$, then  the  liveness  of further  heap
+contents starting from $\mathit{x_{\pi}}$ is given by $\Lv_\mathit{x_{\pi}}$.
 
 
-%} %comment
+%} %comment 
 
 \subsection{Soundness of analysis}  
 
@@ -852,12 +846,12 @@ To set up the minefield semantics, we follow these steps:
     environment $\rho$ in either  the  current state or in a
     continuation frame, for each $x \in domain(\rho)$ and each forward
     access
-    path $\alpha$, it is not the case that $x.\alpha \in \Lv$ and $\heap\oxlb\rho(x), \alpha
-    \oxrb = \ell$. Here 
+    path $\alpha$, it is not the case that $x.\alpha \in \Lv$ and $\heap\llbracket\rho(x), \alpha
+    \rrbracket = \ell$. Here 
 %% $x.\alpha$  is  live  and
 %%     corresponds  to   $\ell$ in \heap.  More  formally,  there   are  no  $x\in
-%%     domain(\rho)$ and  $\alpha$, such that  $\heap\oxlb\rho(x), \alpha
-%%     \oxrb = \ell$  and $x.\alpha \in \Lv$, where 
+%%     domain(\rho)$ and  $\alpha$, such that  $\heap\llbracket\rho(x), \alpha
+%%     \rrbracket = \ell$  and $x.\alpha \in \Lv$, where 
 \Lv\ is the liveness environment  corresponding to $\rho$ mentioned in
 step~\ref{gc-1}.
   \end{enumerate}
@@ -1413,7 +1407,7 @@ any non-terminals.
 It is clear that if the TM given as an instance of the halting problem
 accepts the input string, then the earlier derivation can be replayed,
 every time replacing   $\nont{\mathit{\mathit{all}}}{}$   in   the  sentential   form   by
-$\epsilon$. Conversely,  if the TM  does not accept the  input string,
+$\epsilon$. However,  if the TM  does not accept the  input string,
 then  any sentential  form derived  from the  start symbol  would have
 exactly one non-terminal, and this non-terminal will be different from
 $\nont{\mathit{final}}{c}$.  Thus  the  empty   string  would  not  be
@@ -1982,11 +1976,14 @@ propagated inside closures.
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
-\clearpage
-\section{Appendix: Soundness of liveness analysis}
+\newpage
+\ 
+\newpage
+
+\section{Appendix: Not to be included in the paper.}
  
 
-\begin{figure*}[t!]
+\begin{figure*}[h!]
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.5}
 
@@ -2001,328 +1998,372 @@ Premise & Transition & Rule name \\
     \kappa], e, \cred{\sigma'}$ }   &  {\sc const}
 \\
 \hline
-& \makecell{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
+& \makecell[t]{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap,
+  (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow$ \\ $
   \rho', S, \heap[\ell := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  {\sc cons} \\
 \hline
-$\heap(\rho(x)) \mbox{ is } (v, d)$ & \makecell{$\rho, (\rho', \ell, e,
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\
+  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
+{\sc car-bang} 
+\\
+\hline
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S,
+    \heap)}$, \\ $\heap(\rho(x)) \mbox{ is } (v, d)$} & \makecell[t]{$\rho, (\rho', \ell, e,
   \cred{\sigma'} )\!:\!S, \heap, (\CAR~x), \cred{\sigma}$  $
-  \rightsquigarrow \rho', S, \heap[\ell := v], e, \cred{\sigma'}$}      &
+  \rightsquigarrow $ \\ $\rho', S, \heap[\ell := v], e, \cred{\sigma'}$}      &
 {\sc car-select} \\
 \hline
-$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  \heap,\,
-(\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
-s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$      &
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
+    S, \heap)}$, \\ $\heap(\rho(x))
+\mbox{ is } \langle s, \rho'\rangle$ }& \makecell[t]{$\rho, S,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow $\\ $  \rho', (\rho, \ell,
+  (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$ }        &
+{\sc car-clo}\\
+\hline
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
+    S, \heap)}$, \\$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
+(\CAR~x), \cred{\sigma} \rightsquigarrow$ \\ $ \rho', \,(\rho, addr(\langle
+s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$ }     &
 {\sc car-1-clo} \\
+%% \hline
 
-
+%% $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
+%%   \heap, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+%%   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$}      &
+%% {\sc car-clo}
+%% \\
 \hline
-
-$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-  \heap, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
-  (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$}      &
-{\sc car-clo}
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\
+  $\heap(\rho(x)) \mbox{ is } \bot$  or $\heap(\rho(y)) \mbox{ is }
+  \bot$} & $\rho, S,
+  \heap, (+~x~y), \cred{\sigma} \rightsquigarrow \bang$   &
+{\sc prim-1-bang} 
 \\
-
 \hline
-$\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$
- & \makecell{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap,
-  (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, \heap[\ell
-    := \heap(\rho'(x)) + \heap(\rho'(y))], e, \cred{\sigma'}$}      &
+
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho,
+    S, \heap)}$, \\ 
+$\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$}
+ & 
+
+\makecell[t]{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap,
+  (+~x~y), \cred{\sigma}$  $\rightsquigarrow$ \\ $\rho', S, \heap[\ell
+    := \heap(\rho'(x)) + \heap(\rho'(y))], e, \cred{\sigma'}$}     
+ &
 {\sc prim-add} \\
 \hline
-$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-  \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$} &\makecell[t]{$\rho, S,
+  \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow$ \\ $ \rho', (\rho, \rho(x),
   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 {\sc prim-1-clo} \\
 \hline
-$\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-  S, \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $} & \makecell[t]{$\rho,
+  S, \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow$ \\ $ \rho', (\rho,\rho(y),
   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 {\sc prim-2-clo} \\
 \hline
-{$\mathit{f}~\mbox{defined as}$
-$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell{$\rho, S, \heap,
-  (f~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (f~\myvec{x}), \sigma) =
+    (\rho, S, \heap)}$,\\ $\mathit{f}~\mbox{defined as}$
+$~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
+  (f~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow$\\$ [\myvec{y} \mapsto
     \rho(\myvec{x})], S, \heap, e_{\mathit{f}}, \cred{\sigma}$}      &
 {\sc funcall} \\
 \hline
-$\ell$ is a new location& \makecell{$\rho, S, \heap, (\LET~x\leftarrow
-  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, \heap[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}\rangle], e, \cred{\sigma}$} &
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\LET~x\leftarrow
+  s~\IN~e), \sigma) = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
+  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x \mapsto \ell], S, \heap[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}\rangle], e, \cred{\sigma}$} &
 {\sc let} \\ 
 \hline
-$\heap(\rho(x)) \ne 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2),
+    \sigma) = (\rho, S, \heap)}$, \\
+  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  \heap, (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma} \rightsquigarrow \bang$   &
+{\sc if-bang} 
+\\
+\hline
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2),
+    \sigma) = (\rho, S, \heap)}$, \\$\heap(\rho(x)) \ne 0$}  & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
   \cred{\sigma}$  $\rightsquigarrow \rho, S, \heap,  e_1, \cred{\sigma}$} & {\sc if-true} \\
 \hline
-$\heap(\rho(x)) = 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) = 0$} & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
   \cred{\sigma}$   $\rightsquigarrow
 \rho, S, \heap,  e_2, \cred{\sigma}$} & {\sc if-false} \\
 \hline
-$\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
-  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
-\rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, \heap, s,
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) = \langle s, \rho' \rangle $} & \makecell[t]{$\rho, S, \heap,
+  (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow$ \\ $
+\rho', (\rho, \rho(x), (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, \heap, s,
 \cred{\clazy\sigma}$}
 &
 {\sc if-clo} \\
 \hline
-{$\heap(\rho(x))~\mbox{is in WHNF with value}~v$}& \makecell{$\rho,
-  (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\ell := v], e, 
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) = (\rho, S, \heap)}$,\\
+  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  \heap, (\SRETURN~x), \cred{\sigma} \rightsquigarrow \bang$   &
+{\sc return-bang} 
+\\
+\hline
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) =
+    (\rho, S, \heap)}$,\\ $\heap(\rho(x))~\mbox{is in WHNF with
+    value}~v$} & \makecell[t]{$\rho,
+  (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow$\\$ \rho', S, \heap[\ell := v], e, 
   \cred{\sigma'}$} &
 {\sc return-whnf}\\
 \hline
-$\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) = \langle s, \rho' \rangle $} & \makecell[t]{$\rho, S, \heap,
   (\SRETURN~x), \cred{\sigma}$  $
-  \rightsquigarrow$
-$\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
+  \rightsquigarrow$ \\
+$\rho',~ (\rho, \rho(x), (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
   \cred{\sigma}$} &
 {\sc return-clo} \\
 \hline
 \end{tabular}
-\caption{Minefield semantics.\label{fig:minefield-semantics}}
+\caption{Minefield semantics. The differences with the small-step
+  semantics have been highlighted by shading. \label{fig:minefield-semantics}}
 \end{center}
-\vskip -5mm
 \end{figure*}
 
 
-We shall now  present a proof of soundness of  the liveness analysis
-presented in Section~\ref{sec:liveness-analysis}.   While the proof is
-on the broad lines of \cite{asati14lgc}, there are several differences
-due to  the lazy  semantics of  the language  being 
-analyzed in this paper. Here is the idea behind the proof.
-\begin{enumerate}
-\item       We        enrich       the        standard       semantics
-  (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
-  collection  just  before  each  $\rightsquigarrow$  transition.  The
-  simulated garbage collection starts from  the root-set and inserts a
-  special value  $\bot$ at each location  in the heap that  contains a
-  reference that is reachable but not live. Any attempt to dereference
-  such  locations during  the  transition will  result  in entering  a
-  special state denoted \bang. We call the semantics after
-  augmentation  \emph{minefield semantics}.
-\item \label{inline2} Assuming that a  program enters the \bang\ state,
-  we  show  how to  construct,  through  inline expansion,  a  program
-  without function calls which has the same minefield behavior.
-\item  The final  part  of the  proof shows  that  no program  without
-  function calls can enter a \bang\ state. As a consequence no program
-  (with or without function calls) can enter the \bang\ state. 
-\end{enumerate}
+%% We shall now  present a proof of soundness of  the liveness analysis
+%% presented in Section~\ref{sec:liveness-analysis}.   While the proof is
+%% on the broad lines of \cite{asati14lgc}, there are several differences
+%% due to  the lazy  semantics of  the language  being 
+%% analyzed in this paper. Here is the idea behind the proof.
+%% \begin{enumerate}
+%% \item       We        enrich       the        standard       semantics
+%%   (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
+%%   collection  just  before  each  $\rightsquigarrow$  transition.  The
+%%   simulated garbage collection starts from  the root-set and inserts a
+%%   special value  $\bot$ at each location  in the heap that  contains a
+%%   reference that is reachable but not live. Any attempt to dereference
+%%   such  locations during  the  transition will  result  in entering  a
+%%   special state denoted \bang. We call the semantics after
+%%   augmentation  \emph{minefield semantics}.
+%% \item \label{inline2} Assuming that a  program enters the \bang\ state,
+%%   we  show  how to  construct,  through  inline expansion,  a  program
+%%   without function calls which has the same minefield behavior.
+%% \item  The final  part  of the  proof shows  that  no program  without
+%%   function calls can enter a \bang\ state. As a consequence no program
+%%   (with or without function calls) can enter the \bang\ state. 
+%% \end{enumerate}
 
-\subsection{Minefield semantics}
+%% \subsection{Minefield semantics}
 
-To set up the minefield semantics, we follow these steps:
-\begin{enumerate}
-\item   We   enrich    the   abstract   machine   state
-  $\rho,\,S,\,\heap,\,e$   to  $\rho,\,S,\,\heap,\,e,\,\sigma$,
-  where  $\sigma$  is  the  demand  on  the  expression
-  $e$. We  call such a state  a \emph{minefield state}.
-  The demand $\sigma$ is  ``dynamic'' in that it arises
-  from the  actual sequence of function  calls that led
-  to  the evaluation  of  $e$.  The  0-CFA demand  used
-  during    liveness     analysis    is     a    static
-  over-approximation   of   $\sigma$   that   considers
-  \emph{all  possible calls}  that  could  lead to  the
-  evaluation of  $e$.  The  information in  the continuation frames on
-  the   stack  $S$ are  also
-  similarly augmented with their  demands.  Thus a stacked
-  entry now takes  the form $(\rho, x,  e, \sigma)$.  A
-  modification  of  the   small  step  semantics  which
-  carries the extra information  is shown in the bottom
-  table of Figure~\ref{fig:minefield-semantics}.
-\item $GC$  models a liveness based  garbage collection
-  $GC(\rho, S,  \heap, \sigma)$ returns $(\rho',  S', \heap')$,
-  where the changes are due to certain references being
-  replaced by  $\bot$.  This represents the  act of not
-  retaining   (effectively   garbage  collecting)   the
-  objects  pointed to  by  these  references during  an
-  actual  garbage  collection.  This  is  done  in  the
-  following way:
-  \begin{enumerate}
-  \item Given the current state $\rho, S,
-    \heap,   e,  \sigma$   and   the  demand   transformers
-    $\Lfonly$, we can  construct a liveness environment
-    \Lv for $e$.   If  $e$  is  an expression,  then  $  \Lv  =
-    \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
-    application, then $ \Lv = ref(e, \sigma, \Lfonly)$.
-    We  can similarly  define the  liveness environment
-    for each  of the  suspended evaluation  contexts in
-    $S$, giving  a stack of liveness  environments that
-    we shall denote $\mathsf{SL}$.
-  \item \emph{Garbage collection  of objects pointed by
-    root   set:}  For   each   $x  \in   domain(\rho)$,
-    $\rho'(x)=\bot$     iff      $x.\epsilon     \notin
-    \Lv$.    Similarly,    for   each    stack    entry
-    $(\rho,\_,\_,\_)$  in   $S$  with  $\Lv'$   as  the
-    corresponding      liveness     environment      in
-    $\mathsf{SL}$, and  for each $x  \in domain(\rho)$,
-    $\rho'(x)=\bot$ iff $x.\epsilon \notin \Lv'$.
-  \item  \emph{Garbage  collection  of objects  in  the
-    heap:} For each location  $\ell$, $\heap'(\ell) = \bot$
-    iff  there   is  no  $x$  in   either  the  current
-    environment  or  one  of the  stacked  environments
-    $\rho$, such  that for some  $\alpha$ corresponding
-    to a  closure-free path  in the heap  starting from
-    $x$,  $\heap[x.\alpha]   =  \ell$  and   $x.\alpha  \in
-    \Lv$. Here \Lv\ is the liveness of the variables in
-    the current environment or the stacked environment.
+%% To set up the minefield semantics, we follow these steps:
+%% \begin{enumerate}
+%% \item   We   enrich    the   abstract   machine   state
+%%   $\rho,\,S,\,\heap,\,e$   to  $\rho,\,S,\,\heap,\,e,\,\sigma$,
+%%   where  $\sigma$  is  the  demand  on  the  expression
+%%   $e$. We  call such a state  a \emph{minefield state}.
+%%   The demand $\sigma$ is  ``dynamic'' in that it arises
+%%   from the  actual sequence of function  calls that led
+%%   to  the evaluation  of  $e$.  The  0-CFA demand  used
+%%   during    liveness     analysis    is     a    static
+%%   over-approximation   of   $\sigma$   that   considers
+%%   \emph{all  possible calls}  that  could  lead to  the
+%%   evaluation of  $e$.  The  information in  the continuation frames on
+%%   the   stack  $S$ are  also
+%%   similarly augmented with their  demands.  Thus a stacked
+%%   entry now takes  the form $(\rho, x,  e, \sigma)$.  A
+%%   modification  of  the   small  step  semantics  which
+%%   carries the extra information  is shown in the bottom
+%%   table of Figure~\ref{fig:minefield-semantics}.
+%% \item $GC$  models a liveness based  garbage collection
+%%   $GC(\rho, S,  \heap, \sigma)$ returns $(\rho',  S', \heap')$,
+%%   where the changes are due to certain references being
+%%   replaced by  $\bot$.  This represents the  act of not
+%%   retaining   (effectively   garbage  collecting)   the
+%%   objects  pointed to  by  these  references during  an
+%%   actual  garbage  collection.  This  is  done  in  the
+%%   following way:
+%%   \begin{enumerate}
+%%   \item Given the current state $\rho, S,
+%%     \heap,   e,  \sigma$   and   the  demand   transformers
+%%     $\Lfonly$, we can  construct a liveness environment
+%%     \Lv for $e$.   If  $e$  is  an expression,  then  $  \Lv  =
+%%     \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
+%%     application, then $ \Lv = ref(e, \sigma, \Lfonly)$.
+%%     We  can similarly  define the  liveness environment
+%%     for each  of the  suspended evaluation  contexts in
+%%     $S$, giving  a stack of liveness  environments that
+%%     we shall denote $\mathsf{SL}$.
+%%   \item \emph{Garbage collection  of objects pointed by
+%%     root   set:}  For   each   $x  \in   domain(\rho)$,
+%%     $\rho'(x)=\bot$     iff      $x.\epsilon     \notin
+%%     \Lv$.    Similarly,    for   each    stack    entry
+%%     $(\rho,\_,\_,\_)$  in   $S$  with  $\Lv'$   as  the
+%%     corresponding      liveness     environment      in
+%%     $\mathsf{SL}$, and  for each $x  \in domain(\rho)$,
+%%     $\rho'(x)=\bot$ iff $x.\epsilon \notin \Lv'$.
+%%   \item  \emph{Garbage  collection  of objects  in  the
+%%     heap:} For each location  $\ell$, $\heap'(\ell) = \bot$
+%%     iff  there   is  no  $x$  in   either  the  current
+%%     environment  or  one  of the  stacked  environments
+%%     $\rho$, such  that for some  $\alpha$ corresponding
+%%     to a  closure-free path  in the heap  starting from
+%%     $x$,  $\heap[x.\alpha]   =  \ell$  and   $x.\alpha  \in
+%%     \Lv$. Here \Lv\ is the liveness of the variables in
+%%     the current environment or the stacked environment.
 
-\warning{We have to tell  the reader about closure free
-  paths  earlier  on.   Also,  has  $\heap[x.\alpha]$  been
-  defined?}
-  \end{enumerate}
-Starting from the initial state $([\;]_\rho,([\;]_\rho,
-\ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
-every transition  is preceded  by a  garbage collection
-using $GC$.  The details of the transition for the {\sc
-  car-clo}  rule   is  shown   in  the  top   table  of
-Figure~\ref{fig:minefield-semantics}.  If  this  or  an
-earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
-bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
-enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
-the transition is the same as the earlier {\sc car-clo}
-rule.
-\end{enumerate}
+%% \warning{We have to tell  the reader about closure free
+%%   paths  earlier  on.   Also,  has  $\heap[x.\alpha]$  been
+%%   defined?}
+%%   \end{enumerate}
+%% Starting from the initial state $([\;]_\rho,([\;]_\rho,
+%% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
+%% every transition  is preceded  by a  garbage collection
+%% using $GC$.  The details of the transition for the {\sc
+%%   car-clo}  rule   is  shown   in  the  top   table  of
+%% Figure~\ref{fig:minefield-semantics}.  If  this  or  an
+%% earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
+%% bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
+%% enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
+%% the transition is the same as the earlier {\sc car-clo}
+%% rule.
+%% \end{enumerate}
 
-\subsection{Inlining} 
+%% \subsection{Inlining} 
 
-Consider a call tree, each  of whose nodes represents a
-function  that  was  called (but  did  not  necessarily
-return because  of a \bang).   Assume that each  of the
-nodes of  the tree is  also annotated with  the program
-point where  the corresponding call was  invoked.  This
-tree  can  be  used  to  inline  function  calls  in  a
-hierarchical fashion.  The details of inlining a single
-function      call     $(\LET\,\,      x     \leftarrow
-(f\,y_1\,\ldots\,y_n) \,\,  \IN\,\, e)$ is  as follows.
-Let  $f$ be  defined  (after renaming  its formals  and
-locals  to  be  disjoint from  existing  variables)  by
-$(\DEFINE\ (f\  z_1\ \ldots\  z_n)\ e_f)$. The  call is
-replaced  by   a  sequence  of  $\LET$s   of  the  form
-$z_i\leftarrow (\ID\,\,y_i)$ followed by the body $e_f$
-but with its  $(\SRETURN\,\,w)$ expressions replaced by
-$(\LET\,\, x  \leftarrow (\ID\,\, w) \,\,  \IN\,\, e)$.
-We prefer to use the  identity function $\ID$ as a form
-of no-op rather than  introducing the form $(\LET\,\, x
-\leftarrow  w \,\,  \IN\,\, e)$  where the  RHS of  the
-$\LET$-definition   is  a   simple  variable.    For  a
-call-less program,  the initial state of  the minefield
-semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
-\ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
-(e_{\mainpgm})$.
+%% Consider a call tree, each  of whose nodes represents a
+%% function  that  was  called (but  did  not  necessarily
+%% return because  of a \bang).   Assume that each  of the
+%% nodes of  the tree is  also annotated with  the program
+%% point where  the corresponding call was  invoked.  This
+%% tree  can  be  used  to  inline  function  calls  in  a
+%% hierarchical fashion.  The details of inlining a single
+%% function      call     $(\LET\,\,      x     \leftarrow
+%% (f\,y_1\,\ldots\,y_n) \,\,  \IN\,\, e)$ is  as follows.
+%% Let  $f$ be  defined  (after renaming  its formals  and
+%% locals  to  be  disjoint from  existing  variables)  by
+%% $(\DEFINE\ (f\  z_1\ \ldots\  z_n)\ e_f)$. The  call is
+%% replaced  by   a  sequence  of  $\LET$s   of  the  form
+%% $z_i\leftarrow (\ID\,\,y_i)$ followed by the body $e_f$
+%% but with its  $(\SRETURN\,\,w)$ expressions replaced by
+%% $(\LET\,\, x  \leftarrow (\ID\,\, w) \,\,  \IN\,\, e)$.
+%% We prefer to use the  identity function $\ID$ as a form
+%% of no-op rather than  introducing the form $(\LET\,\, x
+%% \leftarrow  w \,\,  \IN\,\, e)$  where the  RHS of  the
+%% $\LET$-definition   is  a   simple  variable.    For  a
+%% call-less program,  the initial state of  the minefield
+%% semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
+%% \ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
+%% (e_{\mainpgm})$.
 
  
-\subsection{Soundness Results}
+%% \subsection{Soundness Results}
 
-  We  consider  a  garbage  collection  followed  by  a
-  transition as a step.  We show by induction that, for
-  programs  without function  calls, starting  from the
-  initial  state  that  has $e_{\main}$  as  the  first
-  expression to  be evaluated  instead of  $\main$, any
-  transition of $n$ steps occurs without a \bang.
+%%   We  consider  a  garbage  collection  followed  by  a
+%%   transition as a step.  We show by induction that, for
+%%   programs  without function  calls, starting  from the
+%%   initial  state  that  has $e_{\main}$  as  the  first
+%%   expression to  be evaluated  instead of  $\main$, any
+%%   transition of $n$ steps occurs without a \bang.
 
-We  first  need  an auxiliary  result  about  minefield
-semantics. Consider  a trace of a  minefield execution.
-For every minefield state  $(\rho, S, \heap, e(s), \sigma)$
-that appears  on the LHS of  a $\rightsquigarrow$ step,
-the  demand   $\sigma$  on   the  expression   $e$  (or
-application $s$) is non-null.  This can be proved by an
-induction  on  the  number  of  steps  leading  to  the
-minefield  state.   The  base step  holds  because  the
-demand $\sigma_{all}$  on $\mainpgm$ is  non-null.  The
-inductive step  follows from  the observation  that for
-each  step of  the minefield  semantics, if  the demand
-$\sigma$ on  the LHS of  a minefield step  is non-null,
-the demand on  the RHS is a  transformation of $\sigma$
-(for example $\clazy\sigma$) which is also non-null.
+%% We  first  need  an auxiliary  result  about  minefield
+%% semantics. Consider  a trace of a  minefield execution.
+%% For every minefield state  $(\rho, S, \heap, e(s), \sigma)$
+%% that appears  on the LHS of  a $\rightsquigarrow$ step,
+%% the  demand   $\sigma$  on   the  expression   $e$  (or
+%% application $s$) is non-null.  This can be proved by an
+%% induction  on  the  number  of  steps  leading  to  the
+%% minefield  state.   The  base step  holds  because  the
+%% demand $\sigma_{all}$  on $\mainpgm$ is  non-null.  The
+%% inductive step  follows from  the observation  that for
+%% each  step of  the minefield  semantics, if  the demand
+%% $\sigma$ on  the LHS of  a minefield step  is non-null,
+%% the demand on  the RHS is a  transformation of $\sigma$
+%% (for example $\clazy\sigma$) which is also non-null.
 
-Let us clarify this observation:  Since the minefield semantics models
-lazy  evaluation,  parts  of  the  program may  not  be  evaluated  at
-all.  However,  if  an  expression  (or  application)  happens  to  be
-evaluated, it  will appear  on the  LHS of a  minefield step,  and the
-context-sensitive demand on it will be non-null.
+%% Let us clarify this observation:  Since the minefield semantics models
+%% lazy  evaluation,  parts  of  the  program may  not  be  evaluated  at
+%% all.  However,  if  an  expression  (or  application)  happens  to  be
+%% evaluated, it  will appear  on the  LHS of a  minefield step,  and the
+%% context-sensitive demand on it will be non-null.
 
-We  show  next  that   the  minefield  execution  of  a
-call-less program  cannot go \bang. Note  that, for the
-sake of  concreteness, by a single  minefield execution
-we   shall  mean   the  evaluation   of  $(main)$   (or
-$e_{\mainpgm}$,  for call-less  programs)  to its  WHNF
-driven  by   the  printing  mechanism   represented  by
-\print. With  minor variations, the proof  will also be
-applicable   for   subsequent  evaluations   fired   by
-$\print$.
+%% We  show  next  that   the  minefield  execution  of  a
+%% call-less program  cannot go \bang. Note  that, for the
+%% sake of  concreteness, by a single  minefield execution
+%% we   shall  mean   the  evaluation   of  $(main)$   (or
+%% $e_{\mainpgm}$,  for call-less  programs)  to its  WHNF
+%% driven  by   the  printing  mechanism   represented  by
+%% \print. With  minor variations, the proof  will also be
+%% applicable   for   subsequent  evaluations   fired   by
+%% $\print$.
 
-\begin{lemma}
-\label{lemma:call-less-cannot-go-bang-app}
-Consider the minefield execution of  a program without function calls.
-Such a program cannot enter the \bang\ state.
-\end{lemma}
-\begin{proof}
-Consider a state in the minefield execution of a program $(\rho, S, \heap,
-e, \sigma)$.   We show  by induction  on the  number $n$  of minefield
-steps  leading to  this state  that  the next  step cannot  lead to  a
-\bang\ state.
+%% \begin{lemma}
+%% \label{lemma:call-less-cannot-go-bang-app}
+%% Consider the minefield execution of  a program without function calls.
+%% Such a program cannot enter the \bang\ state.
+%% \end{lemma}
+%% \begin{proof}
+%% Consider a state in the minefield execution of a program $(\rho, S, \heap,
+%% e, \sigma)$.   We show  by induction  on the  number $n$  of minefield
+%% steps  leading to  this state  that  the next  step cannot  lead to  a
+%% \bang\ state.
 
-When $n$ is 0, the  state is $([\;]_\rho,\_, [\;]_{S} ,
-[\;]_{\heap},  e_{\mainpgm},  \sigma_{all})$.  Further,  we
-have   to  show   that   a  $GC(..)$   followed  by   a
-$\rightsquigarrow$ step cannot lead  to a \bang\ state.
-Now, because  our programs  are in  ANF, $e_{\mainpgm}$
-can  only  be a  $\LET$.  A  {\sc  let} step  does  not
-dereference anything and thus cannot result in a \bang.
+%% When $n$ is 0, the  state is $([\;]_\rho,\_, [\;]_{S} ,
+%% [\;]_{\heap},  e_{\mainpgm},  \sigma_{all})$.  Further,  we
+%% have   to  show   that   a  $GC(..)$   followed  by   a
+%% $\rightsquigarrow$ step cannot lead  to a \bang\ state.
+%% Now, because  our programs  are in  ANF, $e_{\mainpgm}$
+%% can  only  be a  $\LET$.  A  {\sc  let} step  does  not
+%% dereference anything and thus cannot result in a \bang.
 
-For the inductive step, we  shall show that none of the
-minefield steps that  involves dereferencing results in
-a   \bang.   These  are   the   steps   which  have   a
-$\heap(\rho(...))$ in the premise.  Recall that a minefield
-step   consists   of   a   GC  step   followed   by   a
-$\rightsquigarrow$.   The   $\rightsquigarrow$  can  go
-\bang\ because it dereferences a $\bot$ inserted by the
-immediately  preceding  GC  or  the GC  of  an  earlier
-minefield step.  \warning{However the  demand $\sigma'$
-  on basis of which an earlier GC would have inserted a
-  $\bot$,  would  have   included  the  current  demand
-  $\sigma$.}  Thus,  if the  earlier GC had  inserted a
-$\bot$, so would the current  GC.  Thus it is enough to
-consider the $\rightsquigarrow$  along with the current
-GC and show that it does not lead to a \bang.
+%% For the inductive step, we  shall show that none of the
+%% minefield steps that  involves dereferencing results in
+%% a   \bang.   These  are   the   steps   which  have   a
+%% $\heap(\rho(...))$ in the premise.  Recall that a minefield
+%% step   consists   of   a   GC  step   followed   by   a
+%% $\rightsquigarrow$.   The   $\rightsquigarrow$  can  go
+%% \bang\ because it dereferences a $\bot$ inserted by the
+%% immediately  preceding  GC  or  the GC  of  an  earlier
+%% minefield step.  \warning{However the  demand $\sigma'$
+%%   on basis of which an earlier GC would have inserted a
+%%   $\bot$,  would  have   included  the  current  demand
+%%   $\sigma$.}  Thus,  if the  earlier GC had  inserted a
+%% $\bot$, so would the current  GC.  Thus it is enough to
+%% consider the $\rightsquigarrow$  along with the current
+%% GC and show that it does not lead to a \bang.
 
-We consider the steps {\sc car-clo} and {\sc car-1-clo}
-only. The rest  of the steps are similar.  For the {\sc
-  car-clo}  step in  the state  $\rho, S,  \heap, (\CAR~x),
-\sigma$, we  know that $\sigma$ is  non-null. There for
-the  liveness  of  $x$  includes  $\epsilon$,  and  the
-dereferencing $\heap(\rho(x))$ will go without \bang.
+%% We consider the steps {\sc car-clo} and {\sc car-1-clo}
+%% only. The rest  of the steps are similar.  For the {\sc
+%%   car-clo}  step in  the state  $\rho, S,  \heap, (\CAR~x),
+%% \sigma$, we  know that $\sigma$ is  non-null. There for
+%% the  liveness  of  $x$  includes  $\epsilon$,  and  the
+%% dereferencing $\heap(\rho(x))$ will go without \bang.
 
-For the  {\sc car-1-clo}  step, observe that  there are
-two dereferences.  First $x$  is dereferenced to  get a
-cons  cell  and then  the  head  of  the cons  cell  is
-dereferenced  to  obtain  a  closure.   If  the  demand
-$\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
-of    $x$   will    include    both   $\epsilon$    and
-$\acar\epsilon$,  and  a  GC with  this  liveness  will
-neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
-first   component  of   the   cons   cell.  Thus   both
-dereferences    will    happen   normally    and    the
-$\rightsquigarrow$ step will not enter \bang.
-\end{proof} 
+%% For the  {\sc car-1-clo}  step, observe that  there are
+%% two dereferences.  First $x$  is dereferenced to  get a
+%% cons  cell  and then  the  head  of  the cons  cell  is
+%% dereferenced  to  obtain  a  closure.   If  the  demand
+%% $\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
+%% of    $x$   will    include    both   $\epsilon$    and
+%% $\acar\epsilon$,  and  a  GC with  this  liveness  will
+%% neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
+%% first   component  of   the   cons   cell.  Thus   both
+%% dereferences    will    happen   normally    and    the
+%% $\rightsquigarrow$ step will not enter \bang.
+%% \end{proof} 
 
-Now we are ready to prove the main soundness result.
+%% Now we are ready to prove the main soundness result.
 
-\begin{theorem}
-The  minefield  execution of  no  program  can enter  a
-\bang\ state.
-\end{theorem}
+%% \begin{theorem}
+%% The  minefield  execution of  no  program  can enter  a
+%% \bang\ state.
+%% \end{theorem}
  
-\begin{proof}
-Assume to  the contrary that  a program $P$  enters the
-\bang\  state.  We can  transform  $P$  to a  call-less
-program $P'$ such that  the minefield executions of $P$
-and $P'$  are identical  except for change  of variable
-names.  \warning{Check  whether  the previous  line  is
-  correct.}                 However,                 by
-Lemma~\ref{lemma:call-less-cannot-go-bang-app} we know that
-$P'$,   a   call-less   program,   cannot   enter   the
-\bang\  state.  Therefor  $P$  also  cannot  enter  the
-\bang\ state.
-\end{proof}
+%% \begin{proof}
+%% Assume to  the contrary that  a program $P$  enters the
+%% \bang\  state.  We can  transform  $P$  to a  call-less
+%% program $P'$ such that  the minefield executions of $P$
+%% and $P'$  are identical  except for change  of variable
+%% names.  \warning{Check  whether  the previous  line  is
+%%   correct.}                 However,                 by
+%% Lemma~\ref{lemma:call-less-cannot-go-bang-app} we know that
+%% $P'$,   a   call-less   program,   cannot   enter   the
+%% \bang\  state.  Therefor  $P$  also  cannot  enter  the
+%% \bang\ state.
+%% \end{proof}
  
 \end{document}
 

@@ -34,7 +34,6 @@ set style line 4 lt 1 lc  9 lw .4
 plot "output/$1_gc-live_output/rch.sort"  w l ls 2 notitle, \
     "output/$1_gc-plain_output/rch.sort" w l ls 1 notitle, \
     "output/$1_gc-freq_output/rch.sort"  w l ls 3 notitle,  \
-    "output/$1_gc-live_output/rgc.sort"  w l ls 5 notitle,  \
     "output/$1_gc-live_output/use.sort"  w l ls 4 notitle
 
 #    EOF
