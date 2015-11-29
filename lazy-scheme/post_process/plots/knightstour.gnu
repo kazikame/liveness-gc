@@ -17,7 +17,7 @@ set ytics nomirror ("0" 0, "200" 200e3, "400" 400e3, "600" 600e3, "700" 700e3)
 set autoscale
 set grid noxtics
 
-# clolored ... blue, red, black, gray
+# colored ... blue, red, black, gray
 set style line 1 lt 1 lc  3 lw 1.0 
 set style line 2 lt 1 lc  1 lw 1.0
 set style line 3 lt 1 lc -1 lw .4
@@ -29,6 +29,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot "output/knightstour_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/knightstour_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/knightstour_gc-freq_output/rch.sort"  w l ls 3 notitle,            "output/knightstour_gc-live_output/use.sort"  w l ls 5 notitle
+plot "output/knightstour_gc-live_output/rch.sort"  w l ls 1 notitle,     "output/knightstour_gc-plain_output/rch.sort" w l ls 2 notitle,     "output/knightstour_gc-freq_output/rch.sort"  w l ls 3 notitle,            "output/knightstour_gc-live_output/use.sort"  w l ls 5 notitle
 
 #    EOF

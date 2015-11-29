@@ -8,7 +8,7 @@ set terminal postscript dashed color portrait "Helvetica" 16
 
 set size ratio 0 1, .33
 
-set xlabel "sudoku"
+set xlabel "sudoku*"
 set border 3 lw 0
 
 set output "sudoku_win.eps"
@@ -18,7 +18,7 @@ set ytics nomirror ("1.8" 1.8e3, "2.4" 2.4e3, "3.0" 3.0e3, "3.6" 3.6e3, "4.2" 4.
 set autoscale
 set grid noxtics
 
-# clolored ... blue, red, black, gray
+# colored ... blue, red, black, gray
 set style line 1 lt 1 lc  3 lw 1.0 
 set style line 2 lt 1 lc  1 lw 1.0
 set style line 3 lt 1 lc -1 lw .4
@@ -30,6 +30,6 @@ set style line 4 lt 1 lc  9 lw .4
 # set style line 3 lw 0.90 lc -1
 # set style line 4 lw 0.10 lc -1
 
-plot [.8e5:1.0e5] [1.8e3:4.2e3] "output/sudoku_gc-live_output/rch.sort"  w l ls 2 notitle,     "output/sudoku_gc-plain_output/rch.sort" w l ls 1 notitle,     "output/sudoku_gc-freq_output/rch.sort"  w l ls 3 notitle,        "output/sudoku_gc-live_output/use.sort"  w l ls 5 notitle
+plot [.8e5:1.0e5] [1.8e3:4.2e3] "output/sudoku_gc-live_output/rch.sort"  w l ls 1 notitle,     "output/sudoku_gc-plain_output/rch.sort" w l ls 2 notitle,     "output/sudoku_gc-freq_output/rch.sort"  w l ls 3 notitle,        "output/sudoku_gc-live_output/use.sort"  w l ls 5 notitle
 
 #    EOF
