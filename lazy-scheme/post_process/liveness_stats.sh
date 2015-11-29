@@ -17,7 +17,6 @@ echo "|} \\\\ \hline"
 for bm in $AllBMs
 do 
    bmname=`echo $bm | sed -e 's/_/\\\\_/'`
-   echo $bmname
    cfgnt=`wc -l $OUTDIR/$bm/program-cfg.txt | cut -d' ' -f1`
    cfgrl=`fgrep -o '|' $OUTDIR/$bm/program-cfg.txt | wc -l`
    cfgrl=`expr $cfgrl + $cfgnt`
