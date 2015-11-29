@@ -12,8 +12,8 @@ set xlabel "deriv"
 set border 3 lw 0
 
 set output "deriv_win.eps"
-#set xtics nomirror :
-#set ytics nomirror :
+set xtics nomirror ("0.05" 5e3, "0.10" 10e3, "0.15" 15e3, "0.20" 20e3, "0.25" 25e3, "0.30" 30e3, "0.35" 35e3, "0.40" 40e3, "0.45" 40.5e3, "0.50" 50e3, "0.55" 55e3, "0.60" 60e3)
+set ytics nomirror ("3" 3e3, "6" 6e3, "9" 9e3, "12" 12e3)
 set autoscale
 set grid noxtics
 
