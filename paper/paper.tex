@@ -378,30 +378,30 @@ Premise & Transition & Rule name \\
 \hline
 \hline 
           & $\rho,\, (\rho', \ell, e)\!:\!S,\, \heap,\, \kappa
-  \rightsquigarrow \rho',\, S,\, \heap[\ell := \kappa],\, e$    &  \sc{const}
+  \rightsquigarrow \rho',\, S,\, \heap[\ell := \kappa],\, e$    &  {\sc const}
 \\
 \hline
           & {$\rho, \,(\rho', \ell, e)\!:\!S,\, \heap,\, (\CONS~x~y)
 \rightsquigarrow
-$  $\rho',\, S,\, \heap[\ell := (\rho(x), \rho(y))],\, e$}     &  \sc{cons} \\
+$  $\rho',\, S,\, \heap[\ell := (\rho(x), \rho(y))],\, e$}     &  {\sc cons} \\
 \hline
 
 $\heap(\rho(x)) \mbox{ is } (v, d)$ & $\rho,\, (\rho', \ell, e)\!:\!S,\, \heap,\,
 (\CAR~x)  \rightsquigarrow \rho',\, S,\, \heap[\ell := v],\, e$      &
-\sc{car-select} \\
+{\sc car-select} \\
 \hline
 
 
 
 $\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  \heap,\,
 (\CAR~x)  \rightsquigarrow \rho', \,(\rho, addr(\langle s, \rho'\rangle), (\CAR~x))\!:\!S,\, \heap,\, s$      &
-\sc{car-1-clo} \\
+{\sc car-1-clo} \\
 \hline
 
 $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, \heap,\, (\CAR~x)
 \rightsquigarrow
 \rho',\, (\rho, \rho(x), (\CAR~x))\!:\!S, \,\heap,\, s$      &
-\sc{car-clo}
+{\sc car-clo}
 \\
 \hline
 
@@ -410,53 +410,53 @@ $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, \heap,\, (\
 $\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$
  & {$\rho,\, (\rho', \ell, e)\!:\!S,\, \heap,\, (+~x~y)  \rightsquigarrow$
 $\rho', \,S,\, \heap[\ell := \heap(\rho'(x)) + \heap(\rho'(y))],\, e$}      &
-\sc{prim-add} \\
+{\sc prim-add} \\
 \hline
 
 $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ & $\rho,\, S,\, \heap,\, (+~x~y)
 \rightsquigarrow
 \rho',\, (\rho, \rho(x), (+~x~y))\!:\!S,\, \heap,\, s$      &
-\sc{prim-1-clo} \\
+{\sc prim-1-clo} \\
 \hline
 $\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & $\rho,\, S,\, \heap,\, (+~x~y)
 \rightsquigarrow
 \rho', (\rho,\, \rho(y),\, (+~x~y))\!:\!S,\, \heap,\, s$      &
-\sc{prim-2-clo} \\
+{\sc prim-2-clo} \\
 \hline
 {$\mathit{f}~\mbox{defined as}$
 $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho,\, S,\, \heap,\,
 (f~\myvec{x})  \rightsquigarrow
 [\myvec{y} \mapsto \rho(\myvec{x})],\, S,\, \heap,\, e_{\mathit{f}}$      &
-\sc{funcall} \\
+{\sc funcall} \\
 \hline
 $\ell$ is a new location& {$\rho,\, S,\, \heap,\, (\LET~x\leftarrow s~\IN~e)
   \rightsquigarrow$
 $\rho\oplus[x \mapsto \ell],\, S,\, \heap[\ell \mapsto \langle s,
     \lfloor\rho\rfloor_{FV(s)} %% \oplus [x \mapsto  \ell] -- NO LAZY LETS
     \rangle],\, e$} &
-\sc{let} \\
+{\sc let} \\
 \hline
 $\heap(\rho(x)) \ne 0$ & $\rho,\, S,\, \heap,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho,\, S,\, \heap,\,  e_1$ & \sc{if-true} \\
+\rho,\, S,\, \heap,\,  e_1$ & {\sc if-true} \\
 \hline
 $\heap(\rho(x)) = 0$ & $\rho,\, S,\, \heap,\, (\SIF~x~e_1~e_2)   \rightsquigarrow
-\rho,\, S, \,\heap, \, e_2$ & \sc{if-false} \\
+\rho,\, S, \,\heap, \, e_2$ & {\sc if-false} \\
 \hline
 $\heap(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, \heap,\,
   (\SIF~x~e_1~e_2)   \rightsquigarrow
 \rho',\, (\rho, \rho(x), (\SIF~x~e_1~e_2))\!:\!S,\, \heap, \, s$}
 &
-\sc{if-clo} \\
+{\sc if-clo} \\
 \hline
 {$\heap(\rho(x))~\mbox{is in WHNF with value}~v$}& $\rho,\, (\rho', \ell,
 e)\!:\!S,\, \heap,\,
 (\SRETURN~x)  \rightsquigarrow \rho',\, S,\, \heap[\ell := v],\, e$ &
-\sc{return-whnf}\\
+{\sc return-whnf}\\
 \hline
 $\heap(\rho(x)) = \langle s, \rho' \rangle $ & {$\rho,\, S,\, \heap,\, (\SRETURN~x)
   \rightsquigarrow$
 $\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, \heap,\,  s$} &
-\sc{return-clo} \\
+{\sc return-clo} \\
 \hline
 \end{tabular}
 \caption{The small-step semantics for the language. \label{fig:lang-semantics}}
@@ -798,19 +798,19 @@ Premise & Transition & Rule name \\
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,}
   $\heap(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
-\sc{car-clo-bang} 
+{\sc car-clo-bang} 
 \\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,} $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
-  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \ell,
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$         &
-\sc{car-clo}\\
+{\sc car-clo}\\
 \hline
 \end{tabular}
 \end{center}
-\caption{Minefield semantics for \sc{car-clo-bang} and
-  \sc{car-clo} \label{fig:minefield-semantics-for-some}}
+\caption{Minefield semantics for {\sc car-clo-bang} and
+  {\sc car-clo} \label{fig:minefield-semantics-for-some}}
 \end{figure*}
 
 To set up the minefield semantics, we follow these steps:
@@ -890,7 +890,7 @@ call-less program,  the initial state of  the minefield
 semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
 \ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
 e_{\mainpgm}$.
-  
+   
  
 \subsection{Soundness Results}
 We first need an auxiliary  result about minefield semantics. Consider
@@ -899,7 +899,7 @@ S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
 $\rightsquigarrow$ step, the demand $\sigma$ on the expression $e$ (or
 application $s$) is  non-null.  This can be proved by  an induction on
 the number  of steps leading  to the  minefield state.  The  base step
-holds   because  the   demand   $\sigma_{all}$   on  $(\mainpgm)$   is
+holds   because  the   demand   $\sigma_{\mathit{all}}$   on  $(\mainpgm)$   is
 non-null. For the inductive step we  observe that for each step of the
 minefield semantics, if the demand $\sigma$  on the LHS of a minefield
 step  is non-null,  the  demand  on the  RHS  is  a transformation  of
@@ -1267,9 +1267,9 @@ the grammars may not be necessarily generated from liveness analysis.
 \newcommand{\state}{\ensuremath{\mathsf{S}}}
 \newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}  
 \begin{lemma}\label{lemma:grammar-undecidable}
-Consider a grammar    $G$    of   the    kind    described    in
+Given a grammar    $G$    of   the    kind    described    in
 Definition~\ref{def:specialgrammar}  and a forward access path $\alpha$
-consisting  of symbols \acar\  and \acdr\  only. The membership problem
+consisting  of symbols \acar\  and \acdr\  only, the membership problem
 $\alpha\$ \in \mathscr{L}(G)$ is undecidable.
 \end{lemma} 
 
@@ -1362,21 +1362,21 @@ We now show that the proof can be replayed for the class of grammars
 generated from liveness analysis of programs. 
 
 \begin{lemma}\label{lemma:grammar-from-analysis-undecidable}
-Consider    a    grammar    $G$    of   the    kind    described    in
+Given   a    grammar    $G$    of   the    kind    described    in
 Definition~\ref{def:specialgrammar}  that  is  generated  by  liveness
-analysis  of a  program,  and  a forward  access  path $\alpha$.   The
+analysis  of a  program  and  a forward  access  path $\alpha$,    the
 membership problem $\alpha\$ \in \mathscr{L}(G)$ is undecidable.
 \end{lemma} 
 
 \begin{proof}
 Given a Turing machine and an input string, we shall define a function
-for   each  of   the  non-terminals   introduced  in   the  proof   of
+for   each  non-terminal   introduced  in   the  proof   of
 Lemma~\ref{lemma:grammar-undecidable}.
 %% Liveness  analysis  of  $f$  will  result in  not  only  contain  a
 %% production  $P$ itself,  but could  also contain  extra productions
 %% that necessarily contain the \clazy\ symbol.
-For instance, corresponding to the production $\nont{i}{c} \rightarrow
-c \nont{j}{\acar}\bcar$, with $c$ as \acar\ for concreteness, consider
+For instance, corresponding to the production $\nont{i}{\acar} \rightarrow
+\acar \nont{j}{\acar}\bcar$,  consider
 the program:
  
 \input{equivalent-program}
@@ -1386,12 +1386,13 @@ corresponding function creates joins them with a $\SIF$.   If there
 are $n$ such functions,  then \mainpgm\  creates  a $n$-way
 branch  and inserts  a  single call  to a  distinct  function in  each
 branch. It can  be verified that the grammar for the function shown
-above, includes the productions:
+above, includes the productions---$\nont{\mathit{all}}{}$
+corresponds to the demand $\sigma_{\mathit{all}}$:
 \begin{align*}
-\nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{all}{} \\
-\nont{i}{\acar} &\rightarrow \clazy\nont{i}{\acar}\bcar\nont{all}{} \\
-\nont{all}{} &\rightarrow \epsilon \mid \acar\nont{all}{} \mid
-\acdr\nont{all}{}
+\nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
+\nont{i}{\acar} &\rightarrow \clazy\nont{i}{\acar}\bcar\nont{\mathit{all}}{} \\
+\nont{\mathit{all}}{} &\rightarrow \epsilon \mid \acar\nont{\mathit{all}}{} \mid
+\acdr\nont{\mathit{all}}{}
 \end{align*}
 
 
@@ -1404,14 +1405,14 @@ replaying the  earlier proof:  (a) If $\mathsf{S}  \rightarrow \beta_1
 grammar  generated from  liveness  analysis of the constructed program
 will  have the  production
 $\mathsf{S}      \rightarrow      \beta_1     \mathsf{S'}      \beta_2
-\nont{\mathit{all}}{}$,  and (b)  other  productions are  of the  form
+\nont{\mathit{\mathit{all}}}{}$,  and (b)  other  productions are  of the  form
 $\mathsf{S}       \rightarrow       \beta_1'\mathsf{S'}       \beta_2'
 \nont{\mathit{all}}{}$, where $\beta_1'$ and $\beta_2'$ do not contain
 any non-terminals.
 
 It is clear that if the TM given as an instance of the halting problem
 accepts the input string, then the earlier derivation can be replayed,
-replacing   $\nont{\mathit{all}}{}$   in   the  sentential   form   by
+every time replacing   $\nont{\mathit{\mathit{all}}}{}$   in   the  sentential   form   by
 $\epsilon$. Conversely,  if the TM  does not accept the  input string,
 then  any sentential  form derived  from the  start symbol  would have
 exactly one non-terminal, and this non-terminal will be different from
@@ -1556,24 +1557,22 @@ basis  of  reachability  (RGC  mode)  or  use
 liveness  DFAs  (LGC  mode).  
 
 In        the       liveness        analysis       described        in
-Section~\ref{sec:liveness-analysis}, the liveness of closure variables
-in  an application  $s$ is  derived from  dependence chains  along all
-paths from the program point where the closure is created to reachable
-evaluation  points.  Assume,  for   the  sake  of  concreteness,  that
-$\epath_1$  and $\epath_2$  two  such evaluation  points.   This is  a
-static approximation  without any  knowledge regarding which  of these
-paths will be  eventually taken during execution. During  garbage collection, we would
-like to use a more precise  liveness based on the  actual
-paths  taken  during  execution.    Therefore we create  liveness  automata
-separately  for the dependences in   $\epath_1$ and  $\epath_2$  as  well as  a  automaton
-corresponding to  both paths  $\epath_1$ and $\epath_2$.   The closure
-corresponding to  $s$ carries  the liveness  environment for  its free
-variables (as pointers to automata, one for each variable).  Initially
-the  liveness  environment is  based  on  the dependences  along  both
-$\epath_1$    and   $\epath_2$.    However,   after    evaluating   an
+Section~\ref{sec:liveness-analysis},   the  liveness   of  a   closure
+variable is  derived from dependence  chains along all paths  from the
+program point  where the closure  was created to  reachable evaluation
+points.  Assume,  for the  sake of  concreteness, that  $\epath_1$ and
+$\epath_2$ are two such evaluation points.  During garbage collection,
+we would like to use a more precise liveness, based on the actual paths
+taken  during  execution.   Therefore   we  create  separate  liveness
+automata for dependences  along paths to $\epath_1$  and $\epath_2$, in
+addition to  automata for dependences  along paths to  both $\epath_1$
+and $\epath_2$.  The closure carries  the liveness environment for its
+free  variables (as  pointers  to automata,  one  for each  variable).
+Initially the liveness  environment is based on  the dependences along
+both  $\epath_1$   and  $\epath_2$.   However,  after   evaluating  an
 \SIF\ condition, the liveness environments are updated to one based on
-either $\epath_1$ or  $\epath_2$, so that subsequent garbage collections  are based on
-more precise liveness information. 
+either   $\epath_1$  or   $\epath_2$,  so   that  subsequent   garbage
+collections are based on more precise liveness information.
 
 Based on  the above considerations,  we restrict the  possible garbage
 collection points in a function body to the following:
@@ -1764,31 +1763,19 @@ representative of practical programs.
 \newcommand{\hgt}{2.9cm}
 \begin{figure*}[t]
 \renewcommand{\arraystretch}{.1}
-\begin{tabular}{@{}c@{}@{}c@{}}
-%%    \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
-%%    & {\epsfig{file=lambda_win.eps, height=\hgt}}
-%% \\ \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
-%% &  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
-%% \\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
-%% &  \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
-%% \\ \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
-%% &  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
-%% \\ \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
-%% &  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
-%% \\ \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
-%% &  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
-%% \\ \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
-%% &  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
-%% \\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
-%% &  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
-   \hskip -4mm{\epsfig{file=lambda_win.eps, height=\hgt}}
+\begin{tabular}{@{}c@{}@{}c@{}@{}c@{}}
+   \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=nperm_win.eps, height=\hgt}}
-\\   \hskip -4mm{\epsfig{file=treejoin_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=paraffins.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=lcss_win.eps, height=\hgt}}
-\\   \hskip -4mm{\epsfig{file=sudoku_win.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=fibheap_win.eps, height=\hgt}}
-\\  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=huffman_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=knightstour_win.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=nqueens_win.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=deriv_win.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=lambda_win.eps, height=\hgt}}
 %\\ (a) & (b)
 \end{tabular}%\vskip -10mm
  \caption{Memory usage.  
@@ -2012,21 +1999,21 @@ Premise & Transition & Rule name \\
 \hline
 &\makecell{ $\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S,
   \heap, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\ell :=
-    \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
+    \kappa], e, \cred{\sigma'}$ }   &  {\sc const}
 \\
 \hline
 & \makecell{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
-  \rho', S, \heap[\ell := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
+  \rho', S, \heap[\ell := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  {\sc cons} \\
 \hline
 $\heap(\rho(x)) \mbox{ is } (v, d)$ & \makecell{$\rho, (\rho', \ell, e,
   \cred{\sigma'} )\!:\!S, \heap, (\CAR~x), \cred{\sigma}$  $
   \rightsquigarrow \rho', S, \heap[\ell := v], e, \cred{\sigma'}$}      &
-\sc{car-select} \\
+{\sc car-select} \\
 \hline
 $\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  \heap,\,
 (\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
 s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$      &
-\sc{car-1-clo} \\
+{\sc car-1-clo} \\
 
 
 \hline
@@ -2034,7 +2021,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
   \heap, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$}      &
-\sc{car-clo}
+{\sc car-clo}
 \\
 
 \hline
@@ -2042,53 +2029,53 @@ $\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$
  & \makecell{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap,
   (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, \heap[\ell
     := \heap(\rho'(x)) + \heap(\rho'(y))], e, \cred{\sigma'}$}      &
-\sc{prim-add} \\
+{\sc prim-add} \\
 \hline
 $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
   \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
-\sc{prim-1-clo} \\
+{\sc prim-1-clo} \\
 \hline
 $\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
   S, \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
-\sc{prim-2-clo} \\
+{\sc prim-2-clo} \\
 \hline
 {$\mathit{f}~\mbox{defined as}$
 $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell{$\rho, S, \heap,
   (f~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
     \rho(\myvec{x})], S, \heap, e_{\mathit{f}}, \cred{\sigma}$}      &
-\sc{funcall} \\
+{\sc funcall} \\
 \hline
 $\ell$ is a new location& \makecell{$\rho, S, \heap, (\LET~x\leftarrow
   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, \heap[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}\rangle], e, \cred{\sigma}$} &
-\sc{let} \\ 
+{\sc let} \\ 
 \hline
 $\heap(\rho(x)) \ne 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
-  \cred{\sigma}$  $\rightsquigarrow \rho, S, \heap,  e_1, \cred{\sigma}$} & \sc{if-true} \\
+  \cred{\sigma}$  $\rightsquigarrow \rho, S, \heap,  e_1, \cred{\sigma}$} & {\sc if-true} \\
 \hline
 $\heap(\rho(x)) = 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
   \cred{\sigma}$   $\rightsquigarrow
-\rho, S, \heap,  e_2, \cred{\sigma}$} & \sc{if-false} \\
+\rho, S, \heap,  e_2, \cred{\sigma}$} & {\sc if-false} \\
 \hline
 $\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
   (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
 \rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, \heap, s,
 \cred{\clazy\sigma}$}
 &
-\sc{if-clo} \\
+{\sc if-clo} \\
 \hline
 {$\heap(\rho(x))~\mbox{is in WHNF with value}~v$}& \makecell{$\rho,
   (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\ell := v], e, 
   \cred{\sigma'}$} &
-\sc{return-whnf}\\
+{\sc return-whnf}\\
 \hline
 $\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
   (\SRETURN~x), \cred{\sigma}$  $
   \rightsquigarrow$
 $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
   \cred{\sigma}$} &
-\sc{return-clo} \\
+{\sc return-clo} \\
 \hline
 \end{tabular}
 \caption{Minefield semantics.\label{fig:minefield-semantics}}

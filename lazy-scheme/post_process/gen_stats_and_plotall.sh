@@ -2,7 +2,7 @@
 DIR=`dirname $0`
 PROGNAME=`basename $0`
 TestBMs="  test testsmall small "
-SmallBMs=" nperm fibheap lambda sudoku lcss nqueens paraffins deriv"
+SmallBMs=" nperm fibheap lambda sudoku lcss nqueens paraffins deriv gc_bench"
 LargeBMs=" treejoin knightstour "
 AllBMs="$SmallBMs $LargeBMs"
 help()
@@ -55,6 +55,7 @@ limit["fft"]=172762
 limit["huffman"]=100070
 limit["paraffins"]=5185
 limit["deriv"]=11124
+limit["gc_bench"]=204813;
 ## UNUSED BMs
 limit["small"]=17
 limit["test"]=247

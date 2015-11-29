@@ -50,6 +50,9 @@ lazy-scheme/benchmarks/programs/nperm/results/
 lazy-scheme/benchmarks/programs/nqueens/results/
 lazy-scheme/benchmarks/programs/sudoku/results/
 lazy-scheme/benchmarks/programs/treejoin/results/
+lazy-scheme/benchmarks/programs/deriv/results/
+lazy-scheme/benchmarks/programs/huffman/results/
+lazy-scheme/benchmarks/programs/paraffins/results/
 lazy-scheme/src/output/anf_prog.txt
 lazy-scheme/src/output/fft/
 lazy-scheme/src/output/fft_gc-freq_output/
