@@ -12,7 +12,7 @@ set xlabel "paraffins"
 set border 3 lw 0
 
 set output "paraffins.eps"
-set xtics nomirror 19e5
+set xtics nomirror (".03" 3e3, ".06" 6e3, ".09" 9e3, ".12" 12e3, ".15" 15e3)
 set ytics nomirror 3e3
 set autoscale
 set grid noxtics
