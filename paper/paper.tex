@@ -512,7 +512,7 @@ next  in the  environment $\rho$.
 %% 3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
 %% system will be denoted $\mathcal{S}$.}
 The  initial  state  of  the  transition  system  described  above  is
-$([\;]_\rho,\,   (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
+$([\;]_\rho,\,    (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
 (\print~\ans)):[\;]_{S}, 
 [\;]_{\heap},\, (\mainpgm))$,  in which  $[\;]_\rho$,
 $[\;]_{\mbox \footnotesize {H}}$
@@ -893,13 +893,6 @@ e_{\mainpgm}$.
   
  
 \subsection{Soundness Results}
-
-%% We consider a round of  garbage collection followed by a transition
-%% as  a  step.  We  show  by  induction  that, for  programs  without
-%% function  calls, %%  starting from  the %%  initial state  that has
-%% $e_{\main}$ as the %% expression to be evaluated, any transition of
-%% $n$ steps occurs without a \bang.
-
 We first need an auxiliary  result about minefield semantics. Consider
 a trace of  a minefield execution.  For every  minefield state $(\rho,
 S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
@@ -910,13 +903,7 @@ holds   because  the   demand   $\sigma_{all}$   on  $(\mainpgm)$   is
 non-null. For the inductive step we  observe that for each step of the
 minefield semantics, if the demand $\sigma$  on the LHS of a minefield
 step  is non-null,  the  demand  on the  RHS  is  a transformation  of
-$\sigma$ (for example $\clazy\sigma$) which is also non-null.
-
-%% Let  us clarify  this  observation: Since  the minefield  semantics
-%% models lazy evaluation,  parts of the program may  not be evaluated
-%% at all.  However,  if an expression (or application)  happens to be
-%% evaluated, it will  appear on the LHS of a  minefield step, and the
-%% context-sensitive demand on it will be non-null.
+$\sigma$ (for example $(\clazy\cup\acar)\sigma$) which is also non-null.
 
 Note that our proofs will be for a single round of minefield execution
 i.e.  the evaluation of $(\mainpgm)$ (or $e_{\mainpgm}$, for call-less
@@ -936,9 +923,10 @@ Call a $GC(\ldots)$  followed by a $\rightsquigarrow$  transition as a
 step. Consider a state $(\rho, S,  \heap, e, \sigma)$ in the minefield
 execution of a  program.  We show by induction on  the number of steps
 $n$ leading  to this  state that  the next  transition cannot  enter a
-\bang\ state.  When $n$ is 0,  the state is $([\;]_\rho,\_, [\;]_{S} ,
-            [\;]_{\heap},  e_{\mainpgm},  \sigma_{all})$.   Since  the
-            call to $GC(\ldots)$  in this state does  nothing, we just
+\bang\ state.  When $n$ is 0,  the state is $([\;]_\rho,\,    (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
+(\print~\ans)):[\;]_{S}, 
+[\;]_{\heap},\, (\mainpgm))$.   Since  the
+            call to $GC$  in this state does  nothing, we just
             have to show that the $\rightsquigarrow$ transition cannot
             enter  a \bang\  state.  Since  our programs  are in  ANF,
             $e_{\mainpgm}$ can  only be  a $\LET$ expression.   A {\sc
@@ -947,17 +935,16 @@ $n$ leading  to this  state that  the next  transition cannot  enter a
 
 For the inductive step, we shall show that none of the minefield steps
 that involves dereferencing  results in a \bang.  These  are the steps
-which  have a  $\heap(\rho(...))$ in  the  premise. 
-Now a  $\rightsquigarrow$ step can  go
-\bang\ because it dereferences a $\bot$ inserted by the
-immediately  preceding  garbage collection or  the garbage collection of  an  earlier
-minefield step.  \warning{However the  demand $\sigma'$
-  on basis of which an earlier collection would have inserted a
-  $\bot$,  would  have   included  the  current  demand
-  $\sigma$.  Thus,  if the  earlier garbage collection had  inserted a
-$\bot$, so would the current  garbage collection.  Thus it is enough to
-consider the $\rightsquigarrow$  along with the current
-GC and show that it does not lead to a \bang.}
+which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
+$\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
+inserted  by  the  immediately  preceding garbage  collection  or  the
+garbage collection of an earlier minefield step.  \warning{However the
+  demand $\sigma'$ on basis of  which an earlier collection would have
+  inserted a $\bot$, would have  included the current demand $\sigma$.
+  Thus, if  the earlier garbage  collection had inserted a  $\bot$, so
+  would the current garbage collection.  Thus it is enough to consider
+  the $\rightsquigarrow$  along with the  current GC and show  that it
+  does not lead to a \bang.}
 
 We consider the rules {\sc car-clo} and {\sc car-1-clo} only.  
 The rest  of the rules involve similar reasoning. For the {\sc
@@ -975,8 +962,8 @@ of    $x$   will    include    both   $\epsilon$    and
 $\acar\epsilon$,  and  a  garbage collection with  this  liveness  will
 neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
 first   component  of   the   cons   cell.  Thus   both
-dereferences    will    happen   normally    and    the
-$\rightsquigarrow$ step will not enter \bang.
+dereferences    can take place without 
+$\rightsquigarrow$ entering the   \bang\ state.
 \end{proof} 
 
 Now we are ready to prove the main soundness result.
