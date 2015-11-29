@@ -2086,6 +2086,7 @@ cons* followpaths(cons* loc, state_index index, ostream& out)
 			 loccopy->val.closure.arg2 = new_arg2;
 
 		 }
+
 	 }
 
 	  if (loccopy->val.closure.arg1 != NULL)
@@ -2791,7 +2792,7 @@ void create_heap_bft(ostream& out)
 	add_elements_to_vector(print_vector, print_stack);
 	for (auto ele : print_vector)
 	{
-		if (heap_map.find(ele) == heap_map.end())
+		if (ele && heap_map.find(ele) == heap_map.end())
 		{
 			assert(is_valid_address(ele));
 			heap_map[ele] = index;

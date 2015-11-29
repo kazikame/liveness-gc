@@ -1,30 +1,20 @@
-(define ( and a b)
- (if a 
- (if b #t 
- #f ) 
- #f))
-
-(define ( or a b)
- (if a a 
- b 
- ))
-
-(define (list listx ) (cons listx () ) ) 
+#lang racket
+(define (list listx ) (cons listx '() ) ) 
 
 (define (id idx ) idx ) 
 
 (define (firstcol fcx ) 
-(if (null? fcx ) () 
+(if (null? fcx ) '() 
 (cons (car (car fcx ) ) 
 (firstcol (cdr fcx ) ) ) ) ) 
 
 (define (rest rx ) 
-(if (null? rx ) () 
+(if (null? rx ) '() 
 (cons (cdr (car rx ) ) 
 (rest (cdr rx ) ) ) ) ) 
 
 (define (transpose tx ) 
-(if (null? (car tx ) ) () 
+(if (null? (car tx ) ) '() 
 (cons (firstcol tx ) 
 (transpose (rest tx ) ) ) ) ) 
 
@@ -34,7 +24,7 @@
 (append (cdr ax ) ay ) ) ) ) 
 
 (define (concat cx ) 
-(if (null? cx ) () 
+(if (null? cx ) '() 
 (append (car cx ) 
 (concat (cdr cx ) ) ) ) ) 
 
@@ -43,7 +33,7 @@
 (+ 1 (length (cdr lx ) ) ) ) ) 
 
 (define (take tkn tkx ) 
-(if (eq? tkn 0 ) () 
+(if (eq? tkn 0 ) '() 
 (cons (car tkx ) 
 (take (- tkn 1 ) (cdr tkx ) ) ) ) ) 
 
@@ -62,7 +52,7 @@
 (define (single sx ) (if (eq? (length sx ) 1 ) #t #f ) ) 
 
 (define (map-cols mcx ) 
-(if (null? mcx ) () 
+(if (null? mcx ) '() 
 (cons (cols (car mcx ) ) 
 (map-cols (cdr mcx ) ) ) ) ) 
 
@@ -73,12 +63,12 @@
 (define (boxes bsx ) (unpack (map-cols (pack bsx ) ) ) ) 
 
 (define (map-split msx ) 
-(if (null? msx ) () 
+(if (null? msx ) '() 
 (cons (split (car msx ) ) 
 (map-split (cdr msx ) ) ) ) ) 
 
 (define (map-concat mcox ) 
-(if (null? mcox ) () 
+(if (null? mcox ) '() 
 (cons (concat (car mcox ) ) 
 (map-concat (cdr mcox ) ) ) ) ) 
 
@@ -101,7 +91,7 @@
 (and (not (elem (car ndx ) (cdr ndx ) ) ) (nodups (cdr ndx ) ) ) ) ) 
 
 (define (map-nodups mndx ) 
-(if (null? mndx ) () 
+(if (null? mndx ) '() 
 (cons (nodups (car mndx ) ) 
 (map-nodups (cdr mndx ) ) ) ) ) 
 
@@ -113,12 +103,12 @@
 ; (all-nodups (boxes vg ) ) ) ) ) 
 
 (define (map-choice mchx ) 
-(if (null? mchx ) () 
+(if (null? mchx ) '() 
 (cons (choice (car mchx ) ) 
 (map-choice (cdr mchx ) ) ) ) ) 
 
 (define (map-map-choice mmchx ) 
-(if (null? mmchx ) () 
+(if (null? mmchx ) '() 
 (cons (map-choice (car mmchx ) ) 
 (map-map-choice (cdr mmchx ) ) ) ) ) 
 
@@ -126,18 +116,18 @@
 
 (define (map-cp mcpx ) 
 (if (null? mcpx ) 
-() 
+'() 
 (cons (cp (car mcpx ) ) 
 (map-cp (cdr mcpx ) ) ) ) ) 
 
-(define (cp cpx ) (if (null? cpx ) (list () ) 
+(define (cp cpx ) (if (null? cpx ) (list '() ) 
 		 (concat (cphelp (car cpx ) (cp (cdr cpx ) ) ) ) ) ) 
 
-(define (cphelp cphx cphy ) (if (null? cphx ) () 
+(define (cphelp cphx cphy ) (if (null? cphx ) '() 
 			 (cons (cphelp2 (car cphx ) cphy ) 
 			 (cphelp (cdr cphx ) cphy ) ) ) ) 
 
-(define (cphelp2 cph2x cph2y ) (if (null? cph2y ) () 
+(define (cphelp2 cph2x cph2y ) (if (null? cph2y ) '() 
 			 (cons (cons cph2x (car cph2y ) ) 
 				 (cphelp2 cph2x (cdr cph2y ) ) ) ) ) 
 
@@ -155,7 +145,7 @@
 (remove rmvv (cdr rmvx ) ) 
 (cons (car rmvx ) (remove rmvv (cdr rmvx ) ) ) ) ) ) 
 
-(define (filter-single fslx ) (if (null? fslx ) () 
+(define (filter-single fslx ) (if (null? fslx ) '() 
 			 (if (single (car fslx ) ) 
 			 (cons (car fslx ) (filter-single (cdr fslx ) ) ) 
 			 (filter-single (cdr fslx ) ) ) ) ) 
@@ -165,14 +155,14 @@
 
 (define (reducehelp redhx rsingles ) 
 		 (if (null? redhx ) 
-			 () 
+			 '() 
 			 (cons (minus (car redhx ) rsingles ) 
 			 (reducehelp (cdr redhx ) rsingles ) ) ) ) 
 
 (define (prune prux ) (pruneby-boxes (pruneby-cols (pruneby-rows prux ) ) ) ) 
 
 (define (map-reduce mredx ) 
-(if (null? mredx ) () 
+(if (null? mredx ) '() 
 (cons (reduce (car mredx ) ) (map-reduce (cdr mredx ) ) ) ) ) 
 
 (define (pruneby-boxes prubx ) 
@@ -188,7 +178,7 @@
 (alltrue (map-single asex ) ) ) 
 
 (define (map-single msex ) 
-(if (null? msex ) () 
+(if (null? msex ) '() 
 (cons (single (car msex ) ) 
 (map-single (cdr msex ) ) ) ) ) 
 
@@ -196,7 +186,7 @@
 (alltrue (map-all-single aasex ) ) ) 
 
 (define (map-all-single masex ) 
-(if (null? masex ) () 
+(if (null? masex ) '() 
 (cons (all-single (car masex ) ) 
 (map-all-single (cdr masex ) ) ) ) ) 
 
@@ -217,7 +207,7 @@
 (define (all-consistent actx ) (alltrue (map-consistent actx ) ) ) 
 
 (define (map-consistent mctx ) 
-(if (null? mctx ) () 
+(if (null? mctx ) '() 
 (cons (consistent (car mctx ) ) 
 (map-consistent (cdr mctx ) ) ) ) ) 
 
@@ -232,13 +222,13 @@
 (not (safe bkdx ) ) ) ) ) 
 
 (define (search m ) 
-(if (blocked m ) () 
+(if (blocked m ) '() 
 (if (complete m ) (collapse m ) 
 	 (let ((m1 (expand m ) ) ) 
 (searchhelp m1 ) ) ) ) ) 
 
 (define (searchhelp m2 ) 
-(if (null? m2 ) () 
+(if (null? m2 ) '() 
 (let ((s2 (search (prune (car m2 ) ) ) ) ) 
 (if (single s2 ) 
 s2 
@@ -252,24 +242,24 @@ s2
 (any-not-single (cdr ansx ) ) ) ) ) 
 
 (define (until-any-not-single uansx ) 
-(if (null? uansx ) () 
-(if (any-not-single (car uansx ) ) () 
+(if (null? uansx ) '() 
+(if (any-not-single (car uansx ) ) '() 
 (cons (car uansx ) 
 (until-any-not-single (cdr uansx ) ) ) ) ) ) 
 
 (define (after-any-not-single aansx ) 
-(if (null? aansx ) () 
+(if (null? aansx ) '() 
 (if (any-not-single (car aansx ) ) aansx 
 (after-any-not-single (cdr aansx ) ) ) ) ) 
 
 (define (until-not-single unsx ) 
-(if (null? unsx ) () 
-(if (not-single (car unsx ) ) () 
+(if (null? unsx ) '() 
+(if (not-single (car unsx ) ) '() 
 (cons (car unsx ) 
 (until-not-single (cdr unsx ) ) ) ) ) ) 
 
 (define (after-not-single afnsx ) 
-(if (null? afnsx ) () 
+(if (null? afnsx ) '() 
 (if (not-single (car afnsx ) ) afnsx 
 (after-not-single (cdr afnsx ) ) ) ) ) 
 
@@ -285,7 +275,7 @@ s2
 		 (expandhelp vrows1 vrow1 vrow2 vrows2 vcs ) ) ) ) ) ) ) ) ) ) 
 
 (define (expandhelp vrs1 vr1 vr2 vrs2 ehx ) 
-(if (null? ehx ) () 
+(if (null? ehx ) '() 
 (let ((vnr (append vr1 (cons (list (car ehx ) ) vr2 ) ) ) ) 
 (let ((vnb (append vrs1 (cons vnr vrs2 ) ) ) ) 
 (cons vnb (expandhelp vrs1 vr1 vr2 vrs2 (cdr ehx ) ) ) ) ) ) ) 
@@ -303,20 +293,20 @@ s2
 ; (if (empty chv ) vals (list chv ) ) ) ) 
 
 (define (choice chv ) 
-(let ((vals (cons 1 (cons 2 (cons 3 (cons 4 () ) ) ) ) ) ) 
+(let ((vals (cons 1 (cons 2 (cons 3 (cons 4 '() ) ) ) ) ) ) 
 (if (empty chv ) vals (list chv ) ) ) ) 
 
 
-(let ((b1 (cons (cons 8 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 0 (cons 0 (cons 3 (cons 6 (cons 0 (cons 0 (cons 0 (cons 0 (cons 8 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 0 (cons 7 (cons 0 (cons 0 (cons 9 (cons 0 (cons 2 (cons 0 (cons 0 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 0 (cons 5 (cons 0 (cons 0 (cons 0 (cons 7 (cons 0 (cons 0 (cons 0 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 0 (cons 0 (cons 0 (cons 0 (cons 4 (cons 5 (cons 7 (cons 0 (cons 0 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 6 (cons 0 (cons 0 (cons 1 (cons 0 (cons 4 (cons 0 (cons 3 (cons 0 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 0 (cons 0 (cons 1 (cons 0 (cons 0 (cons 0 (cons 0 (cons 6 (cons 8 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 0 (cons 4 (cons 8 (cons 5 (cons 0 (cons 0 (cons 0 (cons 1 (cons 0 () ) ) ) ) ) ) ) ) ) 
-(cons (cons 0 (cons 9 (cons 7 (cons 0 (cons 0 (cons 0 (cons 4 (cons 0 (cons 0 () ) ) ) ) ) ) ) ) ) 
-() ) ) ) ) ) ) ) ) ) 
+(let ((b1 (cons (cons 8 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 (cons 0 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 0 (cons 0 (cons 3 (cons 6 (cons 0 (cons 0 (cons 0 (cons 0 (cons 8 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 0 (cons 7 (cons 0 (cons 0 (cons 9 (cons 0 (cons 2 (cons 0 (cons 0 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 0 (cons 5 (cons 0 (cons 0 (cons 0 (cons 7 (cons 0 (cons 0 (cons 0 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 0 (cons 0 (cons 0 (cons 0 (cons 4 (cons 5 (cons 7 (cons 0 (cons 0 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 6 (cons 0 (cons 0 (cons 1 (cons 0 (cons 4 (cons 0 (cons 3 (cons 0 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 0 (cons 0 (cons 1 (cons 0 (cons 0 (cons 0 (cons 0 (cons 6 (cons 8 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 0 (cons 4 (cons 8 (cons 5 (cons 0 (cons 0 (cons 0 (cons 1 (cons 0 '() ) ) ) ) ) ) ) ) ) 
+(cons (cons 0 (cons 9 (cons 7 (cons 0 (cons 0 (cons 0 (cons 4 (cons 0 (cons 0 '() ) ) ) ) ) ) ) ) ) 
+'() ) ) ) ) ) ) ) ) ) 
 ) ) 
 (solve b1 ) 
 ) 

@@ -1,385 +1,394 @@
-(define (and anx any)
-        (let ((_var0 #t))
-             (let ((_var1 (eq? anx
-                               _var0)))
-                  (if _var1
-                      any
-                      (let ((_var2 #f))
-                           _var2)))))
-
-(define (or orx ory)
-        (let ((_var3 #t))
-             (let ((_var4 (eq? orx
-                               _var3)))
-                  (if _var4
-                      orx
-                      ory))))
+(define (or a b)
+        (if a
+            a
+            b))
 
 (define (append ax ay)
-        (let ((_var5 (null? ax)))
-             (if _var5
+        (let ((_var0 (null? ax)))
+             (if _var0
                  ay
-                 (let ((_var6 (car ax)))
-                      (let ((_var8 (cdr ax)))
-                           (let ((_var9 (append _var8
+                 (let ((_var1 (car ax)))
+                      (let ((_var3 (cdr ax)))
+                           (let ((_var4 (append _var3
                                                 ay)))
-                                (let ((_var7 (cons _var6
-                                                   _var9)))
-                                     _var7)))))))
+                                (let ((_var2 (cons _var1
+                                                   _var4)))
+                                     _var2)))))))
 
 (define (divide1 a b n op)
-        (let ((_var11 (< a
-                         b)))
-             (if _var11
-                 (let ((_var12 0))
-                      (let ((_var13 (eq? op
-                                         _var12)))
-                           (if _var13
+        (let ((_var6 (< a
+                        b)))
+             (if _var6
+                 (let ((_var7 0))
+                      (let ((_var8 (eq? op
+                                        _var7)))
+                           (if _var8
                                n
                                a)))
-                 (let ((_var14 (- a
-                                  b)))
-                      (let ((_var16 1))
-                           (let ((_var17 (+ _var16
+                 (let ((_var9 (- a
+                                 b)))
+                      (let ((_var11 1))
+                           (let ((_var12 (+ _var11
                                             n)))
-                                (let ((_var15 (divide1 _var14
+                                (let ((_var10 (divide1 _var9
                                                        b
-                                                       _var17
+                                                       _var12
                                                        op)))
-                                     _var15)))))))
+                                     _var10)))))))
 
 (define (divide a b)
-        (let ((_var19 0))
-             (let ((_var21 0))
-                  (let ((_var20 (divide1 a
+        (let ((_var14 0))
+             (let ((_var16 0))
+                  (let ((_var15 (divide1 a
                                          b
-                                         _var19
-                                         _var21)))
-                       _var20))))
+                                         _var14
+                                         _var16)))
+                       _var15))))
 
 (define (take n lst)
-        (let ((_var23 0))
-             (let ((_var24 (eq? _var23
+        (let ((_var18 0))
+             (let ((_var19 (eq? _var18
                                 n)))
-                  (if _var24
-                      (let ((_var25 '()))
-                           _var25)
-                      (let ((_var26 (car lst)))
-                           (let ((_var28 1))
-                                (let ((_var29 (- n
-                                                 _var28)))
-                                     (let ((_var31 (cdr lst)))
-                                          (let ((_var30 (take _var29
-                                                              _var31)))
-                                               (let ((_var27 (cons _var26
-                                                                   _var30)))
-                                                    _var27))))))))))
+                  (if _var19
+                      (let ((_var20 '()))
+                           _var20)
+                      (let ((_var21 (car lst)))
+                           (let ((_var23 1))
+                                (let ((_var24 (- n
+                                                 _var23)))
+                                     (let ((_var26 (cdr lst)))
+                                          (let ((_var25 (take _var24
+                                                              _var26)))
+                                               (let ((_var22 (cons _var21
+                                                                   _var25)))
+                                                    _var22))))))))))
 
 (define (drop n lst)
-        (let ((_var34 0))
-             (let ((_var35 (eq? _var34
+        (let ((_var29 0))
+             (let ((_var30 (eq? _var29
                                 n)))
-                  (if _var35
+                  (if _var30
                       lst
-                      (let ((_var36 1))
-                           (let ((_var37 (- n
-                                            _var36)))
-                                (let ((_var39 (cdr lst)))
-                                     (let ((_var38 (drop _var37
-                                                         _var39)))
-                                          _var38))))))))
+                      (let ((_var31 1))
+                           (let ((_var32 (- n
+                                            _var31)))
+                                (let ((_var34 (cdr lst)))
+                                     (let ((_var33 (drop _var32
+                                                         _var34)))
+                                          _var33))))))))
 
 (define (reverse lst)
-        (let ((_var41 (null? lst)))
-             (if _var41
-                 (let ((_var42 '()))
-                      _var42)
-                 (let ((_var43 (cdr lst)))
-                      (let ((_var44 (reverse _var43)))
-                           (let ((_var46 (car lst)))
-                                (let ((_var48 '()))
-                                     (let ((_var47 (cons _var46
-                                                         _var48)))
-                                          (let ((_var45 (append _var44
-                                                                _var47)))
-                                               _var45)))))))))
+        (let ((_var36 (null? lst)))
+             (if _var36
+                 (let ((_var37 '()))
+                      _var37)
+                 (let ((_var38 (cdr lst)))
+                      (let ((_var39 (reverse _var38)))
+                           (let ((_var41 (car lst)))
+                                (let ((_var43 '()))
+                                     (let ((_var42 (cons _var41
+                                                         _var43)))
+                                          (let ((_var40 (append _var39
+                                                                _var42)))
+                                               _var40)))))))))
 
 (define (zip xs ys)
-        (let ((_var51 (null? xs)))
-             (let ((_var53 (null? ys)))
-                  (let ((_var52 (or _var51
-                                    _var53)))
-                       (if _var52
-                           (let ((_var55 '()))
-                                _var55)
-                           (let ((_var56 (car xs)))
-                                (let ((_var58 (car ys)))
-                                     (let ((_var57 (cons _var56
-                                                         _var58)))
-                                          (let ((_var61 (cdr xs)))
-                                               (let ((_var63 (cdr ys)))
-                                                    (let ((_var62 (zip _var61
-                                                                       _var63)))
-                                                         (let ((_var60 (cons _var57
-                                                                             _var62)))
-                                                              _var60))))))))))))
+        (let ((_var46 (null? xs)))
+             (let ((_var48 (null? ys)))
+                  (let ((_var47 (or _var46
+                                    _var48)))
+                       (if _var47
+                           (let ((_var50 '()))
+                                _var50)
+                           (let ((_var51 (car xs)))
+                                (let ((_var53 (car ys)))
+                                     (let ((_var52 (cons _var51
+                                                         _var53)))
+                                          (let ((_var56 (cdr xs)))
+                                               (let ((_var58 (cdr ys)))
+                                                    (let ((_var57 (zip _var56
+                                                                       _var58)))
+                                                         (let ((_var55 (cons _var52
+                                                                             _var57)))
+                                                              _var55))))))))))))
 
 (define (getLength lst)
-        (let ((_var66 (null? lst)))
-             (if _var66
-                 (let ((_var67 0))
-                      _var67)
-                 (let ((_var68 1))
-                      (let ((_var70 (cdr lst)))
-                           (let ((_var71 (getLength _var70)))
-                                (let ((_var69 (+ _var68
-                                                 _var71)))
-                                     _var69)))))))
+        (let ((_var61 (null? lst)))
+             (if _var61
+                 (let ((_var62 0))
+                      _var62)
+                 (let ((_var63 1))
+                      (let ((_var65 (cdr lst)))
+                           (let ((_var66 (getLength _var65)))
+                                (let ((_var64 (+ _var63
+                                                 _var66)))
+                                     _var64)))))))
 
 (define (findk k km m pairs)
-        (let ((_var73 (null? pairs)))
-             (if _var73
+        (let ((_var68 (null? pairs)))
+             (if _var68
                  km
-                 (let ((_var74 (car pairs)))
-                      (let ((_var75 (car _var74)))
-                           (let ((_var77 (car pairs)))
-                                (let ((_var78 (cdr _var77)))
-                                     (let ((s (+ _var75
-                                                 _var78)))
-                                          (let ((_var80 (< s
+                 (let ((_var69 (car pairs)))
+                      (let ((_var70 (car _var69)))
+                           (let ((_var72 (car pairs)))
+                                (let ((_var73 (cdr _var72)))
+                                     (let ((s (+ _var70
+                                                 _var73)))
+                                          (let ((_var75 (< s
                                                            m)))
-                                               (if _var80
+                                               (if _var75
+                                                   (let ((_var76 1))
+                                                        (let ((_var77 (+ _var76
+                                                                         k)))
+                                                             (let ((_var79 (cdr pairs)))
+                                                                  (let ((_var78 (findk _var77
+                                                                                       km
+                                                                                       m
+                                                                                       _var79)))
+                                                                       _var78))))
                                                    (let ((_var81 1))
                                                         (let ((_var82 (+ _var81
                                                                          k)))
                                                              (let ((_var84 (cdr pairs)))
                                                                   (let ((_var83 (findk _var82
-                                                                                       km
-                                                                                       m
-                                                                                       _var84)))
-                                                                       _var83))))
-                                                   (let ((_var86 1))
-                                                        (let ((_var87 (+ _var86
-                                                                         k)))
-                                                             (let ((_var89 (cdr pairs)))
-                                                                  (let ((_var88 (findk _var87
                                                                                        k
                                                                                        s
-                                                                                       _var89)))
-                                                                       _var88))))))))))))))
+                                                                                       _var84)))
+                                                                       _var83))))))))))))))
 
 (define (elem n lst)
-        (let ((_var91 (null? lst)))
-             (if _var91
-                 (let ((_var92 0))
-                      _var92)
-                 (let ((_var93 (car lst)))
-                      (let ((_var94 (eq? _var93
+        (let ((_var86 (null? lst)))
+             (if _var86
+                 (let ((_var87 0))
+                      _var87)
+                 (let ((_var88 (car lst)))
+                      (let ((_var89 (eq? _var88
                                          n)))
-                           (if _var94
-                               (let ((_var95 1))
-                                    _var95)
-                               (let ((_var96 (cdr lst)))
-                                    (let ((_var97 (elem n
-                                                        _var96)))
-                                         _var97))))))))
+                           (if _var89
+                               (let ((_var90 1))
+                                    _var90)
+                               (let ((_var91 (cdr lst)))
+                                    (let ((_var92 (elem n
+                                                        _var91)))
+                                         _var92))))))))
 
 (define (zip0 lst)
-        (let ((_var98 (null? lst)))
-             (if _var98
-                 (let ((_var99 '()))
-                      _var99)
-                 (let ((_var100 (car lst)))
-                      (let ((_var102 0))
-                           (let ((_var101 (cons _var100
-                                                _var102)))
-                                (let ((_var105 (cdr lst)))
-                                     (let ((_var106 (zip0 _var105)))
-                                          (let ((_var104 (cons _var101
-                                                               _var106)))
-                                               _var104)))))))))
+        (let ((_var93 (null? lst)))
+             (if _var93
+                 (let ((_var94 '()))
+                      _var94)
+                 (let ((_var95 (car lst)))
+                      (let ((_var97 0))
+                           (let ((_var96 (cons _var95
+                                               _var97)))
+                                (let ((_var100 (cdr lst)))
+                                     (let ((_var101 (zip0 _var100)))
+                                          (let ((_var99 (cons _var96
+                                                              _var101)))
+                                               _var99)))))))))
 
 (define (mapsnd pairs)
-        (let ((_var108 (null? pairs)))
-             (if _var108
-                 (let ((_var109 '()))
-                      _var109)
-                 (let ((_var110 (car pairs)))
-                      (let ((_var111 (cdr _var110)))
-                           (let ((_var113 (cdr pairs)))
-                                (let ((_var114 (mapsnd _var113)))
-                                     (let ((_var112 (cons _var111
-                                                          _var114)))
-                                          _var112))))))))
+        (let ((_var103 (null? pairs)))
+             (if _var103
+                 (let ((_var104 '()))
+                      _var104)
+                 (let ((_var105 (car pairs)))
+                      (let ((_var106 (cdr _var105)))
+                           (let ((_var108 (cdr pairs)))
+                                (let ((_var109 (mapsnd _var108)))
+                                     (let ((_var107 (cons _var106
+                                                          _var109)))
+                                          _var107))))))))
 
 (define (max a b)
-        (let ((_var116 (> a
+        (let ((_var111 (> a
                           b)))
-             (if _var116
+             (if _var111
                  a
                  b)))
 
 (define (algb2 k0j1 k1j1 pairs x)
-        (let ((_var117 (null? pairs)))
-             (if _var117
-                 (let ((_var118 '()))
-                      _var118)
-                 (let ((_var119 (car pairs)))
-                      (let ((k0j (cdr _var119)))
-                           (let ((_var121 (car pairs)))
-                                (let ((y (car _var121)))
-                                     (let ((_var123 (eq? x
+        (let ((_var112 (null? pairs)))
+             (if _var112
+                 (let ((_var113 '()))
+                      _var113)
+                 (let ((_var114 (car pairs)))
+                      (let ((k0j (cdr _var114)))
+                           (let ((_var116 (car pairs)))
+                                (let ((y (car _var116)))
+                                     (let ((_var118 (eq? x
                                                          y)))
-                                          (if _var123
-                                              (let ((_var124 1))
-                                                   (let ((kjcurr (+ _var124
+                                          (if _var118
+                                              (let ((_var119 1))
+                                                   (let ((kjcurr (+ _var119
                                                                     k0j1)))
-                                                        (let ((_var127 (cons y
+                                                        (let ((_var122 (cons y
                                                                              kjcurr)))
-                                                             (let ((_var129 (cdr pairs)))
-                                                                  (let ((_var130 (algb2 k0j
+                                                             (let ((_var124 (cdr pairs)))
+                                                                  (let ((_var125 (algb2 k0j
                                                                                         kjcurr
-                                                                                        _var129
+                                                                                        _var124
                                                                                         x)))
-                                                                       (let ((_var128 (cons _var127
-                                                                                            _var130)))
-                                                                            _var128))))))
+                                                                       (let ((_var123 (cons _var122
+                                                                                            _var125)))
+                                                                            _var123))))))
                                               (let ((kjcurr (max k1j1
                                                                  k0j)))
-                                                   (let ((_var127 (cons y
+                                                   (let ((_var122 (cons y
                                                                         kjcurr)))
-                                                        (let ((_var129 (cdr pairs)))
-                                                             (let ((_var130 (algb2 k0j
+                                                        (let ((_var124 (cdr pairs)))
+                                                             (let ((_var125 (algb2 k0j
                                                                                    kjcurr
-                                                                                   _var129
+                                                                                   _var124
                                                                                    x)))
-                                                                  (let ((_var128 (cons _var127
-                                                                                       _var130)))
-                                                                       _var128))))))))))))))
+                                                                  (let ((_var123 (cons _var122
+                                                                                       _var125)))
+                                                                       _var123))))))))))))))
 
 (define (algb1 xs pairs)
-        (let ((_var132 (null? xs)))
-             (if _var132
-                 (let ((_var133 (mapsnd pairs)))
-                      _var133)
-                 (let ((_var134 0))
-                      (let ((_var136 0))
-                           (let ((_var138 (car xs)))
-                                (let ((n (algb2 _var134
-                                                _var136
+        (let ((_var127 (null? xs)))
+             (if _var127
+                 (let ((_var128 (mapsnd pairs)))
+                      _var128)
+                 (let ((_var129 0))
+                      (let ((_var131 0))
+                           (let ((_var133 (car xs)))
+                                (let ((n (algb2 _var129
+                                                _var131
                                                 pairs
-                                                _var138)))
-                                     (let ((_var140 (cdr xs)))
-                                          (let ((_var141 (algb1 _var140
+                                                _var133)))
+                                     (let ((_var135 (cdr xs)))
+                                          (let ((_var136 (algb1 _var135
                                                                 n)))
-                                               _var141)))))))))
+                                               _var136)))))))))
 
 (define (algb xs ys)
-        (let ((_var142 0))
-             (let ((_var144 (zip0 ys)))
-                  (let ((_var145 (algb1 xs
-                                        _var144)))
-                       (let ((_var143 (cons _var142
-                                            _var145)))
-                            _var143)))))
+        (let ((_var137 0))
+             (let ((_var139 (zip0 ys)))
+                  (let ((_var140 (algb1 xs
+                                        _var139)))
+                       (let ((_var138 (cons _var137
+                                            _var140)))
+                            _var138)))))
 
 (define (algc m n xs ys lst)
-        (let ((_var147 (null? ys)))
-             (if _var147
+        (let ((_var142 (null? ys)))
+             (if _var142
                  lst
-                 (let ((_var148 1))
-                      (let ((_var150 (getLength xs)))
-                           (let ((_var149 (eq? _var148
-                                               _var150)))
-                                (if _var149
-                                    (let ((_var152 1))
-                                         (let ((_var154 (car xs)))
-                                              (let ((_var155 (elem _var154
+                 (let ((_var143 1))
+                      (let ((_var145 (getLength xs)))
+                           (let ((_var144 (eq? _var143
+                                               _var145)))
+                                (if _var144
+                                    (let ((_var147 1))
+                                         (let ((_var149 (car xs)))
+                                              (let ((_var150 (elem _var149
                                                                    ys)))
-                                                   (let ((_var153 (eq? _var152
-                                                                       _var155)))
-                                                        (if _var153
-                                                            (let ((_var157 (car xs)))
-                                                                 (let ((_var158 (cons _var157
+                                                   (let ((_var148 (eq? _var147
+                                                                       _var150)))
+                                                        (if _var148
+                                                            (let ((_var152 (car xs)))
+                                                                 (let ((_var153 (cons _var152
                                                                                       lst)))
-                                                                      _var158))
+                                                                      _var153))
                                                             lst)))))
-                                    (let ((_var159 2))
+                                    (let ((_var154 2))
                                          (let ((m2 (divide m
-                                                           _var159)))
+                                                           _var154)))
                                               (let ((xs1 (take m2
                                                                xs)))
                                                    (let ((xs2 (drop m2
                                                                     xs)))
                                                         (let ((l1 (algb xs1
                                                                         ys)))
-                                                             (let ((_var161 (reverse xs2)))
-                                                                  (let ((_var163 (reverse ys)))
-                                                                       (let ((_var162 (algb _var161
-                                                                                            _var163)))
-                                                                            (let ((l2 (reverse _var162)))
-                                                                                 (let ((_var166 0))
-                                                                                      (let ((_var168 0))
-                                                                                           (let ((_var170 0))
-                                                                                                (let ((_var172 1))
-                                                                                                     (let ((_var171 (- _var170
-                                                                                                                       _var172)))
-                                                                                                          (let ((_var175 (zip l1
+                                                             (let ((_var156 (reverse xs2)))
+                                                                  (let ((_var158 (reverse ys)))
+                                                                       (let ((_var157 (algb _var156
+                                                                                            _var158)))
+                                                                            (let ((l2 (reverse _var157)))
+                                                                                 (let ((_var161 0))
+                                                                                      (let ((_var163 0))
+                                                                                           (let ((_var165 0))
+                                                                                                (let ((_var167 1))
+                                                                                                     (let ((_var166 (- _var165
+                                                                                                                       _var167)))
+                                                                                                          (let ((_var170 (zip l1
                                                                                                                               l2)))
-                                                                                                               (let ((k (findk _var166
-                                                                                                                               _var168
-                                                                                                                               _var171
-                                                                                                                               _var175)))
-                                                                                                                    (let ((_var177 (- m
+                                                                                                               (let ((k (findk _var161
+                                                                                                                               _var163
+                                                                                                                               _var166
+                                                                                                                               _var170)))
+                                                                                                                    (let ((_var172 (- m
                                                                                                                                       m2)))
-                                                                                                                         (let ((_var179 (- n
+                                                                                                                         (let ((_var174 (- n
                                                                                                                                            k)))
-                                                                                                                              (let ((_var181 (drop k
+                                                                                                                              (let ((_var176 (drop k
                                                                                                                                                    ys)))
-                                                                                                                                   (let ((ex1 (algc _var177
-                                                                                                                                                    _var179
+                                                                                                                                   (let ((ex1 (algc _var172
+                                                                                                                                                    _var174
                                                                                                                                                     xs2
-                                                                                                                                                    _var181
+                                                                                                                                                    _var176
                                                                                                                                                     lst)))
-                                                                                                                                        (let ((_var183 (take k
+                                                                                                                                        (let ((_var178 (take k
                                                                                                                                                              ys)))
-                                                                                                                                             (let ((_var184 (algc m2
+                                                                                                                                             (let ((_var179 (algc m2
                                                                                                                                                                   k
                                                                                                                                                                   xs1
-                                                                                                                                                                  _var183
+                                                                                                                                                                  _var178
                                                                                                                                                                   ex1)))
-                                                                                                                                                  _var184)))))))))))))))))))))))))))))
+                                                                                                                                                  _var179)))))))))))))))))))))))))))))
 
 (define (lcss xs ys)
-        (let ((_var185 (getLength xs)))
-             (let ((_var187 (getLength ys)))
-                  (let ((_var189 '()))
-                       (let ((_var186 (algc _var185
-                                            _var187
+        (let ((_var180 (getLength xs)))
+             (let ((_var182 (getLength ys)))
+                  (let ((_var184 '()))
+                       (let ((_var181 (algc _var180
+                                            _var182
                                             xs
                                             ys
-                                            _var189)))
-                            _var186)))))
+                                            _var184)))
+                            _var181)))))
 
 (define (makeList n)
-        (let ((_var191 0))
-             (let ((_var192 (eq? _var191
+        (let ((_var186 0))
+             (let ((_var187 (eq? _var186
                                  n)))
-                  (if _var192
-                      (let ((_var193 '()))
-                           _var193)
-                      (let ((_var194 1))
-                           (let ((_var195 (- n
-                                             _var194)))
-                                (let ((_var196 (makeList _var195)))
-                                     (let ((_var197 (cons n
-                                                          _var196)))
-                                          _var197))))))))
+                  (if _var187
+                      (let ((_var188 '()))
+                           _var188)
+                      (let ((_var189 1))
+                           (let ((_var190 (- n
+                                             _var189)))
+                                (let ((_var191 (makeList _var190)))
+                                     (let ((_var192 (cons n
+                                                          _var191)))
+                                          _var192))))))))
 
-(let ((_var198 100))
-     (let ((a (makeList _var198)))
-          (let ((_var200 50))
-               (let ((b (makeList _var200)))
-                    (let ((_var202 (lcss a
-                                         b)))
-                         _var202)))))
+(define (run-in-loop a b n)
+        (let ((_var193 0))
+             (let ((_var194 (= n
+                               _var193)))
+                  (if _var194
+                      (let ((_var195 '()))
+                           _var195)
+                      (let ((_var196 (lcss a
+                                           b)))
+                           (let ((_var198 1))
+                                (let ((_var199 (- n
+                                                  _var198)))
+                                     (let ((_var200 (run-in-loop a
+                                                                 b
+                                                                 _var199)))
+                                          (let ((_var197 (cons _var196
+                                                               _var200)))
+                                               _var197)))))))))
+
+(let ((_var202 100))
+     (let ((a (makeList _var202)))
+          (let ((_var204 90))
+               (let ((b (makeList _var204)))
+                    (let ((_var206 8))
+                         (let ((_var207 (run-in-loop a
+                                                     b
+                                                     _var206)))
+                              _var207))))))
