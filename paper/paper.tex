@@ -143,9 +143,9 @@ liveness analysis itself and in the design of the garbage collector.
 %% collection  point  in   the  program  with  a   set  of  deterministic
 %% finite-state automata (DFA) describing the liveness at that point.
 To show the effectiveness of our method, we
-implement a copying collector that uses the results of the liveness
+implemented a copying collector that uses the results of the liveness
 analysis to preserve live 
-objects, both evaluated (i.e.  in WHNF) and closures.  Our experiments
+objects, both evaluated (i.e., in WHNF) and closures.  Our experiments
 confirm  that  for  programs  running with  a  liveness-based  garbage
 collector,   there  is   a   significant  decrease   in  peak   memory
 requirements.   In  addition,   a  sizable  reduction  in   the  number  of
@@ -172,19 +172,19 @@ the same program running with a reachabilty-based collector.
 
 Functional programs make extensive use of dynamically allocated
 memory.  The
-allocation  is either  explicit (using  constructors, for example) or
+allocation  is either  explicit (i. e., using  constructors) or
 implicit (creating  closures).  Programs  written in  lazy
 functional languages put additional  demands on memory as they require
 closures to  be carried  from the  point of creation  to the  point of
 evaluation.
 
 While  the runtime  system  of most  functional  languages includes  a
-garbage  collector    to  efficiently  reclaim  memory,  empirical
-studies on Scheme~\cite{karkare06effectiveness} and, more importantly,
-on  Haskell~\cite{rojemo96lag}  programs  have shown  that  garbage collectors  leave
-uncollected a  large number of  memory objects that are  reachable but
-not live (here {\em live} means  the object can potentially be used by
-the program  at a  later stage).  This  results in  unnecessary memory
+garbage collector to efficiently  reclaim memory, empirical studies on
+Scheme~\cite{karkare06effectiveness}   and,   more   importantly,   on
+Haskell~\cite{rojemo96lag} programs have shown that garbage collectors
+leave uncollected a large number  of memory objects that are reachable
+but not live (here {\em live} means the object can potentially be used
+by the program at a  later stage).  This results in unnecessary memory
 retention.
 
 In this paper,  we propose the use of liveness  analysis of heap cells
@@ -262,7 +262,7 @@ collector (RGC) will preserve all cells.
 In  this work  we show  that  static analysis  of heap  data can  help
 garbage collectors in reclaiming more garbage.  The specific
 contributions of this paper are
-\begin{itemize}
+\begin{myitemize}
 \item  We  formulate  a  liveness  analysis for  a  lazy  first-order
   functional language and  prove its correctness. The 
   proof involves specifying liveness through a non-standard semantics  and then proving the analysis 
@@ -280,7 +280,7 @@ contributions of this paper are
   updating liveness  information carried in closures  during execution
   results  in   more  garbage  being  collected.    Empirical  results
   show the effectiveness of liveness-based garbage collection.
-\end{itemize}
+\end{myitemize}
 As far as we know,  this is the first work on liveness-based garbage
   collection      for      lazy     languages.       All      previous
   attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
@@ -357,9 +357,11 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
        (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
     \end{array}\right.
 \end{eqnarray*}
+\vspace*{-6pt}
   \caption{The syntax of our language}\label{fig:lang-syntax}
-\figrule
+%\figrule
 \normalsize
+\vspace*{-6pt}
 \end{figure}
 
 
@@ -458,6 +460,7 @@ $\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, \heap,\,  s$} &
 \caption{The small-step semantics for the language. \label{fig:lang-semantics}}
 \end{center}
 %}\comment
+\vspace*{-6pt}
 \end{figure*}
 
 
@@ -1976,17 +1979,13 @@ propagated inside closures.
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
 
-\newpage
-\ 
-\newpage
-
-\section{Appendix: Not to be included in the paper.}
- 
-
+\clearpage
+\appendix
+%\section{Appendix: Not to be included in the paper.}
 \begin{figure*}[h!]
+\noindent{\Large \bf A. Minefield Semantics}
 \begin{center}\footnotesize
-\renewcommand{\arraystretch}{1.5}
-
+\renewcommand{\arraystretch}{1.2}
 
 \begin{tabular}{|c|c|c|}
 \hline

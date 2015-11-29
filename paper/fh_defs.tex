@@ -1,6 +1,23 @@
 %%%%%%%%%% IMPERATIVE %%%%%%%%%%%%
 
 \newcommand*\rot{\rotatebox{65}}
+
+\newcounter{lcount}
+\newenvironment{myenumerate}{
+\begin{list}{\arabic{lcount}.}
+{\usecounter{lcount}\setlength{\topsep}{1mm}\setlength{\itemsep}{0.25mm}
+\setlength{\parsep}{0.1mm}
+\setlength{\itemindent}{0mm}\setlength{\partopsep}{0mm}
+\setlength{\labelwidth}{15mm}
+\setlength{\leftmargin}{4mm}}}{\end{list}}
+
+\newenvironment{myitemize}{\begin{list}{$\bullet$}
+{\setlength{\topsep}{1mm}\setlength{\itemsep}{0.25mm}
+\setlength{\parsep}{0.1mm}
+\setlength{\itemindent}{0mm}\setlength{\partopsep}{0mm}
+\setlength{\labelwidth}{15mm}
+\setlength{\leftmargin}{4mm}}}{\end{list}}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Comment out a part of latex document
 \newcommand{\cmt}[1]{}
