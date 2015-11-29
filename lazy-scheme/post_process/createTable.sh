@@ -29,7 +29,7 @@ Lmin["huffman"]=72
 Lmin["knightstour"]=642303
 Lmin["nqueens"]=1082
 Lmin["deriv"]=589
-Lmin["treejoin"]=677800
+Lmin["treejoin"]=887005
 Lmin["lambda"]=18169
 Lmin["gc_bench"]=72
 
