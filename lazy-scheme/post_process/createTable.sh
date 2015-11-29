@@ -2,7 +2,7 @@
 DIR=`dirname $0`
 SCRIPT1=$DIR/touchedAndCopied.awk
 AllBMs="lambda nperm treejoin lcss sudoku fibheap nqueens gc_bench"
-AllBMs="fibheap sudoku nperm paraffins lcss huffman knightstour nqueens deriv treejoin lambda "
+AllBMs="fibheap sudoku nperm paraffins lcss huffman knightstour nqueens deriv treejoin lambda gc_bench "
 #AllBMs="sudoku"
 echo "\\newcommand{\\rlratio}{$\\frac{RGC}{LGC}$}"
 cat <<EOF
@@ -31,6 +31,7 @@ Lmin["nqueens"]=1082
 Lmin["deriv"]=589
 Lmin["treejoin"]=677800
 Lmin["lambda"]=18169
+Lmin["gc_bench"]=72
 
 declare -A Rmin
 Rmin["fibheap"]=37043
@@ -44,6 +45,7 @@ Rmin["nqueens"]=10101
 Rmin["deriv"]=11124
 Rmin["treejoin"]=1616533
 Rmin["lambda"]=20466
+Rmin["gc_bench"]=204813
 
 OUTPUTDIR=output.GOLD
 for BM in $AllBMs
