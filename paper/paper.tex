@@ -566,8 +566,8 @@ model  which  talks  about  liveness of  references.   Using  $\acar$,
 $\acdr$  to  represent access  using  $\CAR$  and $\CDR$  fields,  the
 liveness of the structure reachable from a variable can be represented
 by a set of {\em access paths} i.e.  prefix-closed set of strings from
-$\{\acar,\acdr\}^\ast$.  Given an initial location $\ell$ (typically a
-variable  reference) and  a heap  \heap, semantically  an access  path
+$\{\acar,\acdr\}^\ast$.  Given an initial location $\ell$ (usually a 
+reference corresponding to a variable) and  a heap  \heap, semantically  an access  path
 $\alpha$ represents  a reference, denoted $\heap\llbracket\ell,  \alpha\rrbracket$, in
 the heap  that is  obtained by  starting with  $\ell$ and  chasing the
 \CAR\ or  \CDR\ fields in the heap as specified  by the  access path.  
@@ -748,11 +748,11 @@ $\mathit{ref}(s,   \sigma',   \Lfonly)$   is  added   to   $\Lv   \cup
 As noted earlier, $x.\alpha \in  \Lv_y$ specifies the liveness  of the
 reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$ corresponds to  a closure-free path
 in \heap\   starting from $\rho(x)$.  If this  path is intercepted  by a
-closure,  say  $\CAR~{x_{\pi}}$, then  the  liveness  of further  heap
+closure,  say  $(\CAR~{x_{\pi}})$, then  the  liveness  of further  heap
 contents starting from $\mathit{x_{\pi}}$ is given by $\Lv_\mathit{x_{\pi}}$.
 
 
-%} %comment
+%} %comment 
 
 \subsection{Soundness of analysis}  
 
@@ -1407,7 +1407,7 @@ any non-terminals.
 It is clear that if the TM given as an instance of the halting problem
 accepts the input string, then the earlier derivation can be replayed,
 every time replacing   $\nont{\mathit{\mathit{all}}}{}$   in   the  sentential   form   by
-$\epsilon$. Conversely,  if the TM  does not accept the  input string,
+$\epsilon$. However,  if the TM  does not accept the  input string,
 then  any sentential  form derived  from the  start symbol  would have
 exactly one non-terminal, and this non-terminal will be different from
 $\nont{\mathit{final}}{c}$.  Thus  the  empty   string  would  not  be
