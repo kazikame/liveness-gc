@@ -136,7 +136,7 @@ garbage reclaimed and  a  reduction in  the peak memory requirement
 of programs.   While this  technique has already  been shown  to yield
 benefits for  eager first-order  languages, the  lack of  a statically
 determinable execution  order and  the presence  of closures  pose new
-challenges  for lazy  languages.  These  requires changes  both in  the
+challenges  for lazy  languages.  These  require changes  both in  the
 liveness analysis itself and in the design of the garbage collector.
 
 %% We use the  result of the analysis to annotate  each potential garbage
@@ -179,9 +179,9 @@ closures to  be carried  from the  point of creation  to the  point of
 evaluation.
 
 While  the runtime  system  of most  functional  languages includes  a
-garbage  collector  (GC)  to  efficiently  reclaim  memory,  empirical
+garbage  collector    to  efficiently  reclaim  memory,  empirical
 studies on Scheme~\cite{karkare06effectiveness} and, more importantly,
-on  Haskell~\cite{rojemo96lag}  programs  have shown  that  GCs  leave
+on  Haskell~\cite{rojemo96lag}  programs  have shown  that  garbage collectors  leave
 uncollected a  large number of  memory objects that are  reachable but
 not live (here {\em live} means  the object can potentially be used by
 the program  at a  later stage).  This  results in  unnecessary memory
@@ -191,20 +191,21 @@ In this paper,  we propose the use of liveness  analysis of heap cells
 for garbage collection in a lazy first-order functional language.  The
 central notion in our analysis  is a generalization of liveness called
 {\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
-expression.   The  analysis has  two  parts.   First, we  calculate  a
+expression.   The  analysis  has  two parts.   We  first  calculate  a
 context-sensitive  summary   of  each   function  as  a   {\em  demand
   transformer} that transforms a {\em  symbolic} demand on its body to
 demands  on its  arguments.   This  summary is  used  to step  through
-function  calls during  analysis.  Second,  the concrete  demand on  a
-function  body is  obtained through  a conservative approximation
-similar to 0-CFA~\cite{Shivers:1988} that combines the  demands on all the calls
-to  the function.   The result  of the  analysis is  an annotation  of
+function  calls  during analysis.   Next,  the  concrete demand  on  a
+function body is obtained through a conservative approximation similar
+to  0-CFA~\cite{Shivers:1988} that  combines  the demands  on all  the
+calls to the function.  The result of the analysis is an annotation of
 certain program points with  deterministic finite-state automata (DFA)
 capturing the liveness of variables at these points.  Depending on the
-program point where garbage collection has been triggered, the garbage
-collector consults a  set of automata to  restrict reachability during
-marking.  This  results in  an increase in  the garbage  reclaimed and
-consequently in fewer garbage collections.
+program  point where  garbage collection  has been  triggered, the
+garbage collector
+consults a  set of automata  to restrict reachability  during marking.
+This results in an increase  in the garbage reclaimed and consequently
+in fewer garbage collections.
 
 While this idea has been shown  to be effective for a first-order {\em
   eager}  language~\cite{asati14lgc}, a  straightforward extension  of
@@ -213,29 +214,24 @@ objects may  include closures (runtime representations  of unevaluated
 expressions).   Firstly, since  data  is made  live  by evaluation  of
 closures, and  in lazy languages the  place in the program  where this
 evaluation  takes  place  cannot be  statically  determined,  laziness
-complicates  liveness analysis  itself.  Secondly,  for liveness-based
-garbage collection to  be effective, we need  to extend liveness-based
-collection to closures apart from evaluated data.  Since a closure can
-escape the scope in which it was created, it has to carry the liveness
-information of  its free variables. Moreover,  as execution progresses
-and  possible  future uses  are  eliminated,  we update  the  liveness
-information  in a  closure with  a more  precise version.   Because of
-these reasons,  the garbage collector also  becomes significantly more
-complicated than a liveness-based collector for a eager language.
+complicates  liveness analysis  itself.  Moreover,  for liveness-based
+garbage collection to  be effective, we need to extend  it to closures
+apart from  evaluated data.  Since a  closure can escape the  scope in
+which it was created, it has  to carry the liveness information of its
+free variables. Moreover, as  execution progresses and possible future
+uses are eliminated,  we update the liveness information  in a closure
+with a  more precise version.  Because of these reasons,   the garbage
+collector  also   becomes  significantly   more  complicated   than  a
+liveness-based collector for a eager language.
 
 \warning{Experiments  with  a   single  generation  copying  collector
   (Section~\ref{sec:experiments})  confirm  the  expected  performance
   benefits.   Liveness-based  collection  results in  an  increase  in
-  garbage reclaimed.   As a  consequence, there is  a decrease  in the
-  number of  collections (up to 45\%)  and a decrease (up  to 88\%) in
-  the number  of {\em dragged}  cells (cells  that survive a  GC after
-  their  last use).  Besides,  there  is a  reduction  in the  overall
-  execution time for some programs.  Our experiments show that a mixed
-  strategy, where we  do liveness based GC up to  the closure boundary
-  and reachability based GC for  the arguments (free variables) of the
-  closure,  gives us  similar benefits  as a  fully liveness  based GC
-  (where  the  arguments  of  the closure  are  also  collected  using
-  liveness) with lesser overhead (Section~\ref{sec:strategies}).}
+  garbage reclaimed.   As a  consequence, there is  a reduction  in the
+  number of collections up to ???\% and a decrease in the
+  minimum memory requirement up to ???\%. 
+  As an added benefit, there is also a reduction in the overall
+  execution time for some programs.}
  
 
 %------------------------------------------------------------%
@@ -248,7 +244,7 @@ of $(\length\  \pz)$.  The heap is  represented by a graph  in which a
 node either  represents atomic  values ($\NIL$,  integers etc.),  or a
 \CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
 (represented  by  shaded  clouds).   Edges   in  the  graph  are  {\em
-  references} and represent  variables  or fields.  The figure shows
+  references} and represent values of  variables  or fields.  The figure shows
 the  lists \px\  and  \pz\ partially  evaluated.   The evaluation  was
 triggered by the test (\NULLQ~(\CAR~\pz)) in the \SIF\ expression.
 
@@ -618,7 +614,7 @@ result of $(\CDR~y)$.
 %% \epsilon\rbrace $ of $x$ at the  exit from $\pi$ becomes the demand
 %% on  $y+z$,  and  this,  in turn  generates  the  liveness  $\lbrace
 %% y.\epsilon, z.\epsilon \rbrace$ at the entry of $\pi$.
-
+  
 We use $\sigma$  to range over demands, $\alpha$ to  range over access
 paths  and $\Lv$  to range  over liveness  environments. $\Lv_y$  will
 denote  the liveness  of an  individual  variable $y$  in $\Lv$.   The
@@ -634,20 +630,20 @@ paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 \label{sec:liveness-analysis}
   
 %\comment{  
-Consider  the program in  Figure~\ref{fig:mot-example2}.  As
-  mentioned earlier,  a lazy  evaluation of  the $\LET$  expression at
-  $\pi_1$ creates a closure for $(length~x)$ instead of evaluating it.
-  Since the  closure may escape the  scope in which it  is created, it
-  carries a copy  of $x$ within itself.   We treat the copy  of $x$ in
-  the closure as being separate from the $x$ introduced by the $\LET$,
-  and call  it a \emph{closure variable}.   For liveness calculations,
-  such variables are distinguished from variables introduced by \LET s
-  and  function arguments  (called \emph{stack  variables} since  they
-  reside in the activation stack). Notationally, we distinguish
-  a closure variable from its corresponding stack variable by
-  subscripting it with the program point where the closure was created\footnote{Mutiple occurrences of the same variable in an
-    application are further distinguished by their positions in the
-    application.}. 
+Consider the  program in Figure~\ref{fig:mot-example2}.   As mentioned
+earlier, a lazy evaluation of the $\LET$ expression at $\pi_1$ creates
+a closure  for $(\length~\px)$  instead of  evaluating it.   Since the
+closure may escape the scope in which it is created, it carries a copy
+of $\px$ within itself.  We treat the  copy of $\px$ in the closure as
+being separate from the $\px$ introduced  by the $\LET$, and call it a
+\emph{closure  variable}.  For  liveness calculations,  such variables
+are distinguished  from variables  introduced by  \LET s  and function
+arguments  (called \emph{stack  variables}  since they  reside in  the
+activation  stack). Notationally,  we distinguish  a closure  variable
+from  its corresponding  stack variable  by subscripting  it with  the
+program   point  where   the   closure  was   created\footnote{Mutiple
+  occurrences  of the  same  variable in  an  application are  further
+  distinguished by their positions in the application.}.
 
 
   Since a  closure is evaluated  only at evaluation points,  a closure
@@ -665,27 +661,31 @@ Consider  the program in  Figure~\ref{fig:mot-example2}.  As
 
   Closure  variables get  their  liveness values  through  a chain  of
   dependences beginning at  a variable at an evaluation  point.  As an
-  example,  the  variable $z$  returned  at  $\psi_2$ depends  on  $y$
-  through  the  expression $(+~y~1)$.   $y$  in  turn depends  on  the
-  closure  variable  $x_{\pi_1}$   through  $(length~x_{\pi_1})$.   We
-  denote  this chain  of dependences  as $\lbrack  \psi_2\!\!\!:\!\!\!z \leftarrow
-  (+~y~1),\,  y  \leftarrow   (length~x_{\pi_1})\rbrack$.   Indeed,  the
+  example, consider the following program:
+
+\input{example-to-illustrate-liveness}
+  
+The  variable \pz\   returned  at  $\psi_2$ depends  on  \py\ 
+  through  the  expression $(+~\py~1)$.   $\py$  in  turn depends  on  the
+  closure  variable  $\px_{\pi_1}$   through  $(\length~\px_{\pi_1})$.   We
+  denote  this chain  of dependences  as $\lbrack  \psi_2\!\!\!:\!\!\!\pz \leftarrow
+  (+~\py~1),\,  \py  \leftarrow   (\length~\px_{\pi_1})\rbrack$.   Indeed,  the
   closures  in  the  heap  are   a  runtime  representation  of  these
-  dependences.  Since  $z$  is  evaluated   at  $\psi_2$  due  to  the
-  expression $\SRETURN~z$,  the demand made by  the calling context(s)
-  of  $f$ places  a demand  on  $z$ which  will impart  a liveness  to
-  $x_{\pi_1}$.  Other dependence chains which result in a liveness for
-  $x_{\pi_1}$       are       $\lbrack       \psi_1\!\!\!:\!\!y       \leftarrow
-  (length~x_{\pi_1})\rbrack$ and $\lbrack \psi_3\!\!\!:\!\!\!w \leftarrow (/~u~y),\,\,
-  y  \leftarrow  (length~x_{\pi_1})\rbrack$.   The  liveness  analysis
-  described in this section declares the liveness of $x_{\pi_1}$ to be
+  dependences.  Since  $\pz$  is  evaluated   at  $\psi_2$  due  to  the
+  expression $\SRETURN~\pz$,  the demand made by  the calling context(s)
+  of  $f$ places  a demand  on  $\pz$ which  will impart  a liveness  to
+  $\px_{\pi_1}$.  Other dependence chains which result in a liveness for
+  $\px_{\pi_1}$       are       $\lbrack       \psi_1\!\!\!:\!\!\py       \leftarrow
+  (\length~\px_{\pi_1})\rbrack$ and $\lbrack \psi_3\!\!\!:\!\!\!\pw \leftarrow (/~\pu~\py),\,\,
+  \py  \leftarrow  (\length~\px_{\pi_1})\rbrack$.   The  liveness  analysis
+  described in this section declares the liveness of $\px_{\pi_1}$ to be
   a union of the liveness arising  out of these dependence chains.  To
-  be safe, a  garbage collection during evaluation of  $y$ at $\psi_1$
-  has  to  use  this  liveness  to copy  the  heap  from  $x_{\pi_1}$.
+  be safe, a  garbage collection during evaluation of  $\py$ at $\psi_1$
+  has  to  use  this  liveness  to copy  the  heap  from  $\px_{\pi_1}$.
   However,  notice that  if  a garbage  collection  takes place  while
-  evaluating $z$ at $\psi_2$, it can safely consider only the liveness
-  arising  out of  the dependence  chain\linebreak $\lbrack  \psi_2\!\!\!:\!\!\!z \leftarrow
-  (y+1),\,   y  \leftarrow   (length~x_{\pi_1})\rbrack$.   The   garbage
+  evaluating $\pz$ at $\psi_2$, it can safely consider only the liveness
+  arising  out of  the dependence  chain\linebreak $\lbrack  \psi_2\!\!\!:\!\!\!\pz \leftarrow
+  (+~\py~1),\,   \py  \leftarrow   (\length~\x_{\pi_1})\rbrack$.   The   garbage
   collection  scheme described  in Section~\ref{sec:GC-scheme}  uses a
   generalization  of   this  observation   to  dynamically   select  a
   evaluation point specific liveness in order to collect more garbage.
@@ -762,134 +762,9 @@ contents starting from $x_{\pi}$ is given by $\Lv_{x_{\pi}}$.
 
 \subsection{Soundness of analysis}  
 
-
-%% \begin{figure*}[t!]
-%% \begin{center}\footnotesize
-%% \renewcommand{\arraystretch}{1.5}
-
-
-%% \begin{tabular}{|c|c|c|}
-%% \hline
-%% Premise & Transition & Rule name \\ 
-%% \hline
-
-%% \hline
-%% \makecell[t]{$GC(\rho_1, S, \heap_1, \sigma) = (\rho, S, \heap)$,}\\ $\heap(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
-%%   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
-%% \sc{car-clo-bang}
-%% \\
-%% \hline
-%% \makecell[t]{$GC(\rho_1, S, \heap_1, \Lv, \sigma) = (\rho, S, \heap)$,}\\ $\heap(\rho(x))
-%% \mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
-%%   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, x,
-%%   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$         &
-%% \sc{car-clo}\\
-%% \hline
-%% \end{tabular}
-
-%% \medskip
-
-%% \begin{tabular}{|c|c|c|}
-%% \hline
-%% Premise & Transition & Rule name \\ 
-%% \hline
-
-%% \hline
-
-
-%%           &\makecell{ $\rho, (\rho', x, e, \cred{\sigma'})\!:\!S,
-%%   \heap, \kappa, \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\rho'(x) :=
-%%     \kappa], e, \cred{\sigma'}$ }   &  \sc{const}
-%% \\
-%% \hline
-%%           & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, \heap, (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow
-%%   \rho', S, \heap[\rho'(z) := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  \sc{cons} \\
-%% \hline
-%% $\heap(\rho(x)) \mbox{ is } (\ell_1, \ell_2)$ & \makecell{$\rho, (\rho', z, e,
-%%   \cred{\sigma'} )\!:\!S, \heap, (\CAR~x), \cred{\sigma}$  $
-%%   \rightsquigarrow \rho', S, \heap[\rho'(z) := \heap(\ell_1)], e, \cred{\sigma'}$}      &
-%% \sc{car-whnf} \\
-%% \hline
-%% $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{ $\rho, S,
-%%   \heap, (\CAR~x), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
-%%   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$}      &
-%% \sc{car-clo}
-%% \\
-
-%% \hline
-%% $\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$ & $\rho,\, S,\,  \heap,\,
-%% (\CAR~x), \cred{\sigma} \rightsquigarrow \rho', \,(\rho, addr(\langle
-%% s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$      &
-%% \sc{car-1-clo} \\
-
-
-%% \hline
-%% $\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$
-%%  & \makecell{$\rho, (\rho', z, e, \cred{\sigma'})\!:\!S, \heap,
-%%   (+~x~y), \cred{\sigma}$   $\rightsquigarrow \rho', S, \heap[\rho'(z)
-%%     := \heap(\rho'(x)) + \heap(\rho'(y))], e, \cred{\sigma'}$}      &
-%% \sc{prim-whnf} \\
-%% \hline
-%% $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$ &\makecell{$\rho, S,
-%%   \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, x,
-%%   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
-%% \sc{prim-1-clo} \\
-%% \hline
-%% $\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $ & \makecell{$\rho,
-%%   S, \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow \rho', (\rho, y,
-%%   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
-%% \sc{prim-2-clo} \\
-%% \hline
-%% {$\mathit{g}~\mbox{defined as}$
-%% $~(\DEFINE~(g~\myvec{y})~e_{\mathit{g}})$}  & \makecell{$\rho, S, \heap,
-%%   (g~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow [\myvec{y} \mapsto
-%%     \rho(\myvec{x})], S, \heap, e_{\mathit{g}}, \cred{\sigma}$}      &
-%% \sc{funcall} \\
-%% \hline
-%% $\ell$ is a new location& \makecell{$\rho, S, \heap, (\LET~x\leftarrow
-%%   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x \mapsto \ell], S, \heap[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}  \oplus [x \mapsto
-%%   \ell]\rangle], e, \cred{\sigma}$} &
-%% \sc{let} \\ 
-%% \hline
-%% $\heap(\rho(x)) \ne 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
-%%   \cred{\sigma}$  $\rightsquigarrow \rho, S, \heap,  e_1, \cred{\sigma}$} & \sc{if-true} \\
-%% \hline
-%% $\heap(\rho(x)) = 0$ & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
-%%   \cred{\sigma}$   $\rightsquigarrow
-%% \rho, S, \heap,  e_2, \cred{\sigma}$} & \sc{if-false} \\
-%% \hline
-%% $\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
-%%   (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow
-%% \rho', (\rho, x, (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, \heap, s,
-%% \cred{\clazy\sigma}$}
-%% &
-%% \sc{if-clo} \\
-%% \hline
-%% {$\heap(\rho(x))~\mbox{is}$ $\mbox{whnf with value}~v$}& \makecell{$\rho,
-%%   (\rho', z, e, \cred{\sigma'})\!:\!S, \heap, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow \rho', S, \heap[\rho'(z) := v], e,
-%%   \cred{\sigma'}$} &
-%% \sc{return-whnf}\\
-%% \hline
-%% $\heap(\rho(x)) = \langle s, \rho' \rangle $ & \makecell{$\rho, S, \heap,
-%%   (\psi:\SRETURN~x), \cred{\sigma}$  $
-%%   \rightsquigarrow$
-%% $\rho',~ (\rho, x, (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
-%%   \cred{\sigma}$} &
-%% \sc{return-clo} \\
-%% \hline
-%% \end{tabular}
-%% \caption{Minefield semantics.\label{fig:minefield-semantics}}
-%% \end{center}
-%% \vskip -5mm
-%% \end{figure*}
-
-
 We shall now present a proof of soundness of the analysis presented in
-Section~\ref{sec:liveness-analysis}.  %% \warning{While  the proof  is on
-  %% the broad lines of  \cite{asati14lgc}, there are several differences
-  %% due to the  lazy semantics of the language in  this paper.}
-Here are
-the ideas behind the proof.
+Section~\ref{sec:liveness-analysis}.   Here are  the ideas  behind the
+proof.
 \begin{enumerate}
 \item       We   augment     the        standard       semantics
   (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
@@ -920,7 +795,8 @@ Premise & Transition & Rule name \\
 \hline
 
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,} $\heap(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,}
+  $\heap(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
 \sc{car-clo-bang} 
 \\
@@ -934,56 +810,37 @@ Premise & Transition & Rule name \\
 \end{tabular}
 \end{center}
 \caption{Minefield semantics for \sc{car-clo-bang} and
-  \sc{car-clo-bang} \label{fig:minefield-semantics-for-some}}
+  \sc{car-clo} \label{fig:minefield-semantics-for-some}}
 \end{figure*}
-
-
-
-
-
-
 
 To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
 
-\item   We   extend    the   abstract   machine   state
-  $\rho,S,\heap,e$   to  $\rho,S,\heap,e,\sigma$. 
-We  call such a state  a \emph{minefield state}.
-Here $\sigma$  is  the  ``dynamic'' demand  on  the  expression
-  $e$, i.e., it arises
-  from the  actual sequence of function  calls that led
-  to  the evaluation  of  $e$.  %% The  0-CFA demand  used
-  %% during    liveness     analysis    is     a    static
-  %% over-approximation   of   $\sigma$   that   considers
-  %% \emph{all  possible calls}  that  could  lead to  the
-  %% evaluation of  $e$.
-  The  information in  a suspended
-  evaluation  context  on  the   stack  $S$  is  also
-  similarly augmented with its  demand.  Thus a stacked
-  entry now takes  the form $(\rho, \ell,  e, \sigma)$.  %% A
-  %% modification  of  the   small  step  semantics  which
-  %% carries the extra information  is shown in the bottom
-  %% table of Figure~\ref{fig:minefield-semantics}.
+\item  We  extend  the  abstract  machine  state  $\rho,S,\heap,e$  to
+  $\rho,S,\heap,e,\sigma$.   We call  such a  state a  \emph{minefield
+  state}.  Here $\sigma$  is the ``dynamic'' demand  on the expression
+  $e$, i.e., it arises from the actual sequence of function calls that
+  led  to the  evaluation  of $e$. The demand for the initial rule is  $\sigma_{all}$ and each expression $e$ before a $\rightsquigarrow$ step transforms the demand in accordance with the liveness rules of Section~\ref{sec:liveness-analysis} and passes it the expression after the step.  The  information in  continuation
+  frames  on the  stack $S$  are also  similarly augmented  with their
+  demands.  Thus a  stacked entry now takes the form  $(\rho, \ell, e,
+  \sigma)$.
 \item  $GC(\rho,  S,  \heap,  e, \sigma)$ models  a  liveness  based  garbage
   collection that returns $(\rho', S', \heap')$, where the changes in
   $\rho, S$ and  $\heap$ are due
-  to certain references being replaced by $\bot$.  This represents the
+  to certain references being replaced by $\bot$.  This simulates the
   act of  not retaining  (effectively garbage collecting)  the objects
   pointed to by these references  during an actual garbage collection.
   This is done in the following way:
   \begin{enumerate} 
-  \item \label{gc-1}Using the current  evaluation context $\rho, \stk,
-    \heap,   e,  \sigma$   and   the  demand   transformers
-    $\Lfonly$, we construct a liveness environment \Lv\ for the
-    expression $e$.
-      %%  If  $e$  is  an expression,  then  $  \Lv  =
-    %% \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
-    %% application,  then  $  \Lv  =  ref(e,  \sigma,  \Lfonly)$.  
- We  similarly  define  the  liveness  environment  for  the
- expressions $e$ in each of the suspended evaluation contexts $(\rho, \ell,  e, \sigma)$ in $S$, giving
- a stack of liveness environments that we shall denote $\mathsf{SL}$.
+  \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
+    \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
+    liveness environment  \Lv\ for  the expression $e$.   We similarly
+    define the liveness environment for the expressions $e$ in each of
+    the  continuation frames $(\rho,  \ell, e,  \sigma)$ in
+    $S$, giving a stack of  liveness environments that we shall denote
+    $\mathsf{SL}$.
   \item \emph{Garbage collection of objects pointed by root sets:} For
-    the environment $\rho$ in the current  context and for each $x \in
+    the environment $\rho$ in the current state and for each $x \in
     domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
     \Lv$.  Similarly,  for each  stack entry $(\rho,\ell,e,\sigma)$
     in $S$ 
@@ -991,13 +848,18 @@ Here $\sigma$  is  the  ``dynamic'' demand  on  the  expression
     $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
     to $\bot$ iff $x.\epsilon \notin \Lv'$.
   \item \emph{Garbage  collection of  objects in  the heap:}  For each
-    location $\ell$,  we set $\heap(\ell)$  to $\bot$ iff there  is no
-    variable  $x$  in either  the  current  environment or  a  stacked
-    environment,  say  $\rho$,  such   that  $x.\alpha$  is  live  and
-    corresponds  to   $\ell$ in \heap.  More  formally,  there   are  no  $x\in
-    domain(\rho)$ and  $\alpha$, such that  $\heap\oxlb\rho(x), \alpha
-    \oxrb = \ell$  and $x.\alpha \in \Lv$, where \Lv\  is the liveness
-    environment corresponding to $\rho$ mentioned in step~\ref{gc-1}.
+    location $\ell$,  we set $\heap(\ell)$  to $\bot$ iff for each
+    environment $\rho$ in either  the  current state or in a
+    continuation frame, for each $x \in domain(\rho)$ and each forward
+    access
+    path $\alpha$, it is not the case that $x.\alpha \in \Lv$ and $\heap\oxlb\rho(x), \alpha
+    \oxrb = \ell$. Here 
+%% $x.\alpha$  is  live  and
+%%     corresponds  to   $\ell$ in \heap.  More  formally,  there   are  no  $x\in
+%%     domain(\rho)$ and  $\alpha$, such that  $\heap\oxlb\rho(x), \alpha
+%%     \oxrb = \ell$  and $x.\alpha \in \Lv$, where 
+\Lv\ is the liveness environment  corresponding to $\rho$ mentioned in
+step~\ref{gc-1}.
   \end{enumerate}
 \end{enumerate}
 Starting from the initial state,
@@ -1010,7 +872,7 @@ Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
 earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
 enters the  \bang\ state ({\sc  car-clo-bang}). Otherwise
-the transition is the same as the earlier {\sc car-clo}
+the transition is the similar to the earlier {\sc car-clo}
 rule. 
 
 
@@ -1023,20 +885,6 @@ the nodes of  the tree is also annotated with  the program point where
 the corresponding call  was invoked.  This tree can be  used to inline
 function calls in a hierarchical fashion.  The details of the inlining
 can be found in~\cite{asati14lgc}.
-%% The details of inlining a single
-%% function      call     $(\LET\,\,      x     \leftarrow
-%% (f\,y_1\,\ldots\,y_n) \,\,  \IN\,\, e)$ is  as follows.
-%% Let  $f$ be  defined  (after renaming  its formals  and
-%% locals  to  be  disjoint from  existing  variables)  by
-%% $(\DEFINE\ (f\  z_1\ \ldots\  z_n)\ e_f)$. The  call is
-%% replaced  by   a  sequence  of  $\LET$s   of  the  form
-%% $z_i\leftarrow (\ID\,\,y_i)$ followed by the body $e_f$
-%% but with its  $(\SRETURN\,\,w)$ expressions replaced by
-%% $(\LET\,\, x  \leftarrow (\ID\,\, w) \,\,  \IN\,\, e)$.
-%% We prefer to use the  identity function $\ID$ as a form
-%% of no-op rather than  introducing the form $(\LET\,\, x
-%% \leftarrow  w \,\,  \IN\,\, e)$  where the  RHS of  the
-%% $\LET$-definition   is  a   simple  variable. 
 For  a
 call-less program,  the initial state of  the minefield
 semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
@@ -1102,14 +950,14 @@ that involves dereferencing  results in a \bang.  These  are the steps
 which  have a  $\heap(\rho(...))$ in  the  premise. 
 Now a  $\rightsquigarrow$ step can  go
 \bang\ because it dereferences a $\bot$ inserted by the
-immediately  preceding  GC  or  the GC  of  an  earlier
-minefield step.  However the  demand $\sigma'$
-  on basis of which an earlier GC would have inserted a
+immediately  preceding  garbage collection or  the garbage collection of  an  earlier
+minefield step.  \warning{However the  demand $\sigma'$
+  on basis of which an earlier collection would have inserted a
   $\bot$,  would  have   included  the  current  demand
-  $\sigma$.  Thus,  if the  earlier GC had  inserted a
-$\bot$, so would the current  GC.  Thus it is enough to
+  $\sigma$.  Thus,  if the  earlier garbage collection had  inserted a
+$\bot$, so would the current  garbage collection.  Thus it is enough to
 consider the $\rightsquigarrow$  along with the current
-GC and show that it does not lead to a \bang.
+GC and show that it does not lead to a \bang.}
 
 We consider the rules {\sc car-clo} and {\sc car-1-clo} only.  
 The rest  of the rules involve similar reasoning. For the {\sc
@@ -1124,7 +972,7 @@ cons  cell  and then  the  head  of  the cons  cell  is
 dereferenced  to  obtain  a  closure.   If  the  demand
 $\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
 of    $x$   will    include    both   $\epsilon$    and
-$\acar\epsilon$,  and  a  GC with  this  liveness  will
+$\acar\epsilon$,  and  a  garbage collection with  this  liveness  will
 neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
 first   component  of   the   cons   cell.  Thus   both
 dereferences    will    happen   normally    and    the
@@ -1253,22 +1101,14 @@ generate  equations   for  the   demand  transformation
 Figure~\ref{fig:mot-example2}   serves  as   a  running
 example.  Starting with a  symbolic demand $\sigma$, we
 determine  \Lfun{e_{\mathit{f}}}{\sigma}{\Lfonly}.   In
-particular, we  consider $\Lanv{1}{x_i}$,  the liveness
-of the $i^{\mbox{\footnotesize th}}$ parameter $x_i$ at
-the program point at  the beginning of $e_{\mathit{f}}$
-(assumed   to   be   $\pi_1$).   By   the   rule   {\sc
+particular, we  consider $\Lanv{x_i}{}$,  the liveness
+of the $i^{\mbox{\footnotesize th}}$ parameter $x_i$.   By   the   rule   {\sc
   live-define},   this   should    be   the   same   as
 $\Lf{f}{i}{\sigma}$. Applying this to \length, we have:
 $$
- \Lf{\length}{1}{\sigma} = \Lanv{1}{\xl} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
+ \Lf{\length}{1}{\sigma} = \Lanv{\xl}{} = \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma}
   \cup \clazy\Lf{\length}{1}{\clazy\sigma}
 $$
-%% and  the only equation defining \Lfone{\length} is:
-%%   \begin{eqnarray*}
-%%    && \Lf{\length}{1}{\sigma}
-%%     =  \clazy\sigma \cup \acdr\Lf{\length}{1}{\clazy\sigma} \cup
-%% \clazy\Lf{\length}{1}{\clazy\sigma}
-%% \end{eqnarray*}
 
 In general, the equations for \Lfonly\ are recursive as
 in the  case of  \Lfonly$_\mathit{f}$. As  mentioned in
@@ -1338,22 +1178,19 @@ call site of a function.
 
 
 For  the  running  example,   $\length$  has  calls  from  $\main$  at
-$\pi_{12}$ and a recursive call at $\pi_6$.
-So $\sigma_{\length} =
-     \deltacall{\length}{\pi_{12}}{\main}  \cup
-\deltacall{\length}{\pi_6}{\length}$.
-Filling in  the values gives:
+$\pi_{12}$ and a recursive call at $\pi_6$. The demands on these calls
+are $\epsilon$ and $\clazy\sigma_{\mathit{\length}}$. Thus:
 \begin{eqnarray*}
 \sigma_{\length}    &=&
  \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
 \end{eqnarray*}
-As examples, the liveness of \Lanv{1}{\pl} and \Lanv{9}{\pa} in terms
+As examples, the liveness of \Lanv{\pl}{} and \Lanv{\pa}{} in terms
 of  $\sigma_{\length}$ are:
 \begin{align*}
-\Lanv{1}{\pl} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
+\Lanv{\pl}{} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
   \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
  \\
-\Lanv{9}{\pa} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
+\Lanv{\pa}{} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
 \end{align*}
 
 In  summary, the  equations  generated during  liveness
@@ -1364,8 +1201,8 @@ analysis are:
 \item For each function $\mathit{f}$, an equation defining the summary
   demand $\sigma_{\mathit f}$ on $e_f$.
 \item   For  each   function  $\mathit{f}$   (including
-  $\mainpgm$  for  $e_\mainpgm$) an  equation  defining
-  liveness at each GC point of $e_{\mathit f}$.
+  $\mainpgm$) an  equation  defining
+  liveness for each garbage in  $e_{\mathit f}$.
 \end{enumerate}
 \subsection{Solving liveness equations---the grammar
 interpretation}\label{sec:grammar-formulation}      The
@@ -1376,12 +1213,12 @@ Let \var{$X$}  denote the  non-terminal for  a variable
 $X$  occurring on  the LHS  of the  equations generated
 from  the  analysis.  We  can  think  of the  resulting
 productions as being  associated with several grammars,
-one for each non-terminal \var{\Lanv{i}{x}} regarded as
+one for each non-terminal \var{\Lanv{x}{}} regarded as
 a  start  symbol.   As  an  example,  the  grammar  for
-\var{\Lanv{1}{\xl}}     comprises     the     following
+\var{\Lanv{\xl}{}} and \var{\Lanv{\pa}{}}    comprise     the     following
 productions:
 \begin{eqnarray*}
-  \var{\Lanv{1}{\xl}}  &\rightarrow& 
+  \var{\Lanv{\xl}{}}  &\rightarrow& 
   \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\
   & & \mid
   \clazy\var{\Df{\length}{1}}{\clazy\var{\sigma_{\length}}} \\
@@ -1391,18 +1228,18 @@ productions:
 \langle {\sigma_{\length}} \rangle
 &\rightarrow&
 \epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle \\
-\var{\Lanv{9}{\pa}} &\rightarrow& \clazy \bcar \var{\Df{\length}{1}}
+\var{\Lanv{\pa}{}} &\rightarrow& \clazy \bcar \var{\Df{\length}{1}}
 \end{eqnarray*}
 Other  equations  can   be  converted  similarly.   The
-language   generated   by  \var{\Lanv{i}{x}},   denoted
-$\mathscr{L}(\var{\Lanv{i}{x}})$,   is    the   desired
-solution  of  \Lanv{i}{x}.    
+language   generated   by  \var{\Lanv{x}{}},   denoted
+$\mathscr{L}(\var{\Lanv{x}{}})$,   is    the   desired
+solution  of  \Lanv{x}{}.    
 However, recall that the decision problem that we are interested in
 during garbage collection is the following: 
 \begin{quote}
 Let $x.\alpha$ be a forward access path consisting only
 of edges  \acar\ and \acdr\  (but not \bcar,  \bcdr\ or
-\clazy).       Let      $\mathscr{L}(\var{\Lanv{i}{x}})
+\clazy).       Let      $\mathscr{L}(\var{\Lanv{x}{}})
 \stackrel{*}{\hookrightarrow}  \sigma$, where  $\sigma$
 consists  of  forward  access  paths  only.  Then  does
 $\alpha \in \sigma$?
@@ -1636,7 +1473,7 @@ are converted to DFAs.
 (a) & (b) \\
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
 \begin{pspicture}(0,-5)(50,12) %\psframe(0,-5)(40,12)
-  \putnode{t0}{origin}{5}{0}{\var{\Lanv{9}{\pa}}}
+  \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}}
   \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\ \ \ \ }}}
 %  \putnode{t3}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
@@ -1662,7 +1499,7 @@ are converted to DFAs.
 &
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
 \begin{pspicture}(0,-5)(20,12) %\psframe(0,-5)(40,12)
-  \putnode{t0}{origin}{5}{0}{\var{\Lanv{9}{\pa}}}
+  \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}}
   \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
   \psset{arrows=->}
   \ncline{t0}{t1}
@@ -1670,7 +1507,7 @@ are converted to DFAs.
 \\ 
 (c) & (d)  \end{tabular}}
 \caption{(a) The  grammar rules for \var{\Df{\length}{1}}
-  converted into an automaton, and (b) its DFA. The same for \var{\Lanv{9}{\pa}}
+  converted into an automaton, and (b) its DFA. The same for \var{\Lanv{\pa}{}}
   are in (c) and (d).}\label{fig:example-automata}
 \figrule
 \end{figure}
@@ -1691,36 +1528,34 @@ are converted to DFAs.
  \end{eqnarray*}
 
 The strongly regular grammar is converted  into a set of NFAs, one for
-each $\var{\Lanv{i}{x}}$.  The $\hookrightarrow$ simplification is now
+each $\var{\Lanv{x}{}}$.  The  $\hookrightarrow$ simplification is now
 done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
-pairs  of consecutive  edges labeled  \bcar\acar\ or  \bcdr\acdr\ and
-constructing the $\epsilon$-closure. Since the $\epsilon$-closure step
-may  create  more  adjacent  \bcar\acar\ and  \bcdr\acdr\  edges,  the
-simplification is continued till a fixed point is reached, after which
-the edges labeled \bcar \ and  \bcdr\ are deleted.  The details of the
-algorithm, its correctness and termination proofs are given by Karkare
-et.  al.~\cite{karkare07liveness,asati14lgc}.  The resulting automaton
-has  edges labeled  with  \acar,  \acdr\ and  \clazy\  only. In  this
-automaton, for every edge labeled \clazy, we check if the source node
-of the edge has a valid path to  a final final state.  If yes, we mark
-the mark  the source node as  final. Finally, we remove  all the edges
-labeled  \clazy\  and  convert  the automaton  into  a  deterministic
-automaton.    This   effectively  implements   the   $\hookrightarrow$
-simplification rules for  \bcar, \bcdr, and \clazy\  to obtain forward
-paths. While  checking for liveness  during GC, a  forward access-path
-is valid only if it can reach a final state. 
-Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
-from the grammar for \var{\Df{\length}{1}}.  The final DFA is shown in
-Figure~\ref{fig:example-automata}(b).  This expectedly says that given
-a  demand $\epsilon$  on  \length,  the liveness  of  its argument  is
-$\acdr^{*}$  (the  spine  of   the  list  is  traversed).   Similarly,
-Figure~\ref{fig:example-automata}(c)     shows     the     NFA     for
-\var{\Lanv{9}{\pa}}.          The         DFA         shown         in
+pairs  of consecutive  edges  labeled \bcar\acar\  or \bcdr\acdr\  and
+constructing  the $\epsilon$-closure  till a  fixed point  is reached,
+after which  the edges labeled  \bcar \  and \bcdr\ are  deleted.  The
+details of the  algorithm, its correctness and  termination proofs are
+given  in~\cite{karkare07liveness,asati14lgc}.   The
+resulting  automaton   has  edges  labeled  with   \acar,  \acdr\  and
+\clazy\ only.  In this  automaton, for every  edge labeled  \clazy, we
+check if the source node of the edge has a path to a final 
+state.  If yes, \warning{we mark the mark the source node as final. Finally, we
+remove all the edges labeled \clazy\  and convert the automaton into a
+deterministic    automaton.}    These steps   effectively   implement    the
+$\hookrightarrow$   simplification  rules   for   \bcar,  \bcdr,   and
+\clazy\ to  obtain forward paths.  While checking for  liveness during
+garbage  collection, a  forward access-path  is valid  only if  it can
+reach a  final state.  Figure~\ref{fig:example-automata}(a)  shows the
+NFA that is obtained from  the grammar for \var{\Df{\length}{1}}, and   the
+final  DFA  is  shown in  Figure~\ref{fig:example-automata}(b).   This
+expectedly  says that for a  demand  \warning{$\epsilon$  on  \length},  the
+liveness of  its argument  is $\acdr^{*}$  (the spine  of the  list is
+traversed).  Similarly, Figure~\ref{fig:example-automata}(c) shows the
+NFA     for     \var{\Lanv{\pa}{}}.      The     DFA     shown     in
 Figure~\ref{fig:example-automata}(d)  does  not   accept  any  forward
 paths.   This  reflects  the  lazy  nature  of  our  language.   Since
 \length\ does not  evaluate the member elements of  the argument list,
 the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
-liveness based GC is triggered beyond $\pi_9$.
+liveness based garbage collection is triggered beyond $\pi_9$.
 
 
 \section{The Garbage Collection Scheme}
@@ -1740,7 +1575,7 @@ paths from the program point where the closure is created to reachable
 evaluation  points.  Assume,  for   the  sake  of  concreteness,  that
 $\epath_1$  and $\epath_2$  two  such evaluation  points.   This is  a
 static approximation  without any  knowledge regarding which  of these
-paths will be  eventually taken during execution. During  GC, we would
+paths will be  eventually taken during execution. During  garbage collection, we would
 like to use a more precise  liveness based on the  actual
 paths  taken  during  execution.    Therefore we create  liveness  automata
 separately  for the dependences in   $\epath_1$ and  $\epath_2$  as  well as  a  automaton
@@ -1750,7 +1585,7 @@ variables (as pointers to automata, one for each variable).  Initially
 the  liveness  environment is  based  on  the dependences  along  both
 $\epath_1$    and   $\epath_2$.    However,   after    evaluating   an
 \SIF\ condition, the liveness environments are updated to one based on
-either $\epath_1$ or  $\epath_2$, so that subsequent GCs  are based on
+either $\epath_1$ or  $\epath_2$, so that subsequent garbage collections  are based on
 more precise liveness information. 
 
 Based on  the above considerations,  we restrict the  possible garbage
@@ -1759,12 +1594,12 @@ collection points in a function body to the following:
 \item We  maintain static estimates  of the memory required  to create
   the closures for each function body.  On entering a function, if the
   available memory is  less than this requirement for  the function, a
-  GC is triggered.
+  garbage collection is triggered.
 \item Since the evaluation of a  \SIF\ condition may trigger a 
   collection, after evaluating the condition   the available memory
   is  checked once  again against  a  revised estimate  of the  memory
   (based on  value of the condition)  required to execute the  rest of
-  the program.  A GC is triggered if enough memory is unavailable.
+  the program.  A garbage collection is triggered if enough memory is unavailable.
 \end{enumerate}
 
 
@@ -1921,13 +1756,13 @@ overhead, we have added a caching mechanism in our simulator that can
 reuse the DFA from earlier analysis if the program has not changed..
 
 Table~\ref{tab:exp-results}(b)   compares   the   garbage   collection
-statistics  for RGC  and  LGC.  We  report the  number  of GC  events,
-average  number of  cells reclaimed  per GC,  average number  of cells
-touched  per GC,  total  number of  dragged cells  and  total time  to
+statistics  for RGC  and  LGC.  We  report the  number  of garbage collection  events,
+average  number of  cells reclaimed  per garbage collection,  average number  of cells
+touched  per garbage collection,  total  number of  dragged cells  and  total time  to
 perform  all collections.   It is  no  surprise that  number of  cells
-reclaimed per  GC is  higher (and  consequently the  number of  GCs is
+reclaimed per  garbage collection is  higher (and  consequently the  number of  garbage collections is
 lower)  for LGC  based collection.   LGC  also reduces  the number  of
-dragged cells significantly. However, the cost  for LGC is that per GC
+dragged cells significantly. However, the cost  for LGC is that per garbage collection
 execution  time is  more  for  LGC, which  results  in higher  overall
 execution time  for garbage  collection, even  with reduced  number of
 collections.   However, LGC  run time  is still  competitive (slowdown
@@ -2010,51 +1845,41 @@ collection  of closures.  To  implement liveness  based
 collection of closures, we need to record liveness data
 for  each  closure and  update  it  at each  evaluation
 point.   These space  and  run time  overheads make  it
-infeasible  to   incorporate  liveness  based   GC  for
-closures in a practical garbage collector.
+infeasible  to   incorporate  liveness  based   garbage collection  for
+closures in a practical garbage collectors.
 
 
 \section{Related Work} 
 \label{sec:relatedwork}
-Although  augmenting garbage  collection with  liveness
-information has been studied  earlier, it was mainly in
-the   context  of   imperative  languages~\cite{Albert,
-  Hirzel,  khedker07heap}.   Due  to  the  presence  of
-global  variables and  mutation,  practical utility  of
-simple  liveness  based  techniques  are  found  to  be
-inefficient.
+Most previous work on enhancing  garbage collection with liveness were
+in   the  context   of   imperative  languages~\cite{Albert,   Hirzel,
+  khedker07heap}.    Due  to  the  presence  of  global  variables  and
+mutation, these methods are of  limited practical  utility.
 
-In the  space of functional languages,  improving space
-efficiency has  been mainly  studied as a  compile time
-activity.   Either through  rewriting  methods such  as
+There  have been  several efforts  in improving  space utilization  of
+functional programs  by compile-time  analysis.  These  are: rewriting
+methods                             such                            as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
-sharing                  analysis                 based
-reallocation~\cite{jones89compile},     region    based
-analysis~\cite{tofte98region}, or  through insertion of
-compile     time     nullifying     statements     such
-as~\cite{inoue88analysis,lee05static,Hamilton}.     The
-compile  time   marking  approaches  all  rely   on  an
-efficient and precise alias analysis and in the absence
-of  it  cannot  provide  notable  improvement.  Another
-important         approach         advocated         by
-Hofmann~\cite{HofmannJ03}  is to  use linear  typing to
-analyze  first-order   programs  for  heap   usage  and
-annotated them. The system  then uses these annotations
-to re-use allocated memory  cells instead of requesting
-for  newer  cells.  This  requires the  user  to  write
-programs  in  a  specific  way and  hence  may  not  be
-practical
+sharing  analysis   based  reallocation~\cite{jones89compile},  region
+based   analysis~\cite{tofte98region},   or   through   insertion   of
+compile-time                                                nullifying
+statements~\cite{inoue88analysis,lee05static,Hamilton}.            All
+compile-time marking approaches rely on an efficient and precise alias
+analysis and  cannot provide  significant improvement in  its absence.
+An interesting  approach suggested by Hofmann~\cite{HofmannJ03}  is to
+annotate the heap usage of  first-order programs through linear types.
+The annotations are then used to transform the program to serve memory
+allocation requests by re-using allocated memory cells.  However, this
+requires the user to write programs in a specific way.
 
-Simplifiers~\cite{ONeill},  described   as  lightweight
-daemons,  improve  the  efficiency of  the  program  in
-general and  the garbage collector in  particular. Most
-of  the  simplifications  mentioned in  this  work  are
-subsumed by  a liveness  based collector. We  feel this
-work is  orthogonal and can augment  our liveness based
-collector.  The closest to our approach is the liveness
-based        garbage       collector        implemented
-in~\cite{asati14lgc}.  We extend  their work  to handle
-lazy evaluation and closures.
+Simplifiers~\cite{ONeill}, described  as lightweight  daemons, improve
+the efficiency of the program in general and the garbage collectors in
+particular.  \warning{Most  of the  simplifications mentioned  in this
+  work are subsumed by a liveness  based collector.  We feel this work
+  is orthogonal  and can augment  our liveness based  collector.}  The
+approach that is closest to the  method described in this paper is the
+liveness-based garbage collector implemented in~\cite{asati14lgc}.  We
+have extend this to handle lazy evaluation and closures.
  
 %% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
 
@@ -2065,7 +1890,7 @@ lazy evaluation and closures.
 %% memory fall  in two broad categories.  In the first,
 %% the  program   itself  is  instrumented   to  manage
 %% reclamation and reallocation without  the aid of the
-%% garbage collector.   Such attempts  include: sharing
+%% GC.   Such attempts  include: sharing
 %% analysis  based  reallocation~\cite{jones89compile},
 %% deforestation
 %% techniques~\cite{wadler88deforest,gill93ashort,chitil99deforest},
@@ -2131,29 +1956,25 @@ lazy evaluation and closures.
 %% explore.  Further work  includes improvements to the
 %% classical copying  collector to  reduce the  cost of
 %% this.
-We extended  the liveness  based garbage  collection to
-lazy  languages  and  shown  its  benefit  for  garbage
-collection in practical programs.  We defined a context
-sensitive   liveness   analysis   that   uses   context
-independent  summaries of  functions  obtained using  a
-symbolic  demand.  We  showed  that  obtaining  precise
-solution  to  these  equations is  undecidable  in  our
-formulation, and hence we safely approximate the result
-using  DFA.  These DFA  are  consulted  by the  garbage
+We have  extended liveness-based garbage collection  to lazy languages
+and shown its benefit for  standard benchmark programs.  This was done
+by defining a liveness analysis of heap objects that we proved correct
+with  respect   to  a   non-standard  semantics   that  served   as  a
+specification of  liveness.  The result  of the  analysis is a  set of
+grammars, whose membership question was  proved to be undecidable. The
+grammars are  therefore approximated by  DFAs and used by  the garbage
 collector to improve collection.
 
-Liveness  of closures  presented further  challenges to
-our implementation.  We  compared different approximate
-strategies for handling liveness of closures, and found
-that a  mixed strategy---reachability  based collection
-of  closure  arguments,  liveness based  collection  of
-everything else---works  best in practice as  it avoids
-runtime and  space overheads.  With  mixed-mode garbage
-collection scheme,  we were able to  collect more cells
-than  reachability  based  collectors at  a  reasonable
-overhead.
+In addition to collecting evaluated  data, our collector also reclaims
+closures.   Because  of this  we  had  to  make modifications  to  the
+standard run-time representation of a closure to carry liveness of its
+free variables and  periodically and update it  during execution time.
+As  expected, our  garbage collector  could reclaim  more garbage  and
+reduce memory requirements of programs.  An additional benefit was the
+reduction in  execution times for  some programs  in spite of  using a
+more expensive collection scheme.
 
-Although we  provide an  implementation for  a liveness
+\warning{Although we  provide an  implementation for  a liveness
 based garbage  collection scheme for lazy  language, we
 do not  provide a formal  proof of its  correctness.  A
 formal proof of correctness would describe how closures
@@ -2182,7 +2003,7 @@ propagated inside closures.
   schemes,   such  as   incremental  and   generational
   collection.  In summary, we  need to investigate ways
   to make liveness  based garbage collection attractive
-  for practical collectors.
+  for practical collectors.}
 
 
 \bibliography{fun_hra}{}
@@ -2326,9 +2147,9 @@ To set up the minefield semantics, we follow these steps:
   during    liveness     analysis    is     a    static
   over-approximation   of   $\sigma$   that   considers
   \emph{all  possible calls}  that  could  lead to  the
-  evaluation of  $e$.  The  information in  a suspended
-  evaluation  context  (on  the   stack  $S$)  is  also
-  similarly augmented with its  demand.  Thus a stacked
+  evaluation of  $e$.  The  information in  the continuation frames on
+  the   stack  $S$ are  also
+  similarly augmented with their  demands.  Thus a stacked
   entry now takes  the form $(\rho, x,  e, \sigma)$.  A
   modification  of  the   small  step  semantics  which
   carries the extra information  is shown in the bottom
@@ -2342,10 +2163,10 @@ To set up the minefield semantics, we follow these steps:
   actual  garbage  collection.  This  is  done  in  the
   following way:
   \begin{enumerate}
-  \item Given the current  evaluation context $\rho, S,
+  \item Given the current state $\rho, S,
     \heap,   e,  \sigma$   and   the  demand   transformers
     $\Lfonly$, we can  construct a liveness environment
-    \Lv.   If  $e$  is  an expression,  then  $  \Lv  =
+    \Lv for $e$.   If  $e$  is  an expression,  then  $  \Lv  =
     \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
     application, then $ \Lv = ref(e, \sigma, \Lfonly)$.
     We  can similarly  define the  liveness environment
