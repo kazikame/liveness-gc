@@ -170,13 +170,11 @@ the same program running with a reachability-based collector.
 \section{Introduction}
 \label{sec:intro}
 
-Functional programs make extensive use of dynamically allocated
-memory.  The
-allocation  is either  explicit (i. e., using  constructors) or
-implicit (creating  closures).  Programs  written in  lazy
-functional languages put additional  demands on memory as they require
-closures to  be carried  from the  point of creation  to the  point of
-evaluation.
+Functional  programs  make  extensive  use  of  dynamically  allocated
+memory.  The allocation is either explicit (i. e., using constructors)
+or  implicit   (creating  closures).   Programs  in   lazy  functional
+languages put additional  demands on memory, as  they require closures
+to be carried from the point of creation to the point of evaluation.
 
 While  the runtime  system  of most  functional  languages includes  a
 garbage collector to efficiently  reclaim memory, empirical studies on
@@ -217,51 +215,49 @@ complicates  liveness analysis  itself.  Moreover,  for liveness-based
 garbage collection to  be effective, we need to extend  it to closures
 apart from  evaluated data.  Since a  closure can escape the  scope in
 which it was created, it has  to carry the liveness information of its
-free variables. As execution progresses and possible future
-uses are eliminated,  we update the liveness information  in a closure
-with a  more precise version.  Because of these reasons,   the garbage
-collector  also   becomes  significantly   more  complicated   than  a
-liveness-based collector for a eager language.
+free variables. As  execution progresses and possible  future uses are
+eliminated, we  update the  liveness information in  a closure  with a
+more precise version.  Because of these reasons, the garbage collector
+also  becomes significantly  more  complicated  than a  liveness-based
+collector for a eager language.
 
-Experiments  with  a   single  generation  copying  collector
-  (Section~\ref{sec:experiments})  confirm  the  expected  performance
-  benefits.   Liveness-based  collection  results in  an  increase  in
-  garbage reclaimed.   As a  consequence, there is  a reduction  in the
-  number of collections from \warning{1.6X to 23X} and a decrease in the
-  minimum memory requirement from  \warning{1X to 1389X}. 
-  As an added benefit, there is also a reduction in the overall
-  execution time in 5 out of 12 benchmark programs.
+Experiments    with   a    single    generation   copying    collector
+(Section~\ref{sec:experiments})   confirm  the   expected  performance
+benefits.  Liveness-based collection results in an increase in garbage
+reclaimed.  As  a consequence, there is  a reduction in the  number of
+collections from \warning{1.6X  to 23X} and a decrease  in the minimum
+memory requirement from  \warning{1X to 1389X}.  As  an added benefit,
+there is also a reduction in the overall execution time in 5 out of 12
+benchmark programs.
  
 
 %------------------------------------------------------------%
 \subsection{Motivating example}
 \label{sec:motiv}
-\input{fig_motiv}
-Figure~\ref{fig:mot-example} shows an example program and the state of
-the heap at  the program point $\pi$ (we write $\pi\!:\!e$ to associate a label
-$\pi$  with the  program point just
-before the expression $e$), i.e. just  before the evaluation
-of $(\length\  \pz)$.  The heap is  represented by a graph  in which a
-node either  represents atomic  values ($\NIL$,  integers etc.),  or a
+\input{fig_motiv}   Figure~\ref{fig:mot-example}   shows  an   example
+program and the state of the heap at the program point $\pi$\footnote{We write
+$\pi\!:\!e$ to  associate a  label $\pi$ with  the program  point just
+before  the  expression  $e$. The label is not part of the syntax.},  i.e. just  before  the  evaluation  of
+$(\length\ \pz)$.  The heap is represented  by a graph in which a node
+either  represents  atomic  values   ($\NIL$,  integers  etc.),  or  a
 \CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
 (represented  by  shaded  clouds).   Edges   in  the  graph  are  {\em
-  references} and represent values of  variables  or fields.  The figure shows
-the  lists \px\  and  \pz\ partially  evaluated due to  the test (\NULLQ~(\CAR~\pz)) in the \SIF\ expression.
-
-
+  references} and represent values of variables or fields.  The figure
+shows the  lists \px\  and \pz\  partially evaluated  due to  the
+\SIF\ condition 
+(\NULLQ~(\CAR~\pz)).
 The edges  shown by thick  arrows are those  which are live  at $\pi$.
 %% Only those  cell which have a future use  should be preserved
 %% during garbage collection, all other
 %% cells can be  reclaimed.
-Thus if a garbage collection  takes place at
-$\pi$ with the heap shown in Figure~\ref{fig:mot-example}(b), a
-liveness-based collector (LGC) will preserve only the cells referenced
-by  $\pz$,  and the live cells  constituting the  closure
-referenced by $(\CDR~\pz)$.   In contrast, a reachability-based
-collector (RGC) will preserve all cells.
+Thus if a garbage collection takes  place at $\pi$ with the heap shown
+in Figure~\ref{fig:mot-example}(b),  a liveness-based  collector (LGC)
+will preserve only  the cells referenced by $\pz$, and  the live cells
+constituting the  closure referenced by $(\CDR~\pz)$.   In contrast, a
+reachability-based collector (RGC) will preserve all cells.
 
 In  this work  we show  that  static analysis  of heap  data can  help
-garbage collectors in reclaiming more garbage.  The specific
+garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are
 \begin{myitemize}
 \item  We  formulate  a  liveness  analysis for  a  lazy  first-order
@@ -282,51 +278,51 @@ contributions of this paper are
   results  in   more  garbage  being  collected.    Empirical  results
   show the effectiveness of liveness-based garbage collection.
 \end{myitemize}
-As far as we know,  this is the first work on liveness-based garbage
-  collection      for      lazy     languages.       All      previous
-  attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
-    asati14lgc, karkare06effectiveness} have involved either
-  imperative or  eager functional languages. 
+As far  as we know, this  is the first work  on liveness-based garbage
+collection      for      lazy       languages.       All      previous
+attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
+  asati14lgc, karkare06effectiveness} have  involved either imperative
+or eager functional languages.
 
 \subsection{Organization of the paper}
 
-\warning{Section~\ref{sec:defs}   introduces   the   syntax   of   the
-  programming language  considered and gives a  small-step operational
-  semantics for it.   The liveness analysis for this  language and its
-  soundness   proof   is  presented   in   Section~\ref{sec:liveness}.
-  Section~\ref{sec:computing} describes the formulation of liveness as
-  grammars. We  also give a  proof of undecidability of  such grammars
-  and    show    how   they    can    be    approximated   by    DFAs.
-  Section~\ref{sec:GC-scheme}   discusses  details   of  the   garbage
-  collector,  in  particular the  use  of  liveness DFAs  for  garbage
-  collection.     We    report    our    experimental    results    in
-  Section~\ref{sec:experiments}   along    with   some   observations.
-  Section~\ref{sec:relatedwork}  discusses  previous work  related  to
-  garbage  collection  and liveness  and  Section~\ref{sec:conclusion}
-  discusses possible extensions and concludes the paper.}
+Section~\ref{sec:defs}  introduces  the   syntax  of  the  programming
+language considered  and gives a small-step  operational semantics for
+it.  The liveness  analysis for this language and  its soundness proof
+is          presented          in          Section~\ref{sec:liveness}.
+Section~\ref{sec:computing} describes  the formulation of  liveness as
+grammars. We also give a proof  of undecidability of such grammars and
+show     how     they     can     be     approximated     by     DFAs.
+Section~\ref{sec:GC-scheme}   discusses   details   of   the   garbage
+collector,  in  particular  the  use  of  liveness  DFAs  for  garbage
+collection.     We     report    our    experimental     results    in
+Section~\ref{sec:experiments}    along    with   some    observations.
+Section~\ref{sec:relatedwork}  discusses  previous   work  related  to
+garbage  collection  and   liveness  and  Section~\ref{sec:conclusion}
+discusses possible extensions and concludes the paper.
 \section{The target language---syntax and semantics}
 \label{sec:defs}
 Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
 is a first order language with lazy semantics. Programs are restricted
 to        be        in        Administrative        Normal        Form
-(ANF)~\cite{chakravarty03perspective} where  all actual  parameters to
+(ANF)~\cite{chakravarty03perspective}, where  all actual  parameters to
 functions  are  variables.  While  this  restriction  does not  affect
 expressibility,  this form  has  the benefit  of  making explicit  the
-creation of  closures through  the $\LET$  construct.  \warning{ For
-  now, we assume  $\LET$s  in our
-language  are non-recursive;  in the  expression $\LET\,\,  x \leftarrow  s\,\,
-\IN\,\, e$, $x$ should not occur in  $s$}. The  restriction of \LET\ to  a single
-definition  is for  ease  of  exposition---generalization to  multiple
-definitions does not add conceptual difficulties.  We further restrict
-each variable in a program to  be distinct, so that no scope shadowing
-occurs---this  simplifies  reasoning.  
+creation of closures through the $\LET$ construct.  \warning{ We
+  assume that  $\LET$s  in  our  language  are  non-recursive;  in  the
+  expression $\LET\,\, x  \leftarrow s\,\, \IN\,\, e$,  $x$ should not
+  occur in  $s$}. The restriction of  \LET\ to a single  definition is
+for ease  of exposition---generalization to multiple  definitions does
+not add conceptual difficulties.  We further restrict each variable in
+a program  to be  distinct, so that  no scope  shadowing occurs; this
+simplifies reasoning.
 
 
 We denote the body of a function ${\mathit  f}$   as $e_{\mathit f}$.
  We assume that each program has a distinguished function
 \mainpgm,    defined as    $(\DEFINE\      ({\tt
   \mainpgm})\  e_\mainpgm)$,  and  the program begins execution
-with the call to \mainpgm.  Note that program point labels are not  part of the syntax.
+with the call to \mainpgm.  
 
 \begin{figure}[t]\footnotesize
 \renewcommand{\arraystretch}{1}
@@ -493,30 +489,21 @@ in the  heap.
 
 The  semantics  of   expressions  (and  applications\footnote{In  most
  contexts, we  shall use the  term 'expression' and the  notation $e$
-  for both expressions and applications.}) 
+to stand   for both expressions and applications.}) 
 are given by transitions of the form $\rho, \stk, \heap, e \rightsquigarrow
-\rho',  \stk', \heap',  e'$.  Here  \stk\ is  a stack  of continuation
-frames.  Each  continuation frame  is of the  form $(\rho,  \ell, e)$,
+\rho',  \stk', \heap',  e'$.  Here  $\stk$ is  a stack  of continuation
+frames.  Each  continuation frame  is a triple $(\rho,  \ell, e)$,
 signifying that the  location $\ell$ has to be updated  with the value
-of the  currently evaluating  expression, and $e$  is to  be evaluated
+of the  currently evaluating  expression and $e$  is to  be evaluated
 next  in the  environment $\rho$.  
-%% Given a state $\rho, \stk, \heap,
-%% e$  of  the  transition system, we shall call the pair $(\rho, e)$ as
-%% the    \emph{current
-%%   evaluation  context}, and for a continuation frame $(\rho',  \ell, e')$ in
-%% \stk, we shall call the pair $(\rho', e')$ as a   
-%% \emph{suspended  evaluation  context}.}
-%% %% \warning{The
-%% 3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
-%% system will be denoted $\mathcal{S}$.}
-The  initial  state  of  the  transition  system  described  above  is
+The  initial  state  of  the  transition  system  is:
 \[([\;]_\rho,\,     (\rho_\mathit{init},     \,    \ell_{\ans}     ,\,
 (\print~\ans)):[\;]_{S},   [\;]_{\heap},\,   (\mainpgm))\]  in   which
 $[\;]_\rho$, $[\;]_{\mbox  \footnotesize {H}}$ and $[\;]_{S}$  are are
 the empty environment, heap and  stack respectively. The initial stack
 consists  of  a  single  continuation   frame  in  which  \ans\  is  a
 distinguished variable that will eventually  be updated with the value
-of  (\mainpgm)  and  $\rho_\mathit{init}$  maps \ans\  to  a  location
+of  (\mainpgm),  and  $\rho_\mathit{init}$  maps \ans\  to  a  location
 $\ell_{\ans}$.  In addition, \print\ is a function modeling a printing
 mechanism---a   standard   run-time   support  assumption   for   lazy
 languages~\cite{Jones87}---that prints  the value of  (\mainpgm).  The
@@ -536,16 +523,16 @@ Unlike   an   eager  language,   evaluation   of   a  let   expression
 $(\LET~x\leftarrow  s~\IN~e)$ does  not  result in  the evaluation  of
 $s$. Instead,  as the {\sc let}  rule shows, a closure  is created and
 bound to  $x$. The  program points which  trigger evaluation  of these
-closure   are  the   condition  of   an  $\SIF$   ({\sc  IF-clo})   and
-\SRETURN\ ({\sc  return-clo}).  We  call such  points \emph{evaluation
+closures   are  an $\SIF$   condition ({\sc  IF-clo})   and
+ a \SRETURN\ ({\sc  return-clo}).  We  call such  points \emph{evaluation
   points   $(\epath)$}  and   label  them   with  $\psi$   instead  of
 $\pi$. As an  example of closure  evaluation, we  explain the
 three rules for  $(\CAR~x)$.  If $x$ is a closure,  it is evaluated to
 WHNF, say $(d_1, d_2)$.  This is  given by the rule {\sc car-clo}.  If
 $d_1$ is  not in WHNF,  it is  also evaluated ({\sc  car-1-clo}).  The
 address  to be  updated  with the  evaluated value  is
-recorded  in  a  continuation  frame.    This  is  required  for  lazy
-evaluation, else $d_1$ may  be evaluated more than once
+recorded  in  a  continuation  frame.    This  is  required  for the
+evaluation  to be lazy, else $d_1$ may  be evaluated more than once
 due to  sharing~\cite{Jones87}.  Only after this  is the actual selection  done ({\sc
   car-select}).
 
@@ -557,9 +544,17 @@ due to  sharing~\cite{Jones87}.  Only after this  is the actual selection  done 
 A variable is {\em live} if there  is a possibility of its value being
 used in  future computations and  dead if  it is definitely  not used.
 Heap-allocated data  needs a richer model  than classical liveness---a
-model which talks about liveness of references.  An {\em access path}
+model which talks about liveness of references.  
+
+%% The model use the notion of  {\em access paths}, i.e.
+%% a  prefix-closed set of strings  over $\{\acar,\acdr\}^\ast$, in
+%% which 
+%% $\acar$,  $\acdr$ represent  access  using $\CAR$  and $\CDR$  fields.
+
+
+An {\em access path}
 is a  prefix-closed set of strings  over $\{\acar,\acdr\}^\ast$, where
-$\acar$,  $\acdr$ represent  access  using $\CAR$  and $\CDR$  fields.
+$\acar$,  $\acdr$ represent  access  using $\CAR$  and $\CDR$  fields respectively.
 Given an initial location $\ell$ (usually a reference corresponding to
 a variable)  and a  heap \heap, semantically  an access  path $\alpha$
 represents     a      reference,     denoted     $\heap\llbracket\ell,
@@ -579,7 +574,7 @@ expressed as  a set,  for example  by writing  $\{x.\epsilon, x.\acdr,
 x.\acdr\acdr,        y.\epsilon\}$        instead        of        $[x
   \mapsto\{\epsilon,\acdr,\acdr\acdr\},          y\mapsto\{\epsilon\},
   z\mapsto\{\}]$.    In  this   notation,  $y   \mapsto  \{\epsilon\}$
-represents access using $y$ itself and $z \mapsto \{\}$ indicates that
+represents access using $y$ itself and $z \mapsto \{\}$ indicates 
 $z$ is dead.  In lazy  languages, liveness environments are associated
 with regions of programs instead of program points.
 
@@ -589,7 +584,7 @@ future uses of the value of an expression.  The demand on an expression
 $e$   is   again   a   set    of   access   paths---that   subset   of
 $\{\acar,\acdr\}^\ast$ which the  context of $e$ may  explore of $e$'s
 result.   To see  the need  for demands,  consider the expression
-$(\LET~x\leftarrow  (\CDR~y)~\IN~   \SRETURN~x)$.   Assume   that  the
+$(\LET~x\leftarrow  (\CDR~y)~\IN~   (\SRETURN~x))$.   Assume   that  the
 context of this expression places  the demand $\lbrace \epsilon, \acar
 \rbrace$. Since the  value of the expression is the  value of $x$, the
 demand translates to the liveness  $[x \mapsto \lbrace \epsilon, \acar
@@ -607,12 +602,13 @@ result of $(\CDR~y)$.
 %% y.\epsilon, z.\epsilon \rbrace$ at the entry of $\pi$.
   
 We use $\sigma$  to range over demands, $\alpha$ to  range over access
-paths  and $\Lv$  to range  over liveness  environments. $\Lv_y$  will
-denote  the liveness  of an  individual  variable $y$  in $\Lv$.   The
-notation $\sigma_1\sigma_2$ denotes  the set $\lbrace \alpha_1\alpha_2
-\mid \alpha_1  \in \sigma_1, \alpha_2 \in  \sigma_2\rbrace$.  Often we
-shall abuse  notation to juxtapose an  edge label and a  set of access
-paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
+paths and $\Lv$  to range over liveness environments.  The liveness of
+an  individual variable  $y$ in  \Lv\  is $\Lv(y)$,  but more  commonly
+written as  $\Lv_y$.  The notation $\sigma_1\sigma_2$  denotes the set
+$\lbrace  \alpha_1\alpha_2 \mid  \alpha_1 \in  \sigma_1, \alpha_2  \in
+\sigma_2\rbrace$.  Often we shall abuse  notation to juxtapose an edge
+label and  a set  of access  paths; $\acar\sigma$  is a  shorthand for
+$\lbrace\acar\rbrace\sigma$.
 
 \input{example-program}
 %%\label{fig:mot-example2}
@@ -620,7 +616,7 @@ paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 %==============================================================
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
-\input{fig-liveness}
+
 
 
 \subsection{Liveness analysis for lazy languages}
@@ -635,26 +631,27 @@ of $\px$ within itself.  We treat the  copy of $\px$ in the closure as
 being separate from the $\px$ introduced  by the $\LET$, and call it a
 \emph{closure  variable}.  For  liveness calculations,  such variables
 are distinguished  from variables  introduced by  \LET s  and function
-arguments  (called \emph{stack  variables}  since they  reside in  the
-activation  stack). Notationally,  we distinguish  a closure  variable
+arguments  (called \emph{stack  variables},  since they  reside in  the
+activation  stack).   We notationally distinguish  a closure  variable
 from  its corresponding  stack variable  by subscripting  it with  the
-program   point  where   the   closure  was   created\footnote{Multiple
+label of the program   point  where   the   closure  was   created\footnote{Multiple
   occurrences  of the  same  variable in  an  application are  further
   distinguished by their positions in the application.}.
 
 
   Since a  closure is evaluated  only at evaluation points,  a closure
-  variable is attributed  with the same liveness in the  region of the
-  program  from the  point of  creation  of the  closure to  reachable
-  evaluation points.  This  is also true of  stack variables, because,
-  as we shall see, stack  variables derive their liveness from closure
-  variables. Thus, there are two  major differences in our formulation
-  of   liveness   of   lazy   languages   with   liveness   of   eager
+  variable is attributed  with the same liveness in  the entire region
+  of  the  program from  the  point  of  creation  of the  closure  to
+  reachable evaluation points.  This is  also true of stack variables,
+  because, as we shall see, stack variables derive their liveness from
+  closure variables. Thus, there are two major differences between our
+  formulation of  liveness of  lazy languages  with liveness  of eager
   languages~\cite{asati14lgc}:   (i)  the   introduction  of   closure
-  variables in  the liveness calculation,  and (ii) a  single liveness
+  variables in the  liveness calculations, and (ii)  a single liveness
   value for each  variable that is applicable from  its creation point
   to evaluation points.
 
+\input{fig-liveness}
 
   Closure  variables get  their  liveness values  through  a chain  of
   dependences beginning at  a variable at an evaluation  point.  As an
@@ -662,30 +659,31 @@ program   point  where   the   closure  was   created\footnote{Multiple
 
 \input{example-to-illustrate-liveness}
   
-The  variable \pz\   returned  at  $\psi_3$ depends  on  \py\ 
-  through  the  expression $(+~\py~1)$.   $\py$  in  turn depends  on  the
-  closure  variable  $\px_{\mathit{\pi}_1}$   through  $(\length~\px_{\mathit{\pi}_1})$.   We
-  denote  this chain  of dependences  as $\lbrack  \psi_3\!\!\!:\!\!\!\pz \leftarrow
-  (+~\py~1),\,  \py  \leftarrow   (\length~\px_{\mathit{\pi}_1})\rbrack$.   Indeed,  the
-  closures  in  the  heap  are   a  runtime  representation  of  these
-  dependences.  Since  $\pz$  is  evaluated   at  $\psi_3$  due  to  the
-  expression $\SRETURN~\pz$,  the demand made by  the calling context(s)
-  of  $f$ places  a demand  on  $\pz$ which  will impart  a liveness  to
-  $\px_{\pi_1}$.  Other dependence chains which result in a liveness for
-  $\px_{\pi_1}$       are       $\lbrack       \psi_1\!\!\!:\!\!\py       \leftarrow
-  (\length~\px_{\pi_1})\rbrack$ and $\lbrack \psi_2\!\!\!:\!\!\!\pw \leftarrow (/~\pu~\py),\,\,
-  \py  \leftarrow  (\length~\px_{\pi_1})\rbrack$.   The  liveness  analysis
-  described in this section declares the liveness of $\px_{\pi_1}$ to be
-  a union of the liveness arising from these dependence chains.  To
-  be safe, a  garbage collection during evaluation of  $\py$ at $\psi_1$
-  has  to  use  this  liveness  to copy  the  heap  from  $\px_{\pi_1}$.
-  However,  notice that  if  a garbage  collection  takes place  while
-  evaluating $\pz$ at $\psi_3$, it can safely consider only the liveness
-  arising from the dependence  chain\linebreak $\lbrack  \psi_3\!\!\!:\!\!\!\pz \leftarrow
-  (+~\py~1),\,   \py  \leftarrow   (\length~\x_{\pi_1})\rbrack$.   The   garbage
-  collection  scheme described  in Section~\ref{sec:GC-scheme}  uses a
-  generalization  of   this  observation   to  dynamically   select  a
-  evaluation point specific liveness in order to collect more garbage.
+The variable  \pz\ returned  at $\psi_3$ depends  on \py\  through the
+expression $(+~\py~1)$.  $\py$ in turn depends on the closure variable
+$\px_{\mathit{\pi}_1}$  through $(\length~\px_{\mathit{\pi}_1})$.   We
+denote this  chain of  dependences as  $\lbrack \psi_3\!\!\!:\!\!\!\pz
+\leftarrow            (+~\py~1),\,           \py            \leftarrow
+(\length~\px_{\mathit{\pi}_1})\rbrack$.  Indeed,  the chains of closures  in the
+heap are a  runtime representation of these  dependences.  Since $\pz$
+is evaluated  at $\psi_3$  due to  the expression  $\SRETURN~\pz$, the
+demand made by the calling context(s)  of $f$ places a demand on $\pz$
+which  will  impart a  liveness  to  $\px_{\pi_1}$.  Other  dependence
+chains  which result  in  a liveness  for  $\px_{\pi_1}$ are  $\lbrack
+\psi_1\!\!\!:\!\!\py   \leftarrow  (\length~\px_{\pi_1})\rbrack$   and
+$\lbrack   \psi_2\!\!\!:\!\!\!\pw   \leftarrow  (/~\pu~\py),\,\,   \py
+\leftarrow   (\length~\px_{\pi_1})\rbrack$.   The   liveness  analysis
+described in this section declares the liveness of $\px_{\pi_1}$ to be
+a union of  the liveness arising from these dependence  chains.  To be
+safe, a garbage collection during  evaluation of $\py$ at $\psi_1$ has
+to use  this liveness to  copy the heap starting from  $\px_{\pi_1}$.  However,
+notice that if a garbage collection takes place while evaluating $\pz$
+at $\psi_3$, it can safely consider only the liveness arising from the
+dependence chain\linebreak  $\lbrack \psi_3\!\!\!:\!\!\!\pz \leftarrow
+(+~\py~1),\, \py \leftarrow (\length~\x_{\pi_1})\rbrack$.  The garbage
+collection  scheme  described  in Section~\ref{sec:GC-scheme}  uses  a
+generalization of this observation  to dynamically select a evaluation
+point specific liveness in order to collect more garbage.
 
 
 
@@ -722,7 +720,7 @@ namely, the  demand transformation  assumed for  each function  in the
 program should  be the  same as  the demand  transformation calculated
 from      its      body.       As       we      shall      see      in
 Section~\ref{sec:grammar-formulation},  we  convert  the rule  into  a
-grammar and  the the language generated  by this grammar is  the least
+grammar and  the language generated  by this grammar is  the least
 solution satisfying  the rule. We  prefer the least solution  since it
 ensures the safe collection of the greatest amount of garbage.
 
