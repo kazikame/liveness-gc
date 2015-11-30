@@ -1,9 +1,9 @@
+LATEX=latex
 all: 
-#	yes X | xelatex proof.tex 
-	yes X | latex  paper.tex ; dvips paper.dvi -o paper.ps; ps2pdf paper.ps
+	yes X | $(LATEX)  paper.tex ; dvips paper.dvi -o paper.ps; ps2pdf paper.ps
 
 rel:
-	xelatex paper && bibtex paper && xelatex paper && xelatex paper 
+	$(LATEX) paper && bibtex paper && $(LATEX) paper && $(LATEX) paper 
 
 PHONY:
 	rm paper.log paper.aux
