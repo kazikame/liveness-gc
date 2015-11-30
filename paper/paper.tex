@@ -234,11 +234,13 @@ Experiments  with  a   single  generation  copying  collector
  
 
 %------------------------------------------------------------%
-\subsection{Motivating Example}
+\subsection{Motivating example}
 \label{sec:motiv}
 \input{fig_motiv}
 Figure~\ref{fig:mot-example} shows an example program and the state of
-the heap at  the program point $\pi$, i.e. just  before the evaluation
+the heap at  the program point $\pi$ (we write $\pi\!:\!e$ to associate a label
+$\pi$  with the  program point just
+before the expression $e$), i.e. just  before the evaluation
 of $(\length\  \pz)$.  The heap is  represented by a graph  in which a
 node either  represents atomic  values ($\NIL$,  integers etc.),  or a
 \CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
@@ -324,9 +326,7 @@ We denote the body of a function ${\mathit  f}$   as $e_{\mathit f}$.
  We assume that each program has a distinguished function
 \mainpgm,    defined as    $(\DEFINE\      ({\tt
   \mainpgm})\  e_\mainpgm)$,  and  the program begins execution
-with the call to \mainpgm.  We write $\pi\!:\!e$ to associate the label
-$\pi$ (not  part of the syntax) with the  program point just
-before expression $e$.
+with the call to \mainpgm.  Note that program point labels are not  part of the syntax.
 
 \begin{figure}[t]\footnotesize
 \renewcommand{\arraystretch}{1}
@@ -456,7 +456,7 @@ $\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, \heap,\,  s$} &
 {\sc return-clo} \\
 \hline
 \end{tabular}
-\caption{The small-step semantics for the language. \label{fig:lang-semantics}}
+\caption{A small-step semantics for the language. \label{fig:lang-semantics}}
 \end{center}
 %}\comment
 \vspace*{-6pt}
@@ -511,11 +511,11 @@ next  in the  environment $\rho$.
 %% system will be denoted $\mathcal{S}$.}
 The  initial  state  of  the  transition  system  described  above  is
 \[([\;]_\rho,\,     (\rho_\mathit{init},     \,    \ell_{\ans}     ,\,
-(\print~\ans)):[\;]_{S},   [\;]_{\heap},\,  (\mainpgm))\]   in  which
+(\print~\ans)):[\;]_{S},   [\;]_{\heap},\,   (\mainpgm))\]  in   which
 $[\;]_\rho$, $[\;]_{\mbox  \footnotesize {H}}$ and $[\;]_{S}$  are are
 the empty environment, heap and  stack respectively. The initial stack
 consists  of  a  single  continuation   frame  in  which  \ans\  is  a
-distinguished variable that would eventually be updated with the value
+distinguished variable that will eventually  be updated with the value
 of  (\mainpgm)  and  $\rho_\mathit{init}$  maps \ans\  to  a  location
 $\ell_{\ans}$.  In addition, \print\ is a function modeling a printing
 mechanism---a   standard   run-time   support  assumption   for   lazy
@@ -614,7 +614,7 @@ notation $\sigma_1\sigma_2$ denotes  the set $\lbrace \alpha_1\alpha_2
 shall abuse  notation to juxtapose an  edge label and a  set of access
 paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 
-\input{example-program-and-liveness-maps}
+\input{example-program}
 %%\label{fig:mot-example2}
 
 %==============================================================
@@ -623,11 +623,11 @@ paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 \input{fig-liveness}
 
 
-\subsection{Liveness Analysis for lazy languages}
+\subsection{Liveness analysis for lazy languages}
 \label{sec:liveness-analysis}
   
 
-Consider the  program in Figure~\ref{fig:mot-example2}.   As mentioned
+Consider the  program in Figure~\ref{fig:mot-example2-a}.   As mentioned
 earlier, a lazy evaluation of the $\LET$ expression at $\pi_1$ creates
 a closure  for $(\length~\px)$  instead of  evaluating it.   Since the
 closure may escape the scope in which it is created, it carries a copy
@@ -789,21 +789,28 @@ Premise & Transition & Rule name \\
 \hline
 
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,}
-  $\heap(\rho(x)) \mbox{ is } \bot$ & $\rho, S,
-  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
-{\sc car-clo-bang} 
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$, \\
+  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$ &
+{\sc car-bang} 
 \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,} $\heap(\rho(x))
-\mbox{ is } \langle s, \rho'\rangle$ & $\rho, S,
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\ $\heap(\rho(x))
+\mbox{ is } \langle s, \rho'\rangle$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \ell,
-  (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$         &
+  (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, 
+\cred{\renewcommand{\arraystretch}{1}\left\{
+\begin{array}{lr}
+  {\emptyset}&\mbox{if } \sigma = \emptyset \\       
+  {\{\epsilon\} \cup \acar\sigma }&\mbox{otherwise}
+\end{array}\right.
+}$         
+&
 {\sc car-clo}\\
 \hline
 \end{tabular}
 \end{center}
-\caption{Minefield semantics for {\sc car-clo-bang} and
+\caption{Minefield semantics for {\sc car-bang} and
   {\sc car-clo} \label{fig:minefield-semantics-for-some}}
 \end{figure*}
 
@@ -886,7 +893,7 @@ semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
 e_{\mainpgm}$.
    
  
-\subsection{Soundness Results}
+\subsection{Soundness results}
 We first need an auxiliary  result about minefield semantics. Consider
 a trace of  a minefield execution.  For every  minefield state $(\rho,
 S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
@@ -1075,11 +1082,11 @@ The proposition also holds for other modified rules for
 similar reasons.
 
 
-\subsection{Generating Equations for $\Lfonly_{\mathit f}$}
+\subsection{Generating equations for $\Lfonly_{\mathit f}$}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
 \Lfonly$_\mathit{f}$.        The       program       in
-Figure~\ref{fig:mot-example2}   serves  as   a  running
+Figure~\ref{fig:mot-example2-a}   serves  as   a  running
 example.  Starting with a  symbolic demand $\sigma$, we
 determine  \Lfun{e_{\mathit{f}}}{\sigma}{\Lfonly}.   In
 particular, we  consider $\Lanv{x_i}{}$,  the liveness
@@ -1155,20 +1162,23 @@ call site of a function.
 %% $\epsilon$ if it returns a base value.
 
 
-For  the  running  example,   $\length$  has  calls  from  $\main$  at
+For  the  running  example (Figure~\ref{fig:mot-example2-a}),  $\length$  has  calls  from  $\main$  at
 $\pi_{12}$ and a recursive call at $\pi_6$. The demands on these calls
 are $\epsilon$ and $\clazy\sigma_{\mathit{\length}}$. Thus:
 \begin{eqnarray*}
 \sigma_{\length}    &=&
  \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
 \end{eqnarray*}
-As examples, the liveness of \Lanv{\pl}{} and \Lanv{\pa}{} in terms
-of  $\sigma_{\length}$ are:
+As examples, the closure variables $\xl_{\mbox{$\pi$}_1}$ and $\xl_{\mbox{$\pi$}_5}$, and the
+stack variables $\pl$ and $\pa$ have the following liveness in terms
+of  $\sigma_{\length}$:
 \begin{align*}
-\Lanv{\pl}{} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
-  \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}}
- \\
-\Lanv{\pa}{} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
+  \Lv_{\xl_{\mbox{$\pi$}_1}} &= \clazy\sigma_{\mathit{\length}} \\
+  \Lv_{\xl_{\mbox{$\pi$}_5}} &=  (\acdr\Df{\length}{1}{\clazy} \cup
+  \clazy\Df{\length}{1}{\clazy}) \sigma_{\mathit{\length}} \\
+  \Lanv{\pl}{} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
+  \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}} \\
+  \Lanv{\pa}{} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
 \end{align*}
 
 In  summary, the  equations  generated during  liveness
@@ -1538,7 +1548,7 @@ the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
 liveness based garbage collection is triggered beyond $\pi_9$.
 
 
-\section{The Garbage Collection Scheme}
+\section{The garbage collection scheme}
 \label{sec:GC-scheme}
 
 Our experimental setup  consists of an interpreter
@@ -1701,7 +1711,7 @@ a printing function~(Section
 We extend liveness-based  garbage  collection  to
 this function.
 
-\section{Experimental Evaluation}
+\section{Experimental evaluation}
 \label{sec:experiments}
   Our benchmark consists of programs taken from nofib~\cite{nofib} and
   other repositories for  functional  programs~\cite{PLT-Scheme,
@@ -1817,7 +1827,7 @@ overcome common cases and they show promising results}.
 
 
 
-\section{Related Work} 
+\section{Related work} 
 \label{sec:relatedwork}
 
 Most previous work on enhancing  garbage collection with liveness were
@@ -1884,7 +1894,7 @@ have extend this to handle lazy evaluation and closures.
 %% \label{fig:memory-usage-lambda} \figrule
 %% \end{figure}
 \vskip -5mm
-\section{Future Work and Conclusions}
+\section{Future work and conclusions}
 \label{sec:conclusion}
 %% We have  defined a notion of  liveness on structured
 %% data; this generalizes classical liveness and strong
@@ -1978,9 +1988,9 @@ propagated inside closures.
 
 \clearpage
 \appendix
-%\section{Appendix: Not to be included in the paper.}
+%\section{Appendix: not to be included in the paper.}
 \begin{figure*}[h!]
-\noindent{\Large \bf A. Minefield Semantics}
+\noindent{\Large \bf A. Minefield semantics}
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
 
