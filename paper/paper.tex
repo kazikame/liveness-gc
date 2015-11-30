@@ -676,12 +676,12 @@ The  variable \pz\   returned  at  $\psi_3$ depends  on  \py\
   (\length~\px_{\pi_1})\rbrack$ and $\lbrack \psi_2\!\!\!:\!\!\!\pw \leftarrow (/~\pu~\py),\,\,
   \py  \leftarrow  (\length~\px_{\pi_1})\rbrack$.   The  liveness  analysis
   described in this section declares the liveness of $\px_{\pi_1}$ to be
-  a union of the liveness arising  out of these dependence chains.  To
+  a union of the liveness arising from these dependence chains.  To
   be safe, a  garbage collection during evaluation of  $\py$ at $\psi_1$
   has  to  use  this  liveness  to copy  the  heap  from  $\px_{\pi_1}$.
   However,  notice that  if  a garbage  collection  takes place  while
   evaluating $\pz$ at $\psi_3$, it can safely consider only the liveness
-  arising  out of  the dependence  chain\linebreak $\lbrack  \psi_3\!\!\!:\!\!\!\pz \leftarrow
+  arising from the dependence  chain\linebreak $\lbrack  \psi_3\!\!\!:\!\!\!\pz \leftarrow
   (+~\py~1),\,   \py  \leftarrow   (\length~\x_{\pi_1})\rbrack$.   The   garbage
   collection  scheme described  in Section~\ref{sec:GC-scheme}  uses a
   generalization  of   this  observation   to  dynamically   select  a
@@ -1225,8 +1225,8 @@ solution  of  \Lanv{x}{}.
 However, recall that the decision problem that we are interested in
 during garbage collection is the following: 
 \begin{quote}
-Let $x.\alpha$ be a forward access path consisting only
-of edges  \acar\ and \acdr\  (but not \bcar,  \bcdr\ or
+Let $x.\alpha$ be a forward access path (consisting only
+of edges  \acar\ and \acdr\  but not \bcar,  \bcdr\ or
 \clazy).       Let      $\mathscr{L}(\var{\Lanv{x}{}})
 \stackrel{*}{\hookrightarrow}  \sigma$, where  $\sigma$
 consists  of  forward  access  paths  only.  Then  does
@@ -1532,8 +1532,8 @@ state.  If yes, \warning{we mark the mark the source node as final. Finally, we
 remove all the edges labeled \clazy\  and convert the automaton into a
 deterministic    automaton.}    These steps   effectively   implement    the
 $\hookrightarrow$   simplification  rules   for   \bcar,  \bcdr,   and
-\clazy\ to  obtain forward paths.  While checking for  liveness during
-garbage  collection, a  forward access-path  is valid  only if  it can
+\clazy\ to  obtain forward access paths.  While checking for  liveness during
+garbage  collection, a  forward access path  is valid  only if  it can
 reach a  final state.  Figure~\ref{fig:example-automata}(a)  shows the
 NFA that is obtained from  the grammar for \var{\Df{\length}{1}}, and   the
 final  DFA  is  shown in  Figure~\ref{fig:example-automata}(b).   This
