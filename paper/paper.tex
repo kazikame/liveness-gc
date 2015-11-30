@@ -816,7 +816,7 @@ To set up the minefield semantics, we follow these steps:
   $\rho,S,\heap,e,\sigma$.   We call  such a  state a  \emph{minefield
   state}.  Here $\sigma$  is the ``dynamic'' demand  on the expression
   $e$, i.e., it arises from the actual sequence of function calls that
-  led  to the  evaluation  of $e$. The demand for the initial rule is  $\sigma_{all}$ and each expression $e$ before a $\rightsquigarrow$ step transforms the demand in accordance with the liveness rules of Section~\ref{sec:liveness-analysis} and passes it the expression after the step.  The  information in  continuation
+  led  to the  evaluation  of $e$. The demand for the initial state is  $\sigma_{all}$, and each expression $e$ before a $\rightsquigarrow$ step transforms the demand in accordance with the liveness rules of Section~\ref{sec:liveness-analysis} and passes it to the state after the step.  The  information in  continuation
   frames  on the  stack $S$  are also  similarly augmented  with their
   demands.  Thus a  stacked entry now takes the form  $(\rho, \ell, e,
   \sigma)$.
@@ -831,7 +831,7 @@ To set up the minefield semantics, we follow these steps:
   \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
     \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
     liveness environment  \Lv\ for  the expression $e$.   We similarly
-    define the liveness environment for the expressions $e$ in each of
+    define the liveness environments for the expressions $e$ in each of
     the  continuation frames $(\rho,  \ell, e,  \sigma)$ in
     $S$, giving a stack of  liveness environments that we shall denote
     $\mathsf{SL}$.
@@ -867,8 +867,8 @@ using $GC$.  The details of the transition for the {\sc
 Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
 earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
-enters the  \bang\ state ({\sc  car-clo-bang}). Otherwise
-the transition is the similar to the earlier {\sc car-clo}
+enters the  \bang\ state ({\sc  car-bang}). Otherwise
+the transition is similar to the earlier {\sc car-clo}
 rule. 
 
 
