@@ -5,11 +5,12 @@
             \UNL{0} (\DEFINE~(f~\px)
              \UNL{1} $\pi_1$:(\LET~\py~$\leftarrow $\
  (\length~\px) \IN
-             \UNL{2} (\SIF~$\psi_1$:\py~(\LET~\pz~$\leftarrow$~(+~\py~1)~\IN
-             \UNL{7} (\SRETURN~$\psi_2$:\pz))   
-             \UNL{2} (\LET~\pu~$\leftarrow$~(\Sum~\px)~\IN
-             \UNL{3} (\LET~\pw~$\leftarrow$\ (/~\pu~\py)~\IN
-             \UNL{4} (\SRETURN~$\psi_3$:\pw))))))
+             \UNL{4} (\SIF~$\psi_1$:\py
+             \UNL{6}(\LET~\pu~$\leftarrow$~(\Sum~\px)~\IN
+             \UNL{7} (\LET~\pw~$\leftarrow$\ (/~\pu~\py)~\IN
+             \UNL{8} (\SRETURN~$\psi_2$:\pw)))
+             \UNL{6}(\LET~\pz~$\leftarrow$~(+~\py~1)~\IN
+             \UNL{7} (\SRETURN~$\psi_3$:\pz)))))   
         \end{uprogram}}
 }
 \vspace*{.1cm}

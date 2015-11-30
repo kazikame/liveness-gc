@@ -151,7 +151,7 @@ collector,   there  is   a   significant  decrease   in  peak   memory
 requirements.   In  addition,   a  sizable  reduction  in   the  number  of
 collections  ensures that  in spite  of using  a more  complex garbage
 collector,  the execution  time  of  a program  remains comparable  with
-the same program running with a reachabilty-based collector.
+the same program running with a reachability-based collector.
 \warning{On our benchmark programs, we obtain a decrease of up to 75\%
   in the number of collections, and up to 50\% decrease in peak memory
   requirements.}
@@ -195,17 +195,16 @@ expression.   The  analysis  has  two parts.   We  first  calculate  a
 context-sensitive  summary   of  each   function  as  a   {\em  demand
   transformer} that transforms a {\em  symbolic} demand on its body to
 demands  on its  arguments.   This  summary is  used  to step  through
-function  calls  during analysis.   The  concrete demand  on  a
-function body is obtained through a conservative approximation similar
-to  0-CFA~\cite{Shivers:1988} that  combines  the demands  on all  the
-calls to the function.  The result of the analysis is an annotation of
+function calls  during analysis.   The concrete  demand on  a function
+body  is  obtained through  a  conservative  approximation similar  to
+0-CFA~\cite{Shivers:1988} that  combines the demands on  all the calls
+to  the function.   The result  of the  analysis is  an annotation  of
 certain program points with  deterministic finite-state automata (DFA)
-capturing the liveness of variables at these points.  Depending on the
-where  garbage collection  has been  triggered, the
-collector
-consults a  set of automata  to restrict reachability  during marking.
-This results in an increase  in the garbage reclaimed and consequently
-in fewer garbage collections.
+capturing the  liveness of  variables at  these points.   Depending on
+where garbage collection is triggered, the collector consults a set of
+automata to restrict reachability during  marking.  This results in an
+increase in  the garbage reclaimed  and consequently in  fewer garbage
+collections.
 
 While this idea has been shown  to be effective for a first-order {\em
   eager}  language~\cite{asati14lgc}, a  straightforward extension  of
@@ -218,20 +217,20 @@ complicates  liveness analysis  itself.  Moreover,  for liveness-based
 garbage collection to  be effective, we need to extend  it to closures
 apart from  evaluated data.  Since a  closure can escape the  scope in
 which it was created, it has  to carry the liveness information of its
-free variables. Moreover, as  execution progresses and possible future
+free variables. As execution progresses and possible future
 uses are eliminated,  we update the liveness information  in a closure
 with a  more precise version.  Because of these reasons,   the garbage
 collector  also   becomes  significantly   more  complicated   than  a
 liveness-based collector for a eager language.
 
-\warning{Experiments  with  a   single  generation  copying  collector
+Experiments  with  a   single  generation  copying  collector
   (Section~\ref{sec:experiments})  confirm  the  expected  performance
   benefits.   Liveness-based  collection  results in  an  increase  in
   garbage reclaimed.   As a  consequence, there is  a reduction  in the
-  number of collections up to ???\% and a decrease in the
-  minimum memory requirement up to ???\%. 
+  number of collections from \warning{1.6X to 23X} and a decrease in the
+  minimum memory requirement from  \warning{1X to 1389X}. 
   As an added benefit, there is also a reduction in the overall
-  execution time for some programs.}
+  execution time in 5 out of 12 benchmark programs.
  
 
 %------------------------------------------------------------%
@@ -429,7 +428,7 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & $\rho,\, S,\, \heap,\,
 \hline
 $\ell$ is a new location& {$\rho,\, S,\, \heap,\, (\LET~x\leftarrow s~\IN~e)
   \rightsquigarrow$
-$\rho\oplus[x \mapsto \ell],\, S,\, \heap[\ell \mapsto \langle s,
+$\rho\oplus[x \mapsto \ell],\, S,\, \heap[\ell := \langle s,
     \lfloor\rho\rfloor_{FV(s)} %% \oplus [x \mapsto  \ell] -- NO LAZY LETS
     \rangle],\, e$} &
 {\sc let} \\
@@ -465,7 +464,7 @@ $\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, \heap,\,  s$} &
 
 
 
-\subsection{Semantics}
+\subsection{Semantics}\label{sec:semantics}
 %\comment{
 We now give  a small-step semantics for our  language.
 We first specify the domains used by the semantics:
@@ -511,18 +510,17 @@ next  in the  environment $\rho$.
 %% 3-tuple $\rho, \stk,  \heap, e$ representing the state  of the transition
 %% system will be denoted $\mathcal{S}$.}
 The  initial  state  of  the  transition  system  described  above  is
-$([\;]_\rho,\,    (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
-(\print~\ans)):[\;]_{S}, 
-[\;]_{\heap},\, (\mainpgm))$,  in which  $[\;]_\rho$,
-$[\;]_{\mbox \footnotesize {H}}$
-and $[\;]_{S}$ are    are the
-empty environment, heap and stack respectively. The  initial stack consists
-of  a single  continuation frame  in  which \ans\  is a  distinguished
-variable  that  would   eventually  be  updated  with   the  value  of
-(\mainpgm) and $\rho_\mathit{init}$ maps \ans\ to a location $\ell_{\ans}$.   In  addition, \print\ is  a function modeling  a printing
+\[([\;]_\rho,\,     (\rho_\mathit{init},     \,    \ell_{\ans}     ,\,
+(\print~\ans)):[\;]_{S},   [\;]_{\heap},\,  (\mainpgm))\]   in  which
+$[\;]_\rho$, $[\;]_{\mbox  \footnotesize {H}}$ and $[\;]_{S}$  are are
+the empty environment, heap and  stack respectively. The initial stack
+consists  of  a  single  continuation   frame  in  which  \ans\  is  a
+distinguished variable that would eventually be updated with the value
+of  (\mainpgm)  and  $\rho_\mathit{init}$  maps \ans\  to  a  location
+$\ell_{\ans}$.  In addition, \print\ is a function modeling a printing
 mechanism---a   standard   run-time   support  assumption   for   lazy
-languages~\cite{Jones87}---that prints  the value of  (\mainpgm).  The operator $:$
-pushes elements on top of the stack.
+languages~\cite{Jones87}---that prints  the value of  (\mainpgm).  The
+operator~$:$ pushes elements on top of the stack.
 
 The   notation  $[\myvec{x}   \mapsto  \myvec{\ell}]$   represents  an
 environment  that  maps  variables  $x_i$ to  locations  $\ell_i$  and
@@ -552,31 +550,24 @@ due to  sharing~\cite{Jones87}.  Only after this  is the actual selection  done 
   car-select}).
 
 
-%}\comment
-%==============================================================
-\renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
-%==============================================================
-\input{fig-liveness}
-
-
 \section{Liveness}
 \label{sec:liveness}
+
 
 A variable is {\em live} if there  is a possibility of its value being
 used in  future computations and  dead if  it is definitely  not used.
 Heap-allocated data  needs a richer model  than classical liveness---a
-model  which  talks  about  liveness of  references.   Using  $\acar$,
-$\acdr$  to  represent access  using  $\CAR$  and $\CDR$  fields,  the
-liveness of the structure reachable from a variable can be represented
-by a set of {\em access paths} i.e.  prefix-closed set of strings from
-$\{\acar,\acdr\}^\ast$.  Given an initial location $\ell$ (usually a 
-reference corresponding to a variable) and  a heap  \heap, semantically  an access  path
-$\alpha$ represents  a reference, denoted $\heap\llbracket\ell,  \alpha\rrbracket$, in
-the heap  that is  obtained by  starting with  $\ell$ and  chasing the
-\CAR\ or  \CDR\ fields in the heap as specified  by the  access path.  
-$\heap\llbracket\ell, \alpha\rrbracket$  is defined only  if the path followed  in the
-heap  is \emph{closure-free}  (does not  cross closures),  else it  is
-undefined.
+model which talks about liveness of references.  An {\em access path}
+is a  prefix-closed set of strings  over $\{\acar,\acdr\}^\ast$, where
+$\acar$,  $\acdr$ represent  access  using $\CAR$  and $\CDR$  fields.
+Given an initial location $\ell$ (usually a reference corresponding to
+a variable)  and a  heap \heap, semantically  an access  path $\alpha$
+represents     a      reference,     denoted     $\heap\llbracket\ell,
+\alpha\rrbracket$,  in the  heap  that is  obtained  by starting  with
+$\ell$ and chasing the \CAR\ or  \CDR\ fields in the heap as specified
+by  the  access   path.   $\heap\llbracket\ell,  \alpha\rrbracket$  is
+defined only if  the path followed in the  heap is \emph{closure-free}
+(does not cross closures), else it is undefined.
 
 Access paths are used to  represent liveness. As an example, a list
 $x$ with 
@@ -626,10 +617,16 @@ paths; $\acar\sigma$ is a shorthand for $\lbrace\acar\rbrace\sigma$.
 \input{example-program-and-liveness-maps}
 %%\label{fig:mot-example2}
 
+%==============================================================
+\renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
+%==============================================================
+\input{fig-liveness}
+
+
 \subsection{Liveness Analysis for lazy languages}
 \label{sec:liveness-analysis}
   
-%\comment{  
+
 Consider the  program in Figure~\ref{fig:mot-example2}.   As mentioned
 earlier, a lazy evaluation of the $\LET$ expression at $\pi_1$ creates
 a closure  for $(\length~\px)$  instead of  evaluating it.   Since the
@@ -641,7 +638,7 @@ are distinguished  from variables  introduced by  \LET s  and function
 arguments  (called \emph{stack  variables}  since they  reside in  the
 activation  stack). Notationally,  we distinguish  a closure  variable
 from  its corresponding  stack variable  by subscripting  it with  the
-program   point  where   the   closure  was   created\footnote{Mutiple
+program   point  where   the   closure  was   created\footnote{Multiple
   occurrences  of the  same  variable in  an  application are  further
   distinguished by their positions in the application.}.
 
@@ -665,26 +662,26 @@ program   point  where   the   closure  was   created\footnote{Mutiple
 
 \input{example-to-illustrate-liveness}
   
-The  variable \pz\   returned  at  $\psi_2$ depends  on  \py\ 
+The  variable \pz\   returned  at  $\psi_3$ depends  on  \py\ 
   through  the  expression $(+~\py~1)$.   $\py$  in  turn depends  on  the
   closure  variable  $\px_{\mathit{\pi}_1}$   through  $(\length~\px_{\mathit{\pi}_1})$.   We
-  denote  this chain  of dependences  as $\lbrack  \psi_2\!\!\!:\!\!\!\pz \leftarrow
+  denote  this chain  of dependences  as $\lbrack  \psi_3\!\!\!:\!\!\!\pz \leftarrow
   (+~\py~1),\,  \py  \leftarrow   (\length~\px_{\mathit{\pi}_1})\rbrack$.   Indeed,  the
   closures  in  the  heap  are   a  runtime  representation  of  these
-  dependences.  Since  $\pz$  is  evaluated   at  $\psi_2$  due  to  the
+  dependences.  Since  $\pz$  is  evaluated   at  $\psi_3$  due  to  the
   expression $\SRETURN~\pz$,  the demand made by  the calling context(s)
   of  $f$ places  a demand  on  $\pz$ which  will impart  a liveness  to
   $\px_{\pi_1}$.  Other dependence chains which result in a liveness for
   $\px_{\pi_1}$       are       $\lbrack       \psi_1\!\!\!:\!\!\py       \leftarrow
-  (\length~\px_{\pi_1})\rbrack$ and $\lbrack \psi_3\!\!\!:\!\!\!\pw \leftarrow (/~\pu~\py),\,\,
+  (\length~\px_{\pi_1})\rbrack$ and $\lbrack \psi_2\!\!\!:\!\!\!\pw \leftarrow (/~\pu~\py),\,\,
   \py  \leftarrow  (\length~\px_{\pi_1})\rbrack$.   The  liveness  analysis
   described in this section declares the liveness of $\px_{\pi_1}$ to be
   a union of the liveness arising  out of these dependence chains.  To
   be safe, a  garbage collection during evaluation of  $\py$ at $\psi_1$
   has  to  use  this  liveness  to copy  the  heap  from  $\px_{\pi_1}$.
   However,  notice that  if  a garbage  collection  takes place  while
-  evaluating $\pz$ at $\psi_2$, it can safely consider only the liveness
-  arising  out of  the dependence  chain\linebreak $\lbrack  \psi_2\!\!\!:\!\!\!\pz \leftarrow
+  evaluating $\pz$ at $\psi_3$, it can safely consider only the liveness
+  arising  out of  the dependence  chain\linebreak $\lbrack  \psi_3\!\!\!:\!\!\!\pz \leftarrow
   (+~\py~1),\,   \py  \leftarrow   (\length~\x_{\pi_1})\rbrack$.   The   garbage
   collection  scheme described  in Section~\ref{sec:GC-scheme}  uses a
   generalization  of   this  observation   to  dynamically   select  a
@@ -904,9 +901,9 @@ $\sigma$ (for example $(\clazy\cup\acar)\sigma$) which is also non-null.
 
 Note that our proofs will be for a single round of minefield execution
 i.e.  the evaluation of $(\mainpgm)$ (or $e_{\mainpgm}$, for call-less
-programs) to  its WHNF driven  by the printing mechanism.   With minor
-variations,  the   proof  will  also  be   applicable  for  subsequent
-evaluations initiated by $\print$.
+programs)  to   its  WHNF  driven  by   the  printing  mechanism~(Section
+\ref{sec:semantics}).  With  minor variations,  the proof will  also be
+applicable for subsequent evaluations initiated by $\print$.
 %% We show  next that the  minefield execution of a  call-less program
 %% cannot go \bang.
 
@@ -978,7 +975,7 @@ and $P'$  are identical  except for change  of variable
 names. }             However,                 by
 Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
 $P'$,   a   call-less   program,   cannot   enter   the
-\bang\  state.  Therefor  $P$  also  cannot  enter  the
+\bang\  state.  Therefore   $P$  also  cannot  enter  the
 \bang\ state.
 \end{proof}
  
@@ -1094,15 +1091,12 @@ $$
   \cup \clazy\Lf{\length}{1}{\clazy\sigma}
 $$
 
-In general, the equations for \Lfonly\ are recursive as
-in the  case of  \Lfonly$_\mathit{f}$. As  mentioned in
-\cite{asati14lgc},   a   closed   form   solution   for
-$\Lfone{\mathit{f}}$ can  be derived by  observing that
-each of  the liveness rules  modifies a demand  only by
-prefixing  it with  symbols  in  the alphabet  $\lbrace
-\acar, \acdr,\bcar,  \bcdr, \clazy  \rbrace$. Therefore
-we can  assume that $\Lf{f}{i}{\sigma}$ has  the closed
-form:
+In general, the equations for \Lfonly\ are recursive as in the case of
+\Lfonly$_\mathit{f}$. A closed  form solution for $\Lfone{\mathit{f}}$
+can be derived by observing that each of the liveness rules modifies a
+demand  only by  prefixing it  with symbols  in the  alphabet $\lbrace
+\acar, \acdr,\bcar,  \bcdr, \clazy  \rbrace$. Therefore we  can assume
+that $\Lf{f}{i}{\sigma}$ has the closed form:
 \begin{eqnarray}
 \label{eq:LF:DI}
   \Lf{f}{i}{\sigma} = \Df{f}{i}\sigma
@@ -1244,7 +1238,7 @@ contain $S$, and $p_2$ is the fixed set of unrestricted
 productions    $\bcar\acar    \rightarrow    \epsilon$,
 $\bcdr\acdr    \rightarrow   \epsilon$,    $\clazy\acar
 \rightarrow \clazy$,  $\clazy\acdr \rightarrow \clazy$,
-and $\clazy\$ \rightarrow \epsilon$.
+and $\clazy\$ \rightarrow \$ $.
 \end{definition}
 
 %% From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
@@ -1273,7 +1267,7 @@ $\alpha\$ \in \mathscr{L}(G)$ is undecidable.
 \begin{proof}
 Given a Turing machine and  an input $w\in (1+0)^*$, we
 construct a grammar $G$ such that the machine will halt
-on    $w$    if    and   only    if    $\epsilon    \in
+on    $w$    if    and   only    if    $\$    \in
 \mathscr{L}(G)$. The grammar includes  the fixed set of
 unrestricted               productions               in
 Definition~\ref{def:specialgrammar}.
@@ -1296,7 +1290,7 @@ and the sentential form:
 \begin{quote}
   If    the   configuration    of   the    TM   is
   $w_l(\state,c)w_r$, then the  sentential form will be
-  $\overline{w}_l\nont{}{c}\,w_r$,                where
+  $\overline{w}_l\nont{}{c}\,w_r\$ $,                where
   $\overline{w}_l$ is  the same as $w_l$  but with each
   symbol $d$ in $w_l$ replaced by $\overline{d}$.
 \end{quote}
@@ -1315,12 +1309,12 @@ TM moves and the grammar productions are as follows:
   and $\nont{i}{c} \rightarrow \acdr \nont{j}{\acdr}c'$.
 \item For each  transition $(S_i, c) \rightarrow (S_j,c',R)$, there
   are two productions
-  $\nont{i}{c} \rightarrow c \nont{j}{\acar}\bcar$ and $\nont{i}{c}
-  \rightarrow c \nont{j}{\acdr}\bcdr$. 
+  $\nont{i}{c} \rightarrow \overline{c'} \nont{j}{\acar}\bcar$ and $\nont{i}{c}
+  \rightarrow \overline{c'} \nont{j}{\acdr}\bcdr$. 
 \end{enumerate}
 The idea  behind the  productions is explained  with an
 example:  Assume that  the current  sentential form  is
-\bcar\bcdr\nont{i}{\acar}\acar\acar. Also  assume that  the
+$\bcar\bcdr\nont{i}{\acar}\acar\acar\$$. Also  assume that  the
 TM  has  a   transition  $(S_i,\acar)  \rightarrow
 (S_j,\acdr, L)$.  Since the next corresponding  step in
 the  derivation  has  to  be  done  without  any  prior
@@ -1330,10 +1324,10 @@ and  the  invariant  will  be maintained  only  if  the
 production         $\nont{i}{\acar}         \rightarrow
 \acdr\nont{j}{\acdr}\acdr$ is chosen  for the next step
 in  the  derivation.    This  gives  the  configuration
-\bcar\bcdr\acdr\nont{i}{\acdr}\acdr\acar\acar.
+$\bcar\bcdr\acdr\nont{j}{\acdr}\acdr\acar\acar\$$.
 Simplification   with    the   production   $\bcdr\acdr
 \rightarrow               \epsilon$              yields
-\bcar\nont{i}{\acdr}\acdr\acar\acar,    which   exactly
+$\bcar\nont{j}{\acdr}\acdr\acar\acar\$$,    which   exactly
 corresponds  to   the  changed  configuration   of  the
 TM.  Notice  carefully that a wrong  choice breaks
 the invariant  and it cannot be  recovered subsequently
@@ -1350,9 +1344,8 @@ for cleaning up the \bcar\ and \bcdr\  symbols on the left of the head
 and                $\nont{\mathit{final}}{c}               \rightarrow
 \nont{\mathit{final}}{c}\bcar$      and      $\nont{\mathit{final}}{c}
 \rightarrow \nont{\mathit{final}}{c}\bcdr$ for  cleaning up \acar\ and
-\acdr\ on the right of the tape head. Finally the production $\clazy\$
-\rightarrow \epsilon$ is used  to derive $\epsilon$.This completes the
-reduction.
+\acdr\ on the right of the tape head.  This completes the
+reduction.\\ \mbox{}
 \end{proof}
 
 We now show that the proof can be replayed for the class of grammars
@@ -1381,7 +1374,7 @@ the program is:
 The body of the function corresponds  to the RHS of the production. If
 there are  more than one  productions with the same  LHS non-terminal,
 then the function for the non-terminal joins the program fragments for
-the  RHS  with a  $\SIF$.   If  there  are  $n$ such  functions,  then
+the  RHS  with an  $\SIF$.   If  there  are  $n$ such  functions,  then
 \mainpgm\ creates  a $n$-way  branch and  inserts a  single call  to a
 distinct function in each branch. It  can be verified that the grammar
 for      the     function      shown      above,     includes      the
@@ -1415,7 +1408,7 @@ sentential form by $\epsilon$. However, if  the TM does not accept the
 input string, then every sentential form derived from the start symbol
 would    have     at    least    one    non-terminal from the grammar
 of Lemma~\ref{lemma:grammar-undecidable} that is different
-from $\nont{\mathit{final}}{c}$.   Thus  the  empty  string  would  not  be
+from $\nont{\mathit{final}}{c}$.   Thus  $\$$  would  not  be
 derivable from the grammar.
 \end{proof}
 
@@ -1696,7 +1689,8 @@ have not been shown.
 
 %\subsection{Garbage collection for references on print stack}
 The evaluation of  the top-level expression in a program  is driven by
-a printing function.  
+a printing function~(Section
+\ref{sec:semantics}).  
 %% Printing of  atomic values is simple  and does
 %% not  trigger a  garbage  collection.   In case  of  \CONS\ cells,  the
 %% \CAR\ is  first printed followed  by \CDR.   In a lazy  language, both
@@ -1737,7 +1731,7 @@ shown in Table~\ref{tab:exp-results}(a). We  observe that the analysis
 of  all  programs  except \verb@treejoin@  and  \verb@sudoku@  require
 reasonable time.   The bottleneck in  our analysis  is the NFA  to DFA
 conversion with  worst-case exponential behaviour. However,  since the
-analysis has  to be  done only  once, and its  results can be cached and
+analysis has  to be  done only  once and its  results can be cached and
 re-used, the time spent in analysis may be considered acceptable.
 
 
@@ -1853,7 +1847,7 @@ particular.  \warning{Most  of the  simplifications mentioned  in this
   work are subsumed by a liveness  based collector.  We feel this work
   is orthogonal  and can augment  our liveness based  collector.}  The
 approach that is closest to the  method described in this paper is the
-liveness-based garbage collector implemented in~\cite{asati14lgc}.  We
+liveness-based garbage collector implemented in~\cite{karkare07liveness,asati14lgc}.  We
 have extend this to handle lazy evaluation and closures.
  
 %% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
@@ -1932,7 +1926,7 @@ have extend this to handle lazy evaluation and closures.
 %% classical copying  collector to  reduce the  cost of
 %% this.
 We have  extended liveness-based  garbage collection  to lazy
-  languages  and shown  its benefit  for a  set of  standard benchmark
+  languages  and shown  its benefit  for a  set of  benchmark
   programs.  We  defined a liveness analysis  of programs manipulating
   the  heap and  proved  it  correct with  respect  to a  non-standard
   semantics that served as a specification of liveness.  The result of
@@ -2074,7 +2068,8 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\LET~x\leftarrow
   s~\IN~e), \sigma) = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
-  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x \mapsto \ell], S, \heap[\ell \mapsto \langle s, \lfloor\rho\rfloor_{FV(s)}\rangle], e, \cred{\sigma}$} &
+  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x
+    \mapsto \ell], S, \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}\rangle], e, \cred{\sigma}$} &
 {\sc let} \\ 
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2),
