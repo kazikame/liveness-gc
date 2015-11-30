@@ -1373,18 +1373,20 @@ Lemma~\ref{lemma:grammar-undecidable}.
 %% production  $P$ itself,  but could  also contain  extra productions
 %% that necessarily contain the \clazy\ symbol.
 For instance, corresponding to the production $\nont{i}{\acar} \rightarrow
-\acar \nont{j}{\acar}\bcar$,  consider
-the program:
+\acar \nont{j}{\acar}\bcar$,
+the program is:
  
 \input{equivalent-program}
 
-If there more than one productions with the same LHS, then the
-corresponding function creates joins them with a $\SIF$.   If there
-are $n$ such functions,  then \mainpgm\  creates  a $n$-way
-branch  and inserts  a  single call  to a  distinct  function in  each
-branch. It can  be verified that the grammar for the function shown
-above, includes the productions---$\nont{\mathit{all}}{}$
-corresponds to the demand $\sigma_{\mathit{all}}$:
+The body of the function corresponds  to the RHS of the production. If
+there are  more than one  productions with the same  LHS non-terminal,
+then the function for the non-terminal joins the program fragments for
+the  RHS  with a  $\SIF$.   If  there  are  $n$ such  functions,  then
+\mainpgm\ creates  a $n$-way  branch and  inserts a  single call  to a
+distinct function in each branch. It  can be verified that the grammar
+for      the     function      shown      above,     includes      the
+productions shown below. $\nont{\mathit{all}}{}$   corresponds   to  the   demand
+$\sigma_{\mathit{all}}$:
 \begin{align*}
 \nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
 \nont{i}{\acar} &\rightarrow \clazy\nont{i}{\acar}\bcar\nont{\mathit{all}}{} \\
@@ -1404,16 +1406,16 @@ will  have the  production
 $\mathsf{S}      \rightarrow      \beta_1     \mathsf{S'}      \beta_2
 \nont{\mathit{\mathit{all}}}{}$,  and (b)  other  productions are  of the  form
 $\mathsf{S}       \rightarrow       \beta_1'\mathsf{S'}       \beta_2'
-\nont{\mathit{all}}{}$, where $\beta_1'$ and $\beta_2'$ do not contain
-any non-terminals.
+\nont{\mathit{all}}{}$.
 
 It is clear that if the TM given as an instance of the halting problem
 accepts the input string, then the earlier derivation can be replayed,
-every time replacing   $\nont{\mathit{\mathit{all}}}{}$   in   the  sentential   form   by
-$\epsilon$. However,  if the TM  does not accept the  input string,
-then  any sentential  form derived  from the  start symbol  would have
-exactly one non-terminal, and this non-terminal will be different from
-$\nont{\mathit{final}}{c}$.  Thus  the  empty   string  would  not  be
+every   time   replacing   $\nont{\mathit{\mathit{all}}}{}$   in   the
+sentential form by $\epsilon$. However, if  the TM does not accept the
+input string, then every sentential form derived from the start symbol
+would    have     at    least    one    non-terminal from the grammar
+of Lemma~\ref{lemma:grammar-undecidable} that is different
+from $\nont{\mathit{final}}{c}$.   Thus  the  empty  string  would  not  be
 derivable from the grammar.
 \end{proof}
 
@@ -1708,7 +1710,7 @@ this function.
 \section{Experimental Evaluation}
 \label{sec:experiments}
   Our benchmark consists of programs taken from nofib~\cite{nofib} and
-  other  similar  functional  programming  resources~\cite{PLT-Scheme,
+  other repositories for  functional  programs~\cite{PLT-Scheme,
     gc_bench, huffman-sicp}.   All our  benchmarks were executed  on a
   machine having 8  core Intel(R) Core(TM) i7-4770 3.40GHz  CPU , 8192
   KB L2 cache, 16 GB RAM running 64 bit Ubuntu 14.04.
@@ -1730,31 +1732,32 @@ this function.
 
 \subsection{Results}
 
-The statistics related to liveness analysis and DFA generation are shown in
-Table~\ref{tab:exp-results}(a). We observe that the analysis requires
-a reasonable time except for  \verb@treejoin@ and  \verb@sudoku@. 
-The bottleneck in our analysis is the NFA to DFA conversion
-(worst-case exponential behaviour). To avoid this 
-overhead, we use a caching mechanism in our simulator that can
-reuse the DFA from earlier analysis if the program has not changed.
+The statistics  related to  liveness analysis  and DFA  generation are
+shown in Table~\ref{tab:exp-results}(a). We  observe that the analysis
+of  all  programs  except \verb@treejoin@  and  \verb@sudoku@  require
+reasonable time.   The bottleneck in  our analysis  is the NFA  to DFA
+conversion with  worst-case exponential behaviour. However,  since the
+analysis has  to be  done only  once, and its  results can be cached and
+re-used, the time spent in analysis may be considered acceptable.
 
-Table~\ref{tab:exp-results}(b)   compares   the   garbage   collection
-statistics  for RGC  and  LGC.  We  report the  number  of garbage collection  events,
-average  number of  cells reclaimed  per garbage collection,  average number  of cells
-touched  per garbage collection,  and  total time  to
-perform  all collections.   It is  no  surprise that  number of  cells
-reclaimed per  garbage collection is  higher (and  consequently the  number of  garbage collections is
-lower)  for LGC  based collection.   However, the cost  for LGC is that per garbage collection
-execution  time is  more  for  LGC, which  results  in higher  overall
-execution time  for garbage  collection, even  with reduced  number of
-collections.   However, LGC  run time  is still  competitive (slowdown
-within \warning{5X} of RGC for worst case), and is better for 3 benchmarks (best
-case  2X speedup).   Note  that  \verb@gc_bench@~\cite{gc_bench} is  a
-synthetic benchmark  that allocates complete binary  trees of various
-sizes.  These binary trees are never used by the program. As a result,
-the benchmark highly favours LGC.  We have included this benchmark for
-completeness  only  and   the  numbers  for  it   are  not  considered
-representative of practical programs.
+
+Table~\ref{tab:exp-results}(b) compares  garbage collection statistics
+for RGC and  LGC.  We report the number of  garbage collection events,
+average  number of  cells  reclaimed per  garbage collection,  average
+number of cells  touched per garbage collection and the  total time to
+perform all collections.   It is no surprise that the  number of cells
+reclaimed per garbage  collection is higher and the  number of garbage
+collections  lower  for  LGC.   The  cost of  LGC  is  higher  garbage
+collection time, which increases the  overall execution time even with
+reduced number of  collections.  However, the execution time  of LGC is
+still comparable for most benchmarks (slowdown within \warning{5X} of
+RGC in the worst case) and better  for 3 benchmarks (2X speedup in the
+best case).  Note that  \verb@gc_bench@~\cite{gc_bench} is a synthetic
+benchmark \warning{in the no-fib suite} that allocates complete binary
+trees  of various  sizes that  are  never used  by the  program. As  a
+result,  the benchmark  highly favours  LGC.  The  benchmark has  been
+included  for  completeness,  and  we  do  not  consider  its  numbers
+representative of real programs.
 
 \newcommand{\hgt}{2.9cm}
 \newcommand{\LGCLine}{blue}
@@ -1793,22 +1796,21 @@ is the time measured  in number of cons-cells allocated
 cons-cells (scaled down by $10^3$).}
 \label{fig:memory-usage} \figrule
 \end{figure*}
- 
+
 Memory  usage graphs  for select  benchmarks are  shown
 Figure~\ref{fig:memory-usage},  Column   (a).   In some cases, the
 number of  garbage collections  tend to be  very large,
-hence  we  show only  a  slice of the original graph  which  is
-representative  of  the  behavior for  that  particular
-benchmark (Column (b)).  In all the programs we can see
+hence  we  show only  a  slice of the original graph  with 
+representative    behavior  (Column (b)).  In all the programs we can see
 that  the   curve  corresponding  to  LGC   (\LGCLine\ line)
-regularly dips below the RGC curve (\RGCLine\ line), the dip
-is  specially  visible  for the  benchmarks  where  LGC
-outperforms RGC substantially.  The graphs also include the
-curve    for   reachable    cells   (\ReachLine,    obtained
-approximately  by forcing  RGC to  run at  a very  high
-frequency)  and  the  live  cells  for a particular run
-(\UseLine, obtained by post processing the heap access
-at the end of the program).
+dips   below the RGC curve 
+(\RGCLine\ line) during garbage collection.  The graphs also include the
+curve    for   reachable    cells   (\ReachLine)  and live cells
+(\UseLine). These were  obtained
+ by forcing  RGC to  run at   very  high
+frequency. The curve for live cells were obtained by recording heap
+access times and post processing the data 
+at the end of the program.
 
 
 As demonstrated by the gap between the \RGCLine\ and the \UseLine, a large number of cells 
@@ -1823,10 +1825,11 @@ overcome common cases and they show promising results}.
 
 \section{Related Work} 
 \label{sec:relatedwork}
+
 Most previous work on enhancing  garbage collection with liveness were
 in   the  context   of   imperative  languages~\cite{Albert,   Hirzel,
-  khedker07heap}.    Due  to  the  presence  of  global  variables  and
-mutation, these methods are of  limited practical  utility.
+  khedker07heap}.    \warning{Due  to  the  presence  of  global  variables  and
+mutation, these methods are of  limited practical  utility.}
 
 There  have been  several efforts  in improving  space utilization  of
 functional programs  by compile-time  analysis.  These  are: rewriting
@@ -1838,10 +1841,10 @@ compile-time                                                nullifying
 statements~\cite{inoue88analysis,lee05static,Hamilton}.            All
 compile-time marking approaches rely on an efficient and precise alias
 analysis and  cannot provide  significant improvement in  its absence.
-An interesting  approach suggested by Hofmann~\cite{HofmannJ03}  is to
+An interesting  approach suggested in~\cite{HofmannJ03}  is to
 annotate the heap usage of  first-order programs through linear types.
-The annotations are then used to transform the program to serve memory
-allocation requests by re-using allocated memory cells.  However, this
+The annotations are then used to serve memory
+requests through re-allocation.  However, this
 requires the user to write programs in a specific way.
 
 Simplifiers~\cite{ONeill}, described  as lightweight  daemons, improve
@@ -1887,7 +1890,7 @@ have extend this to handle lazy evaluation and closures.
 %% \label{fig:memory-usage-lambda} \figrule
 %% \end{figure}
 \vskip -5mm
-\section{Conclusions and Future Work}
+\section{Future Work and Conclusions}
 \label{sec:conclusion}
 %% We have  defined a notion of  liveness on structured
 %% data; this generalizes classical liveness and strong
@@ -1928,23 +1931,23 @@ have extend this to handle lazy evaluation and closures.
 %% explore.  Further work  includes improvements to the
 %% classical copying  collector to  reduce the  cost of
 %% this.
-We have  extended liveness-based garbage collection  to lazy languages
-and shown its benefit for a set of benchmark programs.  This was done
-by defining a liveness analysis of heap objects that we proved correct
-with  respect   to  a   non-standard  semantics   that  served   as  a
-specification of  liveness.  The result  of the  analysis is a  set of
-grammars, whose membership question was  proved to be undecidable. The
-grammars are  therefore approximated by  DFAs and used by  the garbage
-collector to improve collection.
+We have  extended liveness-based  garbage collection  to lazy
+  languages  and shown  its benefit  for a  set of  standard benchmark
+  programs.  We  defined a liveness analysis  of programs manipulating
+  the  heap and  proved  it  correct with  respect  to a  non-standard
+  semantics that served as a specification of liveness.  The result of
+  the analysis  is a  set of grammars,  whose membership  question was
+  shown to be undecidable. The  grammars are therefore approximated by
+  DFAs and used by the garbage collector to improve collection.
 
-In addition to collecting evaluated  data, our collector also reclaims
-closures.   Because  of this  we  had  to  make modifications  to  the
-standard run-time representation of a closure to carry liveness of its
-free variables and  periodically and update it  during execution time.
-As  expected, our  garbage collector  could reclaim  more garbage  and
-reduce memory requirements of programs.  An additional benefit was the
-reduction in  execution times for  some programs  in spite of  using a
-more expensive collection scheme.
+In addition to  evaluated data, our collector  also reclaims closures.
+For this, we  had to modify the standard run-time  representation of a
+closures  to carry  liveness  of its free  variables and  periodically
+update the liveness during execution  time.  As expected, our garbage
+collector  reclaims more  garbage and  reduces memory  requirement of
+programs.  An  additional benefit is  that in  spite of using  a more
+expensive collector, the execution times remains comparable in
+most cases, and even improves for some programs.
 
 \warning{Although we  provide an  implementation for  a liveness
 based garbage  collection scheme for a lazy  language, we
