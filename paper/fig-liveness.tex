@@ -46,7 +46,7 @@ $\begin{array}{@{}r@{\ }c@{\ }l@{}}
 \\
 
 \mathcal{L}((\SRETURN~\pp{\psi\ }{x}),\sigma,\Lfonly) &=& 
-x.\sigma\\
+\Lv_{\emptyset} \cup \{x.\sigma\}\\
 
 \mathcal{L}((\SIF~\pp{\psi\ }{x~e_1~e_2}),\sigma,\Lfonly) &=&
 \!\left\{\!\!\!\!\begin{array}{l@{\ }l}
@@ -57,11 +57,14 @@ x.\sigma\\
   \emptyset  \qquad\qquad\qquad\qquad\qquad\quad\; \mbox{otherwise} &\\
 \end{array}\right. \\
 
-\mathcal{L}((\LET~x \leftarrow~s~\IN~e),\sigma,\Lfonly) &=&
+\mathcal{L}((\LET~x \leftarrow~\pi:s~\IN~e),\sigma,\Lfonly) &=&
 \mathit{ref\/}(s,\sigma',\Lfonly) \cup \Lv \cup \{x.\sigma'\} 
+\cup \Lv''
 \\
 &&~\mbox{where}~ \mathcal{\Lv} = \mathcal{L}(e,\sigma,\Lfonly),\\
-&&~\mbox{and}~\sigma' = \bigcup_{\pi}  \Lv(x_{\pi})
+&&~\sigma' = \bigcup_{\pi}  \Lv(x_{\pi})\\
+&&~\Lv' = ref(s, \sigma', \Lfonly)\\
+&&~\Lv'' = \bigcup_{\py \in FV(s)} \lbrack\py \mapsto \Lv(\py) \cup \Lv'(\py_{\pi})\rbrack
 \\ & \\
 \end{array}$
 \begin{center}

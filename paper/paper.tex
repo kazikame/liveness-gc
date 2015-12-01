@@ -222,8 +222,8 @@ Experiments    with   a    single    generation   copying    collector
 (Section~\ref{sec:experiments})   confirm  the   expected  performance
 benefits.  Liveness-based collection results in an increase in garbage
 reclaimed.  As  a consequence, there is  a reduction in the  number of
-collections from \warning{1.6X  to 23X} and a decrease  in the minimum
-memory requirement from  \warning{1X to 1389X}.  As  an added benefit,
+collections from 1.6X  to 23X and a decrease  in the minimum
+memory requirement from  1X to 1389X.  As  an added benefit,
 there is also a reduction in the overall execution time in 5 out of 12
 benchmark programs.
  
@@ -305,10 +305,10 @@ to        be        in        Administrative        Normal        Form
 (ANF)~\cite{chakravarty03perspective}, where  all actual  parameters to
 functions  are  variables.  While  this  restriction  does not  affect
 expressibility,  this form  has  the benefit  of  making explicit  the
-creation of closures through the $\LET$ construct.  \warning{ We
+creation of closures through the $\LET$ construct.   We
   assume that  $\LET$s  in  our  language  are  non-recursive;  in  the
   expression $\LET\,\, x  \leftarrow s\,\, \IN\,\, e$,  $x$ should not
-  occur in  $s$}. The restriction of  \LET\ to a single  definition is
+  occur in  $s$. The restriction of  \LET\ to a single  definition is
 for ease  of exposition---generalization to multiple  definitions does
 not add conceptual difficulties.  We further restrict each variable in
 a program  to be  distinct, so that  no scope  shadowing occurs; this
@@ -737,7 +737,9 @@ closure variable  $x_{\pi}$, the liveness of  $x$ is the union  of the
 liveness of the  closure variables.  This liveness,  say $\sigma'$, is
 also  the  demand  on  $s$, thus the  liveness  environment
 $\mathit{ref}(s,   \sigma',   \Lfonly)$   is  added   to   $\Lv   \cup
-\{x.\sigma\}$ to  give the  overall liveness environment  for $(\LET~x
+\{x.\sigma\}$. Finally, the stack variables corresponding to the free
+variables of $s$ are updated and added 
+  to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
 
 As noted earlier, $x.\alpha \in  \Lv_y$ specifies the liveness  of the
@@ -934,13 +936,13 @@ that involves dereferencing  results in a \bang.  These  are the steps
 which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
 $\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
 inserted  by  the  immediately  preceding garbage  collection  or  the
-garbage collection of an earlier minefield step.  \warning{However the
+garbage collection of an earlier minefield step.  However the
   demand $\sigma'$ on basis of  which an earlier collection would have
   inserted a $\bot$, would have  included the current demand $\sigma$.
   Thus, if  the earlier garbage  collection had inserted a  $\bot$, so
   would the current garbage collection.  Thus it is enough to consider
   the $\rightsquigarrow$  along with the  current GC and show  that it
-  does not lead to a \bang.}
+  does not lead to a \bang.
 
 We consider the rules {\sc car-clo} and {\sc car-1-clo} only.  
 The rest  of the rules involve similar reasoning. For the {\sc
@@ -971,10 +973,10 @@ The  minefield  execution of  no  program  can enter  a
  
 \begin{proof}
 Assume to  the contrary that  a program $P$  enters the
-\bang\  state.  \warning{We can  transform  $P$  to a  call-less
+\bang\  state.  We can  transform  $P$  to a  call-less
 program $P'$ such that  the minefield executions of $P$
 and $P'$  are identical  except for change  of variable
-names. }             However,                 by
+names.             However,                 by
 Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
 $P'$,   a   call-less   program,   cannot   enter   the
 \bang\  state.  Therefore   $P$  also  cannot  enter  the
@@ -1054,9 +1056,9 @@ The rules for  \CDR, \PRIM\ and \NULLQ\ are also
 modified similarly.
 
 
-\warning{When   there  are   multiple   occurrences  of   \bcar,
+When   there  are   multiple   occurrences  of   \bcar,
 \bcdr\  and \clazy,  $\hookrightarrow$ is  applied from
-right  to left.}   The reflexive  transitive closure  of
+right  to left.   The reflexive  transitive closure  of
 $\hookrightarrow$      will      be     denoted      as
 $\stackrel{*}{\hookrightarrow}$.      The     following
 proposition  relates  the  original  and  the  modified
@@ -1523,17 +1525,17 @@ given  in~\cite{karkare07liveness,asati14lgc}.   The
 resulting  automaton   has  edges  labeled  with   \acar,  \acdr\  and
 \clazy\ only.  In this  automaton, for every  edge labeled  \clazy, we
 check if the source node of the edge has a path to a final 
-state.  If yes, \warning{we mark the mark the source node as final. Finally, we
+state.  If it does, we mark  the source node as final. Finally, we
 remove all the edges labeled \clazy\  and convert the automaton into a
-deterministic    automaton.}    These steps   effectively   implement    the
+deterministic    automaton.    These steps   effectively   implement    the
 $\hookrightarrow$   simplification  rules   for   \bcar,  \bcdr,   and
 \clazy\ to  obtain forward access paths.  While checking for  liveness during
 garbage  collection, a  forward access path  is valid  only if  it can
 reach a  final state.  Figure~\ref{fig:example-automata}(a)  shows the
 NFA that is obtained from  the grammar for \var{\Df{\length}{1}}, and   the
 final  DFA  is  shown in  Figure~\ref{fig:example-automata}(b).   This
-expectedly  says that for a  demand  \warning{$\epsilon$  on  \length},  the
-liveness of  its argument  is $\acdr^{*}$  (the spine  of the  list is
+expectedly  says that for a  demand  $\sigma_{\length}$,  the
+liveness of  the argument of \length\  is $\acdr^{*}$  (the spine  of the  list is
 traversed).  Similarly, Figure~\ref{fig:example-automata}(c) shows the
 NFA     for     \var{\Lanv{\pa}{}}.      The     DFA     shown     in
 Figure~\ref{fig:example-automata}(d)  does  not   accept  any  forward
@@ -1749,14 +1751,14 @@ reclaimed per garbage  collection is higher and the  number of garbage
 collections  lower  for  LGC.   The  cost of  LGC  is  higher  garbage
 collection time, which increases the  overall execution time even with
 reduced number of  collections.  However, the execution time  of LGC is
-still comparable for most benchmarks (slowdown within \warning{5X} of
-RGC in the worst case) and better  for 3 benchmarks (2X speedup in the
+still comparable for most benchmarks (slowdown within 5X of
+RGC in most cases) and better  for 3 benchmarks (2X speedup in the
 best case).  Note that  \verb@gc_bench@~\cite{gc_bench} is a synthetic
-benchmark \warning{in the no-fib suite} that allocates complete binary
+benchmark that allocates complete binary
 trees  of various  sizes that  are  never used  by the  program. As  a
 result,  the benchmark  highly favours  LGC.  The  benchmark has  been
 included  for  completeness,  and  we  do  not  consider  its  numbers
-representative of real programs.
+as being representative of real programs.
 
 \newcommand{\hgt}{2.9cm}
 \newcommand{\LGCLine}{blue}
@@ -1824,14 +1826,24 @@ overcome common cases and they show promising results}.
 
 \section{Related work} 
 \label{sec:relatedwork}
+The important paper
+by~\cite{Hirzel} investigates the impact of liveness on the
+effectiveness of garbage collection. Their observation is that liveness
+can significantly impact garbage collection but only when it is
+interprocedural. As far as memory requirement is concerned, our paper
+demonstrates this observation.
 
-Most previous work on enhancing  garbage collection with liveness were
-in   the  context   of   imperative  languages~\cite{Albert,   Hirzel,
-  khedker07heap}.    \warning{Due  to  the  presence  of  global  variables  and
-mutation, these methods are of  limited practical  utility.}
 
-There  have been  several efforts  in improving  space utilization  of
-functional programs  by compile-time  analysis.  These  are: rewriting
+There have been several attempts to use liveness analysis to improve 
+garbage collection for imperative languages.~\cite{khedker07heap}
+presents a liveness analysis and uses the results for inserting 
+nullifying statements in Java programs. ~\cite{ran.shaham-sas03} is
+another work which constructs an automaton modelling heap accesses and
+checks temporal properties like liveness against the model.  
+However both the approaches are restricted to intraprocedural scope.
+
+In the space of functional languages, efforts towards improving
+space efficiency using compile-time  analysis are: rewriting
 methods                             such                            as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
 sharing  analysis   based  reallocation~\cite{jones89compile},  region
@@ -1846,14 +1858,14 @@ The annotations are then used to serve memory
 requests through re-allocation.  However, this
 requires the user to write programs in a specific way.
 
-Simplifiers~\cite{ONeill}, described  as lightweight  daemons, improve
-the efficiency of the program in general and the garbage collectors in
-particular.  \warning{Most  of the  simplifications mentioned  in this
-  work are subsumed by a liveness  based collector.  We feel this work
-  is orthogonal  and can augment  our liveness based  collector.}  The
+Simplifiers~\cite{ONeill} are abstractly described as lightweight
+daemons that attach themselves to program data and, when activated, improve
+the efficiency of the program. Our liveness based garbage collection
+as an instance of a  simplifier which is tightly coupled with garbage collectors.  The
 approach that is closest to the  method described in this paper is the
-liveness-based garbage collector implemented in~\cite{karkare07liveness,asati14lgc}.  We
-have extend this to handle lazy evaluation and closures.
+liveness-based garbage collector implemented
+in~\cite{karkare07liveness,asati14lgc} and address eager languages. We
+extend this to handle lazy evaluation and closures.
  
 %% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
 
@@ -1984,8 +1996,9 @@ propagated inside closures.
 \clearpage
 \appendix
 %\section{Appendix: not to be included in the paper.}
+%%%%% prasanna minefield
 \begin{figure*}[h!]
-\noindent{\Large \bf A. Minefield semantics}
+\noindent{\Large \bf A. Minefield semantics(Not included in the paper)}
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
 
@@ -2124,6 +2137,8 @@ $\rho',~ (\rho, \rho(x), (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
   semantics have been highlighted by shading. \label{fig:minefield-semantics}}
 \end{center}
 \end{figure*}
+%%%%%%%%%%%%%%%%%%%%%%
+
 
 
 %% We shall now  present a proof of soundness of  the liveness analysis
