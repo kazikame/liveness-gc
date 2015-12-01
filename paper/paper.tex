@@ -756,12 +756,10 @@ Section~\ref{sec:liveness-analysis}.   Here are  the ideas  behind the
 proof.
 \begin{enumerate}
 \item       We   augment     the        standard       semantics
-  (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
-  collection  just  before  each  $\rightsquigarrow$  transition.  The
-  simulated garbage collection starts from  the root-set and inserts a
-  special value  $\bot$ at each location  in the heap that  contains a
-  reference that is reachable but not live. Any attempt to dereference
-  such  locations during  the  transition will  result  in entering  a
+  (Figure~\ref{fig:lang-semantics}) to model  a dynamic liveness analysis 
+that records liveness values at each reference created during execution.
+Any attempt to dereference a location with a null-liveness  
+  during  a  transition will  result  in entering  a
   special state denoted \bang. We call the semantics after
   augmentation,  \emph{minefield semantics}.
 \item \label{inline1} Assuming that a  program enters the \bang\ state,
@@ -771,8 +769,6 @@ proof.
   function calls can enter a \bang\ state. As a consequence no program
   (with or without function calls) can enter the \bang\ state. 
 \end{enumerate}
-
-
 
 
 \begin{figure*}[t!]
@@ -1847,7 +1843,7 @@ requests through re-allocation.  However, this
 requires the user to write programs in a specific way.
 
 Simplifiers~\cite{ONeill}, described  as lightweight  daemons, improve
-the efficiency of the program in general and the garbage collectors in
+the efficiency of the program in general and garbage collectors in
 particular.  \warning{Most  of the  simplifications mentioned  in this
   work are subsumed by a liveness  based collector.  We feel this work
   is orthogonal  and can augment  our liveness based  collector.}  The
