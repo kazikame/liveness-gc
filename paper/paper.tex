@@ -758,12 +758,10 @@ Section~\ref{sec:liveness-analysis}.   Here are  the ideas  behind the
 proof.
 \begin{enumerate}
 \item       We   augment     the        standard       semantics
-  (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
-  collection  just  before  each  $\rightsquigarrow$  transition.  The
-  simulated garbage collection starts from  the root-set and inserts a
-  special value  $\bot$ at each location  in the heap that  contains a
-  reference that is reachable but not live. Any attempt to dereference
-  such  locations during  the  transition will  result  in entering  a
+  (Figure~\ref{fig:lang-semantics}) to model  a dynamic liveness analysis 
+that records liveness values at each reference created during execution.
+Any attempt to dereference a location with a null-liveness  
+  during  a  transition will  result  in entering  a
   special state denoted \bang. We call the semantics after
   augmentation,  \emph{minefield semantics}.
 \item \label{inline1} Assuming that a  program enters the \bang\ state,
@@ -773,8 +771,6 @@ proof.
   function calls can enter a \bang\ state. As a consequence no program
   (with or without function calls) can enter the \bang\ state. 
 \end{enumerate}
-
-
 
 
 \begin{figure*}[t!]
@@ -818,7 +814,7 @@ To set up the minefield semantics, we follow these steps:
   $\rho,S,\heap,e,\sigma$.   We call  such a  state a  \emph{minefield
   state}.  Here $\sigma$  is the ``dynamic'' demand  on the expression
   $e$, i.e., it arises from the actual sequence of function calls that
-  led  to the  evaluation  of $e$. The demand for the initial rule is  $\sigma_{all}$ and each expression $e$ before a $\rightsquigarrow$ step transforms the demand in accordance with the liveness rules of Section~\ref{sec:liveness-analysis} and passes it the expression after the step.  The  information in  continuation
+  led  to the  evaluation  of $e$. The demand for the initial state is  $\sigma_{all}$, and each expression $e$ before a $\rightsquigarrow$ step transforms the demand in accordance with the liveness rules of Section~\ref{sec:liveness-analysis} and passes it to the state after the step.  The  information in  continuation
   frames  on the  stack $S$  are also  similarly augmented  with their
   demands.  Thus a  stacked entry now takes the form  $(\rho, \ell, e,
   \sigma)$.
@@ -833,7 +829,7 @@ To set up the minefield semantics, we follow these steps:
   \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
     \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
     liveness environment  \Lv\ for  the expression $e$.   We similarly
-    define the liveness environment for the expressions $e$ in each of
+    define the liveness environments for the expressions $e$ in each of
     the  continuation frames $(\rho,  \ell, e,  \sigma)$ in
     $S$, giving a stack of  liveness environments that we shall denote
     $\mathsf{SL}$.
@@ -869,8 +865,8 @@ using $GC$.  The details of the transition for the {\sc
 Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
 earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
-enters the  \bang\ state ({\sc  car-clo-bang}). Otherwise
-the transition is the similar to the earlier {\sc car-clo}
+enters the  \bang\ state ({\sc  car-bang}). Otherwise
+the transition is similar to the earlier {\sc car-clo}
 rule. 
 
 
@@ -1811,16 +1807,20 @@ curve    for   reachable    cells   (\ReachLine)  and live cells
  by forcing  RGC to  run at   very  high
 frequency. The curve for live cells were obtained by recording heap
 access times and post processing the data 
-at the end of the program.
+at the end of the program. Note that the size of an LGC cell is 1.16
+times the size of a RGC cell.
 
 
 As demonstrated by the gap between the \RGCLine\ and the \UseLine, a large number of cells 
 which are unused by the program are still copied during RGC. LGC does a much better job of closing this gap 
 but still falls short of the precision achieved by LGC in case of eager languages
 ~\cite{asati14lgc}. 
-A case for concern is the huge difference in the number of cells touched by LGC vs RGC for some programs.
-This is due to heap locations being  traversed multiple times during LGC. \warning{We have implemented heuristics to 
-overcome common cases and they show promising results}.
+A major source of inefficiency in LGC is multiple traversals of
+already copied heap cells. Since LGC does not mark the heap cells
+after the first visit, the same cells can be repeatedly visited with
+different liveness states. We have mitigated this problem by
+implementing a heuristic which tags \CONS\ cells with the set of
+states already visited. 
 
 
 
@@ -1857,6 +1857,7 @@ annotate the heap usage of  first-order programs through linear types.
 The annotations are then used to serve memory
 requests through re-allocation.  However, this
 requires the user to write programs in a specific way.
+
 
 Simplifiers~\cite{ONeill} are abstractly described as lightweight
 daemons that attach themselves to program data and, when activated, improve
@@ -1960,34 +1961,31 @@ programs.  An  additional benefit is  that in  spite of using  a more
 expensive collector, the execution times remains comparable in
 most cases, and even improves for some programs.
 
-\warning{Although we  provide an  implementation for  a liveness
-based garbage  collection scheme for a lazy  language, we
-do not  provide a formal  proof of its  correctness.  A
-formal proof of correctness would describe how closures
-are handled  during garbage collection and  liveness is
-propagated inside closures.
 
-  Another  interesting exercise  is to  narrow the  gap
-  between  the   actual  liveness  and   the  perceived
-  liveness  of our  garbage collector. Using
-  strictness  analysis  to  eagerly  evaluate  closures
-  might release more dead cells to be garbage
-  collected.  Since our  garbage collector  can handle
-  closures   (suspended  evaluations),   another  major
-  challenge  is to  extend it  to support  higher order
-  programs.
+The graphs show that even in lazy languages there are large amount of
+dead cells that can be collected early. In spite of collecting
+closures there still exists a gap between actual and perceived
+livenesses.
+Language features that could be introduced are higher-order functions
+and recursive lets. We believe that functions can be used to model
+recursive lets and this should be a simple extension to our liveness
+analysis.
+For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}. 
+ 
 
   Orthogonally, we  plan to  improve the  efficiency of
   the liveness based garbage collector using heuristics
   such   as  limiting   the  depth   of  DFA,   merging
   nearly-equivalent    states    and    using    better
-  representation    and    algorithms   for    automata
+  representation(for example BDDs~\cite{Bryant86})    and    algorithms   for    automata
   manipulation.  We   also  need  to   investigate  the
   interaction   of  liveness   with  other   collection
   schemes,   such  as   incremental  and   generational
-  collection.  In summary, we  need to investigate ways
+  collection.  It might be interesting to use a mixed mode garbage collection
+  scheme which allows the costs of LGC to be amortized over several runs
+  of RGC. In summary, we  need to investigate ways
   to make liveness  based garbage collection attractive
-  for practical collectors.}
+  for practical collectors.
 
 
 \bibliography{fun_hra}{}
