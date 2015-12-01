@@ -783,14 +783,21 @@ Premise & Transition & Rule name \\
 
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$, \\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$ &
 {\sc car-bang} 
 \\
 \hline
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
+    S, \heap)}$, \\$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
+(\CAR~x), \cred{\sigma} \rightsquigarrow$ \\ $ \rho', \,(\rho, addr(\langle
+s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$ }     &
+{\sc car-1-clo} 
+\\
+\hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\ $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$} & $\rho, S,
-  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \ell,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \rho(x),
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, 
 \cred{\renewcommand{\arraystretch}{1}\left\{
 \begin{array}{lr}
@@ -863,7 +870,7 @@ every transition  is preceded  by a  garbage collection
 using $GC$.  The details of the transition for the {\sc
   car-clo}  rule   is  shown   in
 Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
-earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
+earlier  call to  $GC$  results  in $\rho(x)$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
 enters the  \bang\ state ({\sc  car-bang}). Otherwise
 the transition is similar to the earlier {\sc car-clo}
@@ -886,7 +893,7 @@ semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
 e_{\mainpgm}$.
    
  
-\subsection{Soundness results}
+\subsection{Soundness result}
 We first need an auxiliary  result about minefield semantics. Consider
 a trace of  a minefield execution.  For every  minefield state $(\rho,
 S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
@@ -2015,7 +2022,7 @@ Premise & Transition & Rule name \\
   \rho', S, \heap[\ell := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  {\sc cons} \\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc car-bang} 
 \\
@@ -2029,7 +2036,7 @@ Premise & Transition & Rule name \\
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
     S, \heap)}$, \\ $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$ }& \makecell[t]{$\rho, S,
-  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow $\\ $  \rho', (\rho, \ell,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow $\\ $  \rho', (\rho, \rho(x),
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$ }        &
 {\sc car-clo}\\
 \hline
@@ -2047,10 +2054,10 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 %% \\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\
-  $\heap(\rho(x)) \mbox{ is } \bot$  or $\heap(\rho(y)) \mbox{ is }
+  $\rho(x) \mbox{ is } \bot$  or $\rho(y) \mbox{ is }
   \bot$} & $\rho, S,
   \heap, (+~x~y), \cred{\sigma} \rightsquigarrow \bang$   &
-{\sc prim-1-bang} 
+{\sc prim-bang} 
 \\
 \hline
 
@@ -2090,7 +2097,7 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2),
     \sigma) = (\rho, S, \heap)}$, \\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc if-bang} 
 \\
@@ -2111,7 +2118,7 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
 {\sc if-clo} \\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) = (\rho, S, \heap)}$,\\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\SRETURN~x), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc return-bang} 
 \\
