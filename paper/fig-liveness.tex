@@ -61,10 +61,10 @@ $\begin{array}{@{}r@{\ }c@{\ }l@{}}
 \mathit{ref\/}(s,\sigma',\Lfonly) \cup \Lv \cup \{x.\sigma'\} 
 \cup \Lv''
 \\
-&&~\mbox{where}~ \mathcal{\Lv} = \mathcal{L}(e,\sigma,\Lfonly),\\
+&&\hspace*{-.65cm}~\mbox{where}~ \mathcal{\Lv} = \mathcal{L}(e,\sigma,\Lfonly),\\
 &&~\sigma' = \bigcup_{\pi}  \Lv(x_{\pi})\\
-&&~\Lv' = ref(s, \sigma', \Lfonly)\\
-&&~\Lv'' = \bigcup_{\py \in FV(s)} \lbrack\py \mapsto \Lv(\py) \cup \Lv'(\py_{\pi})\rbrack
+&&~\Lv' = \mathit{ref}(s, \sigma', \Lfonly)\\
+&&~\Lv'' = \underset{\py \in FV(s)}{{\bigcup}} \lbrack\py \mapsto \Lv(\py) \cup \Lv'(\py_{\pi})\rbrack
 \\ & \\
 \end{array}$
 \begin{center}

@@ -1,4 +1,4 @@
-\documentclass[preprint, 9pt]{sigplanconf}
+\documentclass[9pt]{sigplanconf}
 \usepackage{etex}
 \usepackage{float}
 \usepackage{mathrsfs}
@@ -142,16 +142,15 @@ liveness analysis itself and in the design of the garbage collector.
 %% We use the  result of the analysis to annotate  each potential garbage
 %% collection  point  in   the  program  with  a   set  of  deterministic
 %% finite-state automata (DFA) describing the liveness at that point.
-To show the effectiveness of our method, we
-implemented a copying collector that uses the results of the liveness
-analysis to preserve live 
-objects, both evaluated (i.e., in WHNF) and closures.  Our experiments
-confirm  that  for  programs  running with  a  liveness-based  garbage
-collector,   there  is   a   significant  decrease   in  peak   memory
-requirements.   In  addition,   a  sizable  reduction  in   the  number  of
+To  show the  effectiveness of  our method,  we implemented  a copying
+collector that uses  the results of the liveness  analysis to preserve
+live  objects,  both evaluated  (i.e.,  in  WHNF) and  closures.   Our
+experiments confirm  that for  programs running with  a liveness-based
+garbage  collector, there  is a  significant decrease  in peak  memory
+requirements.   In addition,  a  sizable reduction  in  the number  of
 collections  ensures that  in spite  of using  a more  complex garbage
-collector,  the execution  time  of  a program  remains comparable  with
-the same program running with a reachability-based collector.
+collector, the execution  times of programs running  with liveness and
+reachability-based collectors remain comparable.
 \end{abstract}
 
 \category{D.3.4}{Programming Languages}{Processors}[Memory Management
@@ -677,7 +676,7 @@ to use  this liveness to  copy the heap starting from  $\px_{\pi_1}$.  However,
 notice that if a garbage collection takes place while evaluating $\pz$
 at $\psi_3$, it can safely consider only the liveness arising from the
 dependence chain\linebreak  $\lbrack \psi_3\!\!\!:\!\!\!\pz \leftarrow
-(+~\py~1),\, \py \leftarrow (\length~\x_{\pi_1})\rbrack$.  The garbage
+(+~\py~1),\, \py \leftarrow (\length~\px_{\pi_1})\rbrack$.  The garbage
 collection  scheme  described  in Section~\ref{sec:GC-scheme}  uses  a
 generalization of this observation  to dynamically select a evaluation
 point specific liveness in order to collect more garbage.
@@ -783,14 +782,21 @@ Premise & Transition & Rule name \\
 
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$, \\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$ &
 {\sc car-bang} 
 \\
 \hline
+\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
+    S, \heap)}$, \\$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
+(\CAR~x), \cred{\sigma} \rightsquigarrow$ \\ $ \rho', \,(\rho, addr(\langle
+s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$ }     &
+{\sc car-1-clo} 
+\\
+\hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\ $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$} & $\rho, S,
-  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \ell,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \rho(x),
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, 
 \cred{\renewcommand{\arraystretch}{1}\left\{
 \begin{array}{lr}
@@ -863,7 +869,7 @@ every transition  is preceded  by a  garbage collection
 using $GC$.  The details of the transition for the {\sc
   car-clo}  rule   is  shown   in
 Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
-earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
+earlier  call to  $GC$  results  in $\rho(x)$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
 enters the  \bang\ state ({\sc  car-bang}). Otherwise
 the transition is similar to the earlier {\sc car-clo}
@@ -886,7 +892,7 @@ semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
 e_{\mainpgm}$.
    
  
-\subsection{Soundness results}
+\subsection{Soundness result}
 We first need an auxiliary  result about minefield semantics. Consider
 a trace of  a minefield execution.  For every  minefield state $(\rho,
 S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
@@ -1760,7 +1766,7 @@ as being representative of real programs.
 \newcommand{\LGCLine}{blue}
 \newcommand{\RGCLine}{red}
 \newcommand{\ReachLine}{black}
-\newcommand{\UseLine}{lightblue}
+\newcommand{\UseLine}{light-blue}
 
 \begin{figure*}[t]
 \renewcommand{\arraystretch}{.1}
@@ -1811,52 +1817,49 @@ at the end of the program. Note that the size of an LGC cell is 1.16
 times the size of a RGC cell.
 
 
-As demonstrated by the gap between the \RGCLine\ and the \UseLine, a large number of cells 
-which are unused by the program are still copied during RGC. LGC does a much better job of closing this gap 
-but still falls short of the precision achieved by LGC in case of eager languages
-~\cite{asati14lgc}. 
-A major source of inefficiency in LGC is multiple traversals of
-already copied heap cells. Since LGC does not mark the heap cells
-after the first visit, the same cells can be repeatedly visited with
-different liveness states. We have mitigated this problem by
-implementing a heuristic which tags \CONS\ cells with the set of
-states already visited. 
+As  demonstrated by  the gap  between the  \RGCLine\ and  the \UseLine\
+lines, a  large number of  cells which are  unused by the  program are
+still copied  during RGC. LGC does  a much better job  of closing this
+gap but still falls short of the  precision achieved by LGC in case of
+eager languages ~\cite{asati14lgc}.  A major source of inefficiency in
+LGC is  multiple traversals  of already copied  heap cells.  Since LGC
+does not mark the heap cells after the first visit, the same cells can
+be  repeatedly  visited  with   different  liveness  states.  We  have
+mitigated  this  problem  by   implementing  a  heuristic  which  tags
+\CONS\ cells with the set of states already visited.
 
 
 
 \section{Related work} 
 \label{sec:relatedwork}
-The important paper
-by~\cite{Hirzel} investigates the impact of liveness on the
-effectiveness of garbage collection. Their observation is that liveness
-can significantly impact garbage collection but only when it is
-interprocedural. As far as memory requirement is concerned, our paper
+The impact of  liveness on the effectiveness of  garbage collection is
+investigated in~\cite{Hirzel}.   The observation is that  liveness can
+significantly  impact   garbage  collection,  but  only   when  it  is
+interprocedural.  As far as memory requirement is concerned, our paper
 demonstrates this observation.
 
 
 There have been several attempts to use liveness analysis to improve 
 garbage collection for imperative languages.~\cite{khedker07heap}
 presents a liveness analysis and uses the results for inserting 
-nullifying statements in Java programs. ~\cite{ran.shaham-sas03} is
-another work which constructs an automaton modelling heap accesses and
-checks temporal properties like liveness against the model.  
+nullifying statements in Java programs. In ~\cite{ran.shaham-sas03},
+an automaton modelling heap accesses is created, and
+temporal properties like liveness are checked  against the model.  
 However both the approaches are restricted to intraprocedural scope.
 
-In the space of functional languages, efforts towards improving
-space efficiency using compile-time  analysis are: rewriting
-methods                             such                            as
+In the space of functional  languages, there are: rewriting methods such as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
 sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based   analysis~\cite{tofte98region},   or   through   insertion   of
+based   analysis~\cite{tofte98region},   and    insertion   of
 compile-time                                                nullifying
 statements~\cite{inoue88analysis,lee05static,Hamilton}.            All
 compile-time marking approaches rely on an efficient and precise alias
 analysis and  cannot provide  significant improvement in  its absence.
-An interesting  approach suggested in~\cite{HofmannJ03}  is to
-annotate the heap usage of  first-order programs through linear types.
-The annotations are then used to serve memory
-requests through re-allocation.  However, this
-requires the user to write programs in a specific way.
+An interesting approach suggested  in~\cite{HofmannJ03} is to annotate
+the  heap usage  of first-order  programs through  linear types.   The
+annotations   are  then   used  to   serve  memory   requests  through
+re-allocation.  However, this requires the user to write programs in a
+specific way.
 
 
 Simplifiers~\cite{ONeill} are abstractly described as lightweight
@@ -2015,7 +2018,7 @@ Premise & Transition & Rule name \\
   \rho', S, \heap[\ell := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  {\sc cons} \\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc car-bang} 
 \\
@@ -2029,7 +2032,7 @@ Premise & Transition & Rule name \\
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
     S, \heap)}$, \\ $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$ }& \makecell[t]{$\rho, S,
-  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow $\\ $  \rho', (\rho, \ell,
+  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow $\\ $  \rho', (\rho, \rho(x),
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$ }        &
 {\sc car-clo}\\
 \hline
@@ -2047,10 +2050,10 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 %% \\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\
-  $\heap(\rho(x)) \mbox{ is } \bot$  or $\heap(\rho(y)) \mbox{ is }
+  $\rho(x) \mbox{ is } \bot$  or $\rho(y) \mbox{ is }
   \bot$} & $\rho, S,
   \heap, (+~x~y), \cred{\sigma} \rightsquigarrow \bang$   &
-{\sc prim-1-bang} 
+{\sc prim-bang} 
 \\
 \hline
 
@@ -2090,7 +2093,7 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2),
     \sigma) = (\rho, S, \heap)}$, \\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc if-bang} 
 \\
@@ -2111,7 +2114,7 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
 {\sc if-clo} \\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) = (\rho, S, \heap)}$,\\
-  $\heap(\rho(x)) \mbox{ is } \bot$} & $\rho, S,
+  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\SRETURN~x), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc return-bang} 
 \\
