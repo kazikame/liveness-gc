@@ -12,6 +12,8 @@
 #include "Demands.h"
 #include <ctime>
 #include <sys/stat.h>
+#include<algorithm>
+#include<stdint.h>
 
 using namespace std;
 using namespace Scheme::AST;
@@ -20,9 +22,65 @@ using namespace Scheme::output;
 
 double gctime=0;
 int gccount=0;
+vector<int> heap_map_size;
 extern demand_grammar gLivenessData;
 extern unordered_map<string, expr_demand_grammars*> localLivenessMap;
 extern unordered_map<string, unsigned int> func_heap_cell_reqd;
+
+
+/*
+ * For finding out the ratio of heap cell size
+ */
+struct live_heap_cell
+{
+	cell_type typecell;
+	union
+	{
+		struct
+		{
+			cons *car, *cdr;
+			bool can_delete_car;
+		}cell;
+		int intVal;
+		bool boolval;
+		std::string* stringVal;
+		struct
+		{
+			ExprNode* expr;
+			cons* arg1;
+			cons* arg2;
+			int16_t arg1_name;
+			int16_t arg2_name;
+		}closure;
+	}val;
+	void *forward;
+	bool inWHNF;
+};
+struct reach_heap_cell
+{
+	cell_type typecell;
+	union
+	{
+		struct
+		{
+			cons *car, *cdr;
+		}cell;
+		int intVal;
+		bool boolval;
+		std::string* stringVal;
+		struct
+		{
+			ExprNode* expr;
+			cons* arg1;
+			cons* arg2;
+		}closure;
+	}val;
+	void *forward;
+	bool inWHNF;
+};
+//End of declarations.
+
+
 
 demand_grammar filter_grammar(demand_grammar gLivenessData, vector<string> filter_criteria)
 {
@@ -276,7 +334,12 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	cout << "Heap total="<<hsize<<" Heap left="<<current_heap()<<" Heap used="<<(hsize - current_heap())<<endl;
 	detail_gc();
 	if (gc_type == gc_live)
+	{
 		cleanup(numkeys-1);
+		cout << "Maximum extra memory required during LGC " << *std::max_element(heap_map_size.begin(), heap_map_size.end()) << endl;
+		cout << "size of rgc heap cell = " << sizeof(reach_heap_cell) << endl;
+		cout << "size of lgc heap cell = " << sizeof(live_heap_cell) << endl;
+	}
 
 	cout << "GC Invocations="<<gccount<<" GC Time="<<gctime<<endl;
 	cout << "DFA Gen Time="<<dfa_gen_time<<endl;

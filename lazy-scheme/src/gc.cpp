@@ -51,6 +51,7 @@ GCStatus gc_status = gc_plain;
 extern int gccount;
 extern unordered_map<string, unsigned int> func_heap_cell_reqd;
 unordered_map<cons* , unordered_set<state_index>> heap_dfa_map;
+extern vector<int> heap_map_size;
 
 //ofstream gout("gc_addr.txt", ios::app);
 
@@ -1861,6 +1862,18 @@ void update_heap_ref_stack(ostream& out, int gc_type)
 
 }
 
+int calculate_heap_map_size()
+{
+	int total_elems = 0;
+	for (auto cell : heap_dfa_map)
+	{
+		total_elems += cell.second.size();
+	}
+	heap_map_size.push_back(total_elems);
+	DBG(cout << "Total number of visits to cons cells " << total_elems << endl);
+	return total_elems;
+}
+
 void liveness_gc()
 {
 	clock_t pstart = clock();
@@ -1888,7 +1901,8 @@ void liveness_gc()
 #endif
 	  DBG(pre << "Doing liveness based GC #" << gccount << " after " << num_of_allocations << " allocations"<<endl);
 	  swap_buffer();
-	  DBG(pre << "Number of unique cons cells " << heap_dfa_map.size()<<endl);
+
+
 	  heap_dfa_map.clear();
 
   for (deque<actRec>::iterator stackit = actRecStack.begin();stackit != actRecStack.end(); ++stackit)
@@ -1942,6 +1956,9 @@ void liveness_gc()
  // cout << "GC Time for " << gccount << " = " << gc_time << endl;
   gctime += gc_time;
   //cerr << "Number of cells copied = " << numcopied << endl;
+  calculate_heap_map_size();
+  DBG(cout << "Number of unique cons cells " << heap_dfa_map.size() << " at GC#"<<heap_map_size.size()<<endl);
+
   return;
 }
 
