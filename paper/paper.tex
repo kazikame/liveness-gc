@@ -940,14 +940,14 @@ garbage collection of an earlier minefield step.  However the
   the $\rightsquigarrow$  along with the  current GC and show  that it
   does not lead to a \bang.
 
-We consider the rules {\sc car-clo} and {\sc car-1-clo} only.  
+We consider the rules {\sc car-clo} and {\sc car-bang} only.  
 The rest  of the rules involve similar reasoning. For the {\sc
   car-clo}  rule in  the state  $\rho, S,  \heap, (\CAR~x),
 \sigma$, we  know that $\sigma$ is  non-null. Therefore
 the  liveness  of  $x$  includes  $\epsilon$,  and  the
 dereferencing $\heap(\rho(x))$ will go without \bang.
 
-For the  {\sc car-1-clo}  rule, observe that  there are
+For the  {\sc car-bang}  rule, observe that  there are
 two dereferences.  First $x$  is dereferenced to  get a
 cons  cell  and then  the  head  of  the cons  cell  is
 dereferenced  to  obtain  a  closure.   If  the  demand
