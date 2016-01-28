@@ -1501,6 +1501,61 @@ are converted to DFAs.
 \figrule
 \end{figure}
 
+%\subsection{A liveness-based garbage collection scheme}
+\label{sec:live-clo}
+  \SetStartEndCondition{ }{}{}%
+  \SetKwProg{Pro}{procedure}{\string:}{}
+  \SetKwProg{Fn}{function}{\string:}{}
+  \SetKwFunction{Range}{range}%%
+  \SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
+  \SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
+  \SetKwFor{While}{while}{:}{fintq}%
+  \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
+  \SetKwFunction{Lgc}{$\mathsf{lgc}$}%
+  \SetKwFunction{Copy}{$\mathsf{copy}$}%
+  \SetKwFunction{LCopy}{$lgcCopy$}%
+  \SetKwFunction{RCopy}{$rgcCopy$}%
+\begin{algorithm}[ht!]
+  \Pro{\Lgc{}}
+     {
+       \For {each reference $\mathsf{ref}$ in root set}
+            {$\mathsf{ref}$ = \Copy($\mathsf{ref}, \mathsf{init}(\mathsf{ref.dfa})$)\;}
+            ${\mathsf{copyReferencesOnPrintStack}()}$\;  
+     }
+     \Fn{\Copy{$\mathsf{ref}, \mathsf{state}$}}
+        {
+          \eIf {$\mathsf{final}(\mathsf{state}$)}
+             {
+               $\mathsf{newRef} = \mathsf{dupHeapCell}(\mathsf{ref})$\;
+               \If{$\mathsf{ref\!.cell}$($\mathsf{ref}$)
+                 is a cons cell $\mathsf{(cons~arg_1~arg_2)}$}
+                  {
+                    {
+                      $\mathsf{newRef}\!.\mathsf{arg_1}  = \Copy(\mathsf{arg_1}, \mathsf{next}(\mathsf{state}, 0))$\;
+%                      $\mathsf{newRef}\!.\mathsf{arg_1}   =  \mathsf{newCar}$\;
+                    }
+                    {
+                      $\mathsf{newRef}\!.\mathsf{arg_2} =  \Copy(\mathsf{arg_2},
+                      \mathsf{next}(\mathsf{state} , 1))$\;
+%                      $\mathsf{newRef}\!.\mathsf{arg_2}   = \mathsf{newCdr}$\;
+                    }    
+                  }
+               \If
+                  {$\mathsf{ref\!.cell}$ is a
+                    closure cell, generically  $\mathsf{(binop~arg_1~arg_2)}$}
+              %      
+                   { 
+                     $\mathsf{newRef}\!.\mathsf{arg_1} = \Copy(\mathsf{arg_1}, \mathsf{init}(\mathsf{arg_1.dfa}))$\;
+                     $\mathsf{newRef}\!.\mathsf{arg_2} = \Copy(\mathsf{arg_2}, \mathsf{init}(\mathsf{arg_2.dfa}))$\;
+                   }
+             }
+             {$\mathsf{newRef = ref}$}
+\KwRet $\mathsf{newRef}$\;
+        }
+        \caption{Liveness-based
+          garbage collection.  \label{algo:lgc-a}}
+\end{algorithm}
+
 \subsubsection{From CFGs to GC-ready DFAs}
 \label{sec:NFA-approx}
  We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
@@ -1545,6 +1600,47 @@ paths.   This  reflects  the  lazy  nature  of  our  language.   Since
 \length\ does not  evaluate the member elements of  the argument list,
 the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
 liveness based garbage collection is triggered beyond $\pi_9$.
+
+
+
+
+\newcommand{\hgt}{2.9cm}
+\newcommand{\LGCLine}{blue}
+\newcommand{\RGCLine}{red}
+\newcommand{\ReachLine}{black}
+\newcommand{\UseLine}{light-blue}
+
+\begin{figure*}[t!]
+\renewcommand{\arraystretch}{.1}
+\begin{tabular}{@{}c@{}@{}c@{}@{}c@{}}
+   \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=paraffins.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=huffman.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=deriv.eps, height=\hgt}}
+\\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
+%\\ (a) & (b)
+\end{tabular}%\vskip -10mm
+ \caption{Memory usage.  
+%% Column (a) shows complete  usage, column 
+%%    (b) enlarges  a part  of the  usage.  
+The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
+cells  in  the  active   semi-space  for  RGC  and  LGC
+respectively.  The \ReachLine\ curve represents the number of
+reachable cells and the  \UseLine\ curve represents the
+number  of  cells  that  are actually  live  (of  which
+liveness analysis does a static approximation).  x-axis
+is the time measured  in number of cons-cells allocated
+(scaled down by factor $10^5$). y-axis is the number of
+cons-cells (scaled down by $10^3$).}
+\label{fig:memory-usage} \figrule
+\end{figure*}
 
 
 \section{The garbage collection scheme}
@@ -1612,62 +1708,6 @@ turn,    can    be    one   of    ($\mathsf{unop~arg}$),    ($\mathsf{
 Here each $\mathsf{  arg_i}$ is a reference to another  heap cell.  In
 addition, the closure also carries  a pointer to a DFA (denoted
 $\mathsf{arg_i.dfa_i}$) for each $\mathsf{arg_i}$.
-
-
-%\subsection{A liveness-based garbage collection scheme}
-\label{sec:live-clo}
-  \SetStartEndCondition{ }{}{}%
-  \SetKwProg{Pro}{procedure}{\string:}{}
-  \SetKwProg{Fn}{function}{\string:}{}
-  \SetKwFunction{Range}{range}%%
-  \SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
-  \SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
-  \SetKwFor{While}{while}{:}{fintq}%
-  \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
-  \SetKwFunction{Lgc}{$\mathsf{lgc}$}%
-  \SetKwFunction{Copy}{$\mathsf{copy}$}%
-  \SetKwFunction{LCopy}{$lgcCopy$}%
-  \SetKwFunction{RCopy}{$rgcCopy$}%
-\begin{algorithm}[t]
-  \Pro{\Lgc{}}
-     {
-       \For {each reference $\mathsf{ref}$ in root set}
-            {$\mathsf{ref}$ = \Copy($\mathsf{ref}, \mathsf{init}(\mathsf{ref.dfa})$)\;}
-            ${\mathsf{copyReferencesOnPrintStack}()}$\;  
-     }
-     \Fn{\Copy{$\mathsf{ref}, \mathsf{state}$}}
-        {
-          \eIf {$\mathsf{final}(\mathsf{state}$)}
-             {
-               $\mathsf{newRef} = \mathsf{dupHeapCell}(\mathsf{ref})$\;
-               \If{$\mathsf{ref\!.cell}$($\mathsf{ref}$)
-                 is a cons cell $\mathsf{(cons~arg_1~arg_2)}$}
-                  {
-                    {
-                      $\mathsf{newRef}\!.\mathsf{arg_1}  = \Copy(\mathsf{arg_1}, \mathsf{next}(\mathsf{state}, 0))$\;
-%                      $\mathsf{newRef}\!.\mathsf{arg_1}   =  \mathsf{newCar}$\;
-                    }
-                    {
-                      $\mathsf{newRef}\!.\mathsf{arg_2} =  \Copy(\mathsf{arg_2},
-                      \mathsf{next}(\mathsf{state} , 1))$\;
-%                      $\mathsf{newRef}\!.\mathsf{arg_2}   = \mathsf{newCdr}$\;
-                    }    
-                  }
-               \If
-                  {$\mathsf{ref\!.cell}$ is a
-                    closure cell, generically  $\mathsf{(binop~arg_1~arg_2)}$}
-              %      
-                   { 
-                     $\mathsf{newRef}\!.\mathsf{arg_1} = \Copy(\mathsf{arg_1}, \mathsf{init}(\mathsf{arg_1.dfa}))$\;
-                     $\mathsf{newRef}\!.\mathsf{arg_2} = \Copy(\mathsf{arg_2}, \mathsf{init}(\mathsf{arg_2.dfa}))$\;
-                   }
-             }
-             {$\mathsf{newRef = ref}$}
-\KwRet $\mathsf{newRef}$\;
-        }
-        \caption{Liveness-based
-          garbage collection.  \label{algo:lgc-a}}
-\end{algorithm}
 Algorithm~\ref{algo:lgc-a}   describes   the   garbage
 collection scheme.  Starting with the root set, each cell pointed by a
 live reference  (i.e. whose associated  DFA state is final)  is copied
@@ -1709,7 +1749,6 @@ a printing function~(Section
 %% them.
 We extend liveness-based  garbage  collection  to
 this function.
-
 \section{Experimental evaluation}
 \label{sec:experiments}
   Our benchmark consists of programs taken from nofib~\cite{nofib} and
@@ -1761,44 +1800,6 @@ trees  of various  sizes that  are  never used  by the  program. As  a
 result,  the benchmark  highly favours  LGC.  The  benchmark has  been
 included  for  completeness,  and  we  do  not  consider  its  numbers
 as being representative of real programs.
-
-\newcommand{\hgt}{2.9cm}
-\newcommand{\LGCLine}{blue}
-\newcommand{\RGCLine}{red}
-\newcommand{\ReachLine}{black}
-\newcommand{\UseLine}{light-blue}
-
-\begin{figure*}[t]
-\renewcommand{\arraystretch}{.1}
-\begin{tabular}{@{}c@{}@{}c@{}@{}c@{}}
-   \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=paraffins.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=huffman.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=deriv.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
-%\\ (a) & (b)
-\end{tabular}%\vskip -10mm
- \caption{Memory usage.  
-%% Column (a) shows complete  usage, column 
-%%    (b) enlarges  a part  of the  usage.  
-The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
-cells  in  the  active   semi-space  for  RGC  and  LGC
-respectively.  The \ReachLine\ curve represents the number of
-reachable cells and the  \UseLine\ curve represents the
-number  of  cells  that  are actually  live  (of  which
-liveness analysis does a static approximation).  x-axis
-is the time measured  in number of cons-cells allocated
-(scaled down by factor $10^5$). y-axis is the number of
-cons-cells (scaled down by $10^3$).}
-\label{fig:memory-usage} \figrule
-\end{figure*}
 
 Memory  usage graphs  for select  benchmarks are  shown
 Figure~\ref{fig:memory-usage},  Column   (a).   In some cases, the
@@ -1991,14 +1992,16 @@ For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}
   for practical collectors.
 
 
+\clearpage
+\balance
 \bibliography{fun_hra}{}
 \bibliographystyle{abbrv}
-
 \clearpage
+
 \appendix
 %\section{Appendix: not to be included in the paper.}
 %%%%% prasanna minefield
-\begin{figure*}[h!]
+\begin{figure*}[b!]
 \noindent{\Large \bf A. Minefield semantics(Not included in the paper)}
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
@@ -2134,254 +2137,12 @@ $\rho',~ (\rho, \rho(x), (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
 {\sc return-clo} \\
 \hline
 \end{tabular}
-\caption{Minefield semantics. The differences with the small-step
+
+\caption {Minefield semantics. The differences with the small-step
   semantics have been highlighted by shading. \label{fig:minefield-semantics}}
 \end{center}
+
 \end{figure*}
-%%%%%%%%%%%%%%%%%%%%%%
-
-
-
-%% We shall now  present a proof of soundness of  the liveness analysis
-%% presented in Section~\ref{sec:liveness-analysis}.   While the proof is
-%% on the broad lines of \cite{asati14lgc}, there are several differences
-%% due to  the lazy  semantics of  the language  being 
-%% analyzed in this paper. Here is the idea behind the proof.
-%% \begin{enumerate}
-%% \item       We        enrich       the        standard       semantics
-%%   (Figure~\ref{fig:lang-semantics}) to model  a liveness-based garbage
-%%   collection  just  before  each  $\rightsquigarrow$  transition.  The
-%%   simulated garbage collection starts from  the root-set and inserts a
-%%   special value  $\bot$ at each location  in the heap that  contains a
-%%   reference that is reachable but not live. Any attempt to dereference
-%%   such  locations during  the  transition will  result  in entering  a
-%%   special state denoted \bang. We call the semantics after
-%%   augmentation  \emph{minefield semantics}.
-%% \item \label{inline2} Assuming that a  program enters the \bang\ state,
-%%   we  show  how to  construct,  through  inline expansion,  a  program
-%%   without function calls which has the same minefield behavior.
-%% \item  The final  part  of the  proof shows  that  no program  without
-%%   function calls can enter a \bang\ state. As a consequence no program
-%%   (with or without function calls) can enter the \bang\ state. 
-%% \end{enumerate}
-
-%% \subsection{Minefield semantics}
-
-%% To set up the minefield semantics, we follow these steps:
-%% \begin{enumerate}
-%% \item   We   enrich    the   abstract   machine   state
-%%   $\rho,\,S,\,\heap,\,e$   to  $\rho,\,S,\,\heap,\,e,\,\sigma$,
-%%   where  $\sigma$  is  the  demand  on  the  expression
-%%   $e$. We  call such a state  a \emph{minefield state}.
-%%   The demand $\sigma$ is  ``dynamic'' in that it arises
-%%   from the  actual sequence of function  calls that led
-%%   to  the evaluation  of  $e$.  The  0-CFA demand  used
-%%   during    liveness     analysis    is     a    static
-%%   over-approximation   of   $\sigma$   that   considers
-%%   \emph{all  possible calls}  that  could  lead to  the
-%%   evaluation of  $e$.  The  information in  the continuation frames on
-%%   the   stack  $S$ are  also
-%%   similarly augmented with their  demands.  Thus a stacked
-%%   entry now takes  the form $(\rho, x,  e, \sigma)$.  A
-%%   modification  of  the   small  step  semantics  which
-%%   carries the extra information  is shown in the bottom
-%%   table of Figure~\ref{fig:minefield-semantics}.
-%% \item $GC$  models a liveness based  garbage collection
-%%   $GC(\rho, S,  \heap, \sigma)$ returns $(\rho',  S', \heap')$,
-%%   where the changes are due to certain references being
-%%   replaced by  $\bot$.  This represents the  act of not
-%%   retaining   (effectively   garbage  collecting)   the
-%%   objects  pointed to  by  these  references during  an
-%%   actual  garbage  collection.  This  is  done  in  the
-%%   following way:
-%%   \begin{enumerate}
-%%   \item Given the current state $\rho, S,
-%%     \heap,   e,  \sigma$   and   the  demand   transformers
-%%     $\Lfonly$, we can  construct a liveness environment
-%%     \Lv for $e$.   If  $e$  is  an expression,  then  $  \Lv  =
-%%     \mathcal{L}(e, \sigma, \Lfonly)$, else if $e$ is an
-%%     application, then $ \Lv = ref(e, \sigma, \Lfonly)$.
-%%     We  can similarly  define the  liveness environment
-%%     for each  of the  suspended evaluation  contexts in
-%%     $S$, giving  a stack of liveness  environments that
-%%     we shall denote $\mathsf{SL}$.
-%%   \item \emph{Garbage collection  of objects pointed by
-%%     root   set:}  For   each   $x  \in   domain(\rho)$,
-%%     $\rho'(x)=\bot$     iff      $x.\epsilon     \notin
-%%     \Lv$.    Similarly,    for   each    stack    entry
-%%     $(\rho,\_,\_,\_)$  in   $S$  with  $\Lv'$   as  the
-%%     corresponding      liveness     environment      in
-%%     $\mathsf{SL}$, and  for each $x  \in domain(\rho)$,
-%%     $\rho'(x)=\bot$ iff $x.\epsilon \notin \Lv'$.
-%%   \item  \emph{Garbage  collection  of objects  in  the
-%%     heap:} For each location  $\ell$, $\heap'(\ell) = \bot$
-%%     iff  there   is  no  $x$  in   either  the  current
-%%     environment  or  one  of the  stacked  environments
-%%     $\rho$, such  that for some  $\alpha$ corresponding
-%%     to a  closure-free path  in the heap  starting from
-%%     $x$,  $\heap[x.\alpha]   =  \ell$  and   $x.\alpha  \in
-%%     \Lv$. Here \Lv\ is the liveness of the variables in
-%%     the current environment or the stacked environment.
-
-%% \warning{We have to tell  the reader about closure free
-%%   paths  earlier  on.   Also,  has  $\heap[x.\alpha]$  been
-%%   defined?}
-%%   \end{enumerate}
-%% Starting from the initial state $([\;]_\rho,([\;]_\rho,
-%% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
-%% every transition  is preceded  by a  garbage collection
-%% using $GC$.  The details of the transition for the {\sc
-%%   car-clo}  rule   is  shown   in  the  top   table  of
-%% Figure~\ref{fig:minefield-semantics}.  If  this  or  an
-%% earlier  call to  $GC$  results  in $\heap(\rho(x))$  being
-%% bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
-%% enters the  \bang\ state {\sc  car-clo-bang}. Otherwise
-%% the transition is the same as the earlier {\sc car-clo}
-%% rule.
-%% \end{enumerate}
-
-%% \subsection{Inlining} 
-
-%% Consider a call tree, each  of whose nodes represents a
-%% function  that  was  called (but  did  not  necessarily
-%% return because  of a \bang).   Assume that each  of the
-%% nodes of  the tree is  also annotated with  the program
-%% point where  the corresponding call was  invoked.  This
-%% tree  can  be  used  to  inline  function  calls  in  a
-%% hierarchical fashion.  The details of inlining a single
-%% function      call     $(\LET\,\,      x     \leftarrow
-%% (f\,y_1\,\ldots\,y_n) \,\,  \IN\,\, e)$ is  as follows.
-%% Let  $f$ be  defined  (after renaming  its formals  and
-%% locals  to  be  disjoint from  existing  variables)  by
-%% $(\DEFINE\ (f\  z_1\ \ldots\  z_n)\ e_f)$. The  call is
-%% replaced  by   a  sequence  of  $\LET$s   of  the  form
-%% $z_i\leftarrow (\ID\,\,y_i)$ followed by the body $e_f$
-%% but with its  $(\SRETURN\,\,w)$ expressions replaced by
-%% $(\LET\,\, x  \leftarrow (\ID\,\, w) \,\,  \IN\,\, e)$.
-%% We prefer to use the  identity function $\ID$ as a form
-%% of no-op rather than  introducing the form $(\LET\,\, x
-%% \leftarrow  w \,\,  \IN\,\, e)$  where the  RHS of  the
-%% $\LET$-definition   is  a   simple  variable.    For  a
-%% call-less program,  the initial state of  the minefield
-%% semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
-%% \ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
-%% (e_{\mainpgm})$.
-
- 
-%% \subsection{Soundness Results}
-
-%%   We  consider  a  garbage  collection  followed  by  a
-%%   transition as a step.  We show by induction that, for
-%%   programs  without function  calls, starting  from the
-%%   initial  state  that  has $e_{\main}$  as  the  first
-%%   expression to  be evaluated  instead of  $\main$, any
-%%   transition of $n$ steps occurs without a \bang.
-
-%% We  first  need  an auxiliary  result  about  minefield
-%% semantics. Consider  a trace of a  minefield execution.
-%% For every minefield state  $(\rho, S, \heap, e(s), \sigma)$
-%% that appears  on the LHS of  a $\rightsquigarrow$ step,
-%% the  demand   $\sigma$  on   the  expression   $e$  (or
-%% application $s$) is non-null.  This can be proved by an
-%% induction  on  the  number  of  steps  leading  to  the
-%% minefield  state.   The  base step  holds  because  the
-%% demand $\sigma_{all}$  on $\mainpgm$ is  non-null.  The
-%% inductive step  follows from  the observation  that for
-%% each  step of  the minefield  semantics, if  the demand
-%% $\sigma$ on  the LHS of  a minefield step  is non-null,
-%% the demand on  the RHS is a  transformation of $\sigma$
-%% (for example $\clazy\sigma$) which is also non-null.
-
-%% Let us clarify this observation:  Since the minefield semantics models
-%% lazy  evaluation,  parts  of  the  program may  not  be  evaluated  at
-%% all.  However,  if  an  expression  (or  application)  happens  to  be
-%% evaluated, it  will appear  on the  LHS of a  minefield step,  and the
-%% context-sensitive demand on it will be non-null.
-
-%% We  show  next  that   the  minefield  execution  of  a
-%% call-less program  cannot go \bang. Note  that, for the
-%% sake of  concreteness, by a single  minefield execution
-%% we   shall  mean   the  evaluation   of  $(main)$   (or
-%% $e_{\mainpgm}$,  for call-less  programs)  to its  WHNF
-%% driven  by   the  printing  mechanism   represented  by
-%% \print. With  minor variations, the proof  will also be
-%% applicable   for   subsequent  evaluations   fired   by
-%% $\print$.
-
-%% \begin{lemma}
-%% \label{lemma:call-less-cannot-go-bang-app}
-%% Consider the minefield execution of  a program without function calls.
-%% Such a program cannot enter the \bang\ state.
-%% \end{lemma}
-%% \begin{proof}
-%% Consider a state in the minefield execution of a program $(\rho, S, \heap,
-%% e, \sigma)$.   We show  by induction  on the  number $n$  of minefield
-%% steps  leading to  this state  that  the next  step cannot  lead to  a
-%% \bang\ state.
-
-%% When $n$ is 0, the  state is $([\;]_\rho,\_, [\;]_{S} ,
-%% [\;]_{\heap},  e_{\mainpgm},  \sigma_{all})$.  Further,  we
-%% have   to  show   that   a  $GC(..)$   followed  by   a
-%% $\rightsquigarrow$ step cannot lead  to a \bang\ state.
-%% Now, because  our programs  are in  ANF, $e_{\mainpgm}$
-%% can  only  be a  $\LET$.  A  {\sc  let} step  does  not
-%% dereference anything and thus cannot result in a \bang.
-
-%% For the inductive step, we  shall show that none of the
-%% minefield steps that  involves dereferencing results in
-%% a   \bang.   These  are   the   steps   which  have   a
-%% $\heap(\rho(...))$ in the premise.  Recall that a minefield
-%% step   consists   of   a   GC  step   followed   by   a
-%% $\rightsquigarrow$.   The   $\rightsquigarrow$  can  go
-%% \bang\ because it dereferences a $\bot$ inserted by the
-%% immediately  preceding  GC  or  the GC  of  an  earlier
-%% minefield step.  \warning{However the  demand $\sigma'$
-%%   on basis of which an earlier GC would have inserted a
-%%   $\bot$,  would  have   included  the  current  demand
-%%   $\sigma$.}  Thus,  if the  earlier GC had  inserted a
-%% $\bot$, so would the current  GC.  Thus it is enough to
-%% consider the $\rightsquigarrow$  along with the current
-%% GC and show that it does not lead to a \bang.
-
-%% We consider the steps {\sc car-clo} and {\sc car-1-clo}
-%% only. The rest  of the steps are similar.  For the {\sc
-%%   car-clo}  step in  the state  $\rho, S,  \heap, (\CAR~x),
-%% \sigma$, we  know that $\sigma$ is  non-null. There for
-%% the  liveness  of  $x$  includes  $\epsilon$,  and  the
-%% dereferencing $\heap(\rho(x))$ will go without \bang.
-
-%% For the  {\sc car-1-clo}  step, observe that  there are
-%% two dereferences.  First $x$  is dereferenced to  get a
-%% cons  cell  and then  the  head  of  the cons  cell  is
-%% dereferenced  to  obtain  a  closure.   If  the  demand
-%% $\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
-%% of    $x$   will    include    both   $\epsilon$    and
-%% $\acar\epsilon$,  and  a  GC with  this  liveness  will
-%% neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
-%% first   component  of   the   cons   cell.  Thus   both
-%% dereferences    will    happen   normally    and    the
-%% $\rightsquigarrow$ step will not enter \bang.
-%% \end{proof} 
-
-%% Now we are ready to prove the main soundness result.
-
-%% \begin{theorem}
-%% The  minefield  execution of  no  program  can enter  a
-%% \bang\ state.
-%% \end{theorem}
- 
-%% \begin{proof}
-%% Assume to  the contrary that  a program $P$  enters the
-%% \bang\  state.  We can  transform  $P$  to a  call-less
-%% program $P'$ such that  the minefield executions of $P$
-%% and $P'$  are identical  except for change  of variable
-%% names.  \warning{Check  whether  the previous  line  is
-%%   correct.}                 However,                 by
-%% Lemma~\ref{lemma:call-less-cannot-go-bang-app} we know that
-%% $P'$,   a   call-less   program,   cannot   enter   the
-%% \bang\  state.  Therefor  $P$  also  cannot  enter  the
-%% \bang\ state.
-%% \end{proof}
  
 \end{document}
 
