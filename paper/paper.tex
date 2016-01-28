@@ -37,11 +37,10 @@
 \def\concat{\mathrel{\drawplusplus {12pt}{0.4pt}{5pt}}}
       %It would be better to specify these in font-relative measures, but it
       %probably doesn't scale anyway.
-%\newcommand{\mycomment}[1]{} 
+\newcommand{\mycomment}[1]{} 
 \definecolor{Myblue}{rgb}{.2,0,1}
 \definecolor{Myred}{rgb}{1,.2,.2}
 
-\newcommand{\comment}[1]{{\color{Myblue}{#1}}}
 \newcommand{\warning}[1]{{\color{Myred}{#1}}}
 %\newcommand{\blankout}[1]{}
 \newcommand{\oxlb}{\ensuremath{[\!|}}
@@ -105,6 +104,7 @@
 %
 %\author{
 % 1st. author
+\cmt{{
 \authorinfo {Prasanna Kumar. K} 
        {IIT Bombay, Mumbai 400076, India}
        {prasannak@cse.iitb.ac.in}
@@ -116,14 +116,8 @@
 \authorinfo {Amey Karkare}
        {IIT Kanpur, Kanpur 208016, India}
        {karkare@cse.iitk.ac.in}
-% 3rd. author
-%% \alignauthor Amey Karkare\\
-%%        \affaddr{IIT Kanpur}\\
-%%        \affaddr{Kanpur 208016, India}
-%%        \email{karkare@cse.iitk.ac.in}
-%}
-%}}
-%\authorinfo{Double Blind Review}{}{}
+}}
+\authorinfo{Double Blind Review}{}{}
 \maketitle
 
 \begin{abstract} 
@@ -1731,10 +1725,6 @@ have not been shown.
 \include{autotable}
 \vskip -5mm
 \end{table*} 
-
-
-
-
 
 %\subsection{Garbage collection for references on print stack}
 The evaluation of  the top-level expression in a program  is driven by

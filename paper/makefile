@@ -1,4 +1,4 @@
-LATEX=latex
+LATEX=pslatex
 all: 
 	yes X | $(LATEX)  paper.tex ; dvips paper.dvi -o paper.ps; ps2pdf paper.ps
 
