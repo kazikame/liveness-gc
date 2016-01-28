@@ -445,7 +445,7 @@ $\rho',\, (\rho, \rho(x), (\SRETURN~x))\!:\!S,\, \heap,\,  s$} &
 \caption{A small-step semantics for the language. \label{fig:lang-semantics}}
 \end{center}
 %}\comment
-\vspace*{-6pt}
+\vspace*{-16pt}
 \end{figure*}
 
 
@@ -608,7 +608,6 @@ $\lbrace\acar\rbrace\sigma$.
 %==============================================================
 
 
-
 \subsection{Liveness analysis for lazy languages}
 \label{sec:liveness-analysis}
   
@@ -641,14 +640,16 @@ label of the program   point  where   the   closure  was   created\footnote{Mult
   value for each  variable that is applicable from  its creation point
   to evaluation points.
 
+\begin{figure}[t]
+  \input{example-to-illustrate-liveness}  
+  \caption{Example illustrating liveness of closures}\label{fig:lv-closure}
+\end{figure}
 \input{fig-liveness}
 
-  Closure  variables get  their  liveness values  through  a chain  of
-  dependences beginning at  a variable at an evaluation  point.  As an
-  example, consider the following program:
-
-\input{example-to-illustrate-liveness}
-  
+ 
+Closure  variables get  their  liveness values  through  a chain  of
+dependences beginning at  a variable at an evaluation  point.  As an
+example, consider the program in Figure~\ref{fig:lv-closure}.
 The variable  \pz\ returned  at $\psi_3$ depends  on \py\  through the
 expression $(+~\py~1)$.  $\py$ in turn depends on the closure variable
 $\px_{\mathit{\pi}_1}$  through $(\length~\px_{\mathit{\pi}_1})$.   We

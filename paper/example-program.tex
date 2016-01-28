@@ -4,28 +4,24 @@
   \small
   \renewcommand{\arraystretch}{1}{
     \begin{uprogram}
-      \UNL{1} (\DEFINE\ (\length~\xl)
-      \UNL{2}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\
-      (\NULLQ~\xl) \IN
-      \UNL{3} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
+      \UFL(\DEFINE\ (\length~\xl)
+      \UNL{1}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
+      \UNL{2} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
       $\psi_1\!\!:\,$ \px
-      \UNL{4} \hspace*{.27cm} $\pi_3\!\!:\,
-      $(\LET\ \pv\ $\leftarrow 0$ \IN
-      \UNL{5} \hspace*{.32cm} $\pi_4\!\!:\,
-      (\SRETURN~\psi_2:\pv)$
-      \UNL{4} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\
+      \UNL{3} \hspace*{.27cm} $\pi_3\!\!:\,
+      $(\LET\ \pv\ $\leftarrow 0$\ \IN \hspace*{1.4mm}$\pi_4\!\!:\,(\SRETURN~\psi_2:\pv)$
+      \UNL{3} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\
       $\leftarrow$  (\CDR~\xl)  \IN
-      \UNL{5} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\
+      \UNL{4} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\
       $\leftarrow$  (\length~\pu)  \IN
-      \UNL{6} \hspace*{.34cm} $\pi_7\!\!:\,
-      $(\LET~\pz\ $\leftarrow$ (+~1~\py) \IN
-      \UNL{7} \hspace*{.34cm} $\pi_8\!\!:\,
+      \UNL{5} \hspace*{.34cm} $\pi_7\!\!:\,
+      $(\LET~\pz\ $\leftarrow$ (+~1~\py)\ \IN \hspace*{1.4mm} $\pi_8\!\!:\,
       (\SRETURN~\psi_3:\pz)$)))))))
   \end{uprogram}}
   \renewcommand{\arraystretch}{1}{
     \begin{uprogram}
-      \UNL{1} $(\DEFINE\ (\main)$
-      \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
+      \UFL $(\DEFINE\ (\main)$
+      \UNL{1} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
       (
       \scalebox{0.8}{\psframebox[framearc=.5,
 	  fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
@@ -33,18 +29,18 @@
             {a BIG closure}
       \end{tabular}}}
       ) \IN  
-      \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
+      \UNL{2} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
       \IN
-      \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
+      \UNL{3}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
       $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
-      \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-      $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
-      \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
+      \UNL{4}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
+      $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN  \hspace*{1.4mm}  $\pi_{13}\!\!:\,
       (\SRETURN~\psi_4:\pw)))))$
   \end{uprogram}}
   %%}
 \end{minipage}
 \caption{An example program}\label{fig:mot-example2-a}
+\vspace*{-5mm}
 \end{figure}
-
+%\vspace*{-3mm}
 

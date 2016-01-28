@@ -1,16 +1,14 @@
-\vspace*{-.2cm}
-        {\small
-        \renewcommand{\arraystretch}{1}{
-          \begin{uprogram}
-            \UNL{0} (\DEFINE~(f~\px)
-             \UNL{1} $\pi_1$:(\LET~\py~$\leftarrow $\
- (\length~\px) \IN
-             \UNL{4} (\SIF~$\psi_1$:\py
-             \UNL{6}(\LET~\pu~$\leftarrow$~(\Sum~\px)~\IN
-             \UNL{7} (\LET~\pw~$\leftarrow$\ (/~\pu~\py)~\IN
-             \UNL{8} (\SRETURN~$\psi_2$:\pw)))
-             \UNL{6}(\LET~\pz~$\leftarrow$~(+~\py~1)~\IN
-             \UNL{7} (\SRETURN~$\psi_3$:\pz)))))   
-        \end{uprogram}}
+%\vspace*{-.2cm}
+{\small
+  \renewcommand{\arraystretch}{1}{
+    \begin{uprogram}
+      \UFL (\DEFINE~(f~\px)
+      \UNL{1} $\pi_1$:(\LET~\py~$\leftarrow $\
+      (\length~\px) \IN
+      \UNL{3} (\SIF~$\psi_1$:\py
+      \UNL{5}(\LET~\pu~$\leftarrow$~(\Sum~\px)~\IN
+      \UNL{6} (\LET~\pw~$\leftarrow$\ (/~\pu~\py)~\IN\ \ (\SRETURN~$\psi_2$:\pw)))
+      \UNL{5}(\LET~\pz~$\leftarrow$~(+~\py~1)~\IN\ \ (\SRETURN~$\psi_3$:\pz)))))   
+  \end{uprogram}}
 }
 \vspace*{.1cm}
