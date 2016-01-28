@@ -750,7 +750,7 @@ contents starting from $\mathit{x_{\pi}}$ is given by $\Lv_\mathit{x_{\pi}}$.
 We shall now present a proof of soundness of the analysis presented in
 Section~\ref{sec:liveness-analysis}.   Here are  the ideas  behind the
 proof.
-\begin{enumerate}
+\begin{myenumerate}
 \item       We   augment     the        standard       semantics
   (Figure~\ref{fig:lang-semantics}) to model  a dynamic liveness analysis 
 that records liveness values at each reference created during execution.
@@ -764,7 +764,7 @@ Any attempt to dereference a location with a null-liveness
 \item  The final  step   shows  that  no program  without
   function calls can enter a \bang\ state. As a consequence no program
   (with or without function calls) can enter the \bang\ state. 
-\end{enumerate}
+\end{myenumerate}
 
 
 \begin{figure*}[t!]
@@ -809,7 +809,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 \end{figure*}
 
 To set up the minefield semantics, we follow these steps:
-\begin{enumerate}
+\begin{myenumerate}
 
 \item  We  extend  the  abstract  machine  state  $\rho,S,\heap,e$  to
   $\rho,S,\heap,e,\sigma$.   We call  such a  state a  \emph{minefield
@@ -819,14 +819,14 @@ To set up the minefield semantics, we follow these steps:
   frames  on the  stack $S$  are also  similarly augmented  with their
   demands.  Thus a  stacked entry now takes the form  $(\rho, \ell, e,
   \sigma)$.
-\item  $GC(\rho,  S,  \heap,  e, \sigma)$ models  a  liveness  based  garbage
+\item  $GC(\rho,  S,  \heap,  e, \sigma)$ models  a  liveness-based  garbage
   collection that returns $(\rho', S', \heap')$, where the changes in
   $\rho, S$ and  $\heap$ are due
   to certain references being replaced by $\bot$.  This simulates the
   act of  not retaining  (effectively garbage collecting)  the objects
   pointed to by these references  during an actual garbage collection.
   This is done in the following way:
-  \begin{enumerate} 
+  \begin{myenumerate} 
   \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
     \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
     liveness environment  \Lv\ for  the expression $e$.   We similarly
@@ -855,8 +855,8 @@ To set up the minefield semantics, we follow these steps:
 %%     \rrbracket = \ell$  and $x.\alpha \in \Lv$, where 
 \Lv\ is the liveness environment  corresponding to $\rho$ mentioned in
 step~\ref{gc-1}.
-  \end{enumerate}
-\end{enumerate}
+  \end{myenumerate}
+\end{myenumerate}
 Starting from the initial state,
 %%  $([\;]_\rho,([\;]_\rho,
 %% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
@@ -1175,9 +1175,9 @@ of  $\sigma_{\length}$:
   \Lanv{\pa}{} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
 \end{align*}
 
-In  summary, the  equations  generated during  liveness
+In  summary, the  equations  generated during the
 analysis are:
-\begin{enumerate}
+\begin{myenumerate}
 \item   For  each   function  $\mathit{f}$,   equations
   defining \Df{f}{i} for use by \Lfonly$_{\mathit f}$.
 \item For each function $\mathit{f}$, an equation defining the summary
@@ -1185,24 +1185,22 @@ analysis are:
 \item   For  each   function  $\mathit{f}$   (including
   $\mainpgm$) an  equation  defining
   liveness for each garbage in  $e_{\mathit f}$.
-\end{enumerate}
+\end{myenumerate}
+
 \subsection{Solving liveness equations---the grammar
-interpretation}\label{sec:grammar-formulation}      The
-equations  above   can  now  be  re-interpreted   as  a
-context-free    grammar   (CFG)    on   the    alphabet
-$\lbrace\acar,  \acdr,  \bcar,  \bcdr,  \clazy\rbrace$.
-Let \var{$X$}  denote the  non-terminal for  a variable
-$X$  occurring on  the LHS  of the  equations generated
-from  the  analysis.  We  can  think  of the  resulting
-productions as being  associated with several grammars,
-one for each non-terminal \var{\Lanv{x}{}} regarded as
-a  start  symbol.   As  an  example,  the  grammar  for
-\var{\Lanv{\xl}{}} and \var{\Lanv{\pa}{}}    comprise     the     following
-productions:
+interpretation}\label{sec:grammar-formulation}      
+
+The  equations  above can  now  be  re-interpreted as  a  context-free
+grammar  (CFG) on  the  alphabet $\lbrace\acar,  \acdr, \bcar,  \bcdr,
+\clazy\rbrace$.  Let \var{$X$} denote  the non-terminal for a variable
+$X$ occurring on the LHS of the equations generated from the analysis.
+We can  think of  the resulting productions  as being  associated with
+several grammars, one for  each non-terminal \var{\Lanv{x}{}} regarded
+as a start symbol.  As  an example, the grammar for \var{\Lanv{\xl}{}}
+and \var{\Lanv{\pa}{}} comprise the following productions:
 \begin{eqnarray*}
   \var{\Lanv{\xl}{}}  &\rightarrow& 
-  \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\
-  & & \mid
+  \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\ && \mid
   \clazy\var{\Df{\length}{1}}{\clazy\var{\sigma_{\length}}} \\
   \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
   \acdr\var{\Df{\length}{1}}\clazy
@@ -1217,18 +1215,19 @@ language   generated   by  \var{\Lanv{x}{}},   denoted
 $\mathscr{L}(\var{\Lanv{x}{}})$,   is    the   desired
 solution  of  \Lanv{x}{}.    
 However, recall that the decision problem that we are interested in
-during garbage collection is the following: 
-\begin{quote}
+during garbage collection is: 
+%%\begin{quote} 
+{\em
 Let $x.\alpha$ be a forward access path (consisting only
 of edges  \acar\ and \acdr\  but not \bcar,  \bcdr\ or
 \clazy).       Let      $\mathscr{L}(\var{\Lanv{x}{}})
 \stackrel{*}{\hookrightarrow}  \sigma$, where  $\sigma$
 consists  of  forward  access  paths  only.  Then  does
 $\alpha \in \sigma$?
-\end{quote}
-
-We now model  the above problem as one  of deciding the
-membership of  a context-free grammar augmented  with a
+}
+%%\end{quote}
+We model  this problem as one  of deciding the
+membership of  a CFG augmented  with a
 fixed set of unrestricted productions.
 
 \begin{definition}\label{def:specialgrammar}
@@ -1307,7 +1306,7 @@ $\nont{}{} \rightarrow  \nont{\mathit{init}}{c}w\$$, where  \nont{}{} is
 the start symbol of the  grammar). Further correspondences between the
 TM moves and the grammar productions are as follows:
 
-\begin{enumerate}
+\begin{myenumerate}
 \item For each transition  $(S_i, c) \rightarrow (S_j,c',L)$, there are
   two  productions $\nont{i}{c}  \rightarrow  \acar \nont{j}{\acar}c'$
   and $\nont{i}{c} \rightarrow \acdr \nont{j}{\acdr}c'$.
@@ -1315,7 +1314,7 @@ TM moves and the grammar productions are as follows:
   are two productions
   $\nont{i}{c} \rightarrow \overline{c'} \nont{j}{\acar}\bcar$ and $\nont{i}{c}
   \rightarrow \overline{c'} \nont{j}{\acdr}\bcdr$. 
-\end{enumerate}
+\end{myenumerate}
 The idea  behind the  productions is explained  with an
 example:  Assume that  the current  sentential form  is
 $\bcar\bcdr\nont{i}{\acar}\acar\acar\$$. Also  assume that  the
@@ -1349,7 +1348,7 @@ and                $\nont{\mathit{final}}{c}               \rightarrow
 \nont{\mathit{final}}{c}\bcar$      and      $\nont{\mathit{final}}{c}
 \rightarrow \nont{\mathit{final}}{c}\bcdr$ for  cleaning up \acar\ and
 \acdr\ on the right of the tape head.  This completes the
-reduction.\\ \mbox{}
+reduction.\!
 \end{proof}
 
 We now show that the proof can be replayed for the class of grammars
@@ -1415,13 +1414,6 @@ of Lemma~\ref{lemma:grammar-undecidable} that is different
 from $\nont{\mathit{final}}{c}$.   Thus  $\$$  would  not  be
 derivable from the grammar.
 \end{proof}
-
-
-We circumvent  the problem  of undecidability  by over-
-approximating the CFG by non-deterministic finite state
-automata (NFA). The NFAs  are then simplified using the
-$\hookrightarrow$ rules.   Finally the  simplified NFAs
-are converted to DFAs.
 
 %------------------------------------------------------------%
 
@@ -1510,7 +1502,8 @@ are converted to DFAs.
   \SetKwFunction{Copy}{$\mathsf{copy}$}%
   \SetKwFunction{LCopy}{$lgcCopy$}%
   \SetKwFunction{RCopy}{$rgcCopy$}%
-\begin{algorithm}[ht!]
+
+\begin{algorithm}[t!]
   \Pro{\Lgc{}}
      {
        \For {each reference $\mathsf{ref}$ in root set}
@@ -1547,17 +1540,23 @@ are converted to DFAs.
              {$\mathsf{newRef = ref}$}
 \KwRet $\mathsf{newRef}$\;
         }
-        \caption{Liveness-based
-          garbage collection.  \label{algo:lgc-a}}
+        \caption{Liveness-based garbage collection.  \label{algo:lgc-a}}
 \end{algorithm}
 
-\subsubsection{From CFGs to GC-ready DFAs}
-\label{sec:NFA-approx}
- We use  the algorithm by Mohri  and Nederhof~\cite{mohri00regular} to
- approximate a CFG by a {\em strongly regular\/} grammar.  For
- example, the grammar
- fragment  for  the  non-terminal  $\var{\Df{\length}{1}}$  after  the
- Mohri-Nederhof transformation is:
+%%\subsubsection{From CFGs to GC-ready DFAs}
+%%\label{sec:NFA-approx}
+
+We circumvent the problem of undecidability by over approximating the
+CFG by non-deterministic finite state automata (NFA) using
+%% The NFAs  are then simplified using the
+%%$\hookrightarrow$ rules.   Finally the  simplified NFAs
+%%are converted to DFAs.
+%%
+%% We use  the algorithm by 
+Mohri  and Nederhof~\cite{mohri00regular} method.
+%to approximate a CFG by a {\em strongly regular\/} grammar.  
+For example, the grammar fragment for the non-terminal
+$\var{\Df{\length}{1}}$ after the Mohri-Nederhof transformation is:
  \begin{eqnarray*}
    \var{\Df{\length}{1}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid
    \acdr\var{\Df{\length}{1}}
@@ -1571,9 +1570,11 @@ each $\var{\Lanv{x}{}}$.  The  $\hookrightarrow$ simplification is now
 done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
 pairs  of consecutive  edges  labeled \bcar\acar\  or \bcdr\acdr\  and
 constructing  the $\epsilon$-closure  till a  fixed point  is reached,
-after which  the edges labeled  \bcar \  and \bcdr\ are  deleted.  The
-details of the  algorithm, its correctness and  termination proofs are
-given  in~\cite{karkare07liveness,asati14lgc}.   The
+after which  the edges labeled  \bcar \  and \bcdr\ are  deleted.  
+\cmt{ %% REMOVED FOR BLIND REVIEW
+  The details of the  algorithm, its correctness and  termination proofs are
+given  in~\cite{karkare07liveness,asati14lgc}. }
+The
 resulting  automaton   has  edges  labeled  with   \acar,  \acdr\  and
 \clazy\ only.  In this  automaton, for every  edge labeled  \clazy, we
 check if the source node of the edge has a path to a final 
@@ -1589,12 +1590,12 @@ final  DFA  is  shown in  Figure~\ref{fig:example-automata}(b).   This
 expectedly  says that for a  demand  $\sigma_{\length}$,  the
 liveness of  the argument of \length\  is $\acdr^{*}$  (the spine  of the  list is
 traversed).  Similarly, Figure~\ref{fig:example-automata}(c) shows the
-NFA     for     \var{\Lanv{\pa}{}}.      The     DFA     shown     in
+NFA     for     \var{\Lanv{\pa}{}}.      The     DFA in
 Figure~\ref{fig:example-automata}(d)  does  not   accept  any  forward
-paths.   This  reflects  the  lazy  nature  of  our  language.   Since
-\length\ does not  evaluate the member elements of  the argument list,
+paths, reflecting  the  lazy  nature  of  our  language.   Since
+\length\ does not  evaluate the elements of  the argument list,
 the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
-liveness based garbage collection is triggered beyond $\pi_9$.
+liveness-based GC triggers beyond $\pi_9$.
 
 
 
@@ -1637,7 +1638,7 @@ cons-cells (scaled down by $10^3$).}
 \label{fig:memory-usage} \figrule
 \end{figure*}
 
-
+\vspace*{-2.5mm}
 \section{The garbage collection scheme}
 \label{sec:GC-scheme}
 
@@ -1668,7 +1669,7 @@ collections are based on more precise liveness information.
 
 Based on  the above considerations,  we restrict the  possible garbage
 collection points in a function body to the following:
-\begin{enumerate}
+\begin{myenumerate}
 \item We  maintain static estimates  of the memory required  to create
   the closures for each function body.  On entering a function, if the
   available memory is  less than this requirement for  the function, a
@@ -1678,7 +1679,7 @@ collection points in a function body to the following:
   is  checked once  again against  a  revised estimate  of the  memory
   (based on  value of the condition)  required to execute the  rest of
   the program.  A garbage collection is triggered if enough memory is unavailable.
-\end{enumerate}
+\end{myenumerate}
 
 
 
@@ -1822,7 +1823,7 @@ mitigated  this  problem  by   implementing  a  heuristic  which  tags
 \CONS\ cells with the set of states already visited.
 
 
-
+\vspace*{-2mm}
 \section{Related work} 
 \label{sec:relatedwork}
 The impact of  liveness on the effectiveness of  garbage collection is
@@ -1857,7 +1858,7 @@ specific way.
 
 Simplifiers~\cite{ONeill} are abstractly described as lightweight
 daemons that attach themselves to program data and, when activated, improve
-the efficiency of the program. Our liveness based garbage collection
+the efficiency of the program. Our liveness-based garbage collection
 as an instance of a  simplifier which is tightly coupled with garbage collectors.  The
 approach that is closest to the  method described in this paper is the
 liveness-based garbage collector implemented
@@ -1970,7 +1971,7 @@ For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}
  
 
   Orthogonally, we  plan to  improve the  efficiency of
-  the liveness based garbage collector using heuristics
+  the liveness-based garbage collector using heuristics
   such   as  limiting   the  depth   of  DFA,   merging
   nearly-equivalent    states    and    using    better
   representation(for example BDDs~\cite{Bryant86})    and    algorithms   for    automata
@@ -1980,7 +1981,7 @@ For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}
   collection.  It might be interesting to use a mixed mode garbage collection
   scheme which allows the costs of LGC to be amortized over several runs
   of RGC. In summary, we  need to investigate ways
-  to make liveness  based garbage collection attractive
+  to make liveness-based garbage collection attractive
   for practical collectors.
 
 
