@@ -310,12 +310,12 @@ simplifies reasoning.
 
 We denote the body of a function ${\mathit  f}$   as $e_{\mathit f}$.
  We assume that each program has a distinguished function
-\mainpgm,    defined as    $(\DEFINE\      ({\tt
+\mainpgm,    defined as\linebreak    $(\DEFINE\      ({\tt
   \mainpgm})\  e_\mainpgm)$,  and  the program begins execution
 with the call to \mainpgm.  
 
 \begin{figure}[t]\footnotesize
-\renewcommand{\arraystretch}{1}
+\renewcommand{\arraystretch}{0.9}
 \begin{eqnarray*}
    p \in \mathit{Prog} & \!\!\!::=\!\!\! & d_1 \ldots d_n \,\,\,\, e_\mainpgm
    \hspace{5em} \,\,\,\,\,\,\,\,\,\; \mbox{\em --- program}\\
@@ -354,7 +354,7 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
 %\comment{
 
 \begin{center}\footnotesize
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.2}
 \begin{tabular}{|c|c|c|}
 \hline
 Premise & Transition & Rule name \\
@@ -768,7 +768,7 @@ Any attempt to dereference a location with a null-liveness
 
 \begin{figure*}[t!]
 \begin{center}\footnotesize
-\renewcommand{\arraystretch}{1.5}
+\renewcommand{\arraystretch}{1.2}
 \begin{tabular}{|@{}c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|}
 \hline
 Premise & Transition & Rule name \\ 
@@ -1722,6 +1722,7 @@ have not been shown.
 \label{tab:exp-results}
 \centering
 \include{data-liveness-analysis}
+\vskip -5mm
 \include{autotable}
 \vskip -5mm
 \end{table*} 
@@ -1741,11 +1742,11 @@ We extend liveness-based  garbage  collection  to
 this function.
 \section{Experimental evaluation}
 \label{sec:experiments}
-  Our benchmark consists of programs taken from nofib~\cite{nofib} and
-  other repositories for  functional  programs~\cite{PLT-Scheme,
-    gc_bench, huffman-sicp}.   All our  benchmarks were executed  on a
-  machine having 8  core Intel(R) Core(TM) i7-4770 3.40GHz  CPU , 8192
-  KB L2 cache, 16 GB RAM running 64 bit Ubuntu 14.04.
+Our benchmark consists of programs taken from nofib~\cite{nofib} and
+other repositories for functional programs~\cite{PLT-Scheme,
+  gc_bench, huffman-sicp}.  We ran the experiments on 8 core Intel\textsuperscript{\textregistered} Core\textsuperscript{TM}
+i7-4770 3.40GHz CPU having 8192KB L2 cache, 16GB RAM, running 64 bit
+Ubuntu 14.04.
 
 
 %% The  process  of  liveness-based  garbage  collection  involves  going
@@ -1995,7 +1996,6 @@ For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}
 \noindent{\Large \bf A. Minefield semantics(Not included in the paper)}
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
-
 \begin{tabular}{|c|c|c|}
 \hline
 Premise & Transition & Rule name \\ 
