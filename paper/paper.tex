@@ -37,9 +37,13 @@
 \def\concat{\mathrel{\drawplusplus {12pt}{0.4pt}{5pt}}}
       %It would be better to specify these in font-relative measures, but it
       %probably doesn't scale anyway.
-\newcommand{\mycomment}[1]{} 
+
 \definecolor{Myblue}{rgb}{.2,0,1}
 \definecolor{Myred}{rgb}{1,.2,.2}
+\newcommand{\mycomment}[1]{{\color{Myblue}{#1}} }
+\newcommand{\added}[1]{{\color{Myblue}{#1}}}
+\newcommand{\todelete}[1]{{\color{Myred}{#1}}}
+
 
 \newcommand{\warning}[1]{{\color{Myred}{#1}}}
 %\newcommand{\blankout}[1]{}
@@ -194,11 +198,11 @@ automata to restrict reachability during  marking.  This results in an
 increase in  the garbage reclaimed  and consequently in  fewer garbage
 collections.
 
-While this idea has been shown  to be effective for a first-order {\em
+\warning{While this idea has been shown  to be effective for a first-order {\em
   eager}  language~\cite{asati14lgc}, a  straightforward extension  of
 the technique is not possible for lazy languages, where heap-allocated
 objects may  include closures (runtime representations  of unevaluated
-expressions).   Firstly, since  data  is made  live  by evaluation  of
+expressions).}   Firstly, since  data  is made  live  by evaluation  of
 closures, and  in lazy languages the  place in the program  where this
 evaluation  takes  place  cannot be  statically  determined,  laziness
 complicates  liveness analysis  itself.  Moreover,  for liveness-based
@@ -249,6 +253,28 @@ reachability-based collector (RGC) will preserve all cells.
 In  this work  we show  that  static analysis  of heap  data can  help
 garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are
+\added{
+\begin{myitemize}
+\item  To the best of our knowledge this is the first effort to define a
+liveness based garbage collection for a lazy language. We provide a neat way 
+of handling liveness of functional values or unevaluated thunks (closures).
+\item 
+We  formulate  a  liveness  analysis for  a  lazy  first-order
+  functional language and  prove its correctness. The 
+  proof involves specifying liveness through a non-standard semantics  and then proving the analysis   correct with respect to the specification.   
+\item 
+In this paper, we formally prove that the membership question of liveness grammars is undecidable. We use standard  over-approximating techniques to circumvent this problem.
+\item 
+We  have implemented a garbage  collector that uses the  DFAs to
+  retain live  cells.
+Our  experiments reveal  interesting space-time
+  trade-offs  in  the  engineering  of  the  collector---for  example,
+  updating liveness  information carried in closures  during execution
+  results  in   more  garbage  being  collected.    Empirical  results
+  show the effectiveness of liveness-based garbage collection.
+\end{myitemize}
+}
+\todelete{
 \begin{myitemize}
 \item  We  formulate  a  liveness  analysis for  a  lazy  first-order
   functional language and  prove its correctness. The 
@@ -268,6 +294,7 @@ contributions of this paper are
   results  in   more  garbage  being  collected.    Empirical  results
   show the effectiveness of liveness-based garbage collection.
 \end{myitemize}
+}
 As far  as we know, this  is the first work  on liveness-based garbage
 collection      for      lazy       languages.       All      previous
 attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
@@ -754,8 +781,8 @@ proof.
 \item       We   augment     the        standard       semantics
   (Figure~\ref{fig:lang-semantics}) to model  a dynamic liveness analysis 
 that records liveness values at each reference created during execution.
-Any attempt to dereference a location with a null-liveness  
-  during  a  transition will  result  in entering  a
+Any attempt to dereference a reference \mycomment{that has been declared not live by our analysis} %%with a null-liveness   
+ during  a  transition  will  result  in entering  a
   special state denoted \bang. We call the semantics after
   augmentation,  \emph{minefield semantics}.
 \item \label{inline1} Assuming that a  program enters the \bang\ state,
@@ -805,7 +832,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 \end{tabular}
 \end{center}
 \caption{Minefield semantics for {\sc car-bang} and
-  {\sc car-clo} \label{fig:minefield-semantics-for-some}}
+  {\sc car-clo} \warning{Add a note mentioning that we handle the issue of requiring a specific demand by introducing a new symbol}\label{fig:minefield-semantics-for-some}}
 \end{figure*}
 
 To set up the minefield semantics, we follow these steps:
