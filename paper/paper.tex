@@ -198,11 +198,34 @@ automata to restrict reachability during  marking.  This results in an
 increase in  the garbage reclaimed  and consequently in  fewer garbage
 collections.
 
-\warning{While this idea has been shown  to be effective for a first-order {\em
+\todelete{While this idea has been shown  to be effective for a first-order {\em
   eager}  language~\cite{asati14lgc}, a  straightforward extension  of
 the technique is not possible for lazy languages, where heap-allocated
 objects may  include closures (runtime representations  of unevaluated
-expressions).}   Firstly, since  data  is made  live  by evaluation  of
+expressions).}
+We encounter significant challenges in defining a liveness based garbage 
+collector for lazy languages. 
+\added{
+Firstly, during garbage collection the heap contains both fully 
+evaluated data and unevaluated thunks/closures. 
+For liveness-based
+garbage collection to  be effective, we need to extend  it to closures
+apart from  evaluated data. Since closures can escape the scope in which 
+they were created, they need to carry liveness information of its free 
+variables. 
+Moreover, since  data  is made  live  by evaluation  of
+closures, and  in lazy languages the  place in the program  where this
+evaluation  takes  place  cannot be  statically  determined,  laziness
+complicates  liveness analysis  itself.  
+Also, as  execution progresses and possible  future uses are
+eliminated, we  update the  liveness information in  a closure  with a
+more precise version.  Because of these reasons, the garbage collector
+also  becomes significantly  more  complicated  than a  liveness-based
+collector for a eager language.
+}
+
+\todelete{
+Firstly, since  data  is made  live  by evaluation  of
 closures, and  in lazy languages the  place in the program  where this
 evaluation  takes  place  cannot be  statically  determined,  laziness
 complicates  liveness analysis  itself.  Moreover,  for liveness-based
@@ -214,7 +237,7 @@ eliminated, we  update the  liveness information in  a closure  with a
 more precise version.  Because of these reasons, the garbage collector
 also  becomes significantly  more  complicated  than a  liveness-based
 collector for a eager language.
-
+}
 Experiments    with   a    single    generation   copying    collector
 (Section~\ref{sec:experiments})   confirm  the   expected  performance
 benefits.  Liveness-based collection results in an increase in garbage
@@ -255,17 +278,29 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are
 \added{
 \begin{myitemize}
-\item  To the best of our knowledge this is the first effort to define a
-liveness based garbage collection for a lazy language. We provide a neat way 
-of handling liveness of functional values or unevaluated thunks (closures).
-\item 
-We  formulate  a  liveness  analysis for  a  lazy  first-order
+\item  We propose a liveness based garbage collection scheme for a lazy first order 
+functional language and prove its correctness. 
+To the best of our knowledge this is the first effort to define a
+liveness based garbage collection for a lazy language. 
+Our main contribution is the way we handle liveness of functional values i.e closures which 
+distinguishes our work from earlier work in this area. 
+
+\item
+  We  formulate  a  liveness  analysis for  the  lazy  first-order
   functional language and  prove its correctness. The 
-  proof involves specifying liveness through a non-standard semantics  and then proving the analysis   correct with respect to the specification.   
+  proof involves specifying liveness through a non-standard semantics  and then proving the analysis  
+  correct with respect to the specification.   
+
 \item 
-In this paper, we formally prove that the membership question of liveness grammars is undecidable. We use standard  over-approximating techniques to circumvent this problem.
+  The analysis results  in a set  of context-free  grammars along
+  with  a fixed  set  of non-context-free  productions.  The  decision
+  whether   to  copy  a  cell   during  garbage  collection
+  translates  to a  membership problem  for such  grammars.  In  this
+  paper, we  have shown the  undecidability of this problem. We 
+  circumvent the  problem by over-approximating the  grammars
+  with DFAs.
 \item 
-We  have implemented a garbage  collector that uses the  DFAs to
+We  have implemented a garbage  collector that uses the  result of liveness analysis to
   retain live  cells.
 Our  experiments reveal  interesting space-time
   trade-offs  in  the  engineering  of  the  collector---for  example,
@@ -294,13 +329,13 @@ Our  experiments reveal  interesting space-time
   results  in   more  garbage  being  collected.    Empirical  results
   show the effectiveness of liveness-based garbage collection.
 \end{myitemize}
-}
+
 As far  as we know, this  is the first work  on liveness-based garbage
 collection      for      lazy       languages.       All      previous
 attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
   asati14lgc, karkare06effectiveness} have  involved either imperative
 or eager functional languages.
-
+}
 \subsection{Organization of the paper}
 
 Section~\ref{sec:defs}  introduces  the   syntax  of  the  programming
