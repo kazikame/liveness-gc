@@ -28,6 +28,10 @@
 \usepackage{makecell}
 \usepackage{balance}
 
+% to save space in lists
+\usepackage{enumitem}
+\setlist{nolistsep}
+
 \input{fh_defs}
 \def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
       0pt width #2\hfill\vrule height #3 depth 0pt width #2\hfill
@@ -42,7 +46,7 @@
 \definecolor{Myred}{rgb}{1,.2,.2}
 \newcommand{\mycomment}[1]{{\color{Myblue}{#1}} }
 \newcommand{\added}[1]{{\color{Myblue}{#1}}}
-\newcommand{\todelete}[1]{{\color{Myred}{#1}}}
+\newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
 
 
 \newcommand{\warning}[1]{{\color{Myred}{#1}}}
@@ -256,7 +260,7 @@ In  this work  we show  that  static analysis  of heap  data can  help
 garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are
 \added{
-\begin{myitemize}
+\begin{itemize}
 \item We propose a liveness based garbage collection scheme for a lazy
   first order functional  language and prove its  correctness.  To the
   best  of our  knowledge, this  is the  first work  on liveness-based
@@ -287,10 +291,10 @@ contributions of this paper are
   closures during  execution results in more  garbage being collected.
   Empirical results  show the effectiveness of  liveness-based garbage
   collection.
-\end{myitemize}
+\end{itemize}
 }
 \todelete{
-\begin{myitemize}
+\begin{itemize}
 \item  We  formulate  a  liveness  analysis for  a  lazy  first-order
   functional language and  prove its correctness. The 
   proof involves specifying liveness through a non-standard semantics  and then proving the analysis 
@@ -308,7 +312,7 @@ contributions of this paper are
   updating liveness  information carried in closures  during execution
   results  in   more  garbage  being  collected.    Empirical  results
   show the effectiveness of liveness-based garbage collection.
-\end{myitemize}
+\end{itemize}
 
 As far  as we know, this  is the first work  on liveness-based garbage
 collection      for      lazy       languages.       All      previous
@@ -778,11 +782,12 @@ variables of $s$ are updated and added
   to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
 
-As noted earlier, $x.\alpha \in  \Lv_y$ specifies the liveness  of the
-reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$ corresponds to  a closure-free path
-in \heap\   starting from $\rho(x)$.  If this  path is intercepted  by a
-closure,  say  $(\CAR~{x_{\pi}})$, then  the  liveness  of further  heap
-contents starting from $\mathit{x_{\pi}}$ is given by $\Lv_\mathit{x_{\pi}}$.
+As noted earlier,  $x.\alpha \in \Lv_y$ specifies the  liveness of the
+reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$
+corresponds to a closure-free path  in \heap\ starting from $\rho(x)$.
+If this path is intercepted by a closure, say $(\CAR~{x_{\pi}})$, then
+the liveness of further heap contents starting from $\mathit{x_{\pi}}$
+is given by $\Lv_\mathit{x_{\pi}}$.
 
 
 %} %comment 
@@ -792,7 +797,7 @@ contents starting from $\mathit{x_{\pi}}$ is given by $\Lv_\mathit{x_{\pi}}$.
 We shall now present a proof of soundness of the analysis presented in
 Section~\ref{sec:liveness-analysis}.   Here are  the ideas  behind the
 proof.
-\begin{myenumerate}
+\begin{enumerate}
 \item       We   augment     the        standard       semantics
   (Figure~\ref{fig:lang-semantics}) to model  a dynamic liveness analysis 
 that records liveness values at each reference created during execution.
@@ -806,7 +811,7 @@ Any attempt to dereference a reference \mycomment{that has been declared not liv
 \item  The final  step   shows  that  no program  without
   function calls can enter a \bang\ state. As a consequence no program
   (with or without function calls) can enter the \bang\ state. 
-\end{myenumerate}
+\end{enumerate}
 
 
 \begin{figure*}[t!]
@@ -850,8 +855,8 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
   {\sc car-clo} \warning{Add a note mentioning that we handle the issue of requiring a specific demand by introducing a new symbol}\label{fig:minefield-semantics-for-some}}
 \end{figure*}
 
-To set up the minefield semantics, we follow these steps:
-\begin{myenumerate}
+\noindent To set up the minefield semantics, we follow these steps:
+\begin{enumerate}
 
 \item  We  extend  the  abstract  machine  state  $\rho,S,\heap,e$  to
   $\rho,S,\heap,e,\sigma$.   We call  such a  state a  \emph{minefield
@@ -868,7 +873,7 @@ To set up the minefield semantics, we follow these steps:
   act of  not retaining  (effectively garbage collecting)  the objects
   pointed to by these references  during an actual garbage collection.
   This is done in the following way:
-  \begin{myenumerate} 
+  \begin{enumerate} 
   \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
     \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
     liveness environment  \Lv\ for  the expression $e$.   We similarly
@@ -897,8 +902,8 @@ To set up the minefield semantics, we follow these steps:
 %%     \rrbracket = \ell$  and $x.\alpha \in \Lv$, where 
 \Lv\ is the liveness environment  corresponding to $\rho$ mentioned in
 step~\ref{gc-1}.
-  \end{myenumerate}
-\end{myenumerate}
+  \end{enumerate}
+\end{enumerate}
 Starting from the initial state,
 %%  $([\;]_\rho,([\;]_\rho,
 %% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
@@ -1219,7 +1224,7 @@ of  $\sigma_{\length}$:
 
 In  summary, the  equations  generated during the
 analysis are:
-\begin{myenumerate}
+\begin{enumerate}
 \item   For  each   function  $\mathit{f}$,   equations
   defining \Df{f}{i} for use by \Lfonly$_{\mathit f}$.
 \item For each function $\mathit{f}$, an equation defining the summary
@@ -1227,7 +1232,7 @@ analysis are:
 \item   For  each   function  $\mathit{f}$   (including
   $\mainpgm$) an  equation  defining
   liveness for each garbage in  $e_{\mathit f}$.
-\end{myenumerate}
+\end{enumerate}
 
 \subsection{Solving liveness equations---the grammar
 interpretation}\label{sec:grammar-formulation}      
@@ -1348,7 +1353,7 @@ $\nont{}{} \rightarrow  \nont{\mathit{init}}{c}w\$$, where  \nont{}{} is
 the start symbol of the  grammar). Further correspondences between the
 TM moves and the grammar productions are as follows:
 
-\begin{myenumerate}
+\begin{enumerate}
 \item For each transition  $(S_i, c) \rightarrow (S_j,c',L)$, there are
   two  productions $\nont{i}{c}  \rightarrow  \acar \nont{j}{\acar}c'$
   and $\nont{i}{c} \rightarrow \acdr \nont{j}{\acdr}c'$.
@@ -1356,7 +1361,7 @@ TM moves and the grammar productions are as follows:
   are two productions
   $\nont{i}{c} \rightarrow \overline{c'} \nont{j}{\acar}\bcar$ and $\nont{i}{c}
   \rightarrow \overline{c'} \nont{j}{\acdr}\bcdr$. 
-\end{myenumerate}
+\end{enumerate}
 The idea  behind the  productions is explained  with an
 example:  Assume that  the current  sentential form  is
 $\bcar\bcdr\nont{i}{\acar}\acar\acar\$$. Also  assume that  the
@@ -1711,7 +1716,7 @@ collections are based on more precise liveness information.
 
 Based on  the above considerations,  we restrict the  possible garbage
 collection points in a function body to the following:
-\begin{myenumerate}
+\begin{enumerate}
 \item We  maintain static estimates  of the memory required  to create
   the closures for each function body.  On entering a function, if the
   available memory is  less than this requirement for  the function, a
@@ -1721,7 +1726,7 @@ collection points in a function body to the following:
   is  checked once  again against  a  revised estimate  of the  memory
   (based on  value of the condition)  required to execute the  rest of
   the program.  A garbage collection is triggered if enough memory is unavailable.
-\end{myenumerate}
+\end{enumerate}
 
 
 
