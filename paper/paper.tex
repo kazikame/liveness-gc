@@ -184,7 +184,7 @@ by the program at a  later stage).  This results in unnecessary memory
 retention.
 
 In this paper,  we propose the use of liveness  analysis of heap cells
-for garbage collection in a lazy first-order functional language.  The
+for garbage collection (GC) in a lazy first-order functional language.  The
 central notion in our analysis  is a generalization of liveness called
 {\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
 expression.   The  analysis  has  two parts.   We  first  calculate  a
@@ -197,9 +197,9 @@ body  is  obtained through  a  conservative  approximation similar  to
 to  the function.   The result  of the  analysis is  an annotation  of
 certain program points with  deterministic finite-state automata (DFA)
 capturing the  liveness of  variables at  these points.   Depending on
-where garbage collection is triggered, the collector consults a set of
+where GC is triggered, the collector consults a set of
 automata to restrict reachability during  marking.  This results in an
-increase in  the garbage reclaimed  and consequently in  fewer garbage
+increase in  the garbage reclaimed  and consequently in  fewer 
 collections.
 
 \todelete{While  this  idea has  been  shown  to  be effective  for  a
@@ -212,7 +212,7 @@ collections.
 evaluation of closures, and in lazy languages the place in the program
 where  this evaluation  takes place  cannot be  statically determined,
 laziness   complicates  liveness   analysis  itself.    Moreover,  for
-liveness-based garbage collection  to be effective, we  need to extend
+liveness-based GC  to be effective, we  need to extend
 it to closures apart from evaluated  data.  Since a closure can escape
 the  scope in  which it  was  created, it  has to  carry the  liveness
 information  of  its  free  variables.  As  execution  progresses  and
@@ -250,7 +250,7 @@ The edges  shown by thick  arrows are those  which are live  at $\pi$.
 %% Only those  cell which have a future use  should be preserved
 %% during garbage collection, all other
 %% cells can be  reclaimed.
-Thus if a garbage collection takes  place at $\pi$ with the heap shown
+Thus if a GC takes  place at $\pi$ with the heap shown
 in Figure~\ref{fig:mot-example}(b),  a liveness-based  collector (LGC)
 will preserve only  the cells referenced by $\pz$, and  the live cells
 constituting the  closure referenced by $(\CDR~\pz)$.   In contrast, a
@@ -261,10 +261,10 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are
 \added{
 \begin{itemize}
-\item We propose a liveness based garbage collection scheme for a lazy
+\item We propose a liveness based GC scheme for a lazy
   first order functional  language and prove its  correctness.  To the
   best  of our  knowledge, this  is the  first work  on liveness-based
-  garbage    collection   for    lazy    languages.    All    previous
+  GC   for    lazy    languages.    All    previous
   attempts~\cite{shaham01heap,  ran.shaham-sas03,  shaham02estimating,
     asati14lgc,    karkare06effectiveness}   have    involved   either
   imperative  or  eager  functional  languages.   The  novely  of  our
@@ -279,7 +279,7 @@ contributions of this paper are
 
 \item The  analysis results  in a set  of context-free  grammars along
   with  a fixed  set  of non-context-free  productions.  The  decision
-  whether to  copy a  cell during garbage  collection translates  to a
+  whether to  copy a  cell during GC translates  to a
   membership problem for such grammars.   In this paper, we have shown
   the undecidability  of this  problem. We  circumvent the  problem by
   over-approximating the grammars with DFAs.
@@ -289,8 +289,7 @@ contributions of this paper are
   interesting  space-time   trade-offs  in  the  engineering   of  the
   collector---for  example, updating  liveness information  carried in
   closures during  execution results in more  garbage being collected.
-  Empirical results  show the effectiveness of  liveness-based garbage
-  collection.
+  Empirical results  show the effectiveness of  liveness-based GC.
 \end{itemize}
 }
 \todelete{
@@ -301,8 +300,7 @@ contributions of this paper are
   correct with respect to the specification.   
 \item The analysis results  in a set  of context-free  grammars along
   with  a fixed  set  of non-context-free  productions.  The  decision
-  whether   to  copy  a  cell   during  garbage  collection
-  translates  to a  membership problem  for such  grammars.  In  this
+  whether   to  copy  a  cell   during  GC  translates  to a  membership problem  for such  grammars.  In  this
   paper, we  have shown the  undecidability of this problem and 
   circumvent the  problem by over-approximating the  grammars
   with DFAs.
@@ -311,11 +309,10 @@ contributions of this paper are
   trade-offs  in  the  engineering  of  the  collector---for  example,
   updating liveness  information carried in closures  during execution
   results  in   more  garbage  being  collected.    Empirical  results
-  show the effectiveness of liveness-based garbage collection.
+  show the effectiveness of liveness-based GC.
 \end{itemize}
 
-As far  as we know, this  is the first work  on liveness-based garbage
-collection      for      lazy       languages.       All      previous
+As far  as we know, this  is the first work  on liveness-based GC      for      lazy       languages.       All      previous
 attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
   asati14lgc, karkare06effectiveness} have  involved either imperative
 or eager functional languages.
@@ -330,11 +327,10 @@ Section~\ref{sec:computing} describes  the formulation of  liveness as
 grammars. We also give a proof  of undecidability of such grammars and
 show     how     they     can     be     approximated     by     DFAs.
 Section~\ref{sec:GC-scheme}   discusses   details   of   the   garbage
-collector,  in  particular  the  use  of  liveness  DFAs  for  garbage
-collection.     We     report    our    experimental     results    in
+collector,  in  particular  the  use  of  liveness  DFAs  for  GC.     We     report    our    experimental     results    in
 Section~\ref{sec:experiments}    along    with   some    observations.
 Section~\ref{sec:relatedwork}  discusses  previous   work  related  to
-garbage  collection  and   liveness  and  Section~\ref{sec:conclusion}
+GC  and   liveness  and  Section~\ref{sec:conclusion}
 discusses possible extensions and concludes the paper.
 \section{The target language---syntax and semantics}
 \label{sec:defs}
@@ -712,9 +708,9 @@ $\lbrack   \psi_2\!\!\!:\!\!\!\pw   \leftarrow  (/~\pu~\py),\,\,   \py
 \leftarrow   (\length~\px_{\pi_1})\rbrack$.   The   liveness  analysis
 described in this section declares the liveness of $\px_{\pi_1}$ to be
 a union of  the liveness arising from these dependence  chains.  To be
-safe, a garbage collection during  evaluation of $\py$ at $\psi_1$ has
+safe, a GC during  evaluation of $\py$ at $\psi_1$ has
 to use  this liveness to  copy the heap starting from  $\px_{\pi_1}$.  However,
-notice that if a garbage collection takes place while evaluating $\pz$
+notice that if a GC takes place while evaluating $\pz$
 at $\psi_3$, it can safely consider only the liveness arising from the
 dependence chain\linebreak  $\lbrack \psi_3\!\!\!:\!\!\!\pz \leftarrow
 (+~\py~1),\, \py \leftarrow (\length~\px_{\pi_1})\rbrack$.  The garbage
@@ -728,7 +724,7 @@ Figure~\ref{fig:live-judge}  describes  our  analysis  which  has  two
 parts. The  function $\mathit{ref}$,  takes an  application $s$  and a
 demand $\sigma$ and returns the incremental liveness generated for the
 free variables of $s$ due to  the application.  This will be consulted
-during garbage collection  while exploring the heap  starting from the
+during GC  while exploring the heap  starting from the
 closure  variables.  The function $\mathcal{L}$  uses  $\mathit{ref}$ to  propagate
 liveness across expressions.
 
@@ -786,7 +782,7 @@ As noted earlier,  $x.\alpha \in \Lv_y$ specifies the  liveness of the
 reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$
 corresponds to a closure-free path  in \heap\ starting from $\rho(x)$.
 If this path is intercepted by a closure, say $(\CAR~{x_{\pi}})$, then
-the liveness of further heap contents starting from $\mathit{x_{\pi}}$
+the liveness of heap contents starting from $\mathit{x_{\pi}}$
 is given by $\Lv_\mathit{x_{\pi}}$.
 
 
@@ -871,7 +867,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
   $\rho, S$ and  $\heap$ are due
   to certain references being replaced by $\bot$.  This simulates the
   act of  not retaining  (effectively garbage collecting)  the objects
-  pointed to by these references  during an actual garbage collection.
+  pointed to by these references  during an actual GC.
   This is done in the following way:
   \begin{enumerate} 
   \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
@@ -907,7 +903,7 @@ step~\ref{gc-1}.
 Starting from the initial state,
 %%  $([\;]_\rho,([\;]_\rho,
 %% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
-every transition  is preceded  by a  garbage collection
+every transition  is preceded  by a  GC
 using $GC$.  The details of the transition for the {\sc
   car-clo}  rule   is  shown   in
 Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
@@ -980,11 +976,11 @@ that involves dereferencing  results in a \bang.  These  are the steps
 which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
 $\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
 inserted  by  the  immediately  preceding garbage  collection  or  the
-garbage collection of an earlier minefield step.  However the
+GC of an earlier minefield step.  However the
   demand $\sigma'$ on basis of  which an earlier collection would have
   inserted a $\bot$, would have  included the current demand $\sigma$.
   Thus, if  the earlier garbage  collection had inserted a  $\bot$, so
-  would the current garbage collection.  Thus it is enough to consider
+  would the current GC.  Thus it is enough to consider
   the $\rightsquigarrow$  along with the  current GC and show  that it
   does not lead to a \bang.
 
@@ -1001,7 +997,7 @@ cons  cell  and then  the  head  of  the cons  cell  is
 dereferenced  to  obtain  a  closure.   If  the  demand
 $\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
 of    $x$   will    include    both   $\epsilon$    and
-$\acar\epsilon$,  and  a  garbage collection with  this  liveness  will
+$\acar\epsilon$,  and  a  GC with  this  liveness  will
 neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
 first   component  of   the   cons   cell.  Thus   both
 dereferences    can take place without 
@@ -1214,7 +1210,9 @@ As examples, the closure variables $\xl_{\mbox{$\pi$}_1}$ and $\xl_{\mbox{$\pi$}
 stack variables $\pl$ and $\pa$ have the following liveness in terms
 of  $\sigma_{\length}$:
 \begin{align*}
-  \Lv_{\xl_{\mbox{$\pi$}_1}} &= \clazy\sigma_{\mathit{\length}} \\
+  \Lv_{\xl_{\mbox{$\pi$}_1}} &= \clazy\sigma_{\mathit{\length}} 
+\end{align*}
+\begin{align*}
   \Lv_{\xl_{\mbox{$\pi$}_5}} &=  (\acdr\Df{\length}{1}{\clazy} \cup
   \clazy\Df{\length}{1}{\clazy}) \sigma_{\mathit{\length}} \\
   \Lanv{\pl}{} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
@@ -1262,7 +1260,7 @@ language   generated   by  \var{\Lanv{x}{}},   denoted
 $\mathscr{L}(\var{\Lanv{x}{}})$,   is    the   desired
 solution  of  \Lanv{x}{}.    
 However, recall that the decision problem that we are interested in
-during garbage collection is: 
+during GC is: 
 %%\begin{quote} 
 {\em
 Let $x.\alpha$ be a forward access path (consisting only
@@ -1535,7 +1533,7 @@ derivable from the grammar.
 \figrule
 \end{figure}
 
-%\subsection{A liveness-based garbage collection scheme}
+%\subsection{A liveness-based GC scheme}
 \label{sec:live-clo}
   \SetStartEndCondition{ }{}{}%
   \SetKwProg{Pro}{procedure}{\string:}{}
@@ -1602,7 +1600,7 @@ CFG by non-deterministic finite state automata (NFA) using
 %% We use  the algorithm by 
 Mohri  and Nederhof~\cite{mohri00regular} method.
 %to approximate a CFG by a {\em strongly regular\/} grammar.  
-For example, the grammar fragment for the non-terminal
+For example, the grammar fragment for %the non-terminal
 $\var{\Df{\length}{1}}$ after the Mohri-Nederhof transformation is:
  \begin{eqnarray*}
    \var{\Df{\length}{1}} &\rightarrow& \clazy\var{\Df{\length}{1'}} \mid
@@ -1686,7 +1684,7 @@ cons-cells (scaled down by $10^3$).}
 \end{figure*}
 
 \vspace*{-2.5mm}
-\section{The garbage collection scheme}
+\section{The GC scheme}
 \label{sec:GC-scheme}
 
 Our experimental setup  consists of an interpreter
@@ -1701,7 +1699,7 @@ Section~\ref{sec:liveness-analysis},   the  liveness   of  a   closure
 variable is  derived from dependence  chains along all paths  from the
 program point  where the closure  was created to  reachable evaluation
 points.  Assume,  for the  sake of  concreteness, that  $\epath_1$ and
-$\epath_2$ are two such evaluation points.  During garbage collection,
+$\epath_2$ are two such evaluation points.  During GC,
 we would like to use a more precise liveness, based on the actual paths
 taken  during  execution.   Therefore   we  create  separate  liveness
 automata for dependences  along paths to $\epath_1$  and $\epath_2$, in
@@ -1720,12 +1718,12 @@ collection points in a function body to the following:
 \item We  maintain static estimates  of the memory required  to create
   the closures for each function body.  On entering a function, if the
   available memory is  less than this requirement for  the function, a
-  garbage collection is triggered.
+  GC is triggered.
 \item Since the evaluation of a  \SIF\ condition may trigger a 
   collection, after evaluating the condition   the available memory
   is  checked once  again against  a  revised estimate  of the  memory
   (based on  value of the condition)  required to execute the  rest of
-  the program.  A garbage collection is triggered if enough memory is unavailable.
+  the program.  A GC is triggered if enough memory is unavailable.
 \end{enumerate}
 
 
@@ -1781,10 +1779,10 @@ The evaluation of  the top-level expression in a program  is driven by
 a printing function~(Section
 \ref{sec:semantics}).  
 %% Printing of  atomic values is simple  and does
-%% not  trigger a  garbage  collection.   In case  of  \CONS\ cells,  the
+%% not  trigger a  GC.   In case  of  \CONS\ cells,  the
 %% \CAR\ is  first printed followed  by \CDR.   In a lazy  language, both
 %% \CAR\ and \CDR\  could be closures requiring evaluation,  and this may
-%% trigger  more garbage  collections.  When  this happens.   we have  to
+%% trigger  more GCs.  When  this happens.   we have  to
 %% consider any  references that  might be  on the  print stack  and copy
 %% them.
 We extend liveness-based  garbage  collection  to
@@ -1823,10 +1821,10 @@ analysis has  to be  done only  once and its  results can be cached and
 re-used, the time spent in analysis may be considered acceptable.
 
 
-Table~\ref{tab:exp-results}(b) compares  garbage collection statistics
-for RGC and  LGC.  We report the number of  garbage collection events,
-average  number of  cells  reclaimed per  garbage collection,  average
-number of cells  touched per garbage collection and the  total time to
+Table~\ref{tab:exp-results}(b) compares  GC statistics
+for RGC and  LGC.  We report the number of  GC events,
+average  number of  cells  reclaimed per  GC,  average
+number of cells  touched per GC and the  total time to
 perform all collections.   It is no surprise that the  number of cells
 reclaimed per garbage  collection is higher and the  number of garbage
 collections  lower  for  LGC.   The  cost of  LGC  is  higher  garbage
@@ -1843,12 +1841,12 @@ as being representative of real programs.
 
 Memory  usage graphs  for select  benchmarks are  shown
 Figure~\ref{fig:memory-usage},  Column   (a).   In some cases, the
-number of  garbage collections  tend to be  very large,
+number of  GCs  tend to be  very large,
 hence  we  show only  a  slice of the original graph  with 
 representative    behavior  (Column (b)).  In all the programs we can see
 that  the   curve  corresponding  to  LGC   (\LGCLine\ line)
 dips   below the RGC curve 
-(\RGCLine\ line) during garbage collection.  The graphs also include the
+(\RGCLine\ line) during GC.  The graphs also include the
 curve    for   reachable    cells   (\ReachLine)  and live cells
 (\UseLine). These were  obtained
  by forcing  RGC to  run at   very  high
@@ -1873,7 +1871,7 @@ mitigated  this  problem  by   implementing  a  heuristic  which  tags
 \vspace*{-2mm}
 \section{Related work} 
 \label{sec:relatedwork}
-The impact of  liveness on the effectiveness of  garbage collection is
+The impact of  liveness on the effectiveness of  GC is
 investigated in~\cite{Hirzel}.   The observation is that  liveness can
 significantly  impact   garbage  collection,  but  only   when  it  is
 interprocedural.  As far as memory requirement is concerned, our paper
@@ -1881,7 +1879,7 @@ demonstrates this observation.
 
 
 There have been several attempts to use liveness analysis to improve 
-garbage collection for imperative languages.~\cite{khedker07heap}
+GC for imperative languages.~\cite{khedker07heap}
 presents a liveness analysis and uses the results for inserting 
 nullifying statements in Java programs. In ~\cite{ran.shaham-sas03},
 an automaton modelling heap accesses is created, and
@@ -1905,14 +1903,14 @@ specific way.
 
 Simplifiers~\cite{ONeill} are abstractly described as lightweight
 daemons that attach themselves to program data and, when activated, improve
-the efficiency of the program. Our liveness-based garbage collection
-as an instance of a  simplifier which is tightly coupled with garbage collectors.  The
+the efficiency of the program. Our liveness-based GC
+is an instance of a  simplifier which is tightly coupled with garbage collectors.  The
 approach that is closest to the  method described in this paper is the
 liveness-based garbage collector implemented
 in~\cite{karkare07liveness,asati14lgc} and address eager languages. We
 extend this to handle lazy evaluation and closures.
  
-%% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting garbage collection with extra information using {\it simplifiers}. 
+%% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting GC with extra information using {\it simplifiers}. 
 
 
 
@@ -1987,7 +1985,7 @@ extend this to handle lazy evaluation and closures.
 %% explore.  Further work  includes improvements to the
 %% classical copying  collector to  reduce the  cost of
 %% this.
-We have  extended liveness-based  garbage collection  to lazy
+We have  extended liveness-based  GC  to lazy
   languages  and shown  its benefit  for a  set of  benchmark
   programs.  We  defined a liveness analysis  of programs manipulating
   the  heap and  proved  it  correct with  respect  to a  non-standard
@@ -2025,10 +2023,10 @@ For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}
   manipulation.  We   also  need  to   investigate  the
   interaction   of  liveness   with  other   collection
   schemes,   such  as   incremental  and   generational
-  collection.  It might be interesting to use a mixed mode garbage collection
+  collection.  It might be interesting to use a mixed mode GC
   scheme which allows the costs of LGC to be amortized over several runs
   of RGC. In summary, we  need to investigate ways
-  to make liveness-based garbage collection attractive
+  to make liveness-based GC attractive
   for practical collectors.
 
 
@@ -2042,7 +2040,7 @@ For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}
 %\section{Appendix: not to be included in the paper.}
 %%%%% prasanna minefield
 \begin{figure*}[b!]
-\noindent{\Large \bf A. Minefield semantics(Not included in the paper)}
+\noindent{\Large \bf A. Minefield semantics (Not to be included in the paper) }
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
 \begin{tabular}{|c|c|c|}
