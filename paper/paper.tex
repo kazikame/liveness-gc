@@ -210,14 +210,15 @@ Firstly, during garbage collection the heap contains both fully
 evaluated data and unevaluated thunks/closures. 
 For liveness-based
 garbage collection to  be effective, we need to extend  it to closures
-apart from  evaluated data. Since closures can escape the scope in which 
-they were created, they need to carry liveness information of its free 
-variables. 
+apart from  evaluated data. 
 Moreover, since  data  is made  live  by evaluation  of
 closures, and  in lazy languages the  place in the program  where this
 evaluation  takes  place  cannot be  statically  determined,  laziness
-complicates  liveness analysis  itself.  
-Also, as  execution progresses and possible  future uses are
+complicates  liveness analysis  itself.
+Since closures can escape the scope in which 
+they were created, they need to carry liveness information of its free 
+variables. 
+As  execution progresses and possible  future uses are
 eliminated, we  update the  liveness information in  a closure  with a
 more precise version.  Because of these reasons, the garbage collector
 also  becomes significantly  more  complicated  than a  liveness-based
