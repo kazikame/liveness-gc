@@ -267,7 +267,7 @@ contributions of this paper are
   GC   for    lazy    languages.    All    previous
   attempts~\cite{shaham01heap,  ran.shaham-sas03,  shaham02estimating,
     asati14lgc,    karkare06effectiveness}   have    involved   either
-  imperative  or  eager  functional  languages.   The  novely  of  our
+  imperative  or  eager  functional  languages.   The  novelty  of  our
   approach is in  handling of  liveness of  functional values  (i.e.,
   closures), an issue that arises due to laziness.
 
@@ -1886,31 +1886,33 @@ an automaton modelling heap accesses is created, and
 temporal properties like liveness are checked  against the model.  
 However both the approaches are restricted to intraprocedural scope.
 
-In the space of functional  languages, there are: rewriting methods such as
+In the  space of  functional languages,  there are:  rewriting methods
+such                                                                as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
 sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based   analysis~\cite{tofte98region},   and    insertion   of
-compile-time                                                nullifying
-statements~\cite{inoue88analysis,lee05static,Hamilton}.            All
-compile-time marking approaches rely on an efficient and precise alias
-analysis and  cannot provide  significant improvement in  its absence.
-An interesting approach suggested  in~\cite{HofmannJ03} is to annotate
-the  heap usage  of first-order  programs through  linear types.   The
-annotations   are  then   used  to   serve  memory   requests  through
+based  analysis~\cite{tofte98region},  and insertion  of  compile-time
+nullifying     statements~\cite{inoue88analysis,lee05static,Hamilton}.
+All compile-time marking  approaches rely on an  efficient and precise
+alias  analysis  and cannot  provide  significant  improvement in  its
+absence.  An interesting approach suggested in~\cite{HofmannJ03} is to
+annotate the heap usage of  first-order programs through linear types.
+The  annotations  are  then  used to  serve  memory  requests  through
 re-allocation.  However, this requires the user to write programs in a
 specific way.
 
 
-Simplifiers~\cite{ONeill} are abstractly described as lightweight
-daemons that attach themselves to program data and, when activated, improve
-the efficiency of the program. Our liveness-based GC
-is an instance of a  simplifier which is tightly coupled with garbage collectors.  The
-approach that is closest to the  method described in this paper is the
-liveness-based garbage collector implemented
-in~\cite{karkare07liveness,asati14lgc} and address eager languages. We
-extend this to handle lazy evaluation and closures.
+Simplifiers~\cite{ONeill}  are  abstractly  described  as  lightweight
+daemons that  attach themselves to  program data and,  when activated,
+improve the  efficiency of the  program. Our liveness-based GC  can be
+seen as  an instance  of a  simplifier which  is tightly  coupled with
+garbage  collectors.   The approach  that  is  closest to  the  method
+described  in  this  paper  is the  liveness-based  garbage  collector
+implemented  in~\cite{karkare07liveness,asati14lgc} and  address eager
+languages. We extend this to handle lazy evaluation and closures.
  
-%% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting GC with extra information using {\it simplifiers}. 
+%% A similar  approach has been suggested  in~\cite{ONeill} where they
+%% suggest   augmenting  GC   with   extra   information  using   {\it
+%% simplifiers}.
 
 
 
