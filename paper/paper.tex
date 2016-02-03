@@ -198,46 +198,25 @@ automata to restrict reachability during  marking.  This results in an
 increase in  the garbage reclaimed  and consequently in  fewer garbage
 collections.
 
-\todelete{While this idea has been shown  to be effective for a first-order {\em
-  eager}  language~\cite{asati14lgc}, a  straightforward extension  of
-the technique is not possible for lazy languages, where heap-allocated
-objects may  include closures (runtime representations  of unevaluated
-expressions).}
-We encounter significant challenges in defining a liveness based garbage 
-collector for lazy languages. 
-\added{
-Firstly, during garbage collection the heap contains both fully 
-evaluated data and unevaluated thunks/closures. 
-For liveness-based
-garbage collection to  be effective, we need to extend  it to closures
-apart from  evaluated data. Since closures can escape the scope in which 
-they were created, they need to carry liveness information of its free 
-variables. 
-Moreover, since  data  is made  live  by evaluation  of
-closures, and  in lazy languages the  place in the program  where this
-evaluation  takes  place  cannot be  statically  determined,  laziness
-complicates  liveness analysis  itself.  
-Also, as  execution progresses and possible  future uses are
-eliminated, we  update the  liveness information in  a closure  with a
-more precise version.  Because of these reasons, the garbage collector
-also  becomes significantly  more  complicated  than a  liveness-based
-collector for a eager language.
-}
+\todelete{While  this  idea has  been  shown  to  be effective  for  a
+  first-order     {\em     eager}    language~\cite{asati14lgc},     a
+  straightforward extension of the technique  is not possible for lazy
+  languages,  where   heap-allocated  objects  may   include  closures
+  (runtime   representations    of   unevaluated    expressions).    }
+\added{Designing a liveness based garbage collector for lazy languages
+  poses significant challenges.}  Firstly, since  data is made live by
+evaluation of closures, and in lazy languages the place in the program
+where  this evaluation  takes place  cannot be  statically determined,
+laziness   complicates  liveness   analysis  itself.    Moreover,  for
+liveness-based garbage collection  to be effective, we  need to extend
+it to closures apart from evaluated  data.  Since a closure can escape
+the  scope in  which it  was  created, it  has to  carry the  liveness
+information  of  its  free  variables.  As  execution  progresses  and
+possible  future   uses  are   eliminated,  we  update   the  liveness
+information  in a  closure with  a more  precise version.   Because of
+these reasons,  the garbage collector also  becomes significantly more
+complicated than a liveness-based collector for a eager language.
 
-\todelete{
-Firstly, since  data  is made  live  by evaluation  of
-closures, and  in lazy languages the  place in the program  where this
-evaluation  takes  place  cannot be  statically  determined,  laziness
-complicates  liveness analysis  itself.  Moreover,  for liveness-based
-garbage collection to  be effective, we need to extend  it to closures
-apart from  evaluated data.  Since a  closure can escape the  scope in
-which it was created, it has  to carry the liveness information of its
-free variables. As  execution progresses and possible  future uses are
-eliminated, we  update the  liveness information in  a closure  with a
-more precise version.  Because of these reasons, the garbage collector
-also  becomes significantly  more  complicated  than a  liveness-based
-collector for a eager language.
-}
 Experiments    with   a    single    generation   copying    collector
 (Section~\ref{sec:experiments})   confirm  the   expected  performance
 benefits.  Liveness-based collection results in an increase in garbage
