@@ -1874,19 +1874,17 @@ mitigated  this  problem  by   implementing  a  heuristic  which  tags
 \section{Related work} 
 \label{sec:relatedwork}
 The impact of  liveness on the effectiveness of  GC is
-investigated in~\cite{Hirzel}.   The observation is that  liveness can
+investigated in~\cite{Hirzel}.   They observe that  liveness can
 significantly  impact   garbage  collection,  but  only   when  it  is
 interprocedural.  As far as memory requirement is concerned, our paper
 demonstrates this observation.
 
-
 There have been several attempts to use liveness analysis to improve 
 GC for imperative languages.~\cite{khedker07heap}
 presents a liveness analysis and uses the results for inserting 
-nullifying statements in Java programs. In ~\cite{ran.shaham-sas03},
-an automaton modelling heap accesses is created, and
-temporal properties like liveness are checked  against the model.  
-However both the approaches are restricted to intraprocedural scope.
+nullifying statements in Java programs. In~\cite{ran.shaham-sas03},
+temporal properties like liveness are checked  against an automaton modelling heap accesses.
+Both these approaches are intraprocedural in scope.
 
 In the  space of  functional languages,  there are:  rewriting methods
 such                                                                as
@@ -1900,9 +1898,15 @@ absence.  An interesting approach suggested in~\cite{HofmannJ03} is to
 annotate the heap usage of  first-order programs through linear types.
 The  annotations  are  then  used to  serve  memory  requests  through
 re-allocation.  However, this requires the user to write programs in a
-specific way. Similarly, a liveness based GC subsumes certain safe for
-space optimizations like tail call optimization~\cite{Clinger}.
-
+specific way. 
+%
+Safe-for-space~\cite{appel.cps}              approaches~\cite{Clinger,
+  shao00efficient}  reduce the  amount of  heap used  by a  program by
+allocating   closures    in   registers   and   through    tail   call
+optimizations. However, these approaches take care of only part of the
+problem addressed  by our  analysis as the  program can  still contain
+unused objects and closures that are reachable.
+%
 
 Simplifiers~\cite{ONeill}  are  abstractly  described  as  lightweight
 daemons that  attach themselves to  program data and,  when activated,
@@ -1948,6 +1952,7 @@ languages. We extend this to handle lazy evaluation and closures.
 %% lambda}.}
 %% \label{fig:memory-usage-lambda} \figrule
 %% \end{figure}
+\vspace*{-2mm}
 \vskip -5mm
 \section{Future work and conclusions}
 \label{sec:conclusion}
