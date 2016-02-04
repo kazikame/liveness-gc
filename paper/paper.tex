@@ -1037,7 +1037,8 @@ $P'$,   a   call-less   program,   cannot   enter   the
 
 
 
-\section{Computing liveness and its encoding as DFA}\label{sec:computing}
+%\section{Computing liveness and its encoding as DFA}\label{sec:computing}
+\section{Generating and storing liveness information}\label{sec:computing}
 Section~\ref{sec:liveness}  gave   a  fully context-sensitive
 liveness analysis which 
 %$\mathcal{L}$ and $ref$ together
@@ -1048,7 +1049,8 @@ the  rule {\sc  live-define}, and  (ii)  how to  compute the  concrete
 demand $\sigma$  on each function.   To do so,  we first need to  modify the
 liveness rules to a different form.
 
-\subsection{Modifying liveness rules}
+%\subsection{Modifying liveness rules}
+\subsection{Tweaking the rules}
 
 The   $\mathit{ref}$   rule   for   \CONS,   shown   in
 Figure~\ref{fig:live-judge}, requires us  to remove the
@@ -1123,7 +1125,8 @@ The proposition also holds for other modified rules for
 similar reasons.
 
 
-\subsection{Generating equations for $\Lfonly_{\mathit f}$}
+%\subsection{Generating equations for $\Lfonly_{\mathit f}$}
+\subsection{Computing function summaries $\Lfonly_{\mathit f}$}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
 \Lfonly$_\mathit{f}$.        The       program       in
@@ -1167,7 +1170,8 @@ Note that this equation can also be viewed as a CFG with \{\acdr,
 \clazy\} as terminal symbols and \Df{\length}{1} as the sole
 non-terminal.
 
-\subsection{Generating liveness equations \Lv\  for function bodies}
+%\subsection{Generating liveness equations \Lv\  for function bodies}
+\subsection{Handling user-defined functions}
 \label{sec:bodylivenessbodies}
 
 To  avoid analyzing  the body  of a  function for  each
@@ -1236,8 +1240,8 @@ analysis are:
   liveness for each garbage in  $e_{\mathit f}$.
 \end{enumerate}
 
-\subsection{Solving liveness equations---the grammar
-interpretation}\label{sec:grammar-formulation}      
+%\subsection{Solving liveness equations---the grammar interpretation}\label{sec:grammar-formulation}      
+\subsection{From liveness sets to context-free grammars}\label{sec:grammar-formulation}      
 
 The  equations  above can  now  be  re-interpreted as  a  context-free
 grammar  (CFG) on  the  alphabet $\lbrace\acar,  \acdr, \bcar,  \bcdr,
