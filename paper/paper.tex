@@ -1888,19 +1888,20 @@ an automaton modelling heap accesses is created, and
 temporal properties like liveness are checked  against the model.  
 However both the approaches are restricted to intraprocedural scope.
 
-In the space of functional  languages, there are: rewriting methods such as
+In the  space of  functional languages,  there are:  rewriting methods
+such                                                                as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
 sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based   analysis~\cite{tofte98region},   and    insertion   of
-compile-time                                                nullifying
-statements~\cite{inoue88analysis,lee05static,Hamilton}.            All
-compile-time marking approaches rely on an efficient and precise alias
-analysis and  cannot provide  significant improvement in  its absence.
-An interesting approach suggested  in~\cite{HofmannJ03} is to annotate
-the  heap usage  of first-order  programs through  linear types.   The
-annotations   are  then   used  to   serve  memory   requests  through
+based  analysis~\cite{tofte98region},  and insertion  of  compile-time
+nullifying     statements~\cite{inoue88analysis,lee05static,Hamilton}.
+All compile-time marking  approaches rely on an  efficient and precise
+alias  analysis  and cannot  provide  significant  improvement in  its
+absence.  An interesting approach suggested in~\cite{HofmannJ03} is to
+annotate the heap usage of  first-order programs through linear types.
+The  annotations  are  then  used to  serve  memory  requests  through
 re-allocation.  However, this requires the user to write programs in a
-specific way.
+specific way. Similarly, a liveness based GC subsumes certain safe for
+space optimizations like tail call optimization~\cite{Clinger}.
 
 
 Simplifiers~\cite{ONeill} are abstractly described as lightweight
