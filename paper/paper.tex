@@ -45,11 +45,13 @@
 \definecolor{Myblue}{rgb}{.2,0,1}
 \definecolor{Myred}{rgb}{1,.2,.2}
 \newcommand{\mycomment}[1]{{\color{Myblue}{#1}} }
-\newcommand{\added}[1]{{\color{Myblue}{#1}}}
+%\newcommand{\added}[1]{{\color{Myblue}{#1}}}
+\newcommand{\added}[1]{#1}
 \newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
 
 
-\newcommand{\warning}[1]{{\color{Myred}{#1}}}
+%\newcommand{\warning}[1]{{\color{Myred}{#1}}}
+\newcommand{\warning}[1]{}
 %\newcommand{\blankout}[1]{}
 \newcommand{\oxlb}{\ensuremath{[\!|}}
 \newcommand{\oxrb}{\ensuremath{|\!]}}
@@ -799,7 +801,7 @@ proof.
 \item       We   augment     the        standard       semantics
   (Figure~\ref{fig:lang-semantics}) to model  a dynamic liveness analysis 
 that records liveness values at each reference created during execution.
-Any attempt to dereference a reference \mycomment{that has been declared not live by our analysis} %%with a null-liveness   
+Any attempt to dereference a reference \added{that has been declared not live by our analysis} %%with a null-liveness   
  during  a  transition  will  result  in entering  a
   special state denoted \bang. We call the semantics after
   augmentation,  \emph{minefield semantics}.
