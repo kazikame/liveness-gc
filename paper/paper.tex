@@ -269,7 +269,7 @@ contributions of this paper are
   GC   for    lazy    languages.    All    previous
   attempts~\cite{shaham01heap,  ran.shaham-sas03,  shaham02estimating,
     asati14lgc,    karkare06effectiveness}   have    involved   either
-  imperative  or  eager  functional  languages.   The  novely  of  our
+  imperative  or  eager  functional  languages.   The  novelty  of  our
   approach is in  handling of  liveness of  functional values  (i.e.,
   closures), an issue that arises due to laziness.
 
@@ -1904,16 +1904,18 @@ specific way. Similarly, a liveness based GC subsumes certain safe for
 space optimizations like tail call optimization~\cite{Clinger}.
 
 
-Simplifiers~\cite{ONeill} are abstractly described as lightweight
-daemons that attach themselves to program data and, when activated, improve
-the efficiency of the program. Our liveness-based GC
-is an instance of a  simplifier which is tightly coupled with garbage collectors.  The
-approach that is closest to the  method described in this paper is the
-liveness-based garbage collector implemented
-in~\cite{karkare07liveness,asati14lgc} and address eager languages. We
-extend this to handle lazy evaluation and closures.
+Simplifiers~\cite{ONeill}  are  abstractly  described  as  lightweight
+daemons that  attach themselves to  program data and,  when activated,
+improve the  efficiency of the  program. Our liveness-based GC  can be
+seen as  an instance  of a  simplifier which  is tightly  coupled with
+garbage  collectors.   The approach  that  is  closest to  the  method
+described  in  this  paper  is the  liveness-based  garbage  collector
+implemented  in~\cite{karkare07liveness,asati14lgc} and  address eager
+languages. We extend this to handle lazy evaluation and closures.
  
-%% A similar approach has been suggested in~\cite{ONeill} where they suggest augmenting GC with extra information using {\it simplifiers}. 
+%% A similar  approach has been suggested  in~\cite{ONeill} where they
+%% suggest   augmenting  GC   with   extra   information  using   {\it
+%% simplifiers}.
 
 
 
