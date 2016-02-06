@@ -205,24 +205,26 @@ increase in  the garbage reclaimed  and consequently in  fewer
 collections.
 
 
-\todelete{While  this  idea has  been  shown  to  be effective  for  a
-  first-order     {\em     eager}    language~\cite{asati14lgc},     a
-  straightforward extension of the technique  is not possible for lazy
-  languages,  where   heap-allocated  objects  may   include  closures
-  (runtime   representations    of   unevaluated    expressions).    }
-\added{Designing a liveness based garbage collector for lazy languages
-  poses significant challenges.}  Firstly, since  data is made live by
-evaluation of closures, and in lazy languages the place in the program
-where  this evaluation  takes place  cannot be  statically determined,
-laziness   complicates  liveness   analysis  itself.    Moreover,  for
-liveness-based GC  to be effective, we  need to extend
-it to closures apart from evaluated  data.  Since a closure can escape
-the  scope in  which it  was  created, it  has to  carry the  liveness
-information  of  its  free  variables.  As  execution  progresses  and
-possible  future   uses  are   eliminated,  we  update   the  liveness
-information  in a  closure with  a more  precise version.   Because of
-these reasons,  the garbage collector also  becomes significantly more
-complicated than a liveness-based collector for a eager language.
+\added{While  the idea  of  using static  analysis  to improve  memory
+  utilization  has  been  shown  to   be  effective  for  {\em  eager}
+  languages~\cite{asati14lgc,       HofmannJ03,       inoue88analysis,
+    lee05static}, a straightforward extension  of the technique is not
+  possible  for  lazy  languages,  where  heap-allocated  objects  may
+  include   closures    (runtime   representations    of   unevaluated
+  expressions).   }   \todelete{Designing  a  liveness  based  garbage
+  collector   for  lazy   languages  poses   significant  challenges.}
+Firstly, since  data is made  live by  evaluation of closures,  and in
+lazy languages  the place in  the program where this  evaluation takes
+place cannot  be statically determined, laziness  complicates liveness
+analysis itself.  Moreover, for liveness-based  GC to be effective, we
+need to  extend it  to closures  apart from  evaluated data.   Since a
+closure can escape the scope in which  it was created, it has to carry
+the  liveness  information  of   its  free  variables.   As  execution
+progresses  and possible  future uses  are eliminated,  we update  the
+liveness  information  in  a  closure with  a  more  precise  version.
+Because  of   these  reasons,  the  garbage   collector  also  becomes
+significantly more  complicated than a liveness-based  collector for a
+eager language.
 
 
 Experiments    with   a    single    generation   copying    collector
@@ -265,15 +267,15 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are
 \added{
 \begin{itemize}
-\item We propose a liveness based GC scheme for a lazy
-  first order functional  language and prove its  correctness.  To the
-  best  of our  knowledge, this  is the  first work  on liveness-based
-  GC   for    lazy    languages.    All    previous
-  attempts~\cite{shaham01heap,  ran.shaham-sas03,  shaham02estimating,
-    asati14lgc,    karkare06effectiveness}   have    involved   either
-  imperative  or  eager  functional  languages.   The  novelty  of  our
-  approach is in  handling of  liveness of  functional values  (i.e.,
-  closures), an issue that arises due to laziness.
+\item We  propose a liveness  based GC scheme  for a lazy  first order
+  functional language and  prove its correctness.  To the  best of our
+  knowledge,  this is  the first  work on  liveness-based GC  for lazy
+  languages.       All      previous      attempts~\cite{shaham01heap,
+    ran.shaham-sas03,          shaham02estimating,         asati14lgc,
+    karkare06effectiveness} have  involved either imperative  or eager
+  functional languages.  The novelty of our approach is in handling of
+  liveness  of closures,  an  issue  that arises  due  to laziness  at
+  runtime.
 
 \item  We  formulate a  liveness  analysis  for the  lazy  first-order
   functional language  and prove  its correctness. The  proof involves
@@ -283,10 +285,11 @@ contributions of this paper are
 
 \item The  analysis results  in a set  of context-free  grammars along
   with  a fixed  set  of non-context-free  productions.  The  decision
-  whether to  copy a  cell during GC translates  to a
-  membership problem for such grammars.   In this paper, we have shown
-  the undecidability  of this  problem. We  circumvent the  problem by
-  over-approximating the grammars with DFAs.
+  whether to copy a cell during  GC translates to a membership problem
+  for  such  grammars.  Earlier  assumed  the  undecidability of  this
+  membership question  and used an over-approximation  to overcome it.
+  In this  paper, we provide a  formal proof of the  undecidability of
+  this problem.
 
 \item We have implemented a garbage  collector that uses the result of
   liveness  analysis to  retain  live cells.   Our experiments  reveal
@@ -1037,8 +1040,8 @@ $P'$,   a   call-less   program,   cannot   enter   the
 
 
 
-%\section{Computing liveness and its encoding as DFA}\label{sec:computing}
-\section{Generating and storing liveness information}\label{sec:computing}
+\section{Computing liveness and its encoding as DFA}\label{sec:computing}
+%\section{Generating and storing liveness information}\label{sec:computing}
 Section~\ref{sec:liveness}  gave   a  fully context-sensitive
 liveness analysis which 
 %$\mathcal{L}$ and $ref$ together
@@ -1050,7 +1053,7 @@ demand $\sigma$  on each function.   To do so,  we first need to  modify the
 liveness rules to a different form.
 
 %\subsection{Modifying liveness rules}
-\subsection{Tweaking the rules}
+\paragraph{Symbolic representation of operations}
 
 The   $\mathit{ref}$   rule   for   \CONS,   shown   in
 Figure~\ref{fig:live-judge}, requires us  to remove the
@@ -1126,7 +1129,7 @@ similar reasons.
 
 
 %\subsection{Generating equations for $\Lfonly_{\mathit f}$}
-\subsection{Computing function summaries $\Lfonly_{\mathit f}$}
+\paragraph{Computing function summaries $\Lfonly_{\mathit f}$}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
 \Lfonly$_\mathit{f}$.        The       program       in
@@ -1171,7 +1174,7 @@ Note that this equation can also be viewed as a CFG with \{\acdr,
 non-terminal.
 
 %\subsection{Generating liveness equations \Lv\  for function bodies}
-\subsection{Handling user-defined functions}
+\paragraph{Handling user-defined functions}
 \label{sec:bodylivenessbodies}
 
 To  avoid analyzing  the body  of a  function for  each
@@ -1797,10 +1800,11 @@ We extend liveness-based  garbage  collection  to
 this function.
 \section{Experimental evaluation}
 \label{sec:experiments}
-Our benchmark consists of programs taken from nofib~\cite{nofib} and
-other repositories for functional programs~\cite{PLT-Scheme,
-  gc_bench, huffman-sicp}.  We ran the experiments on 8 core Intel\textsuperscript{\textregistered} Core\textsuperscript{TM}
-i7-4770 3.40GHz CPU having 8192KB L2 cache, 16GB RAM, running 64 bit
+Our benchmark  consists of programs taken  from nofib~\cite{nofib} and
+other repositories for functional programs~\cite{PLT-Scheme, gc_bench,
+  huffman-sicp}.     We    ran    the   experiments    on    8    core
+Intel\textsuperscript{\textregistered}        Core\textsuperscript{TM}
+i7-4770 3.40GHz CPU  having 8192KB L2 cache, 16GB RAM,  running 64 bit
 Ubuntu 14.04.
 
 
@@ -1885,26 +1889,29 @@ significantly  impact   garbage  collection,  but  only   when  it  is
 interprocedural.  As far as memory requirement is concerned, our paper
 demonstrates this observation.
 
-There have been several attempts to use liveness analysis to improve 
-GC for imperative languages.~\cite{khedker07heap}
-presents a liveness analysis and uses the results for inserting 
-nullifying statements in Java programs. In~\cite{ran.shaham-sas03},
-temporal properties like liveness are checked  against an automaton modelling heap accesses.
+There have been  several attempts to use liveness  analysis to improve
+GC for imperative  languages.~\cite{khedker07heap} presents a liveness
+analysis and uses  the results for inserting  nullifying statements in
+Java  programs. In~\cite{ran.shaham-sas03},  temporal properties  like
+liveness  are checked  against an  automaton modelling  heap accesses.
 Both these approaches are intraprocedural in scope.
 
-In the  space of  functional languages,  there are:  rewriting methods
-such                                                                as
+In the space of functional languages, there are: rewriting methods
+such as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
-sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based  analysis~\cite{tofte98region},  and insertion  of  compile-time
-nullifying     statements~\cite{inoue88analysis,lee05static,Hamilton}.
-All compile-time marking  approaches rely on an  efficient and precise
-alias  analysis  and cannot  provide  significant  improvement in  its
-absence.  An interesting approach suggested in~\cite{HofmannJ03} is to
-annotate the heap usage of  first-order programs through linear types.
-The  annotations  are  then  used to  serve  memory  requests  through
+sharing analysis based reallocation~\cite{jones89compile}, region
+based analysis~\cite{tofte98region}, and insertion of compile-time
+nullifying statements~\cite{inoue88analysis}.  All compile-time
+marking approaches rely on an efficient and precise alias analysis and
+cannot provide significant improvement in its absence. The only work
+in the space of lazy languages seems to be~\cite{lee05static,Hamilton}
+which touches upon only basic techniques of compile-time garbage
+marking, explicit deallocation and desctructive allocation. An
+interesting approach suggested in~\cite{HofmannJ03} is to annotate the
+heap usage of first-order programs through linear types.  The
+annotations are then used to serve memory requests through
 re-allocation.  However, this requires the user to write programs in a
-specific way. 
+specific way.
 %
 Safe-for-space~\cite{appel.cps}              approaches~\cite{Clinger,
   shao00efficient}  reduce the  amount of  heap used  by a  program by
@@ -2023,27 +2030,23 @@ most cases, and even improves for some programs.
 The graphs show that even in lazy languages there are large amount of
 dead cells that can be collected early. In spite of collecting
 closures there still exists a gap between actual and perceived
-livenesses.
-Language features that could be introduced are higher-order functions
-and recursive lets. We believe that functions can be used to model
-recursive lets and this should be a simple extension to our liveness
-analysis.
-For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}. 
+livenesses.  Language features that could be introduced are
+higher-order functions and recursive lets. We believe that functions
+can be used to model recursive lets and this should be a simple
+extension to our liveness analysis.  For higher-order we intend to use
+firstification techniques~\cite{Mitchell:2009}.
  
 
-  Orthogonally, we  plan to  improve the  efficiency of
-  the liveness-based garbage collector using heuristics
-  such   as  limiting   the  depth   of  DFA,   merging
-  nearly-equivalent    states    and    using    better
-  representation(for example BDDs~\cite{Bryant86})    and    algorithms   for    automata
-  manipulation.  We   also  need  to   investigate  the
-  interaction   of  liveness   with  other   collection
-  schemes,   such  as   incremental  and   generational
-  collection.  It might be interesting to use a mixed mode GC
-  scheme which allows the costs of LGC to be amortized over several runs
-  of RGC. In summary, we  need to investigate ways
-  to make liveness-based GC attractive
-  for practical collectors.
+  Orthogonally,   we   plan  to   improve   the   efficiency  of   the
+  liveness-based garbage  collector using heuristics such  as limiting
+  the depth of DFA, merging  nearly-equivalent states and using better
+  representation(for example BDDs~\cite{Bryant86})  and algorithms for
+  automata manipulation.  We also  need to investigate the interaction
+  of liveness with  other collection schemes, such  as incremental and
+  generational collection.   It might  be interesting  to use  a mixed
+  mode GC  scheme which allows the  costs of LGC to  be amortized over
+  several runs of RGC. In summary, we need to investigate ways to make
+  liveness-based GC attractive for practical collectors.
 
 
 \clearpage
