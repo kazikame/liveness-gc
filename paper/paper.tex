@@ -44,10 +44,10 @@
 
 \definecolor{Myblue}{rgb}{.2,0,1}
 \definecolor{Myred}{rgb}{1,.2,.2}
-\newcommand{\mycomment}[1]{{\color{Myblue}{#1}} }
-%\newcommand{\added}[1]{{\color{Myblue}{#1}}}
-\newcommand{\added}[1]{#1}
-\newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
+\newcommand{\mycomment}[1]{{\color{Myblue}{#1}}}
+\newcommand{\added}[1]{{\color{Myblue}{#1}}}
+%\newcommand{\added}[1]{#1}
+\newcommand{\todelete}[1]{{\color{Myred}{#1}}}
 
 
 %\newcommand{\warning}[1]{{\color{Myred}{#1}}}
@@ -186,9 +186,9 @@ by the program at a  later stage).  This results in unnecessary memory
 retention.
 
 In this paper,  we propose the use of liveness  analysis of heap cells
-for garbage collection (GC) in a lazy first-order functional language.  The
-central notion in our analysis  is a generalization of liveness called
-{\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
+for garbage collection (GC) in a lazy first-order functional language.
+The central  notion in  our analysis is  a generalization  of liveness
+called {\em  demand}---the pattern of future  uses of the value  of an
 expression.   The  analysis  has  two parts.   We  first  calculate  a
 context-sensitive  summary   of  each   function  as  a   {\em  demand
   transformer} that transforms a {\em  symbolic} demand on its body to
@@ -199,10 +199,9 @@ body  is  obtained through  a  conservative  approximation similar  to
 to  the function.   The result  of the  analysis is  an annotation  of
 certain program points with  deterministic finite-state automata (DFA)
 capturing the  liveness of  variables at  these points.   Depending on
-where GC is triggered, the collector consults a set of
-automata to restrict reachability during  marking.  This results in an
-increase in  the garbage reclaimed  and consequently in  fewer 
-collections.
+where GC  is triggered, the  collector consults  a set of  automata to
+restrict reachability during marking.  This  results in an increase in
+the garbage reclaimed and consequently in fewer collections.
 
 
 \added{While  the idea  of  using static  analysis  to improve  memory
@@ -784,7 +783,7 @@ $\mathit{ref}(s,   \sigma',   \Lfonly)$   is  added   to   $\Lv   \cup
 variables of $s$ are updated and added 
   to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
-
+{\color{Myblue}
 As noted earlier,  $x.\alpha \in \Lv_y$ specifies the  liveness of the
 reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$
 corresponds to a closure-free path  in \heap\ starting from $\rho(x)$.
@@ -796,7 +795,7 @@ is given by $\Lv_\mathit{x_{\pi}}$.
  As we  shall see in section??,  the liveness of the  closure variable
  $x_{\pi}$ is recorded along with the closure so that the GC can refer
  to it during garbage collection.
-
+}
 %} %comment 
 
 \subsection{Soundness of analysis}  
@@ -901,45 +900,45 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
   act of  not retaining  (effectively garbage collecting)  the cells
   pointed to by these references  during an actual GC.
   This is done in the following way:
-  \begin{enumerate} 
+ \begin{enumerate} 
 
-\item  Consider the following environments, 1) environment in the
-   current state, 2) environments in each of the stacked items and 3)
-   the environment in each of the closures in the heap. For each of
-   these environments we can calculate a corresponding liveness environment
-   using the  $e\ and\ \sigma$. 
-\item \emph{GC}  for each  $x \in domain(\rho)$,  we set  $\rho(x)$ to
-  $\bot$ iff $x.\epsilon \notin \Lv$.  Similarly, for each stack entry
-  $(\rho,\ell,e,\sigma)$  in  $S$  with $\Lv'$  as  the  corresponding
-  liveness environment in  $\mathsf{SL}$, and finally for  each $x \in
-  domain(\rho)$  for some  closure in  the heap,  we set  $\rho(x)$ to
-  $\bot$ iff $x.\epsilon \notin \Lv'$ corresponding to the closure.
+ \item  Consider  the following  environments,  1)  environment in  the
+  current state, 2)  environments in each of the stacked  items and 3)
+  the environment  in each of  the closures in  the heap. For  each of
+  these  environments  we  can   calculate  a  corresponding  liveness
+  environment using the $e\ and\ \sigma$.
+
+  \item {\color{Myblue}\emph{GC} for  each $x \in domain(\rho)$, we  set $\rho(x)$ to
+    $\bot$  iff $x.\epsilon  \notin \Lv$.   Similarly, for  each stack
+    entry   $(\rho,\ell,e,\sigma)$  in   $S$   with   $\Lv'$  as   the
+    corresponding liveness  environment in $\mathsf{SL}$,  and finally
+    for  each  $x  \in  domain(\rho)$ for  some  closure  $\langle  s,
+    \lfloor\rho\rfloor_{FV(s)}, \sigma\rangle$ in the heap, for all $x
+    \in  FV(s)$ we  set $x$  to  $\bot$ iff  $x.\epsilon \notin  \Lv'$.}
 
   \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
     \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
     liveness environment  \Lv\ for  the expression $e$.   We similarly
-    define the liveness environments for the expressions $e$ in each of
-    the  continuation frames $(\rho,  \ell, e,  \sigma)$ in
-    $S$, giving a stack of  liveness environments that we shall denote
+    define the liveness  environments for the expressions  $e$ in each
+    of  the continuation  frames  $(\rho, \ell,  e,  \sigma)$ in  $S$,
+    giving  a stack  of  liveness environments  that  we shall  denote
     $\mathsf{SL}$.
-  \item \emph{Garbage collection of objects pointed by root sets:}
-    Consider each of the following environments: (i) The 
-    the environment $\rho$ in the current state (ii) and for each $x \in
+  \item  \emph{Garbage collection  of objects  pointed by  root sets:}
+    Consider  each   of  the  following  environments:   (i)  The  the
+    environment $\rho$ in  the current state (ii) and for  each $x \in
     domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
-    \Lv$.  Similarly,  for each  stack entry $(\rho,\ell,e,\sigma)$
-    in $S$ 
-    with  $\Lv'$   as  the   corresponding  liveness   environment  in
+    \Lv$.  Similarly,  for each stack entry  $(\rho,\ell,e,\sigma)$ in
+    $S$  with  $\Lv'$ as  the  corresponding  liveness environment  in
     $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
     to $\bot$ iff $x.\epsilon \notin \Lv'$.
 
-Consider each of the following environments: (i) The 
-    the environment $\rho$ in the current state and for each $x \in
-    domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
-    \Lv$.  Similarly,  for each  stack entry $(\rho,\ell,e,\sigma)$
-    in $S$ 
-    with  $\Lv'$   as  the   corresponding  liveness   environment  in
-    $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
-    to $\bot$ iff $x.\epsilon \notin \Lv'$.
+Consider each of  the following environments: (i)  The the environment
+$\rho$ in the current state and  for each $x \in domain(\rho)$, we set
+$\rho(x)$ to $\bot$ iff $x.\epsilon  \notin \Lv$.  Similarly, for each
+stack  entry   $(\rho,\ell,e,\sigma)$  in  $S$  with   $\Lv'$  as  the
+corresponding liveness  environment in $\mathsf{SL}$, and  for each $x
+\in domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
+\Lv'$.
 
 
   \item \emph{Garbage  collection of  objects in  the heap:}  
@@ -1021,28 +1020,26 @@ Call a $GC(\ldots)$  followed by a $\rightsquigarrow$  transition as a
 step. Consider a state $(\rho, S,  \heap, e, \sigma)$ in the minefield
 execution of a  program.  We show by induction on  the number of steps
 $n$ leading  to this  state that  the next  transition cannot  enter a
-\bang\ state.  When $n$ is 0,  the state is $([\;]_\rho,\,    (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
-(\print~\ans)):[\;]_{S}, 
-[\;]_{\heap},\, (\mainpgm))$.   Since  the
-            call to $GC$  in this state does  nothing, we just
-            have to show that the $\rightsquigarrow$ transition cannot
-            enter  a \bang\  state.  Since  our programs  are in  ANF,
-            $e_{\mainpgm}$ can  only be  a $\LET$ expression.   A {\sc
-              let}  step  does  not involve  dereferencing,  and  thus
-            cannot result in a \bang.
+\bang\  state.    When  $n$   is  0,   the  state   is  $([\;]_\rho,\,
+(\rho_\mathit{init},   \,  \ell_{\ans}   ,\,  (\print~\ans)):[\;]_{S},
+        [\;]_{\heap},\, (\mainpgm))$.  Since the  call to $GC$ in this
+        state  does   nothing,  we  ju1st   have  to  show   that  the
+        $\rightsquigarrow$  transition cannot  enter  a \bang\  state.
+        Since our  programs are in  ANF, $e_{\mainpgm}$ can only  be a
+        $\LET$  expression.   A  {\sc   let}  step  does  not  involve
+        dereferencing, and thus cannot result in a \bang.
 
 For the inductive step, we shall show that none of the minefield steps
 that involves dereferencing  results in a \bang.  These  are the steps
 which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
 $\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
-inserted  by  the  immediately  preceding garbage  collection  or  the
-GC of an earlier minefield step.  However the
-  demand $\sigma'$ on basis of  which an earlier collection would have
-  inserted a $\bot$, would have  included the current demand $\sigma$.
-  Thus, if  the earlier garbage  collection had inserted a  $\bot$, so
-  would the current GC.  Thus it is enough to consider
-  the $\rightsquigarrow$  along with the  current GC and show  that it
-  does not lead to a \bang.
+inserted by the immediately preceding  garbage collection or the GC of
+an earlier minefield  step.  However the demand $\sigma'$  on basis of
+which an earlier  collection would have inserted a  $\bot$, would have
+included the  current demand $\sigma$.   Thus, if the  earlier garbage
+collection had inserted a $\bot$, so would the current GC.  Thus it is
+enough to  consider the $\rightsquigarrow$  along with the  current GC
+and show that it does not lead to a \bang.
 
 We consider the rules {\sc car-clo} and {\sc car-bang} only.  
 The rest  of the rules involve similar reasoning. For the {\sc
