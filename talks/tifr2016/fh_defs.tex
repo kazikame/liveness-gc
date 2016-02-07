@@ -330,6 +330,14 @@
 \newcommand{\nt}{\ensuremath{N}}
 \newcommand{\var}[1]{\scalebox{.99}{\mbox{$\langle$#1$\rangle$}}}
 
+\newcommand{\OneCell}[1]{%
+\psset{unit=.25mm}
+\begin{pspicture}(0,-2)(36,18)
+\psframe(0,-5)(36,15)
+\putnode{zarb1342}{origin}{18}{5}{\rnode{#1}{}}
+\end{pspicture}%
+}
+
 \newcommand{\TwoCells}[2]{%
 \psset{unit=.25mm}
 \begin{pspicture}(0,-2)(36,18)
