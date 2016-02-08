@@ -78,7 +78,7 @@
 \begin{frame}{Ideal Garbage Collection}
   \begin{quote}
     \ldots garbage collection (GC) is a form of automatic memory management.  The  garbage  collector,  or  just collector,  attempts  to  reclaim
-  garbage, or memory occupied by objects  that are no longer in use by
+  garbage, or memory occupied by objects  that are {\red no longer in use} by
   the program. \ldots
   \end{quote}
   From Wikipedia\\ {\scriptsize \url{https://en.wikipedia.org/wiki/Garbage_collection_(computer_science)}}
@@ -86,11 +86,11 @@
 
 \begin{frame}{Real Garbage Collection}
   \begin{quote}
-    \ldots All garbage collectors use some efficient approximation to
-    liveness. In {\em tracing} garbage collection, the approximation is that
-    an object can't be live unless it is reachable. In {\em reference
+    \ldots All garbage collectors use some efficient {\red approximation to
+    liveness}. In {tracing} garbage collection, the approximation is that
+    an object can't be live unless it is {\red reachable}. In {reference
       counting}, the approximation is that an object can't be live unless
-    it is referenced. 
+    it is {\red referenced}. 
     \ldots
   \end{quote}
   From Memory Management Glossary\\
@@ -185,7 +185,7 @@
 
 \hspace*{.25cm}   \acar\  -- access \CAR\ field \\
 \hspace*{.25cm}   \acdr\  -- access \CDR\ field 
-
+\item {\red Sematics of Access Paths}
   \item {\em Liveness environment:} 
 \only<1>
 {Maps root variables    to set of access paths.
@@ -429,7 +429,7 @@ $\Lexp{{\red{(return\; x)}}}{\sigma} = \{x.\sigma\}$
 \medskip
 
   $\Lexp{{\red{(\SIF \; x\;\;  e_1\; \; e_2)}}}{\sigma} = \{x.\epsilon\} 
- \cup \Lexp{{\red{ e_1}}}{\sigma} \cup \Lexp{{\red{e_2}}}{\sigma}\}$
+ \cup \Lexp{{\red{ e_1}}}{\sigma} \cup \Lexp{{\red{e_2}}}{\sigma}$
 
 
 
@@ -1407,10 +1407,10 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{\acar/\acdr\  removal}
+\begin{frame}{\bcar/\bcdr\ handling}
 
 \begin{itemize}
-\item<1-> The CFG has access paths marked for \acar/\acdr\  removal
+\item<1-> The CFG has access paths marked with \bcar/\bcdr\ for \acar/\acdr\  removal
   arising from the \CONS\  rule.
 \item<2-> \acar\   removal from a set of access paths:
 \begin{align*}
@@ -1427,6 +1427,8 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{GC decision problem}
+  {\red how GC will use this info}
+
 
 Let $x.\alpha$ be  a forward  access path  (consisting only  of edges
 \acar\    and    \acdr,    but    not   \bcar\    or    \bcdr).     Let
@@ -1452,7 +1454,7 @@ $\sigma$ consists of forward access  paths only. Then does $\alpha \in
 $^*${\scriptsize Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Collection for Lazy Languages}, submitted.}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{\acar/\acdr\  removal}
+\begin{frame}{Practical \bcar/\bcdr\  simplification}
 
 \begin{itemize}
 \item The simplification is possible to do on a finite state automaton.
@@ -1923,13 +1925,17 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
   \end{itemize}
 \item<2-> Increasing the scope of the method.
   \begin{itemize}
-  \item Lazy languages. (Under submission)
+  \item Lazy languages. (Under review)
   \item Higher order functions.
   \end{itemize}
 \item<3-> Using the notion of {\em demand} for other analysis.
   \begin{itemize}
   \item Program Slicing
   \item Strictness Analysis
+    \begin{itemize}
+    \item All path problem, requires doing intersection of demands 
+    \item $\Rightarrow$ intersection of CFGs $\Rightarrow$ under-approximation
+    \end{itemize}
   \end{itemize}
 \end{itemize}
 \end{frame}
