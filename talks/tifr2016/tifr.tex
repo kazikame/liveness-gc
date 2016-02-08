@@ -1530,6 +1530,16 @@ $^*${\scriptsize Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Coll
 %%\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\scshape LGC for lazy languages}
+\begin{frame} {Lazy evaluation}
+\begin{itemize}
+\item An evaluation  strategy in which evaluation of  an expression is
+  postponed until its value is needed
+\item Binding  of a  variable to  an expression  {\bf does  not force
+  evaluation} of the expression
+\item Every expression is evaluated at most once
+\end{itemize}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Handling lazy semantics: Challenges}
 \normalsize
@@ -1551,6 +1561,67 @@ $^*${\scriptsize Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Coll
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame} {Lazyness: Motivating example}
+\small
+\begin{columns}
+\begin{column}[T]{.45\textwidth}
+  \renewcommand{\arraystretch}{1.1}{
+    \begin{uprogram}
+      \UFL (\DEFINE\ (\length~\xl)
+      \UNL{1}  $\pi_1\!\!:\, ${(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) }\IN
+      \UNL{2} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\  \px
+      \UNL{3} \hspace*{.27cm} $\pi_3\!\!:\, $(\LET\ \pv\ $\leftarrow 0$ \IN
+      \UNL{4} \hspace*{.32cm} $\pi_4\!\!:\,
+      (\RETURN~\pv)$
+      \UNL{3} \hspace*{.29cm}    $\pi_5\!\!:\, ${(\LET~\pu\
+        $\leftarrow$  (\CDR~\xl)  }\IN
+      \UNL{4} \hspace*{.34cm}   $\pi_6\!\!:\, ${(\LET~\py\
+        $\leftarrow$  (\length~\pu)  }\IN
+      \UNL{5} \hspace*{.34cm} $\pi_7\!\!:\,
+      ${(\LET~\pz\ $\leftarrow$ (1~+~\py) }\IN
+      \UNL{6} \hspace*{.34cm} $\pi_8\!\!:\,
+      {(\RETURN~\pz)}$)))))))
+  \end{uprogram}}
+\end{column}
+\begin{column}[T]{0.45\textwidth}
+\renewcommand{\arraystretch}{1.1}{
+    \begin{uprogram}
+      \UNL{1} $(\DEFINE\ (\mainpgm)$
+      \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
+      (
+      \scalebox{0.8}{\psframebox[framearc=.5,
+	  fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
+          \begin{tabular}{@{}c@{}}
+            {a BIG closure}
+      \end{tabular}}}
+      ) \IN  
+      \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
+      \IN
+      \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
+      $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
+      \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
+      $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
+      \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
+      (\RETURN~\pw)))))$
+  \end{uprogram}}
+\end{column}
+\end{columns}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame} {Handling possible non-evaluation}
+  \begin{itemize}
+  \item No liveness is independent of demand $\sigma$
+  \item A new terminal \clazy\ with following semantics
+    \begin{align*}
+      \clazy\sigma \hookrightarrow & \left\{ 
+      \begin{array}{ll}
+        \emptyset&\mbox{if}~\sigma = \emptyset\\
+        \{\epsilon\} & \mbox{otherwise}
+      \end{array}\right.
+    \end{align*}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Results \& Conclusions}
 \begin{frame}{Experimental Setup}
   \begin{itemize}\itemsep1em
@@ -1568,7 +1639,7 @@ $^*${\scriptsize Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Coll
   \end{itemize}
 
 \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[b]{GC behavior as a  graph}
 \only<1>{
@@ -1915,6 +1986,7 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\scshape Future Work}
 \begin{frame}{Scope for future work}
 \normalsize
 \begin{itemize}\itemsep2em
@@ -1927,6 +1999,11 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
   \begin{itemize}
   \item Lazy languages. (Under review)
   \item Higher order functions.
+    \begin{itemize}
+    \item Specialize all higher order functions (Firstification)
+    \item Analysis on the firstified program 
+    \item For partial applications, carry information about the {\em base} function
+\end{itemize}
   \end{itemize}
 \item<3-> Using the notion of {\em demand} for other analysis.
   \begin{itemize}
@@ -1941,8 +2018,6 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame}{Conclusions}
   \begin{itemize}\itemsep1em
   \item Proposed a liveness-based GC scheme. Proved theoretically:
@@ -1963,6 +2038,5 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
       \item Improving scope of the method.
     \end{itemize}
   \end{itemize}
-
 \end{frame}
 \end{document}
