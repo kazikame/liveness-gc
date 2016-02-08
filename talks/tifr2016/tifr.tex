@@ -234,7 +234,7 @@
   \item Demand  (notation: $\sigma$) is a description  of intended use
     of the result of an expression.
    \pause
-\item We assume the demand on the main expresssion to be $(0+1)^*$,
+\item We assume the demand on the main expression to be $(0+1)^*$,
   which we call $\sigma_{all}$.
 \item The demands on each function body, $\sigma_f$, have to be computed.
   \end{itemize}
@@ -1332,7 +1332,6 @@ $\Lf{\append}{2}{\sigma} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma}$
 \item<3-> Equating the terms without and with $\sigma$, we get:  
     \begin{align*}
         \Uf{\append}{1} &= \{\epsilon\}\;  \cup\;
-      \acar\bcar\cup  
       \acdr\Uf{\append}{1}\\
   \Df{\append}{1} &= \acar\bcar\cup\acdr \Df{\append}{1}\bcdr
     \end{align*}
@@ -1388,7 +1387,6 @@ $\Lf{\append}{2}{\sigma} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma}$
 {\red
 \begin{align*}
         \Uf{\append}{1} &= \{\epsilon\}\;  \cup\;
-      \acar\bcar\cup  
       \acdr\Uf{\append}{1}\\
   \Df{\append}{1} &= \acar\bcar\cup\acdr \Df{\append}{1}\bcdr\\
   \Uf{\append}{2} &= \Uf{\append}{2}\\
@@ -1416,23 +1414,6 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{\bcar/\bcdr\ handling}
-
-\begin{itemize}
-\item<1-> The CFG has access paths marked with \bcar/\bcdr\ for \acar/\acdr\  removal
-  arising from the \CONS\  rule.
-\item<2-> \acar\   removal from a set of access paths:
-\begin{align*}
-\alpha_1\bcar\acar\alpha_2 &\hookrightarrow
-  \alpha_1\alpha_2\\
-\alpha_1\bcar \acdr\alpha_2 &\hookrightarrow
-  \mbox{ drop $\alpha_1\bcar \acdr \alpha_2$ from the set}
-\end{align*}
-\end{itemize}
-\bigskip
-
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Working of Liveness-based GC (Mark phase)}
@@ -1441,25 +1422,47 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
   \item GC traverses a path $\alpha$ starting from a root variable $x$.
   \item GC consults $\Lanv{}{x}$: 
     \begin{itemize}
-    \item Does $\exists\ \hat\alpha \in \mathscr{L}(\Lanv{}{x})$ such
-      that $\hat\alpha \stackrel{*}\hookrightarrow \alpha$ ?
-    \item If some such $\hat\alpha$ exists, then mark the current cell
+    \item Does $\alpha \in \mathscr{L}(\Lanv{\pi}{x})$ ?
+    \item If yes, then mark the current cell
     \end{itemize}
   \item  Note  that  $\alpha$  is a  {\em  forward}-only  access  path
     \begin{itemize}
     \item consisting  only of  edges \acar\  and \acdr,  but not  \bcar\ or
       \bcdr
+    \item But $\mathscr{L}(\Lanv{\pi}{x})$ has access paths marked with \bcar/\bcdr\ for \acar/\acdr\  removal
+  arising from the \CONS\  rule.
     \end{itemize}
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{\bcar/\bcdr\ handling}
+
+\begin{itemize}
+\item \acar\   removal from a set of access paths:
+\begin{align*}
+\alpha_1\bcar\acar\alpha_2 &\hookrightarrow
+  \alpha_1\alpha_2\\
+\alpha_1\bcar \acdr\alpha_2 &\hookrightarrow
+  \mbox{ drop $\alpha_1\bcar \acdr \alpha_2$ from the set}
+\end{align*}
+\item \acdr\   removal from a set of access paths:
+\begin{align*}
+\alpha_1\bcdr\acdr\alpha_2 &\hookrightarrow
+  \alpha_1\alpha_2\\
+\alpha_1\bcdr \acar\alpha_2 &\hookrightarrow
+  \mbox{ drop $\alpha_1\bcdr \acar \alpha_2$ from the set}
+\end{align*}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{GC decision problem}
 
-Let $x.\alpha$ be  a forward  access path.     Let
-$\mathscr{L}(\Lanv{}{x})  \stackrel{*}\hookrightarrow  \sigma$,  where
-$\sigma$ consists of forward access  paths only. Then does $\alpha \in
-\sigma$?
-\bigskip \pause
+%% Let $x.\alpha$ be  a forward  access path.     Let
+%% $\mathscr{L}(\Lanv{}{x})  \stackrel{*}\hookrightarrow  \sigma$,  where
+%% $\sigma$ consists of forward access  paths only. Then does $\alpha \in
+%% \sigma$?
+%% \bigskip \pause
 \begin{itemize}
 \item Deciding the
   membership in  a CFG augmented  with a
@@ -1468,81 +1471,68 @@ $\sigma$ consists of forward access  paths only. Then does $\alpha \in
     \bcar\acar    \rightarrow    \epsilon\\
     \bcdr\acdr    \rightarrow   \epsilon\\
   \end{align*}
-\item The problem shown to be undecidable$^*$.
+\item The problem shown to be undecidable\footnote{ Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Collection for Lazy Languages}, submitted.}.
   \begin{itemize}
   \item Reduction from Halting problem.
   \end{itemize}
 \end{itemize}
-\hrule
-\vfill
-$^*${\scriptsize Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Collection for Lazy Languages}, submitted.}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Practical \bcar/\bcdr\  simplification}
 
 \begin{itemize}
 \item The simplification is possible to do on a finite state automaton.
-\item Over-approximate the CFG by a strongly regular language
+\item Over-approximate the CFG by an automaton
   (Mohri-Nederhoff transformation).
-\item Convert the strongly regular language to an
-  automaton. 
 \item Perform \acar/\acdr\ removal on the automaton.
 \end{itemize}
 
 \end{frame}
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% \begin{frame}{Example}
-%% \scriptsize
-%% \begin{columns}[c]
-%%   \begin{column}[T]{.5\textwidth}
-%% {Grammar for \Lanv{9}{\py}}
-%% \begin{eqnarray*}
-%% \Lanv{9}{y}  &\rightarrow&  {\Uf{\append}{1}} \mid  {\Df
-%%   {\append}{1}}        (\epsilon         \mid        \acdr   \mid
-%%  \acdr\acar {\sigma_{\mathit{\!all}}})\\
-%%   \Uf{\append}{1}    &\rightarrow&    \epsilon   \mid
-%%    \acdr{\Uf{\append}{1}}\\         
-%%    \Df{\append}{1}
-%%    &\rightarrow&               \acar\bcar               \mid
-%%    \acdr\Df{\append}{1}\bcdr\\
-%%  \sigma_{\mathit{\!all}} &\rightarrow & \epsilon \mid \acar
-%%  \sigma_{\mathit{\!all}} \mid \acdr
-%%  \sigma_{\mathit{\!all}}
-%% \end{eqnarray*}
-%%   \end{column}
-%% \begin{column}[T]{.5\textwidth}
-%% After Mohri-Nederhoff transformation
-%% \begin{eqnarray*}
-%% \Lanv{9}{y}  &\rightarrow&  {\Uf{\append}{1}} \mid  {\Df
-%%   {\append}{1}}        (\epsilon         \mid        \acdr   \mid
-%%  \acdr\acar {\sigma_{\mathit{\!all}}})\\
-%%   \Uf{\append}{1}    &\rightarrow&    \epsilon   \mid
-%%    \acdr{\Uf{\append}{1}}\\   
-%%   \Df{\append}{1}
-%%   &\rightarrow&               \acar\bcar \Dfbar{\append}{1}  \mid
-%%   \acdr\Df{\append}{1} \\ 
-%% {\Dfbar{\append}{1}}  &\rightarrow&   \bcdr{\Dfbar{\append}{1}}
-%% \mid \epsilon \\
-%%  \sigma_{\mathit{\!all}} &\rightarrow & \epsilon \mid \acar
-%%  \sigma_{\mathit{\!all}} \mid \acdr
-%%  \sigma_{\mathit{\!all}}
-%% \end{eqnarray*}
-%%   \end{column}
-%% \end{columns}
-
-
-%% \end{frame}
-%% \end{columns}
-
-
-%% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Example}
+  \scriptsize
+  \begin{columns}[c]
+    \begin{column}[T]{.5\textwidth}
+      {Grammar for \Lanv{9}{\py}}
+      \begin{eqnarray*}
+        \Lanv{9}{y}  &\rightarrow&  {\Uf{\append}{1}} \mid  {\Df
+          {\append}{1}}        (\epsilon         \mid        \acdr   \mid
+        \acdr\acar {\sigma_{\mathit{\!all}}})\\
+        \Uf{\append}{1}    &\rightarrow&    \epsilon   \mid
+        \acdr{\Uf{\append}{1}}\\         
+        \Df{\append}{1}
+        &\rightarrow&               \acar\bcar               \mid
+        \acdr\Df{\append}{1}\bcdr\\
+        \sigma_{\mathit{\!all}} &\rightarrow & \epsilon \mid \acar
+        \sigma_{\mathit{\!all}} \mid \acdr
+        \sigma_{\mathit{\!all}}
+      \end{eqnarray*}
+    \end{column}
+    \begin{column}[T]{.5\textwidth}
+      After Mohri-Nederhoff transformation
+      \begin{eqnarray*}
+        \Lanv{9}{y}  &\rightarrow&  {\Uf{\append}{1}} \mid  {\Df
+          {\append}{1}}        (\epsilon         \mid        \acdr   \mid
+        \acdr\acar {\sigma_{\mathit{\!all}}})\\
+        \Uf{\append}{1}    &\rightarrow&    \epsilon   \mid
+        \acdr{\Uf{\append}{1}}\\   
+        \Df{\append}{1}
+        &\rightarrow&               \acar\bcar \Dfbar{\append}{1}  \mid
+        \acdr\Df{\append}{1} \\ 
+                {\Dfbar{\append}{1}}  &\rightarrow&   \bcdr{\Dfbar{\append}{1}}
+                \mid \epsilon \\
+                \sigma_{\mathit{\!all}} &\rightarrow & \epsilon \mid \acar
+                \sigma_{\mathit{\!all}} \mid \acdr
+                \sigma_{\mathit{\!all}}
+      \end{eqnarray*}
+    \end{column}
+  \end{columns}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% \begin{frame}{Automaton for \Lanv{9}{y}}
-%% \input{liveness-dfa-for-presentation.tex}
-%% \end{frame}
-%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Automaton for \Lanv{9}{y}}
+\input{liveness-dfa-for-presentation.tex}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% \begin{frame}{Garbage collection points (GC-points)}
 
@@ -1554,99 +1544,8 @@ $^*${\scriptsize Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Coll
 %%\end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\scshape LGC for lazy languages}
-\begin{frame} {Lazy evaluation}
-\begin{itemize}
-\item An evaluation  strategy in which evaluation of  an expression is
-  postponed until its value is needed
-\item Binding  of a  variable to  an expression  {\bf does  not force
-  evaluation} of the expression
-\item Every expression is evaluated at most once
-\end{itemize}
-\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Handling lazy semantics: Challenges}
-\normalsize
-  \begin{itemize}[<+->]\itemsep2em
-  \item Laziness complicates liveness analysis itself. 
-    \begin{itemize}
-    \item Data is made live by evaluation of closures
-    \item In lazy languages, the place in the program
-      where this evaluation takes place cannot be statically determined
-    \end{itemize}
-  \item Garbage collector significantly more complicated than a liveness-based
-    collector for a eager language.
-    \begin{itemize}
-    \item Need to track liveness of closures
-    \item But closure can escape the scope in which it was created
-    \item Carry the liveness information in the closure itself
-    \item Need to update the liveness information as execution progresses
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Lazyness: Motivating example}
-\small
-\begin{columns}
-\begin{column}[T]{.45\textwidth}
-  \renewcommand{\arraystretch}{1.1}{
-    \begin{uprogram}
-      \UFL (\DEFINE\ (\length~\xl)
-      \UNL{1}  $\pi_1\!\!:\, ${(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) }\IN
-      \UNL{2} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\  \px
-      \UNL{3} \hspace*{.27cm} $\pi_3\!\!:\, $(\LET\ \pv\ $\leftarrow 0$ \IN
-      \UNL{4} \hspace*{.32cm} $\pi_4\!\!:\,
-      (\RETURN~\pv)$
-      \UNL{3} \hspace*{.29cm}    $\pi_5\!\!:\, ${(\LET~\pu\
-        $\leftarrow$  (\CDR~\xl)  }\IN
-      \UNL{4} \hspace*{.34cm}   $\pi_6\!\!:\, ${(\LET~\py\
-        $\leftarrow$  (\length~\pu)  }\IN
-      \UNL{5} \hspace*{.34cm} $\pi_7\!\!:\,
-      ${(\LET~\pz\ $\leftarrow$ (1~+~\py) }\IN
-      \UNL{6} \hspace*{.34cm} $\pi_8\!\!:\,
-      {(\RETURN~\pz)}$)))))))
-  \end{uprogram}}
-\end{column}
-\begin{column}[T]{0.45\textwidth}
-\renewcommand{\arraystretch}{1.1}{
-    \begin{uprogram}
-      \UNL{1} $(\DEFINE\ (\mainpgm)$
-      \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
-      (
-      \scalebox{0.8}{\psframebox[framearc=.5,
-	  fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
-          \begin{tabular}{@{}c@{}}
-            {a BIG closure}
-      \end{tabular}}}
-      ) \IN  
-      \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
-      \IN
-      \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
-      $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
-      \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-      $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
-      \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
-      (\RETURN~\pw)))))$
-  \end{uprogram}}
-\end{column}
-\end{columns}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Handling possible non-evaluation}
-  \begin{itemize}
-  \item No liveness is independent of demand $\sigma$
-  \item A new terminal \clazy\ with following semantics
-    \begin{align*}
-      \clazy\sigma \hookrightarrow & \left\{ 
-      \begin{array}{ll}
-        \emptyset&\mbox{if}~\sigma = \emptyset\\
-        \{\epsilon\} & \mbox{otherwise}
-      \end{array}\right.
-    \end{align*}
-  \end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\scshape Results \& Conclusions}
+\section{\scshape Results}
 \begin{frame}{Experimental Setup}
   \begin{itemize}\itemsep1em
   \item Built a prototype consisting of:
@@ -2009,8 +1908,100 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 }
 
 \end{frame}
+\section{\scshape LGC for lazy languages}
+\begin{frame} {Lazy evaluation}
+\begin{itemize}
+\item An evaluation  strategy in which evaluation of  an expression is
+  postponed until its value is needed
+\item Binding  of a  variable to  an expression  {\bf does  not force
+  evaluation} of the expression
+\item Every expression is evaluated at most once
+\end{itemize}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{\scshape Future Work}
+\begin{frame}{Handling lazy semantics: Challenges}
+\normalsize
+  \begin{itemize}\itemsep2em
+  \item Laziness complicates liveness analysis itself. 
+    \begin{itemize}
+    \item Data is made live by evaluation of closures
+    \item In lazy languages, the place in the program
+      where this evaluation takes place cannot be statically determined
+    \end{itemize}
+    \pause
+  \item Garbage collector significantly more complicated than a liveness-based
+    collector for a eager language.
+    \begin{itemize}
+    \item Need to track liveness of closures
+    \item But closure can escape the scope in which it was created
+    \item Carry the liveness information in the closure itself
+    \item Need to update the liveness information as execution progresses
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame} {Laziness: Motivating example}
+\small
+\begin{columns}
+\begin{column}[T]{.45\textwidth}
+  \renewcommand{\arraystretch}{1.1}{
+    \begin{uprogram}
+      \UFL (\DEFINE\ (\length~\xl)
+      \UNL{1}  $\pi_1\!\!:\, ${(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) }\IN
+      \UNL{2} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\  \px
+      \UNL{3} \hspace*{.27cm} $\pi_3\!\!:\, $(\LET\ \pv\ $\leftarrow 0$ \IN
+      \UNL{4} \hspace*{.32cm} $\pi_4\!\!:\,
+      (\RETURN~\pv)$
+      \UNL{3} \hspace*{.29cm}    $\pi_5\!\!:\, ${(\LET~\pu\
+        $\leftarrow$  (\CDR~\xl)  }\IN
+      \UNL{4} \hspace*{.34cm}   $\pi_6\!\!:\, ${(\LET~\py\
+        $\leftarrow$  (\length~\pu)  }\IN
+      \UNL{5} \hspace*{.34cm} $\pi_7\!\!:\,
+      ${(\LET~\pz\ $\leftarrow$ (1~+~\py) }\IN
+      \UNL{6} \hspace*{.34cm} $\pi_8\!\!:\,
+      {(\RETURN~\pz)}$)))))))
+  \end{uprogram}}
+\end{column}
+\begin{column}[T]{0.45\textwidth}
+\renewcommand{\arraystretch}{1.1}{
+    \begin{uprogram}
+      \UNL{1} $(\DEFINE\ (\mainpgm)$
+      \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
+      (
+      \scalebox{0.8}{\psframebox[framearc=.5,
+	  fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
+          \begin{tabular}{@{}c@{}}
+            {a BIG closure}
+      \end{tabular}}}
+      ) \IN  
+      \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
+      \IN
+      \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
+      $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
+      \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
+      $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
+      \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
+      (\RETURN~\pw)))))$
+  \end{uprogram}}
+\end{column}
+\end{columns}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame} {Handling possible non-evaluation}
+  \begin{itemize}
+  \item No liveness is independent of demand $\sigma$
+  \item A new terminal \clazy\ with following semantics
+    \begin{align*}
+      \clazy\sigma \hookrightarrow & \left\{ 
+      \begin{array}{ll}
+        \emptyset&\mbox{if}~\sigma = \emptyset\\
+        \{\epsilon\} & \mbox{otherwise}
+      \end{array}\right.
+    \end{align*}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{\scshape Future Work  \& Conclusions} 
 \begin{frame}{Scope for future work}
 \normalsize
 \begin{itemize}\itemsep2em
