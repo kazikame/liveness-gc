@@ -180,40 +180,40 @@
 \small
 \begin{columns}
   \begin{column}[T]{0.75\textwidth}
-  \begin{itemize}\itemsep0.75em
-  \item {\em Access paths:} Strings over \{\acar, \acdr\}.
-
-\hspace*{.25cm}   \acar\  -- access \CAR\ field \\
-\hspace*{.25cm}   \acdr\  -- access \CDR\ field 
-\item {\red Sematics of Access Paths}
-  \item {\em Liveness environment:} 
-\only<1>
-{Maps root variables    to set of access paths.
-\begin{eqnarray*}
-\Lanv{i}{}&:&
-\left\{\begin{array}{l}
- y \mapsto \emptyset\\
-       z \mapsto \{\epsilon\}\\
-       w \mapsto \{\epsilon, 1, 10, 100\}
-    \end{array}\right.
-\end{eqnarray*}
-}
-\only<2>
-{Alternate representation.
-\begin{eqnarray*}
-\Lanv{i}{}&:&
-\left\{\begin{array}{l}
-        \emptyset \;\; \cup  \\
-        \{z.\epsilon\} \;\; \cup\\
-        \{w.\epsilon, w.1, w.10, w.100\}
-     \end{array}\right.
-\end{eqnarray*} 
-}
-  \end{itemize}
+    \begin{itemize}\itemsep0.75em
+    \item {\em Access paths:} Strings over \{\acar, \acdr\}.
+      
+      \hspace*{.25cm}   \acar\  -- access \CAR\ field \\
+      \hspace*{.25cm}   \acdr\  -- access \CDR\ field 
+    \item Denote traversals over the heap graph
+    \item {\em Liveness environment:} 
+      \only<1>
+          {Maps root variables    to set of access paths.
+            \begin{eqnarray*}
+              \Lanv{i}{}&:&
+              \left\{\begin{array}{l}
+              y \mapsto \emptyset\\
+              z \mapsto \{\epsilon\}\\
+              w \mapsto \{\epsilon, 1, 10, 100\}
+              \end{array}\right.
+            \end{eqnarray*}
+          }
+          \only<2>
+              {Alternate representation.
+                \begin{eqnarray*}
+                  \Lanv{i}{}&:&
+                  \left\{\begin{array}{l}
+                  \emptyset \;\; \cup  \\
+                  \{z.\epsilon\} \;\; \cup\\
+                  \{w.\epsilon, w.1, w.10, w.100\}
+                  \end{array}\right.
+                \end{eqnarray*} 
+              }
+    \end{itemize}
   \end{column}
-\begin{column}[T]{0.25\textwidth}
-\fbox{\centerline{\epsfig{file=example-liveness-environment.eps, height=5cm}}}
-\end{column}
+  \begin{column}[T]{0.25\textwidth}
+    \fbox{\centerline{\epsfig{file=example-liveness-environment.eps, height=5cm}}}
+  \end{column}
 \end{columns}
 
 \bigskip
@@ -589,7 +589,7 @@ in classical dataflow analysis for imperative languages.
 %% \bigskip
 
 %%   \begin{columns}[c]
-%%   \begin{column}{0.33\textwidth}
+%%   \begin{column}{0.33\textwidth}56
 %%  \centerline{\epsfig{file=live-analysis3.eps, height=2cm}}
 %%   \end{column}
 %%  \begin{column}{0.67\textwidth}
@@ -630,34 +630,43 @@ in classical dataflow analysis for imperative languages.
               \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labr}{result}
               \nccurve[nodesepB=-.2,nodesepA=.2,angleA=295,angleB=135]{->}{labx}{x}
               \nccurve[nodesepB=-.2,angleA=270,angleB=45]{->}{laby}{y}
-              \onslide<2->{
+              \onslide<2>{
                 \nccurve[nodesepB=-.2,angleA=270,angleB=75,linestyle=dashed]{*->}{resultx}{x}
-                \bput(.6){\large \Lf{f}{1}{\sigma}}
+                \bput(.6){\large $\psi_x$}
                 \nccurve[nodesepB=-.2,angleA=270,angleB=105,linestyle=dashed]{*->}{resultx}{y}
-                \aput(.6){\large \Lf{f}{2}{\sigma}}
+                \aput(.6){\large $\psi_y$}
+              }
+              \onslide<3->{
+                \nccurve[nodesepB=-.2,angleA=270,angleB=75,linestyle=dashed]{*->}{resultx}{x}
+                \bput(.6){\large \Lf{f}{1}{\alpha}}
+                \nccurve[nodesepB=-.2,angleA=270,angleB=105,linestyle=dashed]{*->}{resultx}{y}
+                \aput(.6){\large \Lf{f}{2}{\beta}}
 
               }
               \nccurve[nodesepB=-.2,angleA=270,angleB=105]{*->}{resulty}{y}
-              \onslide<3->{\nccurve[nodesepB=-.2,angleA=270,angleB=75,
+              \onslide<2->{\nccurve[nodesepB=-.2,angleA=270,angleB=75,
                   linestyle=dashed]{*->}{startx}{after0}
-                \bput(.5){\large $\alpha$}
+                \onslide<2>{\bput(.5){\large $\alpha$}}
 	        \nccurve[nodesepB=-.2,angleA=270,angleB=105,
                   linestyle=dashed]{*->}{starty}{after1}
-                \aput(.5){\large ${\mathbf \beta}$}}
+                \onslide<2>{\aput(.5){\large ${\mathbf \beta}$}}
+              }
             \end{pspicture}
       }}}
     \end{column}
     \begin{column}{0.5\textwidth}
       \small
       \mbox{\onslide<1->{$\Lapp{{\red{(f \;x \;y)}}}{\sigma} =$}
-        \onslide<2->{$\{x.\Lf{f}{1}{\sigma},  \;  y.\Lf{f}{2}{\sigma}\}$}}
+        \onslide<2->{
+          \alt<2>{$\{x.\overline{\psi_x}{\sigma},  \;  y.\overline{\psi_y}{\sigma}\}$}{$\{x.\Lf{f}{1}{\sigma},  \;  y.\Lf{f}{2}{\sigma}\}$}
+        }}
     \end{column}
   \end{columns}
 }
 {
   \bigskip
   \begin{itemize}
-    \onslide<2->{  \item  \Lfonly$_{\mathit  f}$ is a context independent summary of
+    \onslide<3->{  \item We use \Lfonly$_{\mathit  f}$: context independent summary of
       the function $f$.}
     \onslide<4-> {\item To find \Lf{\mathit  f}{i}{\sigma}: 
       \begin{itemize}
@@ -1426,12 +1435,27 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Working of Liveness-based GC (Mark phase)}
+  \begin{itemize}
+  \item GC invoked at a program point $\pi$
+  \item GC traverses a path $\alpha$ starting from a root variable $x$.
+  \item GC consults $\Lanv{}{x}$: 
+    \begin{itemize}
+    \item Does $\exists\ \hat\alpha \in \mathscr{L}(\Lanv{}{x})$ such
+      that $\hat\alpha \stackrel{*}\hookrightarrow \alpha$ ?
+    \item If some such $\hat\alpha$ exists, then mark the current cell
+    \end{itemize}
+  \item  Note  that  $\alpha$  is a  {\em  forward}-only  access  path
+    \begin{itemize}
+    \item consisting  only of  edges \acar\  and \acdr,  but not  \bcar\ or
+      \bcdr
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{GC decision problem}
-  {\red how GC will use this info}
 
-
-Let $x.\alpha$ be  a forward  access path  (consisting only  of edges
-\acar\    and    \acdr,    but    not   \bcar\    or    \bcdr).     Let
+Let $x.\alpha$ be  a forward  access path.     Let
 $\mathscr{L}(\Lanv{}{x})  \stackrel{*}\hookrightarrow  \sigma$,  where
 $\sigma$ consists of forward access  paths only. Then does $\alpha \in
 \sigma$?
