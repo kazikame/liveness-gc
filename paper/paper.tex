@@ -44,10 +44,10 @@
 
 \definecolor{Myblue}{rgb}{.2,0,1}
 \definecolor{Myred}{rgb}{1,.2,.2}
-\newcommand{\mycomment}[1]{{\color{Myblue}{#1}} }
-%\newcommand{\added}[1]{{\color{Myblue}{#1}}}
-\newcommand{\added}[1]{#1}
-\newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
+\newcommand{\mycomment}[1]{{\color{Myblue}{#1}}}
+\newcommand{\added}[1]{{\color{Myblue}{#1}}}
+%\newcommand{\added}[1]{#1}
+\newcommand{\todelete}[1]{{\color{Myred}{#1}}}
 
 
 %\newcommand{\warning}[1]{{\color{Myred}{#1}}}
@@ -186,9 +186,9 @@ by the program at a  later stage).  This results in unnecessary memory
 retention.
 
 In this paper,  we propose the use of liveness  analysis of heap cells
-for garbage collection (GC) in a lazy first-order functional language.  The
-central notion in our analysis  is a generalization of liveness called
-{\em  demand}---the  pattern  of  future  uses  of  the  value  of  an
+for garbage collection (GC) in a lazy first-order functional language.
+The central  notion in  our analysis is  a generalization  of liveness
+called {\em  demand}---the pattern of future  uses of the value  of an
 expression.   The  analysis  has  two parts.   We  first  calculate  a
 context-sensitive  summary   of  each   function  as  a   {\em  demand
   transformer} that transforms a {\em  symbolic} demand on its body to
@@ -199,30 +199,31 @@ body  is  obtained through  a  conservative  approximation similar  to
 to  the function.   The result  of the  analysis is  an annotation  of
 certain program points with  deterministic finite-state automata (DFA)
 capturing the  liveness of  variables at  these points.   Depending on
-where GC is triggered, the collector consults a set of
-automata to restrict reachability during  marking.  This results in an
-increase in  the garbage reclaimed  and consequently in  fewer 
-collections.
+where GC  is triggered, the  collector consults  a set of  automata to
+restrict reachability during marking.  This  results in an increase in
+the garbage reclaimed and consequently in fewer collections.
 
 
-\todelete{While  this  idea has  been  shown  to  be effective  for  a
-  first-order     {\em     eager}    language~\cite{asati14lgc},     a
-  straightforward extension of the technique  is not possible for lazy
-  languages,  where   heap-allocated  objects  may   include  closures
-  (runtime   representations    of   unevaluated    expressions).    }
-\added{Designing a liveness based garbage collector for lazy languages
-  poses significant challenges.}  Firstly, since  data is made live by
-evaluation of closures, and in lazy languages the place in the program
-where  this evaluation  takes place  cannot be  statically determined,
-laziness   complicates  liveness   analysis  itself.    Moreover,  for
-liveness-based GC  to be effective, we  need to extend
-it to closures apart from evaluated  data.  Since a closure can escape
-the  scope in  which it  was  created, it  has to  carry the  liveness
-information  of  its  free  variables.  As  execution  progresses  and
-possible  future   uses  are   eliminated,  we  update   the  liveness
-information  in a  closure with  a more  precise version.   Because of
-these reasons,  the garbage collector also  becomes significantly more
-complicated than a liveness-based collector for a eager language.
+\added{While  the idea  of  using static  analysis  to improve  memory
+  utilization  has  been  shown  to   be  effective  for  {\em  eager}
+  languages~\cite{asati14lgc,       HofmannJ03,       inoue88analysis,
+    lee05static}, a straightforward extension  of the technique is not
+  possible  for  lazy  languages,  where  heap-allocated  objects  may
+  include   closures    (runtime   representations    of   unevaluated
+  expressions).   }   \todelete{Designing  a  liveness  based  garbage
+  collector   for  lazy   languages  poses   significant  challenges.}
+Firstly, since  data is made  live by  evaluation of closures,  and in
+lazy languages  the place in  the program where this  evaluation takes
+place cannot  be statically determined, laziness  complicates liveness
+analysis itself.  Moreover, for liveness-based  GC to be effective, we
+need to  extend it  to closures  apart from  evaluated data.   Since a
+closure can escape the scope in which  it was created, it has to carry
+the  liveness  information  of   its  free  variables.   As  execution
+progresses  and possible  future uses  are eliminated,  we update  the
+liveness  information  in  a  closure with  a  more  precise  version.
+Because  of   these  reasons,  the  garbage   collector  also  becomes
+significantly more  complicated than a liveness-based  collector for a
+eager language.
 
 
 Experiments    with   a    single    generation   copying    collector
@@ -265,15 +266,15 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are
 \added{
 \begin{itemize}
-\item We propose a liveness based GC scheme for a lazy
-  first order functional  language and prove its  correctness.  To the
-  best  of our  knowledge, this  is the  first work  on liveness-based
-  GC   for    lazy    languages.    All    previous
-  attempts~\cite{shaham01heap,  ran.shaham-sas03,  shaham02estimating,
-    asati14lgc,    karkare06effectiveness}   have    involved   either
-  imperative  or  eager  functional  languages.   The  novelty  of  our
-  approach is in  handling of  liveness of  functional values  (i.e.,
-  closures), an issue that arises due to laziness.
+\item We  propose a liveness  based GC scheme  for a lazy  first order
+  functional language and  prove its correctness.  To the  best of our
+  knowledge,  this is  the first  work on  liveness-based GC  for lazy
+  languages.       All      previous      attempts~\cite{shaham01heap,
+    ran.shaham-sas03,          shaham02estimating,         asati14lgc,
+    karkare06effectiveness} have  involved either imperative  or eager
+  functional languages.  The novelty of our approach is in handling of
+  liveness  of closures,  an  issue  that arises  due  to laziness  at
+  runtime.
 
 \item  We  formulate a  liveness  analysis  for the  lazy  first-order
   functional language  and prove  its correctness. The  proof involves
@@ -283,10 +284,11 @@ contributions of this paper are
 
 \item The  analysis results  in a set  of context-free  grammars along
   with  a fixed  set  of non-context-free  productions.  The  decision
-  whether to  copy a  cell during GC translates  to a
-  membership problem for such grammars.   In this paper, we have shown
-  the undecidability  of this  problem. We  circumvent the  problem by
-  over-approximating the grammars with DFAs.
+  whether to copy a cell during  GC translates to a membership problem
+  for  such  grammars.  Earlier  assumed  the  undecidability of  this
+  membership question  and used an over-approximation  to overcome it.
+  In this  paper, we provide a  formal proof of the  undecidability of
+  this problem.
 
 \item We have implemented a garbage  collector that uses the result of
   liveness  analysis to  retain  live cells.   Our experiments  reveal
@@ -781,7 +783,7 @@ $\mathit{ref}(s,   \sigma',   \Lfonly)$   is  added   to   $\Lv   \cup
 variables of $s$ are updated and added 
   to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
-
+{\color{Myblue}
 As noted earlier,  $x.\alpha \in \Lv_y$ specifies the  liveness of the
 reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$
 corresponds to a closure-free path  in \heap\ starting from $\rho(x)$.
@@ -790,12 +792,10 @@ the liveness of heap contents starting from $\mathit{x_{\pi}}$
 is given by $\Lv_\mathit{x_{\pi}}$.
 
 
-{\color{Myblue}
-As we shall see in section??, the liveness of the closure variable $x_{\pi}$
-is recorded along with the closure so that the GC can refer to it
-during garbage collection. 
+ As we  shall see in section??,  the liveness of the  closure variable
+ $x_{\pi}$ is recorded along with the closure so that the GC can refer
+ to it during garbage collection.
 }
-
 %} %comment 
 
 \subsection{Soundness of analysis}  
@@ -804,15 +804,15 @@ We shall now present a proof of soundness of the analysis presented in
 Section~\ref{sec:liveness-analysis}.   Here are  the ideas  behind the
 proof.
 \begin{enumerate}
-\item       We       augment        the       standard       semantics in
-  Figure~\ref{fig:lang-semantics} to model a GC before the execution
-  of each \LET\ expression. {\color{Myblue}Note  that memory is allocated only during
-  execution of \LET\  expressions}. During GC, we  track each reference
-  in the root set and heap that is not declared live by our analysis.
-Any  attempt to dereference such references results
-  in the transition system entering  a special state denoted \bang.
-We
-  call the semantics after augmentation, \emph{minefield semantics}.
+\item      We     augment      the      standard     semantics      in
+  Figure~\ref{fig:lang-semantics} to  model a GC before  the execution
+  of  each  \LET\  expression.   {\color{Myblue}Note  that  memory  is
+    allocated only during execution  of \LET\ expressions}. During GC,
+  we  track each  reference  in the  root  set and  heap  that is  not
+  declared  live by  our analysis.   Any attempt  to dereference  such
+  references results in the transition system entering a special state
+  denoted   \bang.   We   call  the   semantics  after   augmentation,
+  \emph{minefield semantics}.
 
 %% During GC, we bind  a special value
 %%   $\bot$ to each  reference in the root  set and heap  that is not
@@ -841,20 +841,18 @@ Premise & Transition & Rule name \\
 \hline
 
 \hline 
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$, \\
-  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
+\makecell[t]{ $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$ &
 {\sc car-bang} 
 \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
-    S, \heap)}$, \\$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
+\makecell[t]{$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
 (\CAR~x), \cred{\sigma} \rightsquigarrow$ \\ $ \rho', \,(\rho, addr(\langle
 s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$ }     &
 {\sc car-1-clo} 
 \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\ $\heap(\rho(x))
+\makecell[t]{ $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \rho(x),
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, 
@@ -902,46 +900,45 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
   act of  not retaining  (effectively garbage collecting)  the cells
   pointed to by these references  during an actual GC.
   This is done in the following way:
-  \begin{enumerate} 
- \item Consider the following environments, 1) environment in the
-   current state, 2) environments in each of the stacked items and 3)
-   the environment in each of the closures in the heap. For each of
-   these environments we can calculate a corresponding liveness environment
-   using the  $e\ and\ \sigma$. 
-\item \emph{GC}
-   for each $x \in
-    domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
-    \Lv$.  Similarly,  for each  stack entry $(\rho,\ell,e,\sigma)$
-    in $S$ 
-    with  $\Lv'$   as  the   corresponding  liveness   environment  in
-    $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
-    to $\bot$ iff $x.\epsilon \notin \Lv'$.
+ \begin{enumerate} 
+
+ \item  Consider  the following  environments,  1)  environment in  the
+  current state, 2)  environments in each of the stacked  items and 3)
+  the environment  in each of  the closures in  the heap. For  each of
+  these  environments  we  can   calculate  a  corresponding  liveness
+  environment using the $e\ and\ \sigma$.
+
+  \item {\color{Myblue}\emph{GC} for  each $x \in domain(\rho)$, we  set $\rho(x)$ to
+    $\bot$  iff $x.\epsilon  \notin \Lv$.   Similarly, for  each stack
+    entry   $(\rho,\ell,e,\sigma)$  in   $S$   with   $\Lv'$  as   the
+    corresponding liveness  environment in $\mathsf{SL}$,  and finally
+    for  each  $x  \in  domain(\rho)$ for  some  closure  $\langle  s,
+    \lfloor\rho\rfloor_{FV(s)}, \sigma\rangle$ in the heap, for all $x
+    \in  FV(s)$ we  set $x$  to  $\bot$ iff  $x.\epsilon \notin  \Lv'$.}
 
   \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
     \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
     liveness environment  \Lv\ for  the expression $e$.   We similarly
-    define the liveness environments for the expressions $e$ in each of
-    the  continuation frames $(\rho,  \ell, e,  \sigma)$ in
-    $S$, giving a stack of  liveness environments that we shall denote
+    define the liveness  environments for the expressions  $e$ in each
+    of  the continuation  frames  $(\rho, \ell,  e,  \sigma)$ in  $S$,
+    giving  a stack  of  liveness environments  that  we shall  denote
     $\mathsf{SL}$.
-  \item \emph{Garbage collection of objects pointed by root sets:}
-    Consider each of the following environments: (i) The 
-    the environment $\rho$ in the current state (ii) and for each $x \in
+  \item  \emph{Garbage collection  of objects  pointed by  root sets:}
+    Consider  each   of  the  following  environments:   (i)  The  the
+    environment $\rho$ in  the current state (ii) and for  each $x \in
     domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
-    \Lv$.  Similarly,  for each  stack entry $(\rho,\ell,e,\sigma)$
-    in $S$ 
-    with  $\Lv'$   as  the   corresponding  liveness   environment  in
+    \Lv$.  Similarly,  for each stack entry  $(\rho,\ell,e,\sigma)$ in
+    $S$  with  $\Lv'$ as  the  corresponding  liveness environment  in
     $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
     to $\bot$ iff $x.\epsilon \notin \Lv'$.
 
-Consider each of the following environments: (i) The 
-    the environment $\rho$ in the current state and for each $x \in
-    domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
-    \Lv$.  Similarly,  for each  stack entry $(\rho,\ell,e,\sigma)$
-    in $S$ 
-    with  $\Lv'$   as  the   corresponding  liveness   environment  in
-    $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
-    to $\bot$ iff $x.\epsilon \notin \Lv'$.
+Consider each of  the following environments: (i)  The the environment
+$\rho$ in the current state and  for each $x \in domain(\rho)$, we set
+$\rho(x)$ to $\bot$ iff $x.\epsilon  \notin \Lv$.  Similarly, for each
+stack  entry   $(\rho,\ell,e,\sigma)$  in  $S$  with   $\Lv'$  as  the
+corresponding liveness  environment in $\mathsf{SL}$, and  for each $x
+\in domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
+\Lv'$.
 
 
   \item \emph{Garbage  collection of  objects in  the heap:}  
@@ -1023,28 +1020,26 @@ Call a $GC(\ldots)$  followed by a $\rightsquigarrow$  transition as a
 step. Consider a state $(\rho, S,  \heap, e, \sigma)$ in the minefield
 execution of a  program.  We show by induction on  the number of steps
 $n$ leading  to this  state that  the next  transition cannot  enter a
-\bang\ state.  When $n$ is 0,  the state is $([\;]_\rho,\,    (\rho_\mathit{init},   \, \ell_{\ans}  ,\,
-(\print~\ans)):[\;]_{S}, 
-[\;]_{\heap},\, (\mainpgm))$.   Since  the
-            call to $GC$  in this state does  nothing, we just
-            have to show that the $\rightsquigarrow$ transition cannot
-            enter  a \bang\  state.  Since  our programs  are in  ANF,
-            $e_{\mainpgm}$ can  only be  a $\LET$ expression.   A {\sc
-              let}  step  does  not involve  dereferencing,  and  thus
-            cannot result in a \bang.
+\bang\  state.    When  $n$   is  0,   the  state   is  $([\;]_\rho,\,
+(\rho_\mathit{init},   \,  \ell_{\ans}   ,\,  (\print~\ans)):[\;]_{S},
+        [\;]_{\heap},\, (\mainpgm))$.  Since the  call to $GC$ in this
+        state  does   nothing,  we  ju1st   have  to  show   that  the
+        $\rightsquigarrow$  transition cannot  enter  a \bang\  state.
+        Since our  programs are in  ANF, $e_{\mainpgm}$ can only  be a
+        $\LET$  expression.   A  {\sc   let}  step  does  not  involve
+        dereferencing, and thus cannot result in a \bang.
 
 For the inductive step, we shall show that none of the minefield steps
 that involves dereferencing  results in a \bang.  These  are the steps
 which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
 $\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
-inserted  by  the  immediately  preceding garbage  collection  or  the
-GC of an earlier minefield step.  However the
-  demand $\sigma'$ on basis of  which an earlier collection would have
-  inserted a $\bot$, would have  included the current demand $\sigma$.
-  Thus, if  the earlier garbage  collection had inserted a  $\bot$, so
-  would the current GC.  Thus it is enough to consider
-  the $\rightsquigarrow$  along with the  current GC and show  that it
-  does not lead to a \bang.
+inserted by the immediately preceding  garbage collection or the GC of
+an earlier minefield  step.  However the demand $\sigma'$  on basis of
+which an earlier  collection would have inserted a  $\bot$, would have
+included the  current demand $\sigma$.   Thus, if the  earlier garbage
+collection had inserted a $\bot$, so would the current GC.  Thus it is
+enough to  consider the $\rightsquigarrow$  along with the  current GC
+and show that it does not lead to a \bang.
 
 We consider the rules {\sc car-clo} and {\sc car-bang} only.  
 The rest  of the rules involve similar reasoning. For the {\sc
@@ -1095,8 +1090,8 @@ $P'$,   a   call-less   program,   cannot   enter   the
 
 
 
-%\section{Computing liveness and its encoding as DFA}\label{sec:computing}
-\section{Generating and storing liveness information}\label{sec:computing}
+\section{Computing liveness and its encoding as DFA}\label{sec:computing}
+%\section{Generating and storing liveness information}\label{sec:computing}
 Section~\ref{sec:liveness}  gave   a  fully context-sensitive
 liveness analysis which 
 %$\mathcal{L}$ and $ref$ together
@@ -1108,7 +1103,7 @@ demand $\sigma$  on each function.   To do so,  we first need to  modify the
 liveness rules to a different form.
 
 %\subsection{Modifying liveness rules}
-\subsection{Tweaking the rules}
+\paragraph{Symbolic representation of operations}
 
 The   $\mathit{ref}$   rule   for   \CONS,   shown   in
 Figure~\ref{fig:live-judge}, requires us  to remove the
@@ -1184,7 +1179,7 @@ similar reasons.
 
 
 %\subsection{Generating equations for $\Lfonly_{\mathit f}$}
-\subsection{Computing function summaries $\Lfonly_{\mathit f}$}
+\paragraph{Computing function summaries $\Lfonly_{\mathit f}$}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
 \Lfonly$_\mathit{f}$.        The       program       in
@@ -1229,7 +1224,7 @@ Note that this equation can also be viewed as a CFG with \{\acdr,
 non-terminal.
 
 %\subsection{Generating liveness equations \Lv\  for function bodies}
-\subsection{Handling user-defined functions}
+\paragraph{Handling user-defined functions}
 \label{sec:bodylivenessbodies}
 
 To  avoid analyzing  the body  of a  function for  each
@@ -1855,10 +1850,11 @@ We extend liveness-based  garbage  collection  to
 this function.
 \section{Experimental evaluation}
 \label{sec:experiments}
-Our benchmark consists of programs taken from nofib~\cite{nofib} and
-other repositories for functional programs~\cite{PLT-Scheme,
-  gc_bench, huffman-sicp}.  We ran the experiments on 8 core Intel\textsuperscript{\textregistered} Core\textsuperscript{TM}
-i7-4770 3.40GHz CPU having 8192KB L2 cache, 16GB RAM, running 64 bit
+Our benchmark  consists of programs taken  from nofib~\cite{nofib} and
+other repositories for functional programs~\cite{PLT-Scheme, gc_bench,
+  huffman-sicp}.     We    ran    the   experiments    on    8    core
+Intel\textsuperscript{\textregistered}        Core\textsuperscript{TM}
+i7-4770 3.40GHz CPU  having 8192KB L2 cache, 16GB RAM,  running 64 bit
 Ubuntu 14.04.
 
 
@@ -1943,26 +1939,29 @@ significantly  impact   garbage  collection,  but  only   when  it  is
 interprocedural.  As far as memory requirement is concerned, our paper
 demonstrates this observation.
 
-There have been several attempts to use liveness analysis to improve 
-GC for imperative languages.~\cite{khedker07heap}
-presents a liveness analysis and uses the results for inserting 
-nullifying statements in Java programs. In~\cite{ran.shaham-sas03},
-temporal properties like liveness are checked  against an automaton modelling heap accesses.
+There have been  several attempts to use liveness  analysis to improve
+GC for imperative  languages.~\cite{khedker07heap} presents a liveness
+analysis and uses  the results for inserting  nullifying statements in
+Java  programs. In~\cite{ran.shaham-sas03},  temporal properties  like
+liveness  are checked  against an  automaton modelling  heap accesses.
 Both these approaches are intraprocedural in scope.
 
-In the  space of  functional languages,  there are:  rewriting methods
-such                                                                as
+In the space of functional languages, there are: rewriting methods
+such as
 deforestation~\cite{wadler88deforest,gill93ashort,chitil99deforest},
-sharing  analysis   based  reallocation~\cite{jones89compile},  region
-based  analysis~\cite{tofte98region},  and insertion  of  compile-time
-nullifying     statements~\cite{inoue88analysis,lee05static,Hamilton}.
-All compile-time marking  approaches rely on an  efficient and precise
-alias  analysis  and cannot  provide  significant  improvement in  its
-absence.  An interesting approach suggested in~\cite{HofmannJ03} is to
-annotate the heap usage of  first-order programs through linear types.
-The  annotations  are  then  used to  serve  memory  requests  through
+sharing analysis based reallocation~\cite{jones89compile}, region
+based analysis~\cite{tofte98region}, and insertion of compile-time
+nullifying statements~\cite{inoue88analysis, lee05static}.  All compile-time
+marking approaches rely on an efficient and precise alias analysis and
+cannot provide significant improvement in its absence. The only work
+in the space of lazy languages seems to be~\cite{Hamilton}
+which touches upon only basic techniques of compile-time garbage
+marking, explicit deallocation and desctructive allocation. An
+interesting approach suggested in~\cite{HofmannJ03} is to annotate the
+heap usage of first-order programs through linear types.  The
+annotations are then used to serve memory requests through
 re-allocation.  However, this requires the user to write programs in a
-specific way. 
+specific way.
 %
 Safe-for-space~\cite{appel.cps}              approaches~\cite{Clinger,
   shao00efficient}  reduce the  amount of  heap used  by a  program by
@@ -2081,27 +2080,23 @@ most cases, and even improves for some programs.
 The graphs show that even in lazy languages there are large amount of
 dead cells that can be collected early. In spite of collecting
 closures there still exists a gap between actual and perceived
-livenesses.
-Language features that could be introduced are higher-order functions
-and recursive lets. We believe that functions can be used to model
-recursive lets and this should be a simple extension to our liveness
-analysis.
-For higher-order we intend to use firstification techniques~\cite{Mitchell:2009}. 
+livenesses.  Language features that could be introduced are
+higher-order functions and recursive lets. We believe that functions
+can be used to model recursive lets and this should be a simple
+extension to our liveness analysis.  For higher-order we intend to use
+firstification techniques~\cite{Mitchell:2009}.
  
 
-  Orthogonally, we  plan to  improve the  efficiency of
-  the liveness-based garbage collector using heuristics
-  such   as  limiting   the  depth   of  DFA,   merging
-  nearly-equivalent    states    and    using    better
-  representation(for example BDDs~\cite{Bryant86})    and    algorithms   for    automata
-  manipulation.  We   also  need  to   investigate  the
-  interaction   of  liveness   with  other   collection
-  schemes,   such  as   incremental  and   generational
-  collection.  It might be interesting to use a mixed mode GC
-  scheme which allows the costs of LGC to be amortized over several runs
-  of RGC. In summary, we  need to investigate ways
-  to make liveness-based GC attractive
-  for practical collectors.
+  Orthogonally,   we   plan  to   improve   the   efficiency  of   the
+  liveness-based garbage  collector using heuristics such  as limiting
+  the depth of DFA, merging  nearly-equivalent states and using better
+  representation(for example BDDs~\cite{Bryant86})  and algorithms for
+  automata manipulation.  We also  need to investigate the interaction
+  of liveness with  other collection schemes, such  as incremental and
+  generational collection.   It might  be interesting  to use  a mixed
+  mode GC  scheme which allows the  costs of LGC to  be amortized over
+  several runs of RGC. In summary, we need to investigate ways to make
+  liveness-based GC attractive for practical collectors.
 
 
 \clearpage
@@ -2131,27 +2126,23 @@ Premise & Transition & Rule name \\
   (\CONS~x~y), \cred{\sigma}$  $\rightsquigarrow$ \\ $
   \rho', S, \heap[\ell := (\rho(x),\rho(y))], e, \cred{\sigma'}$}     &  {\sc cons} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S, \heap)}$,\\
-  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
+\makecell[t]{ $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc car-bang} 
 \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho, S,
-    \heap)}$, \\ $\heap(\rho(x)) \mbox{ is } (v, d)$} & \makecell[t]{$\rho, (\rho', \ell, e,
+\makecell[t]{$\heap(\rho(x)) \mbox{ is } (v, d)$} & \makecell[t]{$\rho, (\rho', \ell, e,
   \cred{\sigma'} )\!:\!S, \heap, (\CAR~x), \cred{\sigma}$  $
   \rightsquigarrow $ \\ $\rho', S, \heap[\ell := v], e, \cred{\sigma'}$}      &
 {\sc car-select} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
-    S, \heap)}$, \\ $\heap(\rho(x))
+\makecell[t]{ $\heap(\rho(x))
 \mbox{ is } \langle s, \rho'\rangle$ }& \makecell[t]{$\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow $\\ $  \rho', (\rho, \rho(x),
   (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, \cred{(\clazy \cup \acar)\sigma }$ }        &
 {\sc car-clo}\\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\CAR~x), \sigma) = (\rho,
-    S, \heap)}$, \\$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
+\makecell[t]{$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
 (\CAR~x), \cred{\sigma} \rightsquigarrow$ \\ $ \rho', \,(\rho, addr(\langle
 s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$ }     &
 {\sc car-1-clo} \\
@@ -2163,17 +2154,14 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 %% {\sc car-clo}
 %% \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\
-  $\rho(x) \mbox{ is } \bot$  or $\rho(y) \mbox{ is }
+\makecell[t]{$\rho(x) \mbox{ is } \bot$  or $\rho(y) \mbox{ is }
   \bot$} & $\rho, S,
   \heap, (+~x~y), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc prim-bang} 
 \\
 \hline
 
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho,
-    S, \heap)}$, \\ 
-$\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$}
+\makecell[t]{$\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$}
  & 
 
 \makecell[t]{$\rho, (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap,
@@ -2182,18 +2170,17 @@ $\heap(\rho(x)), \heap(\rho(y)) \in \mathbb{N}$}
  &
 {\sc prim-add} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$} &\makecell[t]{$\rho, S,
+\makecell[t]{$\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$} &\makecell[t]{$\rho, S,
   \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow$ \\ $ \rho', (\rho, \rho(x),
   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 {\sc prim-1-clo} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (+~x~y), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $} & \makecell[t]{$\rho,
+\makecell[t]{$\heap(\rho(y)) \mbox{ is } \langle s, \rho'\rangle $} & \makecell[t]{$\rho,
   S, \heap, (+~x~y), \cred{\sigma}$  $\rightsquigarrow$ \\ $ \rho', (\rho,\rho(y),
   (+~x~y), \cred{\sigma})\!:\!S, \heap, s, \cred{\clazy\sigma}$}      &
 {\sc prim-2-clo} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (f~\myvec{x}), \sigma) =
-    (\rho, S, \heap)}$,\\ $\mathit{f}~\mbox{defined as}$
+\makecell[t]{$\mathit{f}~\mbox{defined as}$
 $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
   (f~\myvec{x}), \cred{\sigma}$  $\rightsquigarrow$\\$ [\myvec{y} \mapsto
     \rho(\myvec{x})], S, \heap, e_{\mathit{f}}, \cred{\sigma}$}      &
@@ -2202,45 +2189,42 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
 \makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\LET~x\leftarrow
   s~\IN~e), \sigma) = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x
-    \mapsto \ell], S, \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}\rangle], e, \cred{\sigma}$} &
+    \mapsto \ell], S, \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}, \sigma_x\rangle], e, \cred{\sigma}$ \\
+    where $\sigma_x\ =\  \lfloor\mathcal{L}(e,\sigma,\Lfonly)\rfloor_{\{x\}}$} &
 {\sc let} \\ 
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2),
-    \sigma) = (\rho, S, \heap)}$, \\
-  $\rho(x) \mbox{ is } \bot$} & $\rho, S,
+\makecell[t]{ $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc if-bang} 
 \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2),
-    \sigma) = (\rho, S, \heap)}$, \\$\heap(\rho(x)) \ne 0$}  & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
+\makecell[t]{$\heap(\rho(x)) \ne 0$}  & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
   \cred{\sigma}$  $\rightsquigarrow \rho, S, \heap,  e_1, \cred{\sigma}$} & {\sc if-true} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) = 0$} & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
+\makecell[t]{$\heap(\rho(x)) = 0$} & \makecell{$\rho, S, \heap, (\pi:\SIF~\psi:x~e_1~e_2),
   \cred{\sigma}$   $\rightsquigarrow
 \rho, S, \heap,  e_2, \cred{\sigma}$} & {\sc if-false} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\pi:\SIF~\psi:x~e_1~e_2), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) = \langle s, \rho' \rangle $} & \makecell[t]{$\rho, S, \heap,
+\makecell[t]{$\heap(\rho(x)) = \langle s, \rho' \rangle $} & \makecell[t]{$\rho, S, \heap,
   (\pi:\SIF~\psi:x~e_1~e_2), \cred{\sigma}$ $\rightsquigarrow$ \\ $
 \rho', (\rho, \rho(x), (\SIF~x~e_1~e_2),  \cred{\sigma})\!:\!S, \heap, s,
 \cred{\clazy\sigma}$}
 &
 {\sc if-clo} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) = (\rho, S, \heap)}$,\\
+\makecell[t]{
   $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\SRETURN~x), \cred{\sigma} \rightsquigarrow \bang$   &
 {\sc return-bang} 
 \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) =
-    (\rho, S, \heap)}$,\\ $\heap(\rho(x))~\mbox{is in WHNF with
+\makecell[t]{$\heap(\rho(x))~\mbox{is in WHNF with
     value}~v$} & \makecell[t]{$\rho,
   (\rho', \ell, e, \cred{\sigma'})\!:\!S, \heap, (\SRETURN~x), \cred{\sigma}$  $\rightsquigarrow$\\$ \rho', S, \heap[\ell := v], e, 
   \cred{\sigma'}$} &
 {\sc return-whnf}\\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\SRETURN~x), \sigma) = (\rho, S, \heap)}$,\\$\heap(\rho(x)) = \langle s, \rho' \rangle $} & \makecell[t]{$\rho, S, \heap,
+\makecell[t]{$\heap(\rho(x)) = \langle s, \rho' \rangle $} & \makecell[t]{$\rho, S, \heap,
   (\SRETURN~x), \cred{\sigma}$  $
   \rightsquigarrow$ \\
 $\rho',~ (\rho, \rho(x), (\SRETURN~x), \cred{\sigma})\!:\!S, \heap,  s,
