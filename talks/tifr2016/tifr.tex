@@ -1915,19 +1915,23 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Scope for future work}
 \normalsize
-  \begin{itemize}\itemsep2em
-     \item Reducing GC-time.
-      \begin{itemize}
-      \item Reducing re-visits to heap nodes.
-      \item Basing the implementation on full Scheme, not ANF-Scheme
-      \end{itemize}
-    \item Increasing the scope of the method.
-      \begin{itemize}
-      \item Higher order functions.
-      \item Lazy languages.
-      \end{itemize}
-    \item Orthogonal: Using the notion of demand for other analysis.
+\begin{itemize}\itemsep2em
+\item<1-> Reducing GC-time.
+  \begin{itemize}
+  \item Reducing re-visits to heap nodes.
+  \item Basing the implementation on full Scheme, not ANF-Scheme
   \end{itemize}
+\item<2-> Increasing the scope of the method.
+  \begin{itemize}
+  \item Lazy languages. (Under submission)
+  \item Higher order functions.
+  \end{itemize}
+\item<3-> Using the notion of {\em demand} for other analysis.
+  \begin{itemize}
+  \item Program Slicing
+  \item Strictness Analysis
+  \end{itemize}
+\end{itemize}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
