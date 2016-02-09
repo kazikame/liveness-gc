@@ -15,13 +15,13 @@ e \in \mathit{Expr} & ::= &
 a \in \mathit{App} & ::= &
 \left\{\begin{array}{lrl}
        k && \mbox{}\\
-       (\CONS\,\, {\red x_1}\,\, {\red x_2}) && \mbox{} \\ 
-       (\CAR\,\, {\red x)} &  (\CDR\,\, {\red x)} & \mbox{} \\ 
-       (\NULLQ\,\, {\red x}) & (\PRIM\,\, {\red x_1}\,\, {\red x_2}) & \mbox{} \\ 
+       (\CONS\,\, {x_1}\,\, {x_2}) && \mbox{} \\ 
+       (\CAR\,\, {x)} &  (\CDR\,\, {x)} & \mbox{} \\ 
+       (\NULLQ\,\, {x}) & (\PRIM\,\, {x_1}\,\, {x_2}) & \mbox{} \\ 
 %        (\NULLQ\,\, x) && \mbox{\em ---  tester} \\ 
 %       (\ID\,\, x) && \mbox{\em ---  identity function (for inlining)} \\ 
 %        (\PRIM\,\, x_1\,\, x_2) && \mbox{\em --- generic arithmetic} \\ 
-       \multicolumn{2}{l}{(f\,\,{\red  x_1}\,\,\ldots\,\, {\red x_n})} 
+       \multicolumn{2}{l}{(f\,\,{ x_1}\,\,\ldots\,\, {x_n})} 
             & \mbox{} 
     \end{array}\right.
 \end{eqnarray*}
