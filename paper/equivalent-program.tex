@@ -1,17 +1,18 @@
 \newcommand{\makeNT}[2]{\mbox{$\mathbf{S_{#2}^{#1}}$}}
 %\begin{figure*}[h!]
-    \begin{minipage}{.50\textwidth}
-        \small
-        \renewcommand{\arraystretch}{1}{
-          \begin{uprogram}
-            \UFL (\DEFINE\ (\makeNT{0}{i}~\pa)
-            \UNL{1} (\LET\ \pb\ $\leftarrow $\
-(\CAR~\pa) \IN
-            \UNL{2} (\LET\ \pc\ $\leftarrow $\
-(\makeNT{0}{j}~\pb) \IN
-            
-            \UNL{3} (\LET\ \pd\ $\leftarrow$\ $5$) \IN
-            \UNL{4} (\LET\ \pe\ $\leftarrow$\ (\CONS\ \pc\ \pd)) \IN\ \ (\SRETURN~\ret))))))
-        \end{uprogram}}
-\end{minipage}
+%\begin{minipage}{.50\textwidth}
+\small
+\renewcommand{\arraystretch}{1}{
+  \begin{uprogram}
+    \UFL (\DEFINE\ (\makeNT{0}{i}~\pa)
+    \UNL{1} (\LET\ \pb\ $\leftarrow $\
+    (\CAR~\pa) \IN
+    \UNL{2} (\LET\ \pc\ $\leftarrow $\
+    (\makeNT{0}{j}~\pb) \IN
+    
+    \UNL{3} (\LET\ \pd\ $\leftarrow$\ $5$) \IN
+    \UNL{4} (\LET\ \pe\ $\leftarrow$\ (\CONS\ \pc\ \pd)) \IN
+    \UNL{5} (\SRETURN~\pe))))))
+\end{uprogram}}
+%\end{minipage}
 %\end{figure*}

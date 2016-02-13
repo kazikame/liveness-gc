@@ -835,14 +835,13 @@ ideas behind the proof.
 \end{enumerate}
 
  
-\begin{figure*}[t!]
+\begin{figure}[t!]
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
 \begin{tabular}{|@{}c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|}
 \hline
 Premise & Transition & Rule name \\ 
 \hline
-
 \hline 
 \makecell[t]{ $\rho(x) \mbox{ is } \bot$} & $\rho, S,
   \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow \bang$ &
@@ -851,27 +850,26 @@ Premise & Transition & Rule name \\
 \hline
 \makecell[t]{$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
 (\CAR~x), \cred{\sigma} \rightsquigarrow$ \\ $ \rho', \,(\rho, addr(\langle
-s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}$ }     &
+s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,$\\ $\quad \heap,\, s, \, \cred{\sigma}$ }     &
 {\sc car-1-clo} 
 \\
 \hline
-\makecell[t]{ $\heap(\rho(x))
-\mbox{ is } \langle s, \rho'\rangle$} & $\rho, S,
-  \heap, (\CAR~x), \cred{\sigma} \rightsquigarrow   \rho', (\rho, \rho(x),
-  (\CAR~x), \cred{\sigma})\!:\!S, \heap, s, 
-\cred{\renewcommand{\arraystretch}{1}\left\{
-\begin{array}{lr}
-  {\emptyset}&\mbox{if } \sigma = \emptyset \\       
-  {\{\epsilon\} \cup \acar\sigma }&\mbox{otherwise}
-\end{array}\right.
-}$         
+\makecell[t]{ $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$} & 
+\makecell[t]{ $\rho, S, \heap, (\CAR~x), \cred{\sigma}
+  \rightsquigarrow$ \\
+  $\rho', (\rho, \rho(x), (\CAR~x), \cred{\sigma})\!:\!S,$\\ $\quad \heap, s,\cred{\renewcommand{\arraystretch}{1}\left\{
+    \begin{array}{lr}
+      {\emptyset}&\mbox{if } \sigma = \emptyset \\       
+      {\{\epsilon\} \cup \acar\sigma }&\mbox{otherwise}
+    \end{array}\right.
+  }$   }      
 &
 {\sc car-clo}\\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S_1, \heap_1, (\LET~x\leftarrow
-  s~\IN~e), \sigma) = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
+    s~\IN~e), \sigma)}$\\ $\cred{ = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x
-    \mapsto \ell], S, \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}, \sigma_x\rangle], e, \cred{\sigma}$ \\
+    \mapsto \ell], S,$\\$ \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}, \sigma_x\rangle], e, \cred{\sigma}$ \\
     where $\sigma_x\ =\  \lfloor\mathcal{L}(e,\sigma,\Lfonly)\rfloor_{\{x\}}$} &
 {\sc let} \\ 
 \hline
@@ -881,7 +879,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
   \warning{Add a note mentioning that we handle the issue of requiring
     a      specific     demand      by      introducing     a      new
     symbol}\label{fig:minefield-semantics-for-some}}
-\end{figure*}
+\end{figure}
 
 \noindent To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
@@ -1290,9 +1288,9 @@ As examples, the closure variables $\xl_{\mbox{$\pi$}_1}$ and $\xl_{\mbox{$\pi$}
 stack variables $\pl$ and $\pa$ have the following liveness in terms
 of  $\sigma_{\length}$:
 \begin{align*}
-  \Lv_{\xl_{\mbox{$\pi$}_1}} &= \clazy\sigma_{\mathit{\length}} 
-\end{align*}
-\begin{align*}
+  \Lv_{\xl_{\mbox{$\pi$}_1}} &= \clazy\sigma_{\mathit{\length}} \\
+%\end{align*}
+%\begin{align*}
   \Lv_{\xl_{\mbox{$\pi$}_5}} &=  (\acdr\Df{\length}{1}{\clazy} \cup
   \clazy\Df{\length}{1}{\clazy}) \sigma_{\mathit{\length}} \\
   \Lanv{\pl}{} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
@@ -1486,35 +1484,44 @@ membership problem $\alpha\$ \in \mathscr{L}(G)$ is undecidable.
 \end{lemma} 
 
 \begin{proof}
-Given a Turing machine and an input string, we shall define a function
-for   each  non-terminal   introduced  in   the  proof   of
-Lemma~\ref{lemma:grammar-undecidable}.
-%% Liveness  analysis  of  $f$  will  result in  not  only  contain  a
-%% production  $P$ itself,  but could  also contain  extra productions
-%% that necessarily contain the \clazy\ symbol.
-For instance, corresponding to the production $\nont{i}{\acar} \rightarrow
-\acar \nont{j}{\acar}\bcar$,
-the program is:
+Given a Turing machine and an input string, the  proof   of
+Lemma~\ref{lemma:grammar-undecidable} generates a grammar. 
+We shall define a function
+for   each  non-terminal $\nont{i}{c}$   introduced  in   this grammar
+such that the
+liveness  analysis  of  the function will  result
+in a set of productions that includes the productions for
+$\nont{i}{c}$ generated for the proof.
+As an example, it  can be verified that the grammar
+for the function shown in Figure~\ref{fig:turing-pgm}(b)    includes      the
+productions shown in Figure~\ref{fig:turing-pgm}(a). Here $\nont{\mathit{all}}{}$   corresponds   to  the   demand
+$\sigma_{\mathit{all}}$.
  
-\input{equivalent-program}
-
-The body of the function corresponds  to the RHS of the production. If
-there are  more than one  productions with the same  LHS non-terminal,
-then the function for the non-terminal joins the program fragments for
-the  RHS  with an  $\SIF$.   If  there  are  $n$ such  functions,  then
+The body of the function corresponds  to the RHS of the productions
+for $\nont{i}{c}$. Productions with the same  LHS non-terminal, but
+with differing non-terminal on RHS can be generated by 
+joining program fragments with $\SIF$.   If  there  are  $n$ such  functions,  then
 \mainpgm\ creates  a $n$-way  branch and  inserts a  single call  to a
-distinct function in each branch. It  can be verified that the grammar
-for      the     function      shown      above,     includes      the
-productions shown below. $\nont{\mathit{all}}{}$   corresponds   to  the   demand
-$\sigma_{\mathit{all}}$:
-\begin{align*}
-\nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
-\nont{i}{\acar} &\rightarrow \clazy\nont{i}{\acar}\bcar\nont{\mathit{all}}{} \\
-\nont{\mathit{all}}{} &\rightarrow \epsilon \mid \acar\nont{\mathit{all}}{} \mid
-\acdr\nont{\mathit{all}}{}
-\end{align*}
+distinct function in each branch.
 
-
+\begin{figure}[t]
+  \begin{minipage}{.45\columnwidth}
+    \begin{align*}
+      \nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
+      \nont{i}{\acar} &\rightarrow \clazy\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
+      \nont{\mathit{all}}{} &\rightarrow \epsilon \mid \acar\nont{\mathit{all}}{} \mid
+      \acdr\nont{\mathit{all}}{}
+    \end{align*}
+  \end{minipage}
+  \begin{minipage}{.45\columnwidth}
+    \input{equivalent-program}
+  \end{minipage}\\
+  \mbox{}\hfill(a)\hfill(b)\hfill\mbox{}
+  \caption{A possible grammar generated by the proof of
+    Lemma~\ref{lemma:grammar-undecidable} and a program to realize the
+  grammar.}\label{fig:turing-pgm}
+\vspace*{-5mm}
+\end{figure}
 
 Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
 had a single non-terminal on the RHS. There are two characteristics of
@@ -1540,13 +1547,11 @@ derivable from the grammar.
 \end{proof}
 
 %------------------------------------------------------------%
-
-
 \begin{figure}[t!]
 \scalebox{0.8}{
   \begin{tabular}{cc}
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-5)(50,12)
+\begin{pspicture}(0,-3)(50,12)
   \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}}
   \putnode{t1}{t0}{15}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
   \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
@@ -1561,7 +1566,7 @@ derivable from the grammar.
 \end{pspicture}
 &
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-5)(30,12)
+\begin{pspicture}(0,-3)(30,12)
   \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}}
   \putnode{t1}{t0}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
   \psset{arrows=->}
@@ -1572,7 +1577,7 @@ derivable from the grammar.
 \\
 (a) & (b) \\
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-5)(50,12) %\psframe(0,-5)(40,12)
+\begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
   \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}}
   \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\ \ \ \ }}}
@@ -1598,7 +1603,7 @@ derivable from the grammar.
 \end{pspicture}
 &
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-5)(20,12) %\psframe(0,-5)(40,12)
+\begin{pspicture}(0,-5)(20,8) %\psframe(0,-5)(40,8)
   \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}}
   \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
   \psset{arrows=->}
@@ -1609,63 +1614,11 @@ derivable from the grammar.
 \caption{(a) The  grammar rules for \var{\Df{\length}{1}}
   converted into an automaton, and (b) its DFA. The same for \var{\Lanv{\pa}{}}
   are in (c) and (d).}\label{fig:example-automata}
+\vspace*{-2mm}
 \figrule
 \end{figure}
 
-%\subsection{A liveness-based GC scheme}
-\label{sec:live-clo}
-  \SetStartEndCondition{ }{}{}%
-  \SetKwProg{Pro}{procedure}{\string:}{}
-  \SetKwProg{Fn}{function}{\string:}{}
-  \SetKwFunction{Range}{range}%%
-  \SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
-  \SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
-  \SetKwFor{While}{while}{:}{fintq}%
-  \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
-  \SetKwFunction{Lgc}{$\mathsf{lgc}$}%
-  \SetKwFunction{Copy}{$\mathsf{copy}$}%
-  \SetKwFunction{LCopy}{$lgcCopy$}%
-  \SetKwFunction{RCopy}{$rgcCopy$}%
-
-\begin{algorithm}[t!]
-  \Pro{\Lgc{}}
-     {
-       \For {each reference $\mathsf{ref}$ in root set}
-            {$\mathsf{ref}$ = \Copy($\mathsf{ref}, \mathsf{init}(\mathsf{ref.dfa})$)\;}
-            ${\mathsf{copyReferencesOnPrintStack}()}$\;  
-     }
-     \Fn{\Copy{$\mathsf{ref}, \mathsf{state}$}}
-        {
-          \eIf {$\mathsf{final}(\mathsf{state}$)}
-             {
-               $\mathsf{newRef} = \mathsf{dupHeapCell}(\mathsf{ref})$\;
-               \If{$\mathsf{ref\!.cell}$($\mathsf{ref}$)
-                 is a cons cell $\mathsf{(cons~arg_1~arg_2)}$}
-                  {
-                    {
-                      $\mathsf{newRef}\!.\mathsf{arg_1}  = \Copy(\mathsf{arg_1}, \mathsf{next}(\mathsf{state}, 0))$\;
-%                      $\mathsf{newRef}\!.\mathsf{arg_1}   =  \mathsf{newCar}$\;
-                    }
-                    {
-                      $\mathsf{newRef}\!.\mathsf{arg_2} =  \Copy(\mathsf{arg_2},
-                      \mathsf{next}(\mathsf{state} , 1))$\;
-%                      $\mathsf{newRef}\!.\mathsf{arg_2}   = \mathsf{newCdr}$\;
-                    }    
-                  }
-               \If
-                  {$\mathsf{ref\!.cell}$ is a
-                    closure cell, generically  $\mathsf{(binop~arg_1~arg_2)}$}
-              %      
-                   { 
-                     $\mathsf{newRef}\!.\mathsf{arg_1} = \Copy(\mathsf{arg_1}, \mathsf{init}(\mathsf{arg_1.dfa}))$\;
-                     $\mathsf{newRef}\!.\mathsf{arg_2} = \Copy(\mathsf{arg_2}, \mathsf{init}(\mathsf{arg_2.dfa}))$\;
-                   }
-             }
-             {$\mathsf{newRef = ref}$}
-\KwRet $\mathsf{newRef}$\;
-        }
-        \caption{Liveness-based garbage collection.  \label{algo:lgc-a}}
-\end{algorithm}
+%\subsection{A liveness-based GC scheme} \label{sec:live-clo}
 
 %%\subsubsection{From CFGs to GC-ready DFAs}
 %%\label{sec:NFA-approx}
@@ -1721,6 +1674,58 @@ paths, reflecting  the  lazy  nature  of  our  language.   Since
 the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
 liveness-based GC triggers beyond $\pi_9$.
 
+  \SetStartEndCondition{ }{}{}%
+  \SetKwProg{Pro}{procedure}{\string:}{}
+  \SetKwProg{Fn}{function}{\string:}{}
+  \SetKwFunction{Range}{range}%%
+  \SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
+  \SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
+  \SetKwFor{While}{while}{:}{fintq}%
+  \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
+  \SetKwFunction{Lgc}{$\mathsf{lgc}$}%
+  \SetKwFunction{Copy}{$\mathsf{copy}$}%
+  \SetKwFunction{LCopy}{$lgcCopy$}%
+  \SetKwFunction{RCopy}{$rgcCopy$}%
+
+\begin{algorithm}[t!]
+  \Pro{\Lgc{}}
+     {
+       \For {each reference $\mathsf{ref}$ in root set}
+            {$\mathsf{ref}$ = \Copy($\mathsf{ref}, \mathsf{init}(\mathsf{ref.dfa})$)\;}
+            ${\mathsf{copyReferencesOnPrintStack}()}$\;  
+     }
+     \Fn{\Copy{$\mathsf{ref}, \mathsf{state}$}}
+        {
+          \eIf {$\mathsf{final}(\mathsf{state}$)}
+             {
+               $\mathsf{newRef} = \mathsf{dupHeapCell}(\mathsf{ref})$\;
+               \If{$\mathsf{ref\!.cell}$($\mathsf{ref}$)
+                 is a cons cell $\mathsf{(cons~arg_1~arg_2)}$}
+                  {
+                    {
+                      $\mathsf{newRef}\!.\mathsf{arg_1}  = \Copy(\mathsf{arg_1}, \mathsf{next}(\mathsf{state}, 0))$\;
+%                      $\mathsf{newRef}\!.\mathsf{arg_1}   =  \mathsf{newCar}$\;
+                    }
+                    {
+                      $\mathsf{newRef}\!.\mathsf{arg_2} =  \Copy(\mathsf{arg_2},
+                      \mathsf{next}(\mathsf{state} , 1))$\;
+%                      $\mathsf{newRef}\!.\mathsf{arg_2}   = \mathsf{newCdr}$\;
+                    }    
+                  }
+               \If
+                  {$\mathsf{ref\!.cell}$ is a
+                    closure cell, generically  $\mathsf{(binop~arg_1~arg_2)}$}
+              %      
+                   { 
+                     $\mathsf{newRef}\!.\mathsf{arg_1} = \Copy(\mathsf{arg_1}, \mathsf{init}(\mathsf{arg_1.dfa}))$\;
+                     $\mathsf{newRef}\!.\mathsf{arg_2} = \Copy(\mathsf{arg_2}, \mathsf{init}(\mathsf{arg_2.dfa}))$\;
+                   }
+             }
+             {$\mathsf{newRef = ref}$}
+\KwRet $\mathsf{newRef}$\;
+        }
+        \caption{Liveness-based garbage collection.  \label{algo:lgc-a}}
+\end{algorithm}
 
 
 
