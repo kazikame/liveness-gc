@@ -1,4 +1,4 @@
-\documentclass[9pt,preprint]{sigplanconf}
+\documentclass[9pt,preprint,letter,nonatbib]{sigplanconf}
 \usepackage{etex}
 \usepackage{float}
 \usepackage{mathrsfs}
@@ -6,7 +6,7 @@
 \usepackage{booktabs}
 \usepackage{stmaryrd}
 \usepackage{boxedminipage}
-%\usepackage[T1]{fontenc}
+\usepackage[T1]{fontenc}
 \usepackage{epsfig}
 \usepackage{multirow}
 \usepackage{url}
@@ -44,15 +44,15 @@
 
 \definecolor{Myblue}{rgb}{.2,0,1}
 \definecolor{Myred}{rgb}{1,.2,.2}
+
 \newcommand{\mycomment}[1]{{\color{Myblue}{#1}}}
-\newcommand{\added}[1]{{\color{Myblue}{#1}}}
-%\newcommand{\added}[1]{#1}
+%\newcommand{\added}[1]{{\color{Myblue}{#1}}}
+\newcommand{\added}[1]{#1}
 \newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
-
-
 %\newcommand{\warning}[1]{{\color{Myred}{#1}}}
 \newcommand{\warning}[1]{}
 %\newcommand{\blankout}[1]{}
+
 \newcommand{\oxlb}{\ensuremath{[\!|}}
 \newcommand{\oxrb}{\ensuremath{|\!]}}
 \newcommand{\cred}[1]{\psframebox[linestyle=none, fillcolor=lightgray,fillstyle=solid,framesep=0.5pt]{#1}}
@@ -71,6 +71,11 @@
 \newtheorem{definition}[theorem]{Definition}
 \newtheorem{lemma}[theorem]{Lemma}
 \begin{document}
+
+\special{papersize=8.5in,11in}
+\setlength{\pdfpageheight}{\paperheight}
+\setlength{\pdfpagewidth}{\paperwidth}
+
 %% \linenumbers 
 % --- Author Metadata here ---
 %\conferenceinfo{WOODSTOCK}{'97 El Paso, Texas USA}
