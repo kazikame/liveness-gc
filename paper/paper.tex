@@ -784,7 +784,7 @@ variables of $s$ are updated and added
   to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
 
-{\color{Myblue}  As noted  earlier, $x.\alpha  \in \Lv$  specifies the
+\added{  As noted  earlier, $x.\alpha  \in \Lv$  specifies the
   liveness of the reference $\heap\llbracket\rho(x), \alpha\rrbracket$
   only   if   $\alpha$  corresponds   to   a   closure-free  path   in
   \heap\ starting  from $\rho(x)$.  If  this path is intercepted  by a
@@ -798,19 +798,18 @@ variables of $s$ are updated and added
 \subsection{Soundness of analysis}  
 
 We shall now present a proof of soundness of the analysis presented in
-Section~\ref{sec:liveness-analysis}. {\color{Myblue} It is easy to see that the analysis
+Section~\ref{sec:liveness-analysis}. \added{It is easy to see that the analysis
 correctly identifies the liveness of stack variables. A stack variable
 is live
 between its introduction through a \LET\  and its last use to
 create a closure variable. This is correctly captured by the
 \LET\ rule in Figure~\ref{fig:live-judge}.}
-
 Proving soundness  for closure  variables is more complex. Here  are the
 ideas behind the proof. 
 \begin{enumerate}
 \item      We     augment      the      standard     semantics      in
   Figure~\ref{fig:lang-semantics} to  model a GC before  the execution
-  of  each \LET\  expression.  {\color{Myblue}Note  that, unlike  eager
+  of  each \LET\  expression.  \added{Note  that, unlike  eager
     languages,   memory  is   allocated  only   during  execution   of
     \LET\ expressions}. During GC, we track each reference in the root
   set and heap that is declared  dead by our analysis.  Any attempt to
@@ -878,7 +877,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 \hline
 \end{tabular}
 \end{center}
-\caption{Minefield  semantics for  {\sc  car-bang}  and {\sc  car-clo}
+\caption{Minefield  semantics for  \CAR\   and \LET.
   \warning{Add a note mentioning that we handle the issue of requiring
     a      specific     demand      by      introducing     a      new
     symbol}\label{fig:minefield-semantics-for-some}}
@@ -907,24 +906,24 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
   demand on the closure. 
 
 \item  $GC(\rho,  S,  \heap,  e, \sigma)$ models  a  liveness-based  garbage
-  collection that returns $(\rho', S', \heap')$, where the changes in
+  collection that returns $(\rho', S', \heap')$. The changes in
   $\rho, S$ and  $\heap$ are due
   to non-live references being replaced by $\bot$.  This simulates the
   act of  garbage collecting  the cells
   pointed to by these references  during an actual garbage collection.
-  To do so, $GC$ needs to consider the following environments:  (1) the  environment in  the
+  To do so, $GC(\ldots)$ needs to consider the following environments:  (1) the  environment in  the
   current state, (2) the  environment in each of the stacked  continuations and (3)
   the environment  in each of  the closures in  the heap.
   
  \begin{enumerate} 
-{\color{Myblue}
+\added{
 
- \item \label{env}  For each of  these environments, $GC$  calculates a
+ \item \label{env}  For each of  these environments, $GC(\ldots)$  calculates a
    liveness  environment $\Lv$  using  the  corresponding  $e$  (or  $s$)  and
    $\sigma$.
  \item 
    For each
-    location $\ell$,  $GC$  sets $\heap(\ell)$  to $\bot$ iff for each
+    location $\ell$,  $GC(\ldots)$  sets $\heap(\ell)$  to $\bot$ iff for each
     environment $\rho$ above, for each $x \in domain(\rho)$, and each forward
     access
     path $\alpha$, it is \emph{not} the case that $x.\alpha \in \Lv$ and $\heap\llbracket\rho(x), \alpha
@@ -986,14 +985,13 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 %% step~\ref{gc-1}.
   \end{enumerate}
 \end{enumerate}
-Starting from the initial state,
+Figure ~\ref{fig:minefield-semantics-for-some} shows some of the
+minefield rules. As mentioned earlier, the transition for a \LET\ 
 %%  $([\;]_\rho,([\;]_\rho,
 %% \ans, (\print~\ans)):[\;]_{S}  , [\;]_{\heap}, (\mainpgm)$,
-every transition  is preceded  by a  GC
-using $GC$.  The details of the transition for the {\sc
-  car-clo}  rule   is  shown   in
-Figure~\ref{fig:minefield-semantics-for-some}.  If  this  or  an
-earlier  call to  $GC$  results  in $\rho(x)$  being
+is preceded  by $GC(\ldots)$.  The details of the transition for the {\sc
+  car-clo}  rule   is  also shown.  If    an
+earlier  call to  $GC(\ldots)$  results  in $\rho(x)$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
 enters the  \bang\ state ({\sc  car-bang}). Otherwise
 the transition is similar to the earlier {\sc car-clo}
@@ -1011,9 +1009,9 @@ function calls in a hierarchical fashion.  The details of the inlining
 can be found in~\cite{asati14lgc}.
 For  a
 call-less program,  the initial state of  the minefield
-semantics  is  assumed  to  be  $([\;]_\rho,([\;]_\rho,
+semantics  is  assumed  to  be  $([\;]_\rho,(\rho_\mathit{init},
 \ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
-e_{\mainpgm}$.
+e_{\mainpgm})$.
    
  
 \subsection{Soundness result}
@@ -1030,8 +1028,7 @@ step  is non-null,  the  demand  on the  RHS  is  a transformation  of
 $\sigma$ (for example $(\clazy\cup\acar)\sigma$) which is also non-null.
 
 Note that our proofs will be for a single round of minefield execution
-i.e.  the evaluation of $(\mainpgm)$ (or $e_{\mainpgm}$, for call-less
-programs)  to   its  WHNF  driven  by   the  printing  mechanism~(Section
+i.e.  the evaluation of  $(\mainpgm)$  to   its  WHNF  driven  by   the  printing  mechanism~(Section
 \ref{sec:semantics}).  With  minor variations,  the proof will  also be
 applicable for subsequent evaluations initiated by $\print$.
 %% We show  next that the  minefield execution of a  call-less program
@@ -1043,39 +1040,36 @@ Consider the minefield execution of  a program without function calls.
 Such a program cannot enter the \bang\ state.
 \end{lemma}
 \begin{proof}
-Call a $GC(\ldots)$  followed by a $\rightsquigarrow$  transition as a
-step. Consider a state $(\rho, S,  \heap, e, \sigma)$ in the minefield
-execution of a  program.  We show by induction on  the number of steps
-$n$ leading  to this  state that  the next  transition cannot  enter a
-\bang\  state.    When  $n$   is  0,   the  state   is  $([\;]_\rho,\,
+Consider a  state  $(\rho,  S,  \heap,  e, \sigma)$  in  the
+minefield execution of a program.  We  show by induction on the number $n$
+of $\rightsquigarrow$ steps  leading to  this state  that the next  transition cannot
+enter a  \bang\ state.   When $n$  is 0,  the state  is $([\;]_\rho,\,
 (\rho_\mathit{init},   \,  \ell_{\ans}   ,\,  (\print~\ans)):[\;]_{S},
-        [\;]_{\heap},\, (\mainpgm))$.  Since the  call to $GC$ in this
-        state  does   nothing,  we  ju1st   have  to  show   that  the
-        $\rightsquigarrow$  transition cannot  enter  a \bang\  state.
-        Since our  programs are in  ANF, $e_{\mainpgm}$ can only  be a
-        $\LET$  expression.   A  {\sc   let}  step  does  not  involve
-        dereferencing, and thus cannot result in a \bang.
+[\;]_{\heap},\, e_{\mainpgm})$.   Since the call  to $GC(\ldots)$ in  this state
+does  nothing,  we  just  have to  show  that  the  $\rightsquigarrow$
+transition cannot  enter a  \bang\ state.  Since  our programs  are in
+ANF, $e_{\mainpgm}$ can only be a $\LET$ expression.  A {\sc let} step
+does not involve dereferencing, and thus cannot result in a \bang.
 
 For the inductive step, we shall show that none of the minefield steps
 that involves dereferencing  results in a \bang.  These  are the steps
 which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
 $\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
-inserted by the immediately preceding  garbage collection or the GC of
-an earlier minefield  step.  However the demand $\sigma'$  on basis of
-which an earlier  collection would have inserted a  $\bot$, would have
-included the  current demand $\sigma$.   Thus, if the  earlier garbage
-collection had inserted a $\bot$, so would the current GC.  Thus it is
-enough to  consider the $\rightsquigarrow$  along with the  current GC
-and show that it does not lead to a \bang.
+inserted by an earlier $GC(\ldots)$.   However the demand $\sigma'$  on basis of
+which the $GC(\ldots)$ would have inserted a  $\bot$ would have
+included the  current demand $\sigma$.     Thus it is
+enough to  show that the $\rightsquigarrow$ step would not lead to a
+\bang, even if $GC(\ldots)$ had been done with the current demand
+$\sigma$.
 
-We consider the rules {\sc car-clo} and {\sc car-bang} only.  
+We consider the rules for \CAR\  only.  
 The rest  of the rules involve similar reasoning. For the {\sc
   car-clo}  rule in  the state  $\rho, S,  \heap, (\CAR~x),
 \sigma$, we  know that $\sigma$ is  non-null. Therefore
 the  liveness  of  $x$  includes  $\epsilon$,  and  the
 dereferencing $\heap(\rho(x))$ will go without \bang.
 
-For the  {\sc car-bang}  rule, observe that  there are
+For the  {\sc car-1-clo}  rule, observe that  there are
 two dereferences.  First $x$  is dereferenced to  get a
 cons  cell  and then  the  head  of  the cons  cell  is
 dereferenced  to  obtain  a  closure.   If  the  demand
@@ -1130,8 +1124,7 @@ demand $\sigma$  on each function.   To do so,  we first need to  modify the
 liveness rules to a different form.
 
 %\subsection{Modifying liveness rules}
-\paragraph{Symbolic representation of operations}
-
+\paragraph{Symbolic representation of operations:}
 The   $\mathit{ref}$   rule   for   \CONS,   shown   in
 Figure~\ref{fig:live-judge}, requires us  to remove the
 leading  \acar\ and  \acdr\  from the  access paths  in
@@ -1206,7 +1199,7 @@ similar reasons.
 
 
 %\subsection{Generating equations for $\Lfonly_{\mathit f}$}
-\paragraph{Computing function summaries $\Lfonly_{\mathit f}$}
+\paragraph{Computing function summaries $\Lfonly_{\mathit f}$:}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
 \Lfonly$_\mathit{f}$.        The       program       in
@@ -1251,9 +1244,8 @@ Note that this equation can also be viewed as a CFG with \{\acdr,
 non-terminal.
 
 %\subsection{Generating liveness equations \Lv\  for function bodies}
-\paragraph{Handling user-defined functions}
+\paragraph{Handling user-defined functions:}
 \label{sec:bodylivenessbodies}
-
 To  avoid analyzing  the body  of a  function for  each
 call, we calculated the  liveness for the arguments and
 the variables in a function  with respect to a symbolic
@@ -1321,8 +1313,7 @@ analysis are:
 \end{enumerate}
 
 %\subsection{Solving liveness equations---the grammar interpretation}\label{sec:grammar-formulation}      
-\subsection{From liveness sets to context-free grammars}\label{sec:grammar-formulation}      
-
+\paragraph{From liveness sets to context-free grammars:}\label{sec:grammar-formulation}      
 The  equations  above can  now  be  re-interpreted as  a  context-free
 grammar  (CFG) on  the  alphabet $\lbrace\acar,  \acdr, \bcar,  \bcdr,
 \clazy\rbrace$.  Let \var{$X$} denote  the non-terminal for a variable
