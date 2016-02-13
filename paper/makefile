@@ -6,5 +6,9 @@ rel:
 	$(LATEX) paper && bibtex paper && $(LATEX) paper && $(LATEX) paper 
 	dvips paper.dvi -o paper.ps; ps2pdf paper.ps
 
-PHONY:
-	rm paper.log paper.aux
+PHONY: clean
+
+clean:
+	$(RM) paper.log paper.aux paper.synctex.gz* autotable.aux
+	$(RM) data-liveness-analysis.aux paper.aux paper.bbl paper.log
+	$(RM) paper.pdf paper.synctex.gz

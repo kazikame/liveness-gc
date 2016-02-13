@@ -1,4 +1,4 @@
-\documentclass[9pt]{sigplanconf}
+\documentclass[9pt,preprint]{sigplanconf}
 \usepackage{etex}
 \usepackage{float}
 \usepackage{mathrsfs}
@@ -263,7 +263,7 @@ reachability-based collector (RGC) will preserve all cells.
 
 In  this work  we show  that  static analysis  of heap  data can  help
 garbage  collectors   in  reclaiming   more  garbage.    The  specific
-contributions of this paper are
+contributions of this paper are:
 \added{
 \begin{itemize}
 \item We  propose a liveness  based GC scheme  for a lazy  first order
@@ -290,7 +290,7 @@ contributions of this paper are
   In this  paper, we provide a  formal proof of the  undecidability of
   this problem.
 
-\item We have implemented a garbage  collector that uses the result of
+\item We have implemented a garbage collector that uses the result of
   liveness  analysis to  retain  live cells.   Our experiments  reveal
   interesting  space-time   trade-offs  in  the  engineering   of  the
   collector---for  example, updating  liveness information  carried in
@@ -619,7 +619,7 @@ with regions of programs instead of program points.
 A notion  that generalizes liveness  is {\em demand}.   While liveness
 gives the patterns of future uses of a variable, demand represents the
 future uses of the value of an expression.  The demand on an expression
-$e$   is   again   a   set    of   access   paths---that   subset   of
+$e$   is   also   a   set    of   access   paths---the   subset   of
 $\{\acar,\acdr\}^\ast$ which the  context of $e$ may  explore of $e$'s
 result.   To see  the need  for demands,  consider the expression
 $(\LET~x\leftarrow  (\CDR~y)~\IN~   (\SRETURN~x))$.   Assume   that  the
@@ -629,7 +629,7 @@ demand translates to the liveness  $[x \mapsto \lbrace \epsilon, \acar
   \rbrace]$.   Due  to  the  \LET\   definition  which  binds  $x$  to
 $(\CDR~y)$, the liveness of $x$  now becomes the demand on $(\CDR~y)$.
 This, in  turn, generates  the liveness $\lbrace  y.\epsilon, y.\acdr,
-y.\acdr\acar  \rbrace$.   These are  the  set  of $y$-rooted  accesses
+y.\acdr\acar  \rbrace$.   These are  the $y$-rooted  accesses
 required to  explore $\lbrace  \epsilon, \acar  \rbrace$ paths  of the
 result of $(\CDR~y)$.
 %% As an  analogy with classical  (strong) liveness analysis,  $y$ and
@@ -835,10 +835,10 @@ ideas behind the proof.
 \end{enumerate}
 
  
-\begin{figure}[t!]
+\begin{figure*}[t!]
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
-\begin{tabular}{|@{}c@{\ }|@{\ }c@{\ }|@{\ }c@{\ }|}
+\begin{tabular}{|@{}c@{\ }|@{\ }c@{}|@{\ }c@{\ }|}
 \hline
 Premise & Transition & Rule name \\ 
 \hline
@@ -849,15 +849,15 @@ Premise & Transition & Rule name \\
 \\
 \hline
 \makecell[t]{$\heap(\rho(x)) \mbox{ is } (\langle s, \rho'\rangle, d)$} & \makecell[t]{$\rho,\, S,\,  \heap,\,
-(\CAR~x), \cred{\sigma} \rightsquigarrow$ \\ $ \rho', \,(\rho, addr(\langle
-s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,$\\ $\quad \heap,\, s, \, \cred{\sigma}$ }     &
+(\CAR~x), \cred{\sigma} \rightsquigarrow$ $ \rho', \,(\rho, addr(\langle
+s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S, \heap,\, s, \, \cred{\sigma}$ }     &
 {\sc car-1-clo} 
 \\
 \hline
 \makecell[t]{ $\heap(\rho(x)) \mbox{ is } \langle s, \rho'\rangle$} & 
 \makecell[t]{ $\rho, S, \heap, (\CAR~x), \cred{\sigma}
-  \rightsquigarrow$ \\
-  $\rho', (\rho, \rho(x), (\CAR~x), \cred{\sigma})\!:\!S,$\\ $\quad \heap, s,\cred{\renewcommand{\arraystretch}{1}\left\{
+  \rightsquigarrow$ 
+  $\rho', (\rho, \rho(x), (\CAR~x), \cred{\sigma})\!:\!S, \heap, s,\cred{\renewcommand{\arraystretch}{1}\left\{
     \begin{array}{lr}
       {\emptyset}&\mbox{if } \sigma = \emptyset \\       
       {\{\epsilon\} \cup \acar\sigma }&\mbox{otherwise}
@@ -867,9 +867,9 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,$\\ $\quad \heap,\, s, \, \cred
 {\sc car-clo}\\
 \hline
 \makecell[t]{$\cred{GC(\rho_1, S_1, \heap_1, (\LET~x\leftarrow
-    s~\IN~e), \sigma)}$\\ $\cred{ = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
-  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x
-    \mapsto \ell], S,$\\$ \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}, \sigma_x\rangle], e, \cred{\sigma}$ \\
+    s~\IN~e), \sigma) = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
+  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow \rho\oplus[x
+    \mapsto \ell], S, \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}, \sigma_x\rangle], e, \cred{\sigma}$ \\
     where $\sigma_x\ =\  \lfloor\mathcal{L}(e,\sigma,\Lfonly)\rfloor_{\{x\}}$} &
 {\sc let} \\ 
 \hline
@@ -879,7 +879,8 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,$\\ $\quad \heap,\, s, \, \cred
   \warning{Add a note mentioning that we handle the issue of requiring
     a      specific     demand      by      introducing     a      new
     symbol}\label{fig:minefield-semantics-for-some}}
-\end{figure}
+\vspace*{-2mm}
+\end{figure*}
 
 \noindent To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
@@ -1520,7 +1521,7 @@ distinct function in each branch.
   \caption{A possible grammar generated by the proof of
     Lemma~\ref{lemma:grammar-undecidable} and a program to realize the
   grammar.}\label{fig:turing-pgm}
-\vspace*{-5mm}
+\vspace*{-6mm}
 \end{figure}
 
 Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
@@ -1751,10 +1752,9 @@ liveness-based GC triggers beyond $\pi_9$.
 &  \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
 %\\ (a) & (b)
-\end{tabular}%\vskip -10mm
+\end{tabular}
+\vspace*{-8mm}
  \caption{Memory usage.  
-%% Column (a) shows complete  usage, column 
-%%    (b) enlarges  a part  of the  usage.  
 The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
 cells  in  the  active   semi-space  for  RGC  and  LGC
 respectively.  The \ReachLine\ curve represents the number of
@@ -1765,9 +1765,10 @@ is the time measured  in number of cons-cells allocated
 (scaled down by factor $10^5$). y-axis is the number of
 cons-cells (scaled down by $10^3$).}
 \label{fig:memory-usage} \figrule
+\vspace*{-1mm}
 \end{figure*}
 
-\vspace*{-2.5mm}
+\vspace*{-6.5mm}
 \section{The GC scheme}
 \label{sec:GC-scheme}
 
