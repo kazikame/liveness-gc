@@ -47,7 +47,7 @@
 \newcommand{\mycomment}[1]{{\color{Myblue}{#1}}}
 \newcommand{\added}[1]{{\color{Myblue}{#1}}}
 %\newcommand{\added}[1]{#1}
-\newcommand{\todelete}[1]{{\color{Myred}{#1}}}
+\newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
 
 
 %\newcommand{\warning}[1]{{\color{Myred}{#1}}}
@@ -783,36 +783,40 @@ $\mathit{ref}(s,   \sigma',   \Lfonly)$   is  added   to   $\Lv   \cup
 variables of $s$ are updated and added 
   to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
-{\color{Myblue}
-As noted earlier,  $x.\alpha \in \Lv_y$ specifies the  liveness of the
-reference $\heap\llbracket\rho(x), \alpha\rrbracket$  only if $\alpha$
-corresponds to a closure-free path  in \heap\ starting from $\rho(x)$.
-If this path is intercepted by a closure, say $(\CAR~{x_{\pi}})$, then
-the liveness of heap contents starting from $\mathit{x_{\pi}}$
-is given by $\Lv_\mathit{x_{\pi}}$.
 
-
- As we  shall see in section??,  the liveness of the  closure variable
- $x_{\pi}$ is recorded along with the closure so that the GC can refer
- to it during garbage collection.
-}
+{\color{Myblue}  As noted  earlier, $x.\alpha  \in \Lv$  specifies the
+  liveness of the reference $\heap\llbracket\rho(x), \alpha\rrbracket$
+  only   if   $\alpha$  corresponds   to   a   closure-free  path   in
+  \heap\ starting  from $\rho(x)$.  If  this path is intercepted  by a
+  closure,  say  $(\CAR~{y_{\pi}})$, then  the  liveness  of the  path
+  starting from $\mathit{y_{\pi}}$ is given by $\Lv_\mathit{y_{\pi}}$.
+  As we shall see in  Section~\ref{sec:GC-scheme}, the liveness of the
+  closure variable  $y_{\pi}$ is recorded  along with the  closure for
+  $s$ so that the GC can refer to it during garbage collection.  }
 %} %comment 
 
 \subsection{Soundness of analysis}  
 
 We shall now present a proof of soundness of the analysis presented in
-Section~\ref{sec:liveness-analysis}.   Here are  the ideas  behind the
-proof.
+Section~\ref{sec:liveness-analysis}. {\color{Myblue} It is easy to see that the analysis
+correctly identifies the liveness of stack variables. A stack variable
+is live
+between its introduction through a \LET\  and its last use to
+create a closure variable. This is correctly captured by the
+\LET\ rule in Figure~\ref{fig:live-judge}.}
+
+Proving soundness  for closure  variables is more complex. Here  are the
+ideas behind the proof. 
 \begin{enumerate}
 \item      We     augment      the      standard     semantics      in
   Figure~\ref{fig:lang-semantics} to  model a GC before  the execution
-  of  each  \LET\  expression.   {\color{Myblue}Note  that  memory  is
-    allocated only during execution  of \LET\ expressions}. During GC,
-  we  track each  reference  in the  root  set and  heap  that is  not
-  declared  live by  our analysis.   Any attempt  to dereference  such
-  references results in the transition system entering a special state
-  denoted   \bang.   We   call  the   semantics  after   augmentation,
-  \emph{minefield semantics}.
+  of  each \LET\  expression.  {\color{Myblue}Note  that, unlike  eager
+    languages,   memory  is   allocated  only   during  execution   of
+    \LET\ expressions}. During GC, we track each reference in the root
+  set and heap that is declared  dead by our analysis.  Any attempt to
+  dereference  such  references  results   in  the  transition  system
+  entering a special state denoted \bang.  We call the semantics after
+  augmentation, \emph{minefield semantics}.
 
 %% During GC, we bind  a special value
 %%   $\bot$ to each  reference in the root  set and heap  that is not
@@ -824,14 +828,14 @@ proof.
 %%   in the transition system entering  a special state denoted \bang.  We
 %%   call the semantics after augmentation, \emph{minefield semantics}.
 \item \label{inline1} Assuming that a program enters the \bang\ state,
-  we  show  how to  construct,  through  inline expansion,  a  program
+  we  construct,  through  inline expansion,  a  program
   without function  calls which has  the same minefield  behavior. The
   final step shows that no program  without function calls can enter the
   \bang\ state. As a consequence  no program (with or without function
   calls) can enter the \bang\ state.
 \end{enumerate}
 
-
+ 
 \begin{figure*}[t!]
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
@@ -865,10 +869,19 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
 &
 {\sc car-clo}\\
 \hline
+\makecell[t]{$\cred{GC(\rho_1, S_1, \heap_1, (\LET~x\leftarrow
+  s~\IN~e), \sigma) = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
+  s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x
+    \mapsto \ell], S, \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}, \sigma_x\rangle], e, \cred{\sigma}$ \\
+    where $\sigma_x\ =\  \lfloor\mathcal{L}(e,\sigma,\Lfonly)\rfloor_{\{x\}}$} &
+{\sc let} \\ 
+\hline
 \end{tabular}
 \end{center}
-\caption{Minefield semantics for {\sc car-bang} and
-  {\sc car-clo} \warning{Add a note mentioning that we handle the issue of requiring a specific demand by introducing a new symbol}\label{fig:minefield-semantics-for-some}}
+\caption{Minefield  semantics for  {\sc  car-bang}  and {\sc  car-clo}
+  \warning{Add a note mentioning that we handle the issue of requiring
+    a      specific     demand      by      introducing     a      new
+    symbol}\label{fig:minefield-semantics-for-some}}
 \end{figure*}
 
 \noindent To set up the minefield semantics, we follow these steps:
@@ -897,66 +910,80 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S,\, \heap,\, s, \, \cred{\sigma}
   collection that returns $(\rho', S', \heap')$, where the changes in
   $\rho, S$ and  $\heap$ are due
   to non-live references being replaced by $\bot$.  This simulates the
-  act of  not retaining  (effectively garbage collecting)  the cells
-  pointed to by these references  during an actual GC.
-  This is done in the following way:
+  act of  garbage collecting  the cells
+  pointed to by these references  during an actual garbage collection.
+  To do so, $GC$ needs to consider the following environments:  (1) the  environment in  the
+  current state, (2) the  environment in each of the stacked  continuations and (3)
+  the environment  in each of  the closures in  the heap.
+  
  \begin{enumerate} 
+{\color{Myblue}
 
- \item  Consider  the following  environments,  1)  environment in  the
-  current state, 2)  environments in each of the stacked  items and 3)
-  the environment  in each of  the closures in  the heap. For  each of
-  these  environments  we  can   calculate  a  corresponding  liveness
-  environment using the $e\ and\ \sigma$.
-
-  \item {\color{Myblue}\emph{GC} for  each $x \in domain(\rho)$, we  set $\rho(x)$ to
-    $\bot$  iff $x.\epsilon  \notin \Lv$.   Similarly, for  each stack
-    entry   $(\rho,\ell,e,\sigma)$  in   $S$   with   $\Lv'$  as   the
-    corresponding liveness  environment in $\mathsf{SL}$,  and finally
-    for  each  $x  \in  domain(\rho)$ for  some  closure  $\langle  s,
-    \lfloor\rho\rfloor_{FV(s)}, \sigma\rangle$ in the heap, for all $x
-    \in  FV(s)$ we  set $x$  to  $\bot$ iff  $x.\epsilon \notin  \Lv'$.}
-
-  \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
-    \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
-    liveness environment  \Lv\ for  the expression $e$.   We similarly
-    define the liveness  environments for the expressions  $e$ in each
-    of  the continuation  frames  $(\rho, \ell,  e,  \sigma)$ in  $S$,
-    giving  a stack  of  liveness environments  that  we shall  denote
-    $\mathsf{SL}$.
-  \item  \emph{Garbage collection  of objects  pointed by  root sets:}
-    Consider  each   of  the  following  environments:   (i)  The  the
-    environment $\rho$ in  the current state (ii) and for  each $x \in
-    domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
-    \Lv$.  Similarly,  for each stack entry  $(\rho,\ell,e,\sigma)$ in
-    $S$  with  $\Lv'$ as  the  corresponding  liveness environment  in
-    $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
-    to $\bot$ iff $x.\epsilon \notin \Lv'$.
-
-Consider each of  the following environments: (i)  The the environment
-$\rho$ in the current state and  for each $x \in domain(\rho)$, we set
-$\rho(x)$ to $\bot$ iff $x.\epsilon  \notin \Lv$.  Similarly, for each
-stack  entry   $(\rho,\ell,e,\sigma)$  in  $S$  with   $\Lv'$  as  the
-corresponding liveness  environment in $\mathsf{SL}$, and  for each $x
-\in domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
-\Lv'$.
-
-
-  \item \emph{Garbage  collection of  objects in  the heap:}  
-
-
-    For each
-    location $\ell$,  we set $\heap(\ell)$  to $\bot$ iff for each
-    environment $\rho$ in either  the  current state or in a
-    continuation frame, for each $x \in domain(\rho)$ and each forward
+ \item \label{env}  For each of  these environments, $GC$  calculates a
+   liveness  environment $\Lv$  using  the  corresponding  $e$  (or  $s$)  and
+   $\sigma$.
+ \item 
+   For each
+    location $\ell$,  $GC$  sets $\heap(\ell)$  to $\bot$ iff for each
+    environment $\rho$ above, for each $x \in domain(\rho)$, and each forward
     access
-    path $\alpha$, it is not the case that $x.\alpha \in \Lv$ and $\heap\llbracket\rho(x), \alpha
-    \rrbracket = \ell$. Here 
+    path $\alpha$, it is \emph{not} the case that $x.\alpha \in \Lv$ and $\heap\llbracket\rho(x), \alpha
+    \rrbracket = \ell$. 
 %% $x.\alpha$  is  live  and
 %%     corresponds  to   $\ell$ in \heap.  More  formally,  there   are  no  $x\in
 %%     domain(\rho)$ and  $\alpha$, such that  $\heap\llbracket\rho(x), \alpha
 %%     \rrbracket = \ell$  and $x.\alpha \in \Lv$, where 
-\Lv\ is the liveness environment  corresponding to $\rho$ mentioned in
-step~\ref{gc-1}.
+}
+
+  %% \item {\color{Myblue}\emph{GC} for  each $x \in domain(\rho)$, we  set $\rho(x)$ to
+  %%   $\bot$  iff $x.\epsilon  \notin \Lv$.   Similarly, for  each stack
+  %%   entry   $(\rho,\ell,e,\sigma)$  in   $S$   with   $\Lv'$  as   the
+  %%   corresponding liveness  environment in $\mathsf{SL}$,  and finally
+  %%   for  each  $x  \in  domain(\rho)$ for  some  closure  $\langle  s,
+  %%   \lfloor\rho\rfloor_{FV(s)}, \sigma\rangle$ in the heap, for all $x
+  %%   \in  FV(s)$ we  set $x$  to  $\bot$ iff  $x.\epsilon \notin  \Lv'$.}
+
+  %% \item  \label{gc-1}Using the  current state  $\rho, \stk,  \heap, e,
+  %%   \sigma$  and the  demand  transformers $\Lfonly$,  we construct  a
+  %%   liveness environment  \Lv\ for  the expression $e$.   We similarly
+  %%   define the liveness  environments for the expressions  $e$ in each
+  %%   of  the continuation  frames  $(\rho, \ell,  e,  \sigma)$ in  $S$,
+  %%   giving  a stack  of  liveness environments  that  we shall  denote
+  %%   $\mathsf{SL}$.
+  %% \item  \emph{Garbage collection  of objects  pointed by  root sets:}
+  %%   Consider  each   of  the  following  environments:   (i)  The  the
+  %%   environment $\rho$ in  the current state (ii) and for  each $x \in
+  %%   domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
+  %%   \Lv$.  Similarly,  for each stack entry  $(\rho,\ell,e,\sigma)$ in
+  %%   $S$  with  $\Lv'$ as  the  corresponding  liveness environment  in
+  %%   $\mathsf{SL}$, and for each $x \in domain(\rho)$, we set $\rho(x)$
+  %%   to $\bot$ iff $x.\epsilon \notin \Lv'$.
+
+%% Consider each of  the following environments: (i)  The the environment
+%% $\rho$ in the current state and  for each $x \in domain(\rho)$, we set
+%% $\rho(x)$ to $\bot$ iff $x.\epsilon  \notin \Lv$.  Similarly, for each
+%% stack  entry   $(\rho,\ell,e,\sigma)$  in  $S$  with   $\Lv'$  as  the
+%% corresponding liveness  environment in $\mathsf{SL}$, and  for each $x
+%% \in domain(\rho)$, we  set $\rho(x)$ to $\bot$  iff $x.\epsilon \notin
+%% \Lv'$.
+
+
+%%   \item \emph{Garbage  collection of  objects in  the heap:}  
+
+
+%%     For each
+%%     location $\ell$,  we set $\heap(\ell)$  to $\bot$ iff for each
+%%     environment $\rho$ in either  the  current state or in a
+%%     continuation frame, for each $x \in domain(\rho)$ and each forward
+%%     access
+%%     path $\alpha$, it is not the case that $x.\alpha \in \Lv$ and $\heap\llbracket\rho(x), \alpha
+%%     \rrbracket = \ell$. Here 
+%% %% $x.\alpha$  is  live  and
+%% %%     corresponds  to   $\ell$ in \heap.  More  formally,  there   are  no  $x\in
+%% %%     domain(\rho)$ and  $\alpha$, such that  $\heap\llbracket\rho(x), \alpha
+%% %%     \rrbracket = \ell$  and $x.\alpha \in \Lv$, where 
+%% \Lv\ is the liveness environment  corresponding to $\rho$ mentioned in
+%% step~\ref{gc-1}.
   \end{enumerate}
 \end{enumerate}
 Starting from the initial state,
@@ -2186,7 +2213,7 @@ $~(\DEFINE~(f~\myvec{y})~e_{\mathit{f}})$}  & \makecell[t]{$\rho, S, \heap,
     \rho(\myvec{x})], S, \heap, e_{\mathit{f}}, \cred{\sigma}$}      &
 {\sc funcall} \\
 \hline
-\makecell[t]{$\cred{GC(\rho_1, S, \heap_1, (\LET~x\leftarrow
+\makecell[t]{$\cred{GC(\rho_1, S_1, \heap_1, (\LET~x\leftarrow
   s~\IN~e), \sigma) = (\rho, S, \heap)}$,\\$\ell$ is a new location}& \makecell[t]{$\rho, S, \heap, (\LET~x\leftarrow
   s~\IN~e), \cred{\sigma}$  $ \rightsquigarrow$ \\ $ \rho\oplus[x
     \mapsto \ell], S, \heap[\ell := \langle s, \lfloor\rho\rfloor_{FV(s)}, \sigma_x\rangle], e, \cred{\sigma}$ \\
