@@ -1115,17 +1115,15 @@ $P'$,   a   call-less   program,   cannot   enter   the
 
 
 
-\section{Computing liveness and its encoding as DFA}\label{sec:computing}
+\section{Towards a  computable form of liveness}\label{sec:computing}
 %\section{Generating and storing liveness information}\label{sec:computing}
-Section~\ref{sec:liveness}  gave   a  fully context-sensitive
-liveness analysis which 
-%$\mathcal{L}$ and $ref$ together
-described the  liveness set for  each variable  in a function  body in
-terms of  a symbolic demand  $\sigma$ and \Lfonly.  However,  we are yet
-to describe  (i) how to obtain demand  transformers \Lfonly\ from
-the  rule {\sc  live-define}, and  (ii)  how to  compute the  concrete
-demand $\sigma$  on each function.   To do so,  we first need to  modify the
-liveness rules to a different form.
+The analysis in Section~\ref{sec:liveness} is fully context-sensitive, 
+describing the  liveness sets  in a function body in
+terms of a symbolic demand $\sigma$  and \Lfonly. However, we are yet to
+describe (i) how to obtain demand transformers \Lfonly\ from the rule
+{\sc live-define} , and (ii) how to compute the concrete demand $\sigma$ on
+each function. To do so, we first need to modify the liveness rules
+to a slightly different form.
 
 %\subsection{Modifying liveness rules}
 \paragraph{Symbolic representation of operations:}
@@ -1773,7 +1771,7 @@ cons-cells (scaled down by $10^3$).}
 \vspace*{-1mm}
 \end{figure*}
 
-\vspace*{-6.5mm}
+%\vspace*{-6.5mm}
 \section{The GC scheme}
 \label{sec:GC-scheme}
 
@@ -2138,7 +2136,7 @@ firstification techniques~\cite{Mitchell:2009}.
 %\section{Appendix: not to be included in the paper.}
 %%%%% prasanna minefield
 \begin{figure*}[b!]
-\noindent{\Large \bf A. Minefield semantics (Not to be included in the paper) }
+\noindent{\Large \bf A. Complete minefield semantics}
 \begin{center}\footnotesize
 \renewcommand{\arraystretch}{1.2}
 \begin{tabular}{|c|c|c|}
