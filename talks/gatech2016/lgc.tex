@@ -775,7 +775,7 @@ $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
  \begin{column}[T]{0.38\textwidth}
 \scriptsize
 \centerline{\bf Function summaries:}
-\bigskip\onslide<2->{
+\bigskip\onslide<6->{
 $\Lf{\append}{1}{\sigma} = \{\epsilon\} \cup \acar\bcar\sigma ~
 \cup$ \\ 
 $ \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma}$\\ \ \\ 
@@ -783,6 +783,25 @@ $\Lf{\append}{2}{\sigma} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma}$
 }
  \end{column}
 \end{columns}
+
+\setbeamercovered{invisible}
+      \raisebox{-25mm}{\scalebox{.85}{
+	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
+      \psset{unit=1mm}
+      \psset{linewidth=.3mm}
+      \begin{pspicture}(0,0)(180,30)
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\onslide<2->{\putnode{o}{origin}{96}{67}{\large\red $\sigma$}}
+	\onslide<3->{\putnode{call1}{o}{13}{26}{\large\red $\sigma$}
+	  \nccurve[nodesepB=-.2,angleA=90,angleB=-135,linecolor=red]{->}{o}{call1}}
+	\onslide<4->{\putnode{call2}{o}{15}{6}{\large\red
+            $\bcdr\sigma$}
+	  \nccurve[nodesepB=-.2,angleA=90,angleB=-135,linecolor=red]{->}{o}{call2}}
+	\onslide<5->{\putnode{call3}{call2}{14}{8}{\large\red
+            $\Lf{\append}{2}{\bcdr\sigma}$}
+	  \nccurve[nodesepB=-.2,angleA=90,angleB=-135,linecolor=red]{->}{call2}{call3}}
+      \end{pspicture}}}
+
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
