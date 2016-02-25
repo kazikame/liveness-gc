@@ -1945,6 +1945,40 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame} {Laziness:  Example}
+\small
+\begin{columns}
+\begin{column}[T]{.45\textwidth}
+  \renewcommand{\arraystretch}{1.1}{
+    \begin{uprogram}
+      \UFL (\DEFINE\ (\length~\xl)
+      \UNL{1} (\SIF\  (\NULLQ~\xl)
+      \UNL{2}  \RETURN~0
+      \UNL{2}  \RETURN~(+ 1 (\length~(\CDR~\xl)))))
+  \end{uprogram}}
+\end{column}
+\begin{column}[T]{0.45\textwidth}
+\renewcommand{\arraystretch}{1.1}{
+  \begin{uprogram}
+    \UFL (\DEFINE\ ($\mainpgm$)
+    \UNL{1}  (\LET\  \pa\  $\leftarrow$
+    (
+    \scalebox{0.8}{\psframebox[framearc=.5,
+        fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
+        \begin{tabular}{@{}c@{}}
+          {a BIG closure}
+        \end{tabular}}}
+    ) \IN 
+    \UNL{2} (\LET\  \pb\  $\leftarrow$ ($+$\ \pa\ \acdr) \IN
+    \UNL{3}   (\LET\ \pc\ $\leftarrow$  (\CONS\ \pb\ \NIL) \IN
+    \UNL{4}     (\LET\ \pw\  $\leftarrow$  (\length\ \pc) \IN
+    \UNL{5}     (\RETURN~\pw))))))
+  \end{uprogram}
+}
+\end{column}
+\end{columns}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Handling lazy semantics: Challenges}
 \normalsize
   \begin{itemize}\itemsep2em
@@ -1965,58 +1999,12 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
     \end{itemize}
   \end{itemize}
 \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Laziness: Motivating example}
-\small
-\begin{columns}
-\begin{column}[T]{.45\textwidth}
-  \renewcommand{\arraystretch}{1.1}{
-    \begin{uprogram}
-      \UFL (\DEFINE\ (\length~\xl)
-      \UNL{1}  $\pi_1\!\!:\, ${(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) }\IN
-      \UNL{2} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\  \px
-      \UNL{3} \hspace*{.27cm} $\pi_3\!\!:\, $(\LET\ \pv\ $\leftarrow 0$ \IN
-      \UNL{4} \hspace*{.32cm} $\pi_4\!\!:\,
-      (\RETURN~\pv)$
-      \UNL{3} \hspace*{.29cm}    $\pi_5\!\!:\, ${(\LET~\pu\
-        $\leftarrow$  (\CDR~\xl)  }\IN
-      \UNL{4} \hspace*{.34cm}   $\pi_6\!\!:\, ${(\LET~\py\
-        $\leftarrow$  (\length~\pu)  }\IN
-      \UNL{5} \hspace*{.34cm} $\pi_7\!\!:\,
-      ${(\LET~\pz\ $\leftarrow$ (1~+~\py) }\IN
-      \UNL{6} \hspace*{.34cm} $\pi_8\!\!:\,
-      {(\RETURN~\pz)}$)))))))
-  \end{uprogram}}
-\end{column}
-\begin{column}[T]{0.45\textwidth}
-\renewcommand{\arraystretch}{1.1}{
-    \begin{uprogram}
-      \UNL{1} $(\DEFINE\ (\mainpgm)$
-      \UNL{2} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
-      (
-      \scalebox{0.8}{\psframebox[framearc=.5,
-	  fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
-          \begin{tabular}{@{}c@{}}
-            {a BIG closure}
-      \end{tabular}}}
-      ) \IN  
-      \UNL{3} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
-      \IN
-      \UNL{4}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
-      $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
-      \UNL{5}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-      $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN
-      \UNL{6}  \hspace*{.25cm}  $\pi_{13}\!\!:\,
-      (\RETURN~\pw)))))$
-  \end{uprogram}}
-\end{column}
-\end{columns}
-\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame} {Handling possible non-evaluation}
   \begin{itemize}
-  \item No liveness is independent of demand $\sigma$
-  \item A new terminal \clazy\ with following semantics
+  \item Liveness no longer remains independent of demand $\sigma$
+  \item Require a new terminal \clazy\ with following semantics
     \begin{align*}
       \clazy\sigma \hookrightarrow & \left\{ 
       \begin{array}{ll}
