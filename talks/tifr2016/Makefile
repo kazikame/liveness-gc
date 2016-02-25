@@ -1,4 +1,4 @@
-TGT=tifr
+TGT=lgc
 LATEX=pslatex
 all: 
 	$(LATEX)  $(TGT).tex && dvips $(TGT).dvi -o $(TGT).ps && ps2pdf $(TGT).ps
