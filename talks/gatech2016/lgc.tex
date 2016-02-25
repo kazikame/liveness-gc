@@ -673,13 +673,13 @@ in classical dataflow analysis for imperative languages.
 {
   \bigskip
   \begin{itemize}
-    \onslide<3->{  \item We use \Lfonly$_{\mathit  f}$: context independent summary of
-      the function $f$.}
-    \onslide<4-> {\item To find \Lf{\mathit  f}{i}{\sigma}: 
+    \onslide<3->{  \item We use \Lfonly$_{\mathit  f}$: context independent summary of  $f$.}
+    \onslide<4-> {\item To find \Lf{\mathit  f}{i}{\ldots}: 
       \begin{itemize}
-      \item Assume a symbolic demand $\sigma$.
+      \item Assume a symbolic demand $\sigma_{sym}$.
       \item Let $e_f$ be the body of $f$..  
-      \item Set  \Lf{\mathit  f}{i}{\sigma} to \Lexp{e_f}{\sigma}($x_i$).
+      \item Set \Lf{\mathit f}{i}{\sigma_{sym}} to
+        \Lexp{e_f}{\sigma_{sym}}($x_i$).  
         \onslide<5->{
         \item How to handle recursive calls?         
           \onslide<6->{
@@ -749,7 +749,7 @@ $\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}\onslide<1->{)}
 
 \bigskip
 
-$\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma\; \cup $\\
+$\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
 $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
 $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
 %% \Lanv{5}{\lista} &= \{\epsilon\} \cup  \acar\bcar\sigma_{\append}\\
@@ -778,7 +778,7 @@ $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
 \bigskip\onslide<2->{
 $\Lf{\append}{1}{\sigma} = \{\epsilon\} \cup \acar\bcar\sigma ~
 \cup$ \\ 
-$ \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma}$\\
+$ \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma}$\\ \ \\ 
 $\Lf{\append}{2}{\sigma} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma}$
 }
  \end{column}
@@ -902,7 +902,7 @@ $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
 \bigskip
 $\Lf{\append}{1}{\sigma} = \{\epsilon\} \cup \acar\bcar\sigma ~
 \cup$ \\ 
-$ \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma}$\\
+$ \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma}$\\ \ \\
 $\Lf{\append}{2}{\sigma} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma}$
  \end{column}
 \end{columns}
