@@ -95,9 +95,9 @@
   \begin{quote}
     \ldots All garbage collectors use some efficient {\red approximation to
     liveness}. In {tracing} garbage collection, the approximation is that
-    an object can't be live unless it is {\red reachable}. In {reference
-      counting}, the approximation is that an object can't be live unless
-    it is {\red referenced}. 
+    an object can't be live unless it is {\red reachable}.
+    %%In {reference counting}, the approximation is that an object
+    %%can't be live unless it is {\red referenced}.
     \ldots
   \end{quote}
   From Memory Management Glossary\\
@@ -113,8 +113,9 @@
       \end{itemize}
     \item Our idea: 
       \begin{itemize}
-      \item We do a liveness analysis and provide GCs with its result.
-      \item Modify GCs to mark data for retention {\em only if it is live}.
+      \item We do  a liveness analysis of {\em heap  data} and provide
+        GC with its result.
+      \item Modify GC to mark data for retention {\em only if it is live}.
       \end{itemize}
     \item Consequences:
       \begin{itemize}
@@ -415,7 +416,7 @@ $\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}\onslide<1->{)}
 \begin{frame}{Liveness analysis}
   \begin{itemize}
   \item {\bf  GOAL:} Compute  Liveness Environment at  various program
-    points
+    points, statically.
   \end{itemize}
   \bigskip\pause
   \Lapp{a}{\sigma}  --  Liveness  environment  generated  by  an  {\em
@@ -665,7 +666,7 @@ in classical dataflow analysis for imperative languages.
       \small
       \mbox{\onslide<1->{$\Lapp{{\red{(f \;x \;y)}}}{\sigma} =$}
         \onslide<2->{
-          \alt<2>{$\{x.\overline{\psi_x}{\sigma},  \;  y.\overline{\psi_y}{\sigma}\}$}{$\{x.\Lf{f}{1}{\sigma},  \;  y.\Lf{f}{2}{\sigma}\}$}
+          \alt<2>{$x.\overline{\psi_x}{\sigma} \cup  \;  y.\overline{\psi_y}{\sigma}$}{$x.\Lf{f}{1}{\sigma} \cup  \;  y.\Lf{f}{2}{\sigma}$}
         }}
     \end{column}
   \end{columns}
@@ -677,13 +678,13 @@ in classical dataflow analysis for imperative languages.
     \onslide<4-> {\item To find \Lf{\mathit  f}{i}{\ldots}: 
       \begin{itemize}
       \item Assume a symbolic demand $\sigma_{sym}$.
-      \item Let $e_f$ be the body of $f$..  
+      \item Let $e_f$ be the body of $f$. 
       \item Set \Lf{\mathit f}{i}{\sigma_{sym}} to
         \Lexp{e_f}{\sigma_{sym}}($x_i$).  
         \onslide<5->{
         \item How to handle recursive calls?         
           \onslide<6->{
-            {\red Use the assumed  \Lfonly$_{\mathit  f}$~!!}
+            {\red Use  \Lfonly$_{\mathit  f}$ with appropriate demand~!!}
         }}
     \end{itemize}}
   \end{itemize}
@@ -719,7 +720,7 @@ in classical dataflow analysis for imperative languages.
 
     \UNL{3} \hspace*{-1.4cm}     $\pi_2\!\!:\, $\onslide<0>{(\SIF\ \xtest}
 
-~$\pi_3\!\!:$\onslide<0>{(\RETURN\ \listb)} 
+~$\pi_3\!\!:$\onslide<0,3->{(\RETURN\ \listb)} 
  
           \UNL{4}\hspace*{-1.8cm} \hspace*{.05cm}    
  $\pi_4\!\!:\, $\onslide<0>{(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN}
@@ -730,10 +731,10 @@ in classical dataflow analysis for imperative languages.
           \UNL{6}\hspace*{-2.4cm} \hspace*{.05cm}   $\pi_6\!\!:\, $\onslide<0>{(\LET\ \xhd\  $\leftarrow$  (\CAR\ \lista)  \IN}
 
 
-          \UNL{7}\hspace*{-2.7cm}  \hspace*{.05cm}   $\pi_7\!\!:\,$\onslide<0>{(\LET\ \xans\  $\leftarrow$ (\CONS\ \ \xhd\ \ \xrec)  \IN 
+          \UNL{7}\hspace*{-2.7cm}  \hspace*{.05cm}   $\pi_7\!\!:\,$\onslide<0>{(\LET\ \xans\  $\leftarrow$} \onslide<0,4->{(\CONS\ \ \xhd\ \ \xrec)} \onslide<0>{  \IN
 
           \UNL{8}\hspace*{-3.0cm} \hspace*{.05cm}}
-$\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}\onslide<1->{)}
+$\pi_8\!\!:\, $ \onslide<0,4->{(\RETURN\ \xans)))))))}\onslide<1->{)}
 \end{uprogram}}
  \end{column}
 \end{columns}
@@ -888,7 +889,7 @@ $\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}\onslide<1->{)}
 
 \bigskip
 
-$\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma\; \cup $\\
+$\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
 $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
 $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
 %% \Lanv{5}{\lista} &= \{\epsilon\} \cup  \acar\bcar\sigma_{\append}\\
@@ -1446,11 +1447,12 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
   \begin{itemize}
   \item GC invoked at a program point $\pi$
   \item GC traverses a path $\alpha$ starting from a root variable $x$.
-  \item GC consults $\Lanv{}{x}$: 
+  \item GC consults $\Lanv{\pi}{x}$: 
     \begin{itemize}
     \item Does $\alpha \in \mathscr{L}(\Lanv{\pi}{x})$ ?
     \item If yes, then mark the current cell
     \end{itemize}
+    \pause
   \item  Note  that  $\alpha$  is a  {\em  forward}-only  access  path
     \begin{itemize}
     \item consisting  only of  edges \acar\  and \acdr,  but not  \bcar\ or
@@ -1497,7 +1499,7 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
     \bcar\acar    \rightarrow    \epsilon\\
     \bcdr\acdr    \rightarrow   \epsilon\\
   \end{align*}
-\item The problem shown to be undecidable\footnote{ Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Collection for Lazy Languages}, submitted.}.
+\item The problem shown to be undecidable\footnote{ Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Collection for Lazy Languages}, under review.}.
   \begin{itemize}
   \item Reduction from Halting problem.
   \end{itemize}
@@ -1656,9 +1658,9 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \normalsize
 \bigskip
 
-\begin{itemize}
-\item Our liveness analysis is precise.
-\end{itemize}
+%% \begin{itemize}
+%% \item Our liveness analysis is precise.
+%% \end{itemize}
 }
 
 \only<2>
@@ -1939,8 +1941,10 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 \begin{itemize}
 \item An evaluation  strategy in which evaluation of  an expression is
   postponed until its value is needed
-\item Binding  of a  variable to  an expression  {\bf does  not force
-  evaluation} of the expression
+  \begin{itemize}
+  \item Binding  of a  variable to  an expression  {\bf does  not force
+    evaluation} of the expression
+  \end{itemize}
 \item Every expression is evaluated at most once
 \end{itemize}
 \end{frame}
@@ -1989,13 +1993,12 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
       where this evaluation takes place cannot be statically determined
     \end{itemize}
     \pause
-  \item Garbage collector significantly more complicated than a liveness-based
-    collector for a eager language.
+  \item Liveness-based garbage collector significantly more complicated than that for an eager language.
     \begin{itemize}
     \item Need to track liveness of closures
-    \item But closure can escape the scope in which it was created
-    \item Carry the liveness information in the closure itself
-    \item Need to update the liveness information as execution progresses
+    \item But a closure can escape the scope in which it was created
+    \item Solution: carry the liveness information in the closure itself
+    \item For precision: need to update the liveness information as execution progresses
     \end{itemize}
   \end{itemize}
 \end{frame}
@@ -2003,14 +2006,18 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame} {Handling possible non-evaluation}
   \begin{itemize}
-  \item Liveness no longer remains independent of demand $\sigma$
+  \item Liveness no longer remains independent of demand $\sigma$ \\
+    \begin{itemize}
+    \item If (\CAR~\px) is not evaluated at all, it does not generate any liveness for \px
+    \end{itemize}
   \item Require a new terminal \clazy\ with following semantics
     \begin{align*}
       \clazy\sigma \hookrightarrow & \left\{ 
       \begin{array}{ll}
         \emptyset&\mbox{if}~\sigma = \emptyset\\
         \{\epsilon\} & \mbox{otherwise}
-      \end{array}\right.
+      \end{array}\right.\\ & \\
+      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
     \end{align*}
   \end{itemize}
 \end{frame}
@@ -2049,22 +2056,23 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Conclusions}
   \begin{itemize}\itemsep1em
-  \item Proposed a liveness-based GC scheme. Proved theoretically:
+  \item Proposed a liveness-based GC scheme. 
+  \item Not covered in this talk:
     \begin{itemize}
     \item The soundness of liveness analysis.
-    \item That it can never do more collections than reachability
-      based GC.
+    \item Details of undecidability proof.
+    \item Details of handling lazy languages.
     \end{itemize}
-    \item Implemented a prototype that:
+    \item A prototype implementation to demonstrate:
       \begin{itemize}
-      \item Demonstrated the precision of the analysis.
-      \item Demonstrated reduced heap requirement.
-      \item Reduced GC time for a majority of programs.
+      \item the precision of the analysis.
+      \item reduced heap requirement.
+      \item reduced GC time for a majority of programs.
     \end{itemize}
     \item Unfinished agenda:
       \begin{itemize}
       \item Improving GC time for a larger fraction of programs.
-      \item Improving scope of the method.
+      \item Extending scope of the method.
     \end{itemize}
   \end{itemize}
 \end{frame}
