@@ -247,7 +247,7 @@ benchmark programs.
 \input{fig_motiv}   Figure~\ref{fig:mot-example}   shows  an   example
 program and the state of the heap at the program point $\pi$\footnote{We write
 $\pi\!:\!e$ to  associate a  label $\pi$ with  the program  point just
-before  the  expression  $e$. The label is not part of the syntax.},  i.e. just  before  the  evaluation  of
+before  the  expression  $e$. The label is not part of the syntax.},  i.e., just  before  the  evaluation  of
 $(\length\ \pz)$.  The heap is represented  by a graph in which a node
 either  represents  atomic  values   ($\NIL$,  integers  etc.),  or  a
 \CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
@@ -290,10 +290,10 @@ contributions of this paper are:
 \item The  analysis results  in a set  of context-free  grammars along
   with  a fixed  set  of non-context-free  productions.  The  decision
   whether to copy a cell during  GC translates to a membership problem
-  for  such  grammars.  Earlier  assumed  the  undecidability of  this
-  membership question  and used an over-approximation  to overcome it.
-  In this  paper, we provide a  formal proof of the  undecidability of
-  this problem.
+  for such  grammars.  Earlier research assumed  the undecidability of
+  this membership question and  used an over-approximation to overcome
+  it.  In this paper, we provide  a formal proof of the undecidability
+  of this problem.
 
 \item We have implemented a garbage collector that uses the result of
   liveness  analysis to  retain  live cells.   Our experiments  reveal
@@ -589,7 +589,7 @@ used in  future computations and  dead if  it is definitely  not used.
 Heap-allocated data  needs a richer model  than classical liveness---a
 model which talks about liveness of references.  
 
-%% The model use the notion of  {\em access paths}, i.e.
+%% The model use the notion of  {\em access paths}, i.e.,
 %% a  prefix-closed set of strings  over $\{\acar,\acdr\}^\ast$, in
 %% which 
 %% $\acar$,  $\acdr$ represent  access  using $\CAR$  and $\CDR$  fields.
@@ -653,19 +653,22 @@ $\lbrace  \alpha_1\alpha_2 \mid  \alpha_1 \in  \sigma_1, \alpha_2  \in
 label and  a set  of access  paths; $\acar\sigma$  is a  shorthand for
 $\lbrace\acar\rbrace\sigma$.
 
-\input{example-program}
-%%\label{fig:mot-example2}
-
 %==============================================================
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
+
+\begin{figure}[t]
+  \input{example-to-illustrate-liveness}  
+  \caption{Example illustrating liveness of closures}\label{fig:lv-closure}
+\end{figure}
+\input{fig-liveness}
 
 
 \subsection{Liveness analysis for lazy languages}
 \label{sec:liveness-analysis}
   
 
-Consider the  program in Figure~\ref{fig:mot-example2-a}.   As mentioned
+Consider the  program in Figure~\ref{fig:lv-closure}.   As mentioned
 earlier, a lazy evaluation of the $\LET$ expression at $\pi_1$ creates
 a closure  for $(\length~\px)$  instead of  evaluating it.   Since the
 closure may escape the scope in which it is created, it carries a copy
@@ -693,41 +696,36 @@ label of the program   point  where   the   closure  was   created\footnote{Mult
   value for each  variable that is applicable from  its creation point
   to evaluation points.
 
-\begin{figure}[t]
-  \input{example-to-illustrate-liveness}  
-  \caption{Example illustrating liveness of closures}\label{fig:lv-closure}
-\end{figure}
-\input{fig-liveness}
-
  
-Closure  variables get  their  liveness values  through  a chain  of
-dependences beginning at  a variable at an evaluation  point.  As an
-example, consider the program in Figure~\ref{fig:lv-closure}.
+Closure  variables  get  their  liveness values  through  a  chain  of
+dependences beginning  at a  variable at an  evaluation point.   As an
+example,  consider again  the program  in Figure~\ref{fig:lv-closure}.
 The variable  \pz\ returned  at $\psi_3$ depends  on \py\  through the
 expression $(+~\py~1)$.  $\py$ in turn depends on the closure variable
 $\px_{\mathit{\pi}_1}$  through $(\length~\px_{\mathit{\pi}_1})$.   We
 denote this  chain of  dependences as  $\lbrack \psi_3\!\!\!:\!\!\!\pz
 \leftarrow            (+~\py~1),\,           \py            \leftarrow
-(\length~\px_{\mathit{\pi}_1})\rbrack$.  Indeed,  the chains of closures  in the
-heap are a  runtime representation of these  dependences.  Since $\pz$
-is evaluated  at $\psi_3$  due to  the expression  $\SRETURN~\pz$, the
-demand made by the calling context(s)  of $f$ places a demand on $\pz$
-which  will  impart a  liveness  to  $\px_{\pi_1}$.  Other  dependence
-chains  which result  in  a liveness  for  $\px_{\pi_1}$ are  $\lbrack
-\psi_1\!\!\!:\!\!\py   \leftarrow  (\length~\px_{\pi_1})\rbrack$   and
-$\lbrack   \psi_2\!\!\!:\!\!\!\pw   \leftarrow  (/~\pu~\py),\,\,   \py
-\leftarrow   (\length~\px_{\pi_1})\rbrack$.   The   liveness  analysis
-described in this section declares the liveness of $\px_{\pi_1}$ to be
-a union of  the liveness arising from these dependence  chains.  To be
-safe, a GC during  evaluation of $\py$ at $\psi_1$ has
-to use  this liveness to  copy the heap starting from  $\px_{\pi_1}$.  However,
-notice that if a GC takes place while evaluating $\pz$
-at $\psi_3$, it can safely consider only the liveness arising from the
-dependence chain\linebreak  $\lbrack \psi_3\!\!\!:\!\!\!\pz \leftarrow
-(+~\py~1),\, \py \leftarrow (\length~\px_{\pi_1})\rbrack$.  The garbage
-collection  scheme  described  in Section~\ref{sec:GC-scheme}  uses  a
-generalization of this observation  to dynamically select a evaluation
-point specific liveness in order to collect more garbage.
+(\length~\px_{\mathit{\pi}_1})\rbrack$.    Indeed,   the   chains   of
+closures  in   the  heap  are   a  runtime  representation   of  these
+dependences.   Since  $\pz$  is  evaluated  at  $\psi_3$  due  to  the
+expression $\SRETURN~\pz$,  the demand made by  the calling context(s)
+of  $f$ places  a demand  on  $\pz$ which  will impart  a liveness  to
+$\px_{\pi_1}$.  Other dependence chains which result in a liveness for
+$\px_{\pi_1}$    are    $\lbrack    \psi_1\!\!\!:\!\!\py    \leftarrow
+(\length~\px_{\pi_1})\rbrack$   and  $\lbrack   \psi_2\!\!\!:\!\!\!\pw
+\leftarrow          (/~\pu~\py),\,\,           \py          \leftarrow
+(\length~\px_{\pi_1})\rbrack$.   The  liveness analysis  described  in
+this section declares  the liveness of $\px_{\pi_1}$ to be  a union of
+the liveness arising  from these dependence chains.  To be  safe, a GC
+during evaluation  of $\py$ at  $\psi_1$ has  to use this  liveness to
+copy the heap starting from  $\px_{\pi_1}$.  However, notice that if a
+GC  takes place  while evaluating  $\pz$  at $\psi_3$,  it can  safely
+consider only the liveness arising from the dependence chain\linebreak
+$\lbrack \psi_3\!\!\!:\!\!\!\pz \leftarrow (+~\py~1),\, \py \leftarrow
+(\length~\px_{\pi_1})\rbrack$.    The    garbage   collection   scheme
+described in Section~\ref{sec:GC-scheme} uses a generalization of this
+observation  to  dynamically  select   an  evaluation  point  specific
+liveness in order to collect more garbage.
 
 
 
@@ -1032,7 +1030,7 @@ step  is non-null,  the  demand  on the  RHS  is  a transformation  of
 $\sigma$ (for example $(\clazy\cup\acar)\sigma$) which is also non-null.
 
 Note that our proofs will be for a single round of minefield execution
-i.e.  the evaluation of  $(\mainpgm)$  to   its  WHNF  driven  by   the  printing  mechanism~(Section
+i.e.,  the evaluation of  $(\mainpgm)$  to   its  WHNF  driven  by   the  printing  mechanism~(Section
 \ref{sec:semantics}).  With  minor variations,  the proof will  also be
 applicable for subsequent evaluations initiated by $\print$.
 %% We show  next that the  minefield execution of a  call-less program
@@ -1199,6 +1197,7 @@ modified  \CONS\ rule  is  given in  \cite{asati14lgc}.
 The proposition also holds for other modified rules for
 similar reasons.
 
+\input{example-program}
 
 %\subsection{Generating equations for $\Lfonly_{\mathit f}$}
 \paragraph{Computing function summaries $\Lfonly_{\mathit f}$:}
@@ -1756,7 +1755,7 @@ liveness-based GC triggers beyond $\pi_9$.
 &  \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
 %\\ (a) & (b)
 \end{tabular}
-\vspace*{-8mm}
+\vspace*{-2mm}
  \caption{Memory usage.  
 The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
 cells  in  the  active   semi-space  for  RGC  and  LGC
@@ -1829,7 +1828,7 @@ collection points in a function body to the following:
 %% which resulted in the  call to ${\mathit g}$ would
 %% be used.
 
-We shall call a  unit allocatable memory as a {\em  cell}.  A cell can
+We shall call a  unit of allocatable memory as a {\em  cell}.  A cell can
 hold    a    basic    value    ($\mathsf{bas}$),    the    constructor
 \CONS\ $(\mathsf{cons~  arg_1~arg_2}$) or a closure.   The closure, in
 turn,    can    be    one   of    ($\mathsf{unop~arg}$),    ($\mathsf{
@@ -1839,7 +1838,7 @@ addition, the closure also carries  a pointer to a DFA (denoted
 $\mathsf{arg_i.dfa_i}$) for each $\mathsf{arg_i}$.
 Algorithm~\ref{algo:lgc-a}   describes   the   garbage
 collection scheme.  Starting with the root set, each cell pointed by a
-live reference  (i.e. whose associated  DFA state is final)  is copied
+live reference  (i.e., whose associated  DFA state is final)  is copied
 using $\mathsf{copy}$.   Copying a \CONS\ cells  just involves copying
 the  cell  itself   and  conditionally  copying  the   \CAR\  and  the
 \CDR\ fields after referring to the  next states of the DFA.  If
@@ -1855,6 +1854,7 @@ have not been shown.
 \begin{table*}[t!]
 \caption{Statistics for liveness analysis and garbage collection}
 \label{tab:exp-results}
+\vskip -2mm
 \centering
 \include{data-liveness-analysis}
 \vskip -5mm
@@ -1928,21 +1928,15 @@ result,  the benchmark  highly favours  LGC.  The  benchmark has  been
 included  for  completeness,  and  we  do  not  consider  its  numbers
 as being representative of real programs.
 
-Memory  usage graphs  for select  benchmarks are  shown
-Figure~\ref{fig:memory-usage},  Column   (a).   In some cases, the
-number of  GCs  tend to be  very large,
-hence  we  show only  a  slice of the original graph  with 
-representative    behavior  (Column (b)).  In all the programs we can see
-that  the   curve  corresponding  to  LGC   (\LGCLine\ line)
-dips   below the RGC curve 
-(\RGCLine\ line) during GC.  The graphs also include the
-curve    for   reachable    cells   (\ReachLine)  and live cells
-(\UseLine). These were  obtained
- by forcing  RGC to  run at   very  high
-frequency. The curve for live cells were obtained by recording heap
-access times and post processing the data 
-at the end of the program. Note that the size of an LGC cell is 1.16
-times the size of a RGC cell.
+Memory    usage    graphs    for     the    benchmarks    are    shown
+Figure~\ref{fig:memory-usage}.  In  all the  programs we can  see that
+the curve  corresponding to  LGC (\LGCLine\ line)  dips below  the RGC
+curve (\RGCLine\ line)  during GC.  The graphs also  include the curve
+for reachable cells (\ReachLine) and live cells (\UseLine). These were
+obtained by forcing  RGC to run at very high  frequency. The curve for
+live  cells were  obtained by  recording  heap access  times and  post
+processing the data at  the end of the program. Note  that the size of
+an LGC cell is 1.16 times the size of a RGC cell.
 
 
 As  demonstrated by  the gap  between the  \RGCLine\ and  the \UseLine\
