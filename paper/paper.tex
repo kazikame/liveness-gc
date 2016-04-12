@@ -1,4 +1,4 @@
-\documentclass[9pt,preprint,nonatbib]{sigplanconf}
+\documentclass[9pt,draft,nonatbib]{sigplanconf}
 \usepackage{etex}
 \usepackage{float}
 \usepackage{mathrsfs}
@@ -244,7 +244,9 @@ benchmark programs.
 %------------------------------------------------------------%
 \subsection{Motivating example}
 \label{sec:motiv}
-\input{fig_motiv}   Figure~\ref{fig:mot-example}   shows  an   example
+\input{fig_motiv}   
+%%
+Figure~\ref{fig:mot-example}   shows  an   example
 program and the state of the heap at the program point $\pi$\footnote{We write
 $\pi\!:\!e$ to  associate a  label $\pi$ with  the program  point just
 before  the  expression  $e$. The label is not part of the syntax.},  i.e., just  before  the  evaluation  of
@@ -1353,202 +1355,7 @@ $\alpha \in \sigma$?
 %%\end{quote}
 We model  this problem as one  of deciding the
 membership of  a CFG augmented  with a
-fixed set of unrestricted productions.
-
-\begin{definition}\label{def:specialgrammar}
-Consider the  grammar $(N,T,  p_1\cup p_2,S)$  in which
-$N$ is  a set  of non-terminals,  $T =  \{\acar, \acdr,
-\bcar,  \bcdr,  \clazy,  \$\}$,   $p_1$  is  a  set  of
-context-free    productions     that    contains    the
-distinguished  production   $S  \rightarrow  \alpha\$$,
-$\alpha$ is a  string of grammar symbols  that does not
-contain $S$, and $p_2$ is the fixed set of unrestricted
-productions    $\bcar\acar    \rightarrow    \epsilon$,
-$\bcdr\acdr    \rightarrow   \epsilon$,    $\clazy\acar
-\rightarrow \clazy$,  $\clazy\acdr \rightarrow \clazy$,
-and $\clazy\$ \rightarrow \$ $.
-\end{definition}
-
-%% From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
-%% that the results of liveness analysis of any program can be modeled by
-%% the kind  of grammar described above. The  following proposition shows
-%% that the converse also holds.
-%% \begin{proposition}
-%% Given    a     grammar    $G$    of    the     form    described    in
-%% Definition~\ref{def:specialgrammar},  it is  possible  to construct  a
-%% program $p$  with program points  $\pi_i$ and variables $x$  such that
-%% the liveness  analysis of $p$  is same as  $G$ except for a  change in
-%% non-terminal names which now have the form \var{\Lanv{i}{x}}.
-%% \end{proposition}
-We first show that membership problem of the class of grammars in
-Definition~\ref{def:specialgrammar} is undecidable. However note that
-the grammars may not be necessarily generated from liveness analysis.
-\newcommand{\state}{\ensuremath{\mathsf{S}}}
-\newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}  
-\begin{lemma}\label{lemma:grammar-undecidable}
-Given a grammar    $G$    of   the    kind    described    in
-Definition~\ref{def:specialgrammar}  and a forward access path $\alpha$
-consisting  of symbols \acar\  and \acdr\  only, the membership problem
-$\alpha\$ \in \mathscr{L}(G)$ is undecidable.
-\end{lemma} 
-
-\begin{proof}
-Given a Turing machine and  an input $w\in (1+0)^*$, we
-construct a grammar $G$ such that the machine will halt
-on    $w$    if    and   only    if    $\$    \in
-\mathscr{L}(G)$. The grammar includes  the fixed set of
-unrestricted               productions               in
-Definition~\ref{def:specialgrammar}.
-
-We shall represent a Turing machine (TM) configuration 
-as $w_l(\state,c)w_r$, where $w_l$ is the string to the
-left of the head, $w_r$ is the string to the right, $c$
-is the symbol under the head and \state\ is the current
-state of  the TM.   For each combination  of state
-and symbol  $(\state,c)$, the grammar will  contain the
-non-terminal \nont{}{c}. We shall synchronize each move
-of the TM to  a derivation  step using  a context
-free production, followed, if possible, by a derivation
-step using either  $\bcar\acar \rightarrow \epsilon$ or
-$\bcdr\acdr   \rightarrow    \epsilon$.    After   each
-synchronization,  we  shall   establish  the  following
-invariant  relation between  the TM  configuration
-and the sentential form:
-
-\begin{quote}
-  If    the   configuration    of   the    TM   is
-  $w_l(\state,c)w_r$, then the  sentential form will be
-  $\overline{w}_l\nont{}{c}\,w_r\$ $,                where
-  $\overline{w}_l$ is  the same as $w_l$  but with each
-  symbol $d$ in $w_l$ replaced by $\overline{d}$.
-\end{quote}
-
-Assume that  the TM starts  in a  state $S_\mathit{init}$ with  a tape
-$cw$ and  the head positioned on  the symbol $c$. Then  the sentential
-form    corresponding     to    the    initial     configuration    is
-$\nont{\mathit{init}}{c}w\$$ (we  can assume that there  is a production
-$\nont{}{} \rightarrow  \nont{\mathit{init}}{c}w\$$, where  \nont{}{} is
-the start symbol of the  grammar). Further correspondences between the
-TM moves and the grammar productions are as follows:
-
-\begin{enumerate}
-\item For each transition  $(S_i, c) \rightarrow (S_j,c',L)$, there are
-  two  productions $\nont{i}{c}  \rightarrow  \acar \nont{j}{\acar}c'$
-  and $\nont{i}{c} \rightarrow \acdr \nont{j}{\acdr}c'$.
-\item For each  transition $(S_i, c) \rightarrow (S_j,c',R)$, there
-  are two productions
-  $\nont{i}{c} \rightarrow \overline{c'} \nont{j}{\acar}\bcar$ and $\nont{i}{c}
-  \rightarrow \overline{c'} \nont{j}{\acdr}\bcdr$. 
-\end{enumerate}
-The idea  behind the  productions is explained  with an
-example:  Assume that  the current  sentential form  is
-$\bcar\bcdr\nont{i}{\acar}\acar\acar\$$. Also  assume that  the
-TM  has  a   transition  $(S_i,\acar)  \rightarrow
-(S_j,\acdr, L)$.  Since the next corresponding  step in
-the  derivation  has  to  be  done  without  any  prior
-knowledge of whether the symbol to the left of the tape
-is a \acar\  or a \acdr, two  productions are provided,
-and  the  invariant  will  be maintained  only  if  the
-production         $\nont{i}{\acar}         \rightarrow
-\acdr\nont{j}{\acdr}\acdr$ is chosen  for the next step
-in  the  derivation.    This  gives  the  configuration
-$\bcar\bcdr\acdr\nont{j}{\acdr}\acdr\acar\acar\$$.
-Simplification   with    the   production   $\bcdr\acdr
-\rightarrow               \epsilon$              yields
-$\bcar\nont{j}{\acdr}\acdr\acar\acar\$$,    which   exactly
-corresponds  to   the  changed  configuration   of  the
-TM.  Notice  carefully that a wrong  choice breaks
-the invariant  and it cannot be  recovered subsequently
-by any choice of productions.
-
-After the  TM has  halted, there  are further  ``cleanup'' derivations
-that derive  $\epsilon$ only if  the invariant has been  maintained so
-far.    For   every   symbol   $c$,  we   introduce   a   non-terminal
-$\nont{\mathit{final}}{c}$  where   $\nont{\mathit{final}}{}$  is  the
-final state  of the  TM. We add  productions $\nont{\mathit{final}}{c}
-\rightarrow         \acar        \nont{\mathit{final}}{c}$         and
-$\nont{\mathit{final}}{c} \rightarrow  \acdr \nont{\mathit{final}}{c}$
-for cleaning up the \bcar\ and \bcdr\  symbols on the left of the head
-and                $\nont{\mathit{final}}{c}               \rightarrow
-\nont{\mathit{final}}{c}\bcar$      and      $\nont{\mathit{final}}{c}
-\rightarrow \nont{\mathit{final}}{c}\bcdr$ for  cleaning up \acar\ and
-\acdr\ on the right of the tape head.  This completes the
-reduction.\!
-\end{proof}
-
-We now show that the proof can be replayed for the class of grammars
-generated from liveness analysis of programs. 
-
-\begin{lemma}\label{lemma:grammar-from-analysis-undecidable}
-Given   a    grammar    $G$    of   the    kind    described    in
-Definition~\ref{def:specialgrammar}  that  is  generated  by  liveness
-analysis  of a  program  and  a forward  access  path $\alpha$,    the
-membership problem $\alpha\$ \in \mathscr{L}(G)$ is undecidable.
-\end{lemma} 
-
-\begin{proof}
-Given a Turing machine and an input string, the  proof   of
-Lemma~\ref{lemma:grammar-undecidable} generates a grammar. 
-We shall define a function
-for   each  non-terminal $\nont{i}{c}$   introduced  in   this grammar
-such that the
-liveness  analysis  of  the function will  result
-in a set of productions that includes the productions for
-$\nont{i}{c}$ generated for the proof.
-As an example, it  can be verified that the grammar
-for the function shown in Figure~\ref{fig:turing-pgm}(b)    includes      the
-productions shown in Figure~\ref{fig:turing-pgm}(a). Here $\nont{\mathit{all}}{}$   corresponds   to  the   demand
-$\sigma_{\mathit{all}}$.
- 
-The body of the function corresponds  to the RHS of the productions
-for $\nont{i}{c}$. Productions with the same  LHS non-terminal, but
-with differing non-terminal on RHS can be generated by 
-joining program fragments with $\SIF$.   If  there  are  $n$ such  functions,  then
-\mainpgm\ creates  a $n$-way  branch and  inserts a  single call  to a
-distinct function in each branch.
-
-\begin{figure}[t]
-  \begin{minipage}{.45\columnwidth}
-    \begin{align*}
-      \nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
-      \nont{i}{\acar} &\rightarrow \clazy\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
-      \nont{\mathit{all}}{} &\rightarrow \epsilon \mid \acar\nont{\mathit{all}}{} \mid
-      \acdr\nont{\mathit{all}}{}
-    \end{align*}
-  \end{minipage}
-  \begin{minipage}{.45\columnwidth}
-    \input{equivalent-program}
-  \end{minipage}\\
-  \mbox{}\hfill(a)\hfill(b)\hfill\mbox{}
-  \caption{A possible grammar generated by the proof of
-    Lemma~\ref{lemma:grammar-undecidable} and a program to realize the
-  grammar.}\label{fig:turing-pgm}
-\vspace*{-6mm}
-\end{figure}
-
-Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
-had a single non-terminal on the RHS. There are two characteristics of
-the grammar produced from liveness-analysis  that are are relevant for
-replaying the  earlier proof:  (a) If $\mathsf{S}  \rightarrow \beta_1
-\mathsf{S'}  \beta_2$  was a  production  in  the earlier  proof,  the
-grammar  generated from  liveness  analysis of the constructed program
-will  have the  production
-$\mathsf{S}      \rightarrow      \beta_1     \mathsf{S'}      \beta_2
-\nont{\mathit{\mathit{all}}}{}$,  and (b)  other  productions are  of the  form
-$\mathsf{S}       \rightarrow       \beta_1'\mathsf{S'}       \beta_2'
-\nont{\mathit{all}}{}$.
-
-It is clear that if the TM given as an instance of the halting problem
-accepts the input string, then the earlier derivation can be replayed,
-every   time   replacing   $\nont{\mathit{\mathit{all}}}{}$   in   the
-sentential form by $\epsilon$. However, if  the TM does not accept the
-input string, then every sentential form derived from the start symbol
-would    have     at    least    one    non-terminal from the grammar
-of Lemma~\ref{lemma:grammar-undecidable} that is different
-from $\nont{\mathit{final}}{c}$.   Thus  $\$$  would  not  be
-derivable from the grammar.
-\end{proof}
-
+fixed set of unrestricted productions. As shown in Appendix~\ref{sec:undec}, the  membership problem of this class of grammars is undecidable.
 %------------------------------------------------------------%
 \begin{figure}[t!]
 \scalebox{0.8}{
@@ -2118,6 +1925,206 @@ firstification techniques~\cite{Mitchell:2009}.
   mode GC  scheme which allows the  costs of LGC to  be amortized over
   several runs of RGC. In summary, we need to investigate ways to make
   liveness-based GC attractive for practical collectors.
+
+\appendix
+\section{Proof of Undecidability}
+\label{sec:undec}
+We show that  membership problem  of the  class of  grammars defined below 
+%%Definition~\ref{def:specialgrammar}
+is undecidable.   We then  show that  the grammars  in this  class are
+indeed generated from liveness analysis.
+\begin{definition}\label{def:specialgrammar}
+Consider the  grammar $(N,T,  p_1\cup p_2,S)$  in which
+$N$ is  a set  of non-terminals,  $T =  \{\acar, \acdr,
+\bcar,  \bcdr,  \clazy,  \$\}$,   $p_1$  is  a  set  of
+context-free    productions     that    contains    the
+distinguished  production   $S  \rightarrow  \alpha\$$,
+$\alpha$ is a  string of grammar symbols  that does not
+contain $S$, and $p_2$ is the fixed set of unrestricted
+productions    $\bcar\acar    \rightarrow    \epsilon$,
+$\bcdr\acdr    \rightarrow   \epsilon$,    $\clazy\acar
+\rightarrow \clazy$,  $\clazy\acdr \rightarrow \clazy$,
+and $\clazy\$ \rightarrow \$ $.
+\end{definition}
+
+%% From Sections \ref{sec:liveness}  and \ref{sec:computing}, it is clear
+%% that the results of liveness analysis of any program can be modeled by
+%% the kind  of grammar described above. The  following proposition shows
+%% that the converse also holds.
+%% \begin{proposition}
+%% Given    a     grammar    $G$    of    the     form    described    in
+%% Definition~\ref{def:specialgrammar},  it is  possible  to construct  a
+%% program $p$  with program points  $\pi_i$ and variables $x$  such that
+%% the liveness  analysis of $p$  is same as  $G$ except for a  change in
+%% non-terminal names which now have the form \var{\Lanv{i}{x}}.
+%% \end{proposition}
+
+
+\newcommand{\state}{\ensuremath{\mathsf{S}}}
+\newcommand{\nont}[2]{\ensuremath{\mathsf{S}_{#1}^{#2}}}
+\begin{lemma}\label{lemma:grammar-undecidable}
+Given a grammar    $G$    of   the    kind    described    in
+Definition~\ref{def:specialgrammar}  and a forward access path $\alpha$
+consisting  of symbols \acar\  and \acdr\  only, the membership problem
+$\alpha\$ \in \mathscr{L}(G)$ is undecidable.
+\end{lemma} 
+
+\begin{proof}
+Given a Turing machine and  an input $w\in (1+0)^*$, we
+construct a grammar $G$ such that the machine will halt
+on    $w$    if    and   only    if    $\$    \in
+\mathscr{L}(G)$. The grammar includes  the fixed set of
+unrestricted               productions               in
+Definition~\ref{def:specialgrammar}.
+
+We shall represent a Turing machine (TM) configuration 
+as $w_l(\state,c)w_r$, where $w_l$ is the string to the
+left of the head, $w_r$ is the string to the right, $c$
+is the symbol under the head and \state\ is the current
+state of  the TM.   For each combination  of state
+and symbol  $(\state,c)$, the grammar will  contain the
+non-terminal \nont{}{c}. We shall synchronize each move
+of the TM to  a derivation  step using  a context
+free production, followed, if possible, by a derivation
+step using either  $\bcar\acar \rightarrow \epsilon$ or
+$\bcdr\acdr   \rightarrow    \epsilon$.    After   each
+synchronization,  we  shall   establish  the  following
+invariant  relation between  the TM  configuration
+and the sentential form:
+
+\begin{quote}
+  If    the   configuration    of   the    TM   is
+  $w_l(\state,c)w_r$, then the  sentential form will be
+  $\overline{w}_l\nont{}{c}\,w_r\$ $,                where
+  $\overline{w}_l$ is  the same as $w_l$  but with each
+  symbol $d$ in $w_l$ replaced by $\overline{d}$.
+\end{quote}
+
+Assume that  the TM starts  in a  state $S_\mathit{init}$ with  a tape
+$cw$ and  the head positioned on  the symbol $c$. Then  the sentential
+form    corresponding     to    the    initial     configuration    is
+$\nont{\mathit{init}}{c}w\$$ (we  can assume that there  is a production
+$\nont{}{} \rightarrow  \nont{\mathit{init}}{c}w\$$, where  \nont{}{} is
+the start symbol of the  grammar). Further correspondences between the
+TM moves and the grammar productions are as follows:
+
+\begin{enumerate}
+\item For each transition  $(S_i, c) \rightarrow (S_j,c',L)$, there are
+  two  productions $\nont{i}{c}  \rightarrow  \acar \nont{j}{\acar}c'$
+  and $\nont{i}{c} \rightarrow \acdr \nont{j}{\acdr}c'$.
+\item For each  transition $(S_i, c) \rightarrow (S_j,c',R)$, there
+  are two productions
+  $\nont{i}{c} \rightarrow \overline{c'} \nont{j}{\acar}\bcar$ and $\nont{i}{c}
+  \rightarrow \overline{c'} \nont{j}{\acdr}\bcdr$. 
+\end{enumerate}
+The idea  behind the  productions is explained  with an
+example:  Assume that  the current  sentential form  is
+$\bcar\bcdr\nont{i}{\acar}\acar\acar\$$. Also  assume that  the
+TM  has  a   transition  $(S_i,\acar)  \rightarrow
+(S_j,\acdr, L)$.  Since the next corresponding  step in
+the  derivation  has  to  be  done  without  any  prior
+knowledge of whether the symbol to the left of the tape
+is a \acar\  or a \acdr, two  productions are provided,
+and  the  invariant  will  be maintained  only  if  the
+production         $\nont{i}{\acar}         \rightarrow
+\acdr\nont{j}{\acdr}\acdr$ is chosen  for the next step
+in  the  derivation.    This  gives  the  configuration
+$\bcar\bcdr\acdr\nont{j}{\acdr}\acdr\acar\acar\$$.
+Simplification   with    the   production   $\bcdr\acdr
+\rightarrow               \epsilon$              yields
+$\bcar\nont{j}{\acdr}\acdr\acar\acar\$$,    which   exactly
+corresponds  to   the  changed  configuration   of  the
+TM.  Notice  carefully that a wrong  choice breaks
+the invariant  and it cannot be  recovered subsequently
+by any choice of productions.
+
+After the  TM has  halted, there  are further  ``cleanup'' derivations
+that derive  $\epsilon$ only if  the invariant has been  maintained so
+far.    For   every   symbol   $c$,  we   introduce   a   non-terminal
+$\nont{\mathit{final}}{c}$  where   $\nont{\mathit{final}}{}$  is  the
+final state  of the  TM. We add  productions $\nont{\mathit{final}}{c}
+\rightarrow         \acar        \nont{\mathit{final}}{c}$         and
+$\nont{\mathit{final}}{c} \rightarrow  \acdr \nont{\mathit{final}}{c}$
+for cleaning up the \bcar\ and \bcdr\  symbols on the left of the head
+and                $\nont{\mathit{final}}{c}               \rightarrow
+\nont{\mathit{final}}{c}\bcar$      and      $\nont{\mathit{final}}{c}
+\rightarrow \nont{\mathit{final}}{c}\bcdr$ for  cleaning up \acar\ and
+\acdr\ on the right of the tape head.  This completes the
+reduction.\!
+\end{proof}
+
+We now show that the proof can be replayed for the class of grammars
+generated from liveness analysis of programs. 
+
+\begin{lemma}\label{lemma:grammar-from-analysis-undecidable}
+Given   a    grammar    $G$    of   the    kind    described    in
+Definition~\ref{def:specialgrammar}  that  is  generated  by  liveness
+analysis  of a  program  and  a forward  access  path $\alpha$,    the
+membership problem $\alpha\$ \in \mathscr{L}(G)$ is undecidable.
+\end{lemma} 
+
+\begin{proof}
+Given a Turing machine and an input string, the  proof   of
+Lemma~\ref{lemma:grammar-undecidable} generates a grammar. 
+We shall define a function
+for   each  non-terminal $\nont{i}{c}$   introduced  in   this grammar
+such that the
+liveness  analysis  of  the function will  result
+in a set of productions that includes the productions for
+$\nont{i}{c}$ generated for the proof.
+As an example, it  can be verified that the grammar
+for the function shown in Figure~\ref{fig:turing-pgm}(b)    includes      the
+productions shown in Figure~\ref{fig:turing-pgm}(a). Here $\nont{\mathit{all}}{}$   corresponds   to  the   demand
+$\sigma_{\mathit{all}}$.
+ 
+The body of the function corresponds  to the RHS of the productions
+for $\nont{i}{c}$. Productions with the same  LHS non-terminal, but
+with differing non-terminal on RHS can be generated by 
+joining program fragments with $\SIF$.   If  there  are  $n$ such  functions,  then
+\mainpgm\ creates  a $n$-way  branch and  inserts a  single call  to a
+distinct function in each branch.
+
+\begin{figure}[t]
+  \begin{minipage}{.45\columnwidth}
+    \begin{align*}
+      \nont{i}{\acar} &\rightarrow \acar\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
+      \nont{i}{\acar} &\rightarrow \clazy\nont{j}{\acar}\bcar\nont{\mathit{all}}{} \\
+      \nont{\mathit{all}}{} &\rightarrow \epsilon \mid \acar\nont{\mathit{all}}{} \mid
+      \acdr\nont{\mathit{all}}{}
+    \end{align*}
+  \end{minipage}
+  \begin{minipage}{.45\columnwidth}
+    \input{equivalent-program}
+  \end{minipage}\\
+  \mbox{}\hfill(a)\hfill(b)\hfill\mbox{}
+  \caption{A possible grammar generated by the proof of
+    Lemma~\ref{lemma:grammar-undecidable} and a program to realize the
+  grammar.}\label{fig:turing-pgm}
+\vspace*{-6mm}
+\end{figure}
+
+Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
+had a single non-terminal on the RHS. There are two characteristics of
+the grammar produced from liveness-analysis  that are are relevant for
+replaying the  earlier proof:  (a) If $\mathsf{S}  \rightarrow \beta_1
+\mathsf{S'}  \beta_2$  was a  production  in  the earlier  proof,  the
+grammar  generated from  liveness  analysis of the constructed program
+will  have the  production
+$\mathsf{S}      \rightarrow      \beta_1     \mathsf{S'}      \beta_2
+\nont{\mathit{\mathit{all}}}{}$,  and (b)  other  productions are  of the  form
+$\mathsf{S}       \rightarrow       \beta_1'\mathsf{S'}       \beta_2'
+\nont{\mathit{all}}{}$.
+
+It is clear that if the TM given as an instance of the halting problem
+accepts the input string, then the earlier derivation can be replayed,
+every   time   replacing   $\nont{\mathit{\mathit{all}}}{}$   in   the
+sentential form by $\epsilon$. However, if  the TM does not accept the
+input string, then every sentential form derived from the start symbol
+would    have     at    least    one    non-terminal from the grammar
+of Lemma~\ref{lemma:grammar-undecidable} that is different
+from $\nont{\mathit{final}}{c}$.   Thus  $\$$  would  not  be
+derivable from the grammar.
+\end{proof}
 
 
 \clearpage
