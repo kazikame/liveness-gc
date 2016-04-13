@@ -1002,8 +1002,6 @@ enters the  \bang\ state ({\sc  car-bang}). Otherwise
 the transition is similar to the earlier {\sc car-clo}
 rule. 
 
-
-
 Consider a trace  of a minefield execution of a  program $p$, possibly
 ending in  a \bang\ state. We  can construct a call-tree  based on the
 trace in  which each node represents  a function that was  called (but
@@ -1016,95 +1014,9 @@ For  a
 call-less program,  the initial state of  the minefield
 semantics  is  assumed  to  be  $([\;]_\rho,(\rho_\mathit{init},
 \ans,      (\print~\ans)):[\;]_{S}     ,      [\;]_{\heap},
-e_{\mainpgm})$.
+e_{\mainpgm})$. The proof that such a program cannot go \bang\ is provided
+in Appendix~\ref{sec:sound}.
    
- 
-\subsection{Soundness result}
-We first need an auxiliary  result about minefield semantics. Consider
-a trace of  a minefield execution.  For every  minefield state $(\rho,
-S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
-$\rightsquigarrow$ step, the demand $\sigma$ on the expression $e$ (or
-application $s$) is  non-null.  This can be proved by  an induction on
-the number  of steps leading  to the  minefield state.  The  base step
-holds   because  the   demand   $\sigma_{\mathit{all}}$   on  $(\mainpgm)$   is
-non-null. For the inductive step we  observe that for each step of the
-minefield semantics, if the demand $\sigma$  on the LHS of a minefield
-step  is non-null,  the  demand  on the  RHS  is  a transformation  of
-$\sigma$ (for example $(\clazy\cup\acar)\sigma$) which is also non-null.
-
-Note that our proofs will be for a single round of minefield execution
-i.e.,  the evaluation of  $(\mainpgm)$  to   its  WHNF  driven  by   the  printing  mechanism~(Section
-\ref{sec:semantics}).  With  minor variations,  the proof will  also be
-applicable for subsequent evaluations initiated by $\print$.
-%% We show  next that the  minefield execution of a  call-less program
-%% cannot go \bang.
-
-\begin{lemma}
-\label{lemma:call-less-cannot-go-bang}
-Consider the minefield execution of  a program without function calls.
-Such a program cannot enter the \bang\ state.
-\end{lemma}
-\begin{proof}
-Consider a  state  $(\rho,  S,  \heap,  e, \sigma)$  in  the
-minefield execution of a program.  We  show by induction on the number $n$
-of $\rightsquigarrow$ steps  leading to  this state  that the next  transition cannot
-enter a  \bang\ state.   When $n$  is 0,  the state  is $([\;]_\rho,\,
-(\rho_\mathit{init},   \,  \ell_{\ans}   ,\,  (\print~\ans)):[\;]_{S},
-[\;]_{\heap},\, e_{\mainpgm})$.   Since the call  to $GC(\ldots)$ in  this state
-does  nothing,  we  just  have to  show  that  the  $\rightsquigarrow$
-transition cannot  enter a  \bang\ state.  Since  our programs  are in
-ANF, $e_{\mainpgm}$ can only be a $\LET$ expression.  A {\sc let} step
-does not involve dereferencing, and thus cannot result in a \bang.
-
-For the inductive step, we shall show that none of the minefield steps
-that involves dereferencing  results in a \bang.  These  are the steps
-which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
-$\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
-inserted by an earlier $GC(\ldots)$.   However the demand $\sigma'$  on basis of
-which the $GC(\ldots)$ would have inserted a  $\bot$ would have
-included the  current demand $\sigma$.     Thus it is
-enough to  show that the $\rightsquigarrow$ step would not lead to a
-\bang, even if $GC(\ldots)$ had been done with the current demand
-$\sigma$.
-
-We consider the rules for \CAR\  only.  
-The rest  of the rules involve similar reasoning. For the {\sc
-  car-clo}  rule in  the state  $\rho, S,  \heap, (\CAR~x),
-\sigma$, we  know that $\sigma$ is  non-null. Therefore
-the  liveness  of  $x$  includes  $\epsilon$,  and  the
-dereferencing $\heap(\rho(x))$ will go without \bang.
-
-For the  {\sc car-1-clo}  rule, observe that  there are
-two dereferences.  First $x$  is dereferenced to  get a
-cons  cell  and then  the  head  of  the cons  cell  is
-dereferenced  to  obtain  a  closure.   If  the  demand
-$\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
-of    $x$   will    include    both   $\epsilon$    and
-$\acar\epsilon$,  and  a  GC with  this  liveness  will
-neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
-first   component  of   the   cons   cell.  Thus   both
-dereferences    can take place without 
-$\rightsquigarrow$ entering the   \bang\ state.
-\end{proof} 
-
-Now we are ready to prove the main soundness result.
-
-\begin{theorem}
-The  minefield  execution of  no  program  can enter  a
-\bang\ state.
-\end{theorem}
- 
-\begin{proof}
-Assume to  the contrary that  a program $P$  enters the
-\bang\  state.  We can  transform  $P$  to a  call-less
-program $P'$ such that  the minefield executions of $P$
-and $P'$  are identical  except for change  of variable
-names.             However,                 by
-Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
-$P'$,   a   call-less   program,   cannot   enter   the
-\bang\  state.  Therefore   $P$  also  cannot  enter  the
-\bang\ state.
-\end{proof}
  
 %% Section~\ref{sec:computing}   shows   how  the   demand   transformers
 %% $\Lfonly$  for  a  program  (representing  a  fully  context-sensitive
@@ -1290,31 +1202,33 @@ are $\epsilon$ and $\clazy\sigma_{\mathit{\length}}$. Thus:
 \sigma_{\length}    &=&
  \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
 \end{eqnarray*}
-As examples, the closure variables $\xl_{\mbox{$\pi$}_1}$ and $\xl_{\mbox{$\pi$}_5}$, and the
-stack variables $\pl$ and $\pa$ have the following liveness in terms
-of  $\sigma_{\length}$:
-\begin{align*}
-  \Lv_{\xl_{\mbox{$\pi$}_1}} &= \clazy\sigma_{\mathit{\length}} \\
-%\end{align*}
-%\begin{align*}
-  \Lv_{\xl_{\mbox{$\pi$}_5}} &=  (\acdr\Df{\length}{1}{\clazy} \cup
-  \clazy\Df{\length}{1}{\clazy}) \sigma_{\mathit{\length}} \\
-  \Lanv{\pl}{} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
-  \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}} \\
-  \Lanv{\pa}{} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
-\end{align*}
 
-In  summary, the  equations  generated during the
-analysis are:
-\begin{enumerate}
-\item   For  each   function  $\mathit{f}$,   equations
-  defining \Df{f}{i} for use by \Lfonly$_{\mathit f}$.
-\item For each function $\mathit{f}$, an equation defining the summary
-  demand $\sigma_{\mathit f}$ on $e_f$.
-\item   For  each   function  $\mathit{f}$   (including
-  $\mainpgm$) an  equation  defining
-  liveness for each garbage in  $e_{\mathit f}$.
-\end{enumerate}
+%% COMMENTED OUT BY PRASANNA
+%% As examples, the closure variables $\xl_{\mbox{$\pi$}_1}$ and $\xl_{\mbox{$\pi$}_5}$, and the
+%% stack variables $\pl$ and $\pa$ have the following liveness in terms
+%% of  $\sigma_{\length}$:
+%% \begin{align*}
+%%   \Lv_{\xl_{\mbox{$\pi$}_1}} &= \clazy\sigma_{\mathit{\length}} \\
+%% %\end{align*}
+%% %\begin{align*}
+%%   \Lv_{\xl_{\mbox{$\pi$}_5}} &=  (\acdr\Df{\length}{1}{\clazy} \cup
+%%   \clazy\Df{\length}{1}{\clazy}) \sigma_{\mathit{\length}} \\
+%%   \Lanv{\pl}{} &= (\clazy \cup \acdr\Df{\length}{1}\clazy
+%%   \cup \clazy\Df{\length}{1}{\clazy})\sigma_{\mathit{\length}} \\
+%%   \Lanv{\pa}{} &= \clazy \bcar \Df{\length}{1}\{\epsilon\}
+%% \end{align*}
+
+%% In  summary, the  equations  generated during the
+%% analysis are:
+%% \begin{enumerate}
+%% \item   For  each   function  $\mathit{f}$,   equations
+%%   defining \Df{f}{i} for use by \Lfonly$_{\mathit f}$.
+%% \item For each function $\mathit{f}$, an equation defining the summary
+%%   demand $\sigma_{\mathit f}$ on $e_f$.
+%% \item   For  each   function  $\mathit{f}$   (including
+%%   $\mainpgm$) an  equation  defining
+%%   liveness for each variable in  $e_{\mathit f}$.
+%% \end{enumerate}
 
 %\subsection{Solving liveness equations---the grammar interpretation}\label{sec:grammar-formulation}      
 \paragraph{From liveness sets to context-free grammars:}\label{sec:grammar-formulation}      
@@ -1327,16 +1241,17 @@ several grammars, one for  each non-terminal \var{\Lanv{x}{}} regarded
 as a start symbol.  As  an example, the grammar for \var{\Lanv{\xl}{}}
 and \var{\Lanv{\pa}{}} comprise the following productions:
 \begin{eqnarray*}
-  \var{\Lanv{\xl}{}}  &\rightarrow& 
-  \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\ && \mid
-  \clazy\var{\Df{\length}{1}}{\clazy\var{\sigma_{\length}}} \\
+  %% \var{\Lanv{\xl}{}}  &\rightarrow& 
+  %% \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\ && \mid
+  %% \clazy\var{\Df{\length}{1}}{\clazy\var{\sigma_{\length}}} \\
   \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
   \acdr\var{\Df{\length}{1}}\clazy
        \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
 \langle {\sigma_{\length}} \rangle
 &\rightarrow&
-\epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle \\
-\var{\Lanv{\pa}{}} &\rightarrow& \clazy \bcar \var{\Df{\length}{1}}
+\epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle 
+%% \\
+%% \var{\Lanv{\pa}{}} &\rightarrow& \clazy \bcar \var{\Df{\length}{1}}
 \end{eqnarray*}
 Other  equations  can   be  converted  similarly.   The
 language   generated   by  \var{\Lanv{x}{}},   denoted
@@ -1811,6 +1726,95 @@ firstification techniques~\cite{Mitchell:2009}.
   liveness-based GC attractive for practical collectors.
 
 \appendix
+\section{Soundness result for liveness analysis under minefield semantics}
+\label{sec:sound}
+We first need an auxiliary  result about minefield semantics. Consider
+a trace of  a minefield execution.  For every  minefield state $(\rho,
+S,   \heap,  e(s),   \sigma)$   that   appears  on   the   LHS  of   a
+$\rightsquigarrow$ step, the demand $\sigma$ on the expression $e$ (or
+application $s$) is  non-null.  This can be proved by  an induction on
+the number  of steps leading  to the  minefield state.  The  base step
+holds   because  the   demand   $\sigma_{\mathit{all}}$   on  $(\mainpgm)$   is
+non-null. For the inductive step we  observe that for each step of the
+minefield semantics, if the demand $\sigma$  on the LHS of a minefield
+step  is non-null,  the  demand  on the  RHS  is  a transformation  of
+$\sigma$ (for example $(\clazy\cup\acar)\sigma$) which is also non-null.
+
+Note that our proofs will be for a single round of minefield execution
+i.e.,  the evaluation of  $(\mainpgm)$  to   its  WHNF  driven  by   the  printing  mechanism~(Section
+\ref{sec:semantics}).  With  minor variations,  the proof will  also be
+applicable for subsequent evaluations initiated by $\print$.
+%% We show  next that the  minefield execution of a  call-less program
+%% cannot go \bang.
+
+\begin{lemma}
+\label{lemma:call-less-cannot-go-bang}
+Consider the minefield execution of  a program without function calls.
+Such a program cannot enter the \bang\ state.
+\end{lemma}
+\begin{proof}
+Consider a  state  $(\rho,  S,  \heap,  e, \sigma)$  in  the
+minefield execution of a program.  We  show by induction on the number $n$
+of $\rightsquigarrow$ steps  leading to  this state  that the next  transition cannot
+enter a  \bang\ state.   When $n$  is 0,  the state  is $([\;]_\rho,\,
+(\rho_\mathit{init},   \,  \ell_{\ans}   ,\,  (\print~\ans)):[\;]_{S},
+[\;]_{\heap},\, e_{\mainpgm})$.   Since the call  to $GC(\ldots)$ in  this state
+does  nothing,  we  just  have to  show  that  the  $\rightsquigarrow$
+transition cannot  enter a  \bang\ state.  Since  our programs  are in
+ANF, $e_{\mainpgm}$ can only be a $\LET$ expression.  A {\sc let} step
+does not involve dereferencing, and thus cannot result in a \bang.
+
+For the inductive step, we shall show that none of the minefield steps
+that involves dereferencing  results in a \bang.  These  are the steps
+which   have   a   $\heap(\rho(...))$   in   the   premise.    Now   a
+$\rightsquigarrow$ step can go \bang\ because it dereferences a $\bot$
+inserted by an earlier $GC(\ldots)$.   However the demand $\sigma'$  on basis of
+which the $GC(\ldots)$ would have inserted a  $\bot$ would have
+included the  current demand $\sigma$.     Thus it is
+enough to  show that the $\rightsquigarrow$ step would not lead to a
+\bang, even if $GC(\ldots)$ had been done with the current demand
+$\sigma$.
+
+We consider the rules for \CAR\  only.  
+The rest  of the rules involve similar reasoning. For the {\sc
+  car-clo}  rule in  the state  $\rho, S,  \heap, (\CAR~x),
+\sigma$, we  know that $\sigma$ is  non-null. Therefore
+the  liveness  of  $x$  includes  $\epsilon$,  and  the
+dereferencing $\heap(\rho(x))$ will go without \bang.
+
+For the  {\sc car-1-clo}  rule, observe that  there are
+two dereferences.  First $x$  is dereferenced to  get a
+cons  cell  and then  the  head  of  the cons  cell  is
+dereferenced  to  obtain  a  closure.   If  the  demand
+$\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
+of    $x$   will    include    both   $\epsilon$    and
+$\acar\epsilon$,  and  a  GC with  this  liveness  will
+neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
+first   component  of   the   cons   cell.  Thus   both
+dereferences    can take place without 
+$\rightsquigarrow$ entering the   \bang\ state.
+\end{proof} 
+
+Now we are ready to prove the main soundness result.
+
+\begin{theorem}
+The  minefield  execution of  no  program  can enter  a
+\bang\ state.
+\end{theorem}
+ 
+\begin{proof}
+Assume to  the contrary that  a program $P$  enters the
+\bang\  state.  We can  transform  $P$  to a  call-less
+program $P'$ such that  the minefield executions of $P$
+and $P'$  are identical  except for change  of variable
+names.             However,                 by
+Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
+$P'$,   a   call-less   program,   cannot   enter   the
+\bang\  state.  Therefore   $P$  also  cannot  enter  the
+\bang\ state.
+\end{proof}
+
+
 \section{Proof of Undecidability}
 \label{sec:undec}
 We show that  membership problem  of the  class of  grammars defined below 
