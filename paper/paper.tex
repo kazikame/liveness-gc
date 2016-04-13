@@ -1358,76 +1358,7 @@ We model  this problem as one  of deciding the
 membership of  a CFG augmented  with a
 fixed set of unrestricted productions. As shown in Appendix~\ref{sec:undec}, the  membership problem of this class of grammars is undecidable.
 %------------------------------------------------------------%
-\begin{figure}[t!]
-\scalebox{0.8}{
-  \begin{tabular}{cc}
-\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-3)(50,12)
-  \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}}
-  \putnode{t1}{t0}{15}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
-  \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
-  \psset{arrows=->}
-  \ncline{t0}{t1}
-  \ncline{t1}{t2}
-  \putnode{l0}{t1}{7}{2}{\clazy}
-  \nccurve[angleA=45, angleB=135, ncurv=4, nodesep=-1]{t1}{t1}
-  \putnode{l1}{t1}{0}{8}{\acdr, \clazy}
-  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t2}{t2}
-  \putnode{l2}{t2}{0}{8}{\clazy}
-\end{pspicture}
-&
-\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-3)(30,12)
-  \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}}
-  \putnode{t1}{t0}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
-  \psset{arrows=->}
-  \ncline{t0}{t1}
-  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t1}{t1}
-  \putnode{l1}{t1}{0}{8}{\acdr}
-\end{pspicture}
-\\
-(a) & (b) \\
-\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
-  \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}}
-  \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
-  \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\ \ \ \ }}}
-%  \putnode{t3}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
-  \psset{arrows=->}
-  \ncline{t0}{t1}
-  \ncline{t1}{t2}
-  \putnode{l0}{t1}{5}{2}{\clazy}
-%  \ncline{t2}{t3}
-%  \nccurve[angleA=55, angleB=125, ncurv=3, nodesep=-.8]{t3}{t3}
-%  \putnode{l2}{tD1}{0}{10}{\acdr}
- \putnode{tD1}{t2}{12}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
-  \putnode{tD2}{tD1}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
-  \psset{arrows=->}
-  \ncline{t2}{tD1}
-  \putnode{l1}{t2}{5}{2}{\bcar}
-  \ncline{tD1}{tD2}
-  \putnode{lD0}{tD1}{5}{2}{\clazy}
-  \nccurve[angleA=45, angleB=135, ncurv=4, nodesep=-1]{tD1}{tD1}
-  \putnode{lD1}{tD1}{0}{8}{\acdr, \clazy}
-  \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{tD2}{tD2}
-  \putnode{lD2}{tD2}{0}{8}{\clazy}
-\end{pspicture}
-&
-\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-5)(20,8) %\psframe(0,-5)(40,8)
-  \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}}
-  \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \ }}} \hspace{5mm}
-  \psset{arrows=->}
-  \ncline{t0}{t1}
-\end{pspicture}
-\\ 
-(c) & (d)  \end{tabular}}
-\caption{(a) The  grammar rules for \var{\Df{\length}{1}}
-  converted into an automaton, and (b) its DFA. The same for \var{\Lanv{\pa}{}}
-  are in (c) and (d).}\label{fig:example-automata}
-\vspace*{-2mm}
-\figrule
-\end{figure}
+
 
 %\subsection{A liveness-based GC scheme} \label{sec:live-clo}
 
