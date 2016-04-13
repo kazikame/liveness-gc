@@ -1195,12 +1195,15 @@ call site of a function.
 %% $\epsilon$ if it returns a base value.
 
 
-For  the  running  example (Figure~\ref{fig:mot-example2-a}),  $\length$  has  calls  from  $\main$  at
-$\pi_{12}$ and a recursive call at $\pi_6$. The demands on these calls
-are $\epsilon$ and $\clazy\sigma_{\mathit{\length}}$. Thus:
+%% For  the  running  example (Figure~\ref{fig:mot-example2-a}), $\length$  has  calls  from  $\main$  at
+%% $\pi_{12}$ and a recursive call at $\pi_6$. The demands on these calls
+For   the   running  example   (Figure~\ref{fig:mot-example2-a}),   if
+$\length$  has calls  from  $\main$  with a  demand  $\epsilon$ and  a
+recursive      call      at       $\pi_6$      with      a      demand
+$\clazy\sigma_{\mathit{\length}}$. Thus:
 \begin{eqnarray*}
-\sigma_{\length}    &=&
- \{\epsilon\}  ~\cup~{\clazy\sigma_{\mathit{\length}}}
+\sigma_{\length}                    &=&                   \{\epsilon\}
+~\cup~{\clazy\sigma_{\mathit{\length}}}
 \end{eqnarray*}
 
 %% COMMENTED OUT BY PRASANNA
@@ -1238,8 +1241,10 @@ grammar  (CFG) on  the  alphabet $\lbrace\acar,  \acdr, \bcar,  \bcdr,
 $X$ occurring on the LHS of the equations generated from the analysis.
 We can  think of  the resulting productions  as being  associated with
 several grammars, one for  each non-terminal \var{\Lanv{x}{}} regarded
-as a start symbol.  As  an example, the grammar for \var{\Lanv{\xl}{}}
-and \var{\Lanv{\pa}{}} comprise the following productions:
+as a start  symbol. The grammar for  \var{\Df{\length}{1}} and $\langle
+{\sigma_{\length}} \rangle$ comprise of the following productions:
+%%  As  an example, the grammar for \var{\Lanv{\xl}{}}
+%% and \var{\Lanv{\pa}{}} comprise the following productions:
 \begin{eqnarray*}
   %% \var{\Lanv{\xl}{}}  &\rightarrow& 
   %% \clazy\var{\sigma_{\length}} \mid \acdr \var{\Df {\length}{1}}{\clazy\var{\sigma_{\length}}}  \\ && \mid
@@ -1269,9 +1274,10 @@ consists  of  forward  access  paths  only.  Then  does
 $\alpha \in \sigma$?
 }
 %%\end{quote}
-We model  this problem as one  of deciding the
-membership of  a CFG augmented  with a
-fixed set of unrestricted productions. As shown in Appendix~\ref{sec:undec}, the  membership problem of this class of grammars is undecidable.
+We model this problem as one of deciding the membership of a CFG
+augmented with a fixed set of unrestricted productions. As shown in
+Appendix~\ref{sec:undec}, the membership problem of this class of
+grammars is undecidable.
 %------------------------------------------------------------%
 
 
