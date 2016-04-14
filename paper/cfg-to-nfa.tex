@@ -64,10 +64,11 @@ garbage collection,  a forward  access path  is valid  only if  it can
 reach a final state.
 
 \newcommand{\nfaD}{%
-  \scalebox{.5}{\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(0,-3)(50,12)
-      \putnode{t0}{origin}{5}{0}{} 
-      \putnode{t1}{t0}{15}{0}{\pscirclebox{\mbox{\ \ \ \      }}}
+  \scalebox{.7}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(2,-2)(30,10)
+      \putnode{t0}{origin}{2}{-1}{} 
+      \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{\ \ \ \      }}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}} 
       \psset{arrows=->} \ncline{t0}{t1} 
@@ -80,14 +81,18 @@ reach a final state.
     \end{pspicture}
 }}
 \newcommand{\dfaD}{%
+  \scalebox{.7}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(0,-3)(30,12)
-      \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}} \putnode{t1}{t0}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \
-      }}}     \psset{arrows=->}    \ncline{t0}{t1}     \nccurve[angleA=45,
-        angleB=135,                                                 ncurv=3,
-        nodesep=-1]{t1}{t1} \putnode{l1}{t1}{0}{8}{\acdr}
+    \begin{pspicture}(2,-2)(14,8)
+      \putnode{t0}{origin}{2}{0}{}
+      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{
+          \mbox{\ \ \ \ }}}     
+      \psset{arrows=->}    
+      \ncline{t0}{t1}     
+      \nccurve[angleA=45, angleB=135, ncurv=2, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{8}{\acdr}
     \end{pspicture}
-}
+}}
 The  NFA for \var{\Df{\length}{1}} is 
 \nfaD\ and the final DFA is \dfaD.
 This  expectedly says  that
