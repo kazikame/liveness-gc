@@ -67,13 +67,12 @@ garbage collection,  a forward  access path  is valid  only if  it can
 reach a final state.
 
 
- \begin{wrapfigure}{r}{0.25\textwidth}
-%\begin{figure}[t!]
+\begin{wrapfigure}{r}{0.25\textwidth}
 \scalebox{0.5}{
-  \begin{tabular}{cc}
-\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-3)(50,12)
-  \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}} \putnode{t1}{t0}{15}{0}{\pscirclebox{\mbox{\ \ \ \
+          \begin{tabular}{cc}
+          \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+          \begin{pspicture}(0,-3)(50,12)
+            \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}} \putnode{t1}{t0}{15}{0}{\pscirclebox{\mbox{\ \ \ \
   }}} \hspace{5mm} \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \
   }}} \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{7}{2}{\clazy} \nccurve[angleA=45,
   angleB=135,                                                 ncurv=4,
@@ -90,14 +89,15 @@ reach a final state.
   nodesep=-1]{t1}{t1} \putnode{l1}{t1}{0}{8}{\acdr}
 \end{pspicture}
 \\
-(a) & (b) \end{tabular}}
+(a) & (b)
+ \end{tabular}}
 \caption{(a) The  grammar rules for \var{\Df{\length}{1}}
   converted      into      an      automaton     and      (b)      its
   DFA.}\label{fig:example-automata}
-\vspace*{-2mm}
 \figrule
-%\end{figure}
+\vspace*{-5mm}
 \end{wrapfigure}
+
 Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
 from the grammar for \var{\Df{\length}{1}}, and the final DFA is shown
 in  Figure~\ref{fig:example-automata}(b).  This  expectedly says  that
@@ -117,37 +117,48 @@ liveness-based GC triggers beyond $\pi_9$.
 
 \begin{wrapfigure}{r}{.25\textwidth}
 \scalebox{0.5}{
-\begin{tabular}{cc}
+\begin{tabular}{c}
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
 \begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
   \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
   }}} \hspace{5mm} \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \
   }}}
-%  \putnode{t3}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}
   \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{5}{2}{\clazy}
-%  \ncline{t2}{t3}
-%  \nccurve[angleA=55, angleB=125, ncurv=3, nodesep=-.8]{t3}{t3}
-%  \putnode{l2}{tD1}{0}{10}{\acdr}
- \putnode{tD1}{t2}{12}{0}{\pscirclebox{\mbox{\       \       \       \
-  }}} \hspace{5mm} \putnode{tD2}{tD1}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \
-  }}} \psset{arrows=->} \ncline{t2}{tD1} \putnode{l1}{t2}{5}{2}{\bcar} \ncline{tD1}{tD2} \putnode{lD0}{tD1}{5}{2}{\clazy} \nccurve[angleA=45,
+  \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\       \       \       \
+  }}} 
+  \psset{arrows=->} \ncline{t2}{tD1} \putnode{l1}{t2}{5}{2}{\bcar}
+  \nccurve[angleA=45,
   angleB=135,                                                 ncurv=4,
-  nodesep=-1]{tD1}{tD1} \putnode{lD1}{tD1}{0}{8}{\acdr, \clazy} \nccurve[angleA=45,
-  angleB=135,                                                 ncurv=3,
-  nodesep=-1]{tD2}{tD2} \putnode{lD2}{tD2}{0}{8}{\clazy}
-\end{pspicture}
-&
+  nodesep=-1]{tD1}{tD1} \putnode{lD1}{tD1}{0}{10}{\acdr}
+\end{pspicture} 
+\\
+(a)
+\\
 \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-5)(20,8) %\psframe(0,-5)(40,8)
+\begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
+  \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
+  }}} 
+  \hspace{5mm} 
+  \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \  }}}
+  \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} 
+\end{pspicture}
+\\
+(b)
+\\
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
   \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
   }}} \hspace{5mm} \psset{arrows=->} \ncline{t0}{t1}
 \end{pspicture}
 \\ 
-(a) & (b)
+(c)
 \end{tabular}}
  \caption{(a) grammar  rules for \var{\Lanv{\pa}{}} converted  into an
-  automation and (b) its DFA.}\label{fig:main1}
+  automaton and  its DFAs after simplification.}\label{fig:main1}
 \end{wrapfigure}
+
+If the expression at $\pi_{12}$ in the main program in Figure~\ref{fig:main-pgm1} was 
+$\CAR~\pc$, then the liveness of $\pc$ would be $(\clazy\sigma_{all}, \acar\sigma_{all})$.
 
 
 
