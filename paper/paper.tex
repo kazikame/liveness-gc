@@ -1170,9 +1170,9 @@ demand  $\sigma$.   To  get   the  actual  liveness  we
 calculate an  over-approximation of the  actual demands
 made by  all the  calls and  calculate the  liveness at
 each  GC  point  inside  the  function  based  on  this
-approximation.  The 0-CFA-style {\em summary demand} is
+approximation.  The {\em summary demand} is
 calculated by  taking a union  of the demands  at every
-call site of a function.
+call site of a function analogous to 0-CFA~\cite{Shivers:1988}.
 
 %% Consider a function  $g$ containing a call to  $f$ at a
 %% site    $\pi$,   say    $\pi\!\!:\!(\LET~x   \leftarrow
@@ -1233,6 +1233,7 @@ $\clazy\sigma_{\mathit{\length}}$. Thus:
 %%   $\mainpgm$) an  equation  defining
 %%   liveness for each variable in  $e_{\mathit f}$.
 %% \end{enumerate}
+We compute the liveness of all variables and arguments of $\length$ in terms of $\sigma_{\length}$.
 
 %\subsection{Solving liveness equations---the grammar interpretation}\label{sec:grammar-formulation}      
 \paragraph{From liveness sets to context-free grammars:}\label{sec:grammar-formulation}      
@@ -1265,7 +1266,7 @@ $\mathscr{L}(\var{\Lanv{x}{}})$,   is    the   desired
 solution  of  \Lanv{x}{}.    
 However, recall that the decision problem that we are interested in
 during GC is: 
-%%\begin{quote} 
+
 {\em
 Let $x.\alpha$ be a forward access path (consisting only
 of edges  \acar\ and \acdr\  but not \bcar,  \bcdr\ or
@@ -1274,7 +1275,7 @@ of edges  \acar\ and \acdr\  but not \bcar,  \bcdr\ or
 consists  of  forward  access  paths  only.  Then  does
 $\alpha \in \sigma$?
 }
-%%\end{quote}
+
 We model this problem as one of deciding the membership of a CFG
 augmented with a fixed set of unrestricted productions. As shown in
 Appendix~\ref{sec:undec}, the membership problem of this class of
@@ -1283,7 +1284,6 @@ grammars is undecidable.
 
 
 %\subsection{A liveness-based GC scheme} \label{sec:live-clo}
-
 %%\subsubsection{From CFGs to GC-ready DFAs}
 %%\label{sec:NFA-approx}
 
@@ -1560,8 +1560,8 @@ eager languages ~\cite{asati14lgc}.  A major source of inefficiency in
 LGC is  multiple traversals  of already copied  heap cells.  Since LGC
 does not mark the heap cells after the first visit, the same cells can
 be  repeatedly  visited  with   different  liveness  states.  We  have
-mitigated  this  problem  by   implementing  a  heuristic  which  tags
-\CONS\ cells with the set of states already visited.
+mitigated  this  problem  by  adding checks to avoid multiple traversals 
+of closure and function arguments.
 
 
 \vspace*{-2mm}
