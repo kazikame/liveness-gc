@@ -6,48 +6,45 @@ CFG by non-deterministic finite state automata (NFA) using
 %%
 %% We use  the algorithm by 
 Mohri   and   Nederhof~\cite{mohri00regular}   method.   This   method
-transforms a  given CFG  into a strongly  regular grammar. 
-
-In our example, the rule  $\var{\Df{\length}{1}}$ has two context free
-productions,           $\acdr\var{\Df{\length}{1}}\clazy$          and
-$\clazy\var{\Df{\length}{1}}{\clazy}$.  We transform this grammar into
-a strongly regular grammar in two steps,
+transforms a CFG $G$ into a strongly  regular grammar $R$ such that $\lang{G} \subseteq \lang{R}$. 
+%%
+If a CFG consists of a set of mutually recursive non-terminals such that the rules involved are not all left regular or not all right regular, then the method breaks the rules into right regular rules by introducing fresh non-terminals. For our example, the rule  $\var{\Df{\length}{1}}$ has two non regular productions,           $\acdr\var{\Df{\length}{1}}\clazy$          and
+$\clazy\var{\Df{\length}{1}}{\clazy}$.  The steps for transforming these productions into
+right regular productions are:
 
 \begin{enumerate}
 \item
 Add a  new non-terminal  $\var{\Df{\length}{1'}}$ to the  grammar with
 the rule $\var{\Df{\length}{1'}} \rightarrow \epsilon$.
 \item
-Consider each production of $\var{\Df{\length}{1}}$,
-\begin{enumerate}
-\item
- replace     $\var{\Df{\length}{1}}     \rightarrow     \clazy$,     by
+ Replace     $\var{\Df{\length}{1}}     \rightarrow     \clazy$,     by
  $\var{\Df{\length}{1}} \rightarrow \clazy\var{\Df{\length}{1'}}$
 \item
- replace
+ Replace
  $\var{\Df{\length}{1}} \rightarrow \clazy\var{\Df{\length}{1}}\clazy$,
  by  $\var{\Df{\length}{1}}  \rightarrow  \clazy\var{\Df{\length}{1}}$
  and $\var{\Df{\length}{1'}} \rightarrow \clazy\var{\Df{\length}{1'}}$
 \item
- replace
+  Replace
  $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}\clazy$,
  by $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}$ and
  $\var{\Df{\length}{1'}} \rightarrow \clazy\var{\Df{\length}{1'}}$
 \end{enumerate}
-\end{enumerate}
 
+Mohri and Nederhof~\cite{mohri00regular} provide the generalization of
+these  steps.  The  rules for  
+$\var{\Df{\length}{1}}$ after the transformation are:
+\begin{eqnarray*}              
+  \var{\Df{\length}{1}}   &\rightarrow&   \clazy\var{\Df{\length}{1'}}
+  \mid                 \acdr\var{\Df{\length}{1}}                 \mid
+  \clazy\var{\Df{\length}{1}}\\  \var{\Df{\length}{1'}}  &\rightarrow&
+  \clazy\var{\Df{\length}{1'}} \mid \epsilon
+\end{eqnarray*}
 
-The    resulting    grammar    fragment    for    %the    non-terminal
-$\var{\Df{\length}{1}}$   after   the  Mohri-Nederhof   transformation
-is:               \begin{eqnarray*}              \var{\Df{\length}{1}}
-&\rightarrow& \clazy\var{\Df{\length}{1'}} \mid \acdr\var{\Df{\length}{1}} \mid \clazy\var{\Df{\length}{1}}\\ \var{\Df{\length}{1'}}
-&\rightarrow& \clazy\var{\Df{\length}{1'}} \mid \epsilon \end{eqnarray*}
-Notice that the language generated  by the strongly regular grammar is
-a superset of the original CFG.
 
 
 The strongly regular grammar is converted  into a set of NFAs, one for
-each $\var{\Lanv{x}{}}$.  The  $\hookrightarrow$ simplification is now
+each non-terminal.  The  $\hookrightarrow$ simplification is now
 done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
 pairs  of consecutive  edges  labeled \bcar\acar\  or \bcdr\acdr\  and
 constructing  the $\epsilon$-closure  till a  fixed point  is reached,
@@ -66,41 +63,34 @@ simplification rules for \bcar, \bcdr, and
 garbage collection,  a forward  access path  is valid  only if  it can
 reach a final state.
 
-
-\begin{wrapfigure}{r}{0.25\textwidth}
-\scalebox{0.5}{
-          \begin{tabular}{cc}
-          \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-          \begin{pspicture}(0,-3)(50,12)
-            \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}} \putnode{t1}{t0}{15}{0}{\pscirclebox{\mbox{\ \ \ \
-  }}} \hspace{5mm} \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \
-  }}} \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{7}{2}{\clazy} \nccurve[angleA=45,
-  angleB=135,                                                 ncurv=4,
-  nodesep=-1]{t1}{t1} \putnode{l1}{t1}{0}{8}{\acdr, \clazy} \nccurve[angleA=45,
-  angleB=135,                                                 ncurv=3,
-  nodesep=-1]{t2}{t2} \putnode{l2}{t2}{0}{8}{\clazy}
-\end{pspicture}
-&
-\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-\begin{pspicture}(0,-3)(30,12)
-  \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}} \putnode{t1}{t0}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \
-  }}}     \psset{arrows=->}    \ncline{t0}{t1}     \nccurve[angleA=45,
-  angleB=135,                                                 ncurv=3,
-  nodesep=-1]{t1}{t1} \putnode{l1}{t1}{0}{8}{\acdr}
-\end{pspicture}
-\\
-(a) & (b)
- \end{tabular}}
-\caption{(a) The  grammar rules for \var{\Df{\length}{1}}
-  converted      into      an      automaton     and      (b)      its
-  DFA.}\label{fig:example-automata}
-\figrule
-\vspace*{-5mm}
-\end{wrapfigure}
-
-Figure~\ref{fig:example-automata}(a)  shows the  NFA that  is obtained
-from the grammar for \var{\Df{\length}{1}}, and the final DFA is shown
-in  Figure~\ref{fig:example-automata}(b).  This  expectedly says  that
+\newcommand{\nfaD}{%
+  \scalebox{.5}{\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(0,-3)(50,12)
+      \putnode{t0}{origin}{5}{0}{} 
+      \putnode{t1}{t0}{15}{0}{\pscirclebox{\mbox{\ \ \ \      }}}
+      \hspace{5mm} 
+      \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}} 
+      \psset{arrows=->} \ncline{t0}{t1} 
+      \ncline{t1}{t2} 
+      \putnode{l0}{t1}{7}{2}{\clazy} \nccurve[angleA=45, angleB=135, 
+        ncurv=4, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{8}{\acdr, \clazy} \nccurve[angleA=45,
+        angleB=135, ncurv=3, nodesep=-1]{t2}{t2} 
+      \putnode{l2}{t2}{0}{8}{\clazy}
+    \end{pspicture}
+}}
+\newcommand{\dfaD}{%
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(0,-3)(30,12)
+      \putnode{t0}{origin}{5}{0}{\var{\Df{\length}{1}}} \putnode{t1}{t0}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \
+      }}}     \psset{arrows=->}    \ncline{t0}{t1}     \nccurve[angleA=45,
+        angleB=135,                                                 ncurv=3,
+        nodesep=-1]{t1}{t1} \putnode{l1}{t1}{0}{8}{\acdr}
+    \end{pspicture}
+}
+The  NFA for \var{\Df{\length}{1}} is 
+\nfaD\ and the final DFA is \dfaD.
+This  expectedly says  that
 for  a  demand  $\sigma_{\length}$,   the  liveness  of  the  argument
 of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
 
