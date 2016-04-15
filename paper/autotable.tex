@@ -1,53 +1,55 @@
 \newcommand{\rlratio}{$\frac{LGC}{RGC}$}
-\renewcommand{\arraystretch}{.9}
-\begin{tabular}{|@{\ }c@{\ }| @{\ }r@{\ }|@{\ }r@{\ }| @{\ }r@{\ }|@{\ }r@{\ }|r@{\ }| r@{\ }|r@{\ }|r@{\ }|r@{\ }| r@{\ }|r@{\ }|r@{\ }|r@{\ }|r@{\ }|r@{\ }|}
+\newcommand{\rlratiotrue}{\raisebox{-2mm}{\rule{0pt}{6mm}}%
+  $\frac{1.16\times LGC}{RGC}$}
+\renewcommand{\arraystretch}{1}
+\begin{tabular}{|@{}c@{}|@{}r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }| @{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }| @{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }|@{\ }r@{\ }|}
 \hline
-  &   \multicolumn{2}{@{}c@{}|}{\#Cells collected/GC}
-  &   \multicolumn{2}{c@{}|}{\#Cells touched/GC}
-  &   \multicolumn{2}{c@{}|}{\#GCs}
-  &   \multicolumn{3}{c@{}|}{Min. Cells Required}
-  &   \multicolumn{2}{c@{}|}{GC time (sec)} & Ratio 
-  &   \multicolumn{3}{c@{}|}{Exec time (sec)}\\
+  &   \multicolumn{2}{@{}c@{\ }|}{\#Cells collected/GC}
+  &   \multicolumn{2}{c@{\ }|}{\#Cells touched/GC}
+  &   \multicolumn{2}{c@{\ }|}{\#GCs}
+  &   \multicolumn{3}{c@{\ }|}{Peak Memory Required} %{Min. Cells Required}
+  &   \multicolumn{3}{c@{\ }|}{GC time (sec)} %& Ratio 
+  &   \multicolumn{3}{c@{\ }|}{Exec time (sec)}\\
 \cline{2-16}
-{Program}&RGC&LGC&RGC&LGC&RGC&LGC&RGC&LGC&\rlratio&RGC&LGC&\rlratio&RGC&LGC&\rlratio\\
+{Program}&RGC&LGC&RGC&LGC&RGC&LGC&RGC&LGC&\rlratiotrue&RGC&LGC&\rlratio&RGC&LGC&\rlratio\\
 \hline
 \hline
 
-\verb@fibheap@ & 3466.2 & 4164.5 & 33576.6 & 50957.9 & 1333 & 1108 & 37043 & 37043 & 0 & 1.46 & 20.00 & 13.70 & 0 & 0 & 0
+\rotmore{\tt fibheap} & 3466.2 & 4164.5 & 33576.6 & 50957.9 & 1333 & 1108 & 37043 & 37043 & 0 & 1.46 & 20.00 & 13.70 & 0 & 0 & 0
 \\ \hline
 
-\verb@sudoku@ & 931.3 & 2328.7 & 3134.6 & 2950.2 & 179 & 72 & 4066 & 2960 & 0 & 0.01 & 0.04 & 4.64 & 0 & 0 & 0
+\rotmore{\tt sudoku} & 931.3 & 2328.7 & 3134.6 & 2950.2 & 179 & 72 & 4066 & 2960 & 0 & 0.01 & 0.04 & 4.64 & 0 & 0 & 0
 \\ \hline
 
-\verb@nperm@ & 4684.4 & 14212.5 & 22743.2 & 23127.1 & 710 & 235 & 27428 & 25343 & 0 & 0.24 & 1.24 & 5.20 & 0 & 0 & 0
+\rotmore{\tt nperm} & 4684.4 & 14212.5 & 22743.2 & 23127.1 & 710 & 235 & 27428 & 25343 & 0 & 0.24 & 1.24 & 5.20 & 0 & 0 & 0
 \\ \hline
 
-\verb@paraffins@ & 661.7 & 2920.5 & 4522.6 & 2933.0 & 16 & 4 & 5185 & 3733 & 0 & 0.00 & 0.00 & 2.01 & 0 & 0 & 0
+\rotmore{\tt paraffins} & 661.7 & 2920.5 & 4522.6 & 2933.0 & 16 & 4 & 5185 & 3733 & 0 & 0.00 & 0.00 & 2.01 & 0 & 0 & 0
 \\ \hline
 
-\verb@lcss@ & 8064.7 & 18268.7 & 14177.9 & 4604.4 & 30 & 14 & 22243 & 16296 & 0 & 0.01 & 0.02 & 3.02 & 0 & 0 & 0
+\rotmore{\tt lcss} & 8064.7 & 18268.7 & 14177.9 & 4604.4 & 30 & 14 & 22243 & 16296 & 0 & 0.01 & 0.02 & 3.02 & 0 & 0 & 0
 \\ \hline
 
-\verb@huffman@ & 10533.8 & 100010.0 & 89536.1 & 88.6 & 356 & 38 & 100070 & 72 & 0 & 0.64 & 0.01 & 0.02 & 0 & 0 & 0
+\rotmore{\tt huffman} & 10533.8 & 100010.0 & 89536.1 & 88.6 & 356 & 38 & 100070 & 72 & 0 & 0.64 & 0.01 & 0.02 & 0 & 0 & 0
 \\ \hline
 
-\verb@knightstour@ & 179155.0 & 312454.0 & 498645.0 & 534562.0 & 529 & 304 & 677800 & 642303 & 0 & 6.24 & 64.43 & 10.32 & 0 & 0 & 0
+\rotmore{\tt knightstour} & 179155.0 & 312454.0 & 498645.0 & 534562.0 & 529 & 304 & 677800 & 642303 & 0 & 6.24 & 64.43 & 10.32 & 0 & 0 & 0
 \\ \hline
 
-\verb@nqueens@ & 2607.4 & 9529.1 & 7493.4 & 829.0 & 3345 & 916 & 10101 & 1082 & 0 & 0.36 & 0.18 & 0.49 & 0 & 0 & 0
+\rotmore{\tt nqueens} & 2607.4 & 9529.1 & 7493.4 & 829.0 & 3345 & 916 & 10101 & 1082 & 0 & 0.36 & 0.18 & 0.49 & 0 & 0 & 0
 \\ \hline
 
-\verb@deriv@ & 854.6 & 10755.3 & 10269.3 & 420.3 & 31 & 3 & 11124 & 589 & 0 & 0.00 & 0.00 & 0.05 & 0 & 0 & 0
+\rotmore{\tt deriv} & 854.6 & 10755.3 & 10269.3 & 420.3 & 31 & 3 & 11124 & 589 & 0 & 0.00 & 0.00 & 0.05 & 0 & 0 & 0
 \\ \hline
 
-\verb@treejoin@ & 50284.2 & 936525.0 & 1566250.0 & 700756.0 & 116 & 5 & 1616533 & 887005 & 0 & 3.84 & 1.90 & 0.49 & 0 & 0 & 0
+\rotmore{\tt treejoin} & 50284.2 & 936525.0 & 1566250.0 & 700756.0 & 116 & 5 & 1616533 & 887005 & 0 & 3.84 & 1.90 & 0.49 & 0 & 0 & 0
 \\ \hline
 
-\verb@lambda@ & 7271.7 & 8448.4 & 13194.2 & 29156.3 & 775 & 667 & 20466 & 18169 & 0 & 0.17 & 4.70 & 28.48 & 0 & 0 & 0
+\rotmore{\tt lambda} & 7271.7 & 8448.4 & 13194.2 & 29156.3 & 775 & 667 & 20466 & 18169 & 0 & 0.17 & 4.70 & 28.48 & 0 & 0 & 0
 \\ \hline
 
-\verb@gc_bench@ & 14932.7 & 204774.0 & 189880.0 & 33.2 & 48 & 4 & 204813 & 72 & 0 & 0.11 & 0.00 & 0.00 & 0 & 0 & 0
+\rotmore{\tt gc\_bench} & 14932.7 & 204774.0 & 189880.0 & 33.2 & 48 & 4 & 204813 & 72 & 0 & 0.11 & 0.00 & 0.00 & 0 & 0 & 0
 \\ \hline
 
-\end{tabular}\\
-(b) Comparing RGC with LGC
+\end{tabular}\\[1mm]
+(b) Comparing RGC with LGC. Note that the size of an LGC cell is 1.16 times the size of an RGC cell.
