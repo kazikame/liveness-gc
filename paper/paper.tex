@@ -1345,28 +1345,54 @@ grammars is undecidable.
 
 
 
-\newcommand{\hgt}{2.9cm}
+\newcommand{\hgt}{4.3cm}
 \newcommand{\LGCLine}{blue}
 \newcommand{\RGCLine}{red}
 \newcommand{\ReachLine}{black}
 \newcommand{\UseLine}{light-blue}
 
+%% \begin{figure*}[t!]
+%% \renewcommand{\arraystretch}{.1}
+%% \begin{tabular}{@{}c@{}@{}c@{}@{}c@{}}
+%%    \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=paraffins.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=huffman.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=deriv.eps, height=\hgt}}
+%% \\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
+%% &  \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
+%% %\\ (a) & (b)
+%% \end{tabular}
+%% \vspace*{-2mm}
+%%  \caption{Memory usage.  
+%% The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
+%% cells  in  the  active   semi-space  for  RGC  and  LGC
+%% respectively.  The \ReachLine\ curve represents the number of
+%% reachable cells and the  \UseLine\ curve represents the
+%% number  of  cells  that  are actually  live  (of  which
+%% liveness analysis does a static approximation).  x-axis
+%% is the time measured  in number of cons-cells allocated
+%% (scaled down by factor $10^5$). y-axis is the number of
+%% cons-cells (scaled down by $10^3$).}
+%% \label{fig:memory-usage} \figrule
+%% \vspace*{-1mm}
+%% \end{figure*}
+
+
+
 \begin{figure*}[t!]
-\renewcommand{\arraystretch}{.1}
+\renewcommand{\arraystretch}{.5}
 \begin{tabular}{@{}c@{}@{}c@{}@{}c@{}}
-   \hskip -4mm{\epsfig{file=fibheap.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=sudoku.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=nperm.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=paraffins.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=lcss.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=huffman.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+   \hskip -4mm{\epsfig{file=huffman.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+\\
+   \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
 &  \hskip -4mm{\epsfig{file=deriv.eps, height=\hgt}}
-\\ \hskip -4mm{\epsfig{file=treejoin.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=lambda.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=gc_bench.eps, height=\hgt}}
-%\\ (a) & (b)
 \end{tabular}
 \vspace*{-2mm}
  \caption{Memory usage.  
@@ -1382,6 +1408,9 @@ cons-cells (scaled down by $10^3$).}
 \label{fig:memory-usage} \figrule
 \vspace*{-1mm}
 \end{figure*}
+
+
+
 
 %\vspace*{-6.5mm}
 \section{The GC scheme}
