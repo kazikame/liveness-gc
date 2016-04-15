@@ -1387,13 +1387,6 @@ cons-cells (scaled down by $10^3$).}
 \section{The GC scheme}
 \label{sec:GC-scheme}
 
-Our experimental setup  consists of an interpreter
-for  our  language,  a liveness  analyzer,  and  a
-single generation copying  collector.  The garbage
-collector can be configured to work on the
-basis  of  reachability  (RGC  mode)  or  use  
-liveness  DFAs  (LGC  mode).  
-
 In        the       liveness        analysis       described        in
 Section~\ref{sec:liveness-analysis},   the  liveness   of  a   closure
 variable is  derived from dependence  chains along all paths  from the
@@ -1490,6 +1483,12 @@ We extend liveness-based  garbage  collection  to
 this function.
 \section{Experimental evaluation}
 \label{sec:experiments}
+Our  experimental  setup   consists  of  the  prototypes   of  (a)  an
+interpreter  for our  language, (b)  a  liveness analyzer,  and (c)  a
+single generation  copying garbage  collector.  The  garbage collector
+can be configured  to work on the basis of  reachability (RGC mode) or
+use liveness DFAs (LGC mode).
+%
 Our benchmark  consists of programs taken  from nofib~\cite{nofib} and
 other repositories for functional programs~\cite{PLT-Scheme, gc_bench,
   huffman-sicp}.     We    ran    the   experiments    on    8    core

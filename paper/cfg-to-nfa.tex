@@ -98,8 +98,8 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
 \newcommand{\dfaE}{%
   \scalebox{.7}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(7,-2)(40,10)
-     \putnode{t0}{origin}{5}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
+    \begin{pspicture}(0,-2)(35,8)
+     \putnode{t0}{origin}{0}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
       }}} \hspace{5mm} \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \
        }}}
        \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{5}{2}{\clazy}
@@ -107,7 +107,7 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
            }}} 
             \psset{arrows=->} \ncline{t2}{tD1} \putnode{l1}{t2}{5}{2}{\bcar}
              \nccurve[angleA=45,
-              angleB=135,                                                 ncurv=4,
+              angleB=135,                                                 ncurv=2,
               nodesep=-1]{tD1}{tD1} \putnode{lD1}{tD1}{0}{10}{\acdr}
               \end{pspicture} 
               }
@@ -116,8 +116,8 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
 \newcommand{\dfaF}{%
   \scalebox{.7}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-2)(27,10)
-     \putnode{t0}{origin}{5}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
+    \begin{pspicture}(3,-2)(24,3)
+     \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
       }}} 
        \hspace{5mm} 
         \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \  }}}
@@ -129,8 +129,8 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
 \newcommand{\dfaG}{%
   \scalebox{.7}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-2)(16,10)
-    \putnode{t0}{origin}{5}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
+    \begin{pspicture}(3,-2)(10,3)
+    \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{7}{0}{\pscirclebox{\mbox{\ \ \ \
       }}} \hspace{1mm} \psset{arrows=->} \ncline{t0}{t1}
       \end{pspicture}
       }
@@ -147,8 +147,8 @@ As there is no $\acar$ symbol to cancel the $\bcar$ symbol in the automaton no
 $\epsilon$ edges are added and the $\bcar$ edge is deleted to get 
 \dfaF.
 We finally do the $\clazy$ simplification and notice that there is no path to a final state. 
-We delete the $\clazy$ edge without marking any state as final giving the final automata for 
-$\var{\Lanv{\pa}{}}$ 
+Thus, we delete the $\clazy$ edge without marking any state as final giving the final automata for 
+$\var{\Lanv{\pa}{}}$ as 
 \dfaG.
 The final automaton does not
 accept any forward paths, reflecting  the lazy nature of our language.
