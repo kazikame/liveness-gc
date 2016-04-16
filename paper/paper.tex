@@ -1237,12 +1237,11 @@ We compute the liveness of all variables and arguments of $\length$ in terms of 
 \paragraph{From liveness sets to context-free grammars:}\label{sec:grammar-formulation}      
 The  equations  above can  now  be  re-interpreted as  a  context-free
 grammar  (CFG) on  the  alphabet $\lbrace\acar,  \acdr, \bcar,  \bcdr,
-\clazy\rbrace$.  Let \var{$X$} denote  the non-terminal for a variable
+\clazy\rbrace$.  Let \var{X} denote  the non-terminal for a variable
 $X$ occurring on the LHS of the equations generated from the analysis.
 We can  think of  the resulting productions  as being  associated with
 several grammars, one for  each non-terminal \var{\Lanv{x}{}} regarded
-as a start  symbol. The grammar for  \var{\Df{\length}{1}} and $\langle
-{\sigma_{\length}} \rangle$ comprise of the following productions:
+as a start  symbol. The grammar for  \var{\Df{\length}{1}} and \var{\sigma_{\length}} comprise of the following productions:
 %%  As  an example, the grammar for \var{\Lanv{\xl}{}}
 %% and \var{\Lanv{\pa}{}} comprise the following productions:
 \begin{eqnarray*}
@@ -1252,9 +1251,9 @@ as a start  symbol. The grammar for  \var{\Df{\length}{1}} and $\langle
   \var{\Df{\length}{1}} &\rightarrow& \clazy \mid
   \acdr\var{\Df{\length}{1}}\clazy
        \mid \clazy\var{\Df{\length}{1}}{\clazy}\\
-\langle {\sigma_{\length}} \rangle
+\var{\sigma_{\length}}
 &\rightarrow&
-\epsilon  \mid \clazy\langle{\sigma_{\length}}\rangle 
+\epsilon  \mid \clazy\var{\sigma_{\length}}
 %% \\
 %% \var{\Lanv{\pa}{}} &\rightarrow& \clazy \bcar \var{\Df{\length}{1}}
 \end{eqnarray*}
