@@ -9,31 +9,31 @@ right regular productions are:
 
 \begin{enumerate}
 \item
-Add a  new non-terminal  $\var{\Df{\length}{1'}}$ to the  grammar with
-the rule $\var{\Df{\length}{1'}} \rightarrow \epsilon$.
+Add a  new non-terminal  $\varnew{\Df{\length}{1}}$ to the  grammar with
+the rule $\varnew{\Df{\length}{1}} \rightarrow \epsilon$.
 \item
  Replace     $\var{\Df{\length}{1}}     \rightarrow     \clazy$,     by
- $\var{\Df{\length}{1}} \rightarrow \clazy\var{\Df{\length}{1'}}$
+ $\var{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
 \item
  Replace
  $\var{\Df{\length}{1}} \rightarrow \clazy\var{\Df{\length}{1}}\clazy$,
  by  $\var{\Df{\length}{1}}  \rightarrow  \clazy\var{\Df{\length}{1}}$
- and $\var{\Df{\length}{1'}} \rightarrow \clazy\var{\Df{\length}{1'}}$
+ and $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
 \item
   Replace
  $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}\clazy$,
  by $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}$ and
- $\var{\Df{\length}{1'}} \rightarrow \clazy\var{\Df{\length}{1'}}$
+ $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
 \end{enumerate}
 
 Mohri and Nederhof~\cite{mohri00regular} provide the generalization of
 these  steps.  The  rules for  
 $\var{\Df{\length}{1}}$ after the transformation are:
 \begin{eqnarray*}              
-  \var{\Df{\length}{1}}   &\rightarrow&   \clazy\var{\Df{\length}{1'}}
+  \var{\Df{\length}{1}}   &\rightarrow&   \clazy\varnew{\Df{\length}{1}}
   \mid                 \acdr\var{\Df{\length}{1}}                 \mid
-  \clazy\var{\Df{\length}{1}}\\  \var{\Df{\length}{1'}}  &\rightarrow&
-  \clazy\var{\Df{\length}{1'}} \mid \epsilon
+  \clazy\var{\Df{\length}{1}}\\  \varnew{\Df{\length}{1}}  &\rightarrow&
+  \clazy\varnew{\Df{\length}{1}} \mid \epsilon
 \end{eqnarray*}
 
 
@@ -61,31 +61,31 @@ reach a final state.
 \newcommand{\nfaD}{%
   \scalebox{.7}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(2,-2)(30,10)
+    \begin{pspicture}(3,-2)(28,10)
       \putnode{t0}{origin}{2}{-1}{} 
-      \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{\ \ \ \      }}}
+      \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{\ \ \ \ }}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}} 
       \psset{arrows=->} \ncline{t0}{t1} 
       \ncline{t1}{t2} 
-      \putnode{l0}{t1}{7}{2}{\clazy} \nccurve[angleA=45, angleB=135, 
-        ncurv=4, nodesep=-1]{t1}{t1} 
-      \putnode{l1}{t1}{0}{8}{\acdr, \clazy} \nccurve[angleA=45,
-        angleB=135, ncurv=3, nodesep=-1]{t2}{t2} 
-      \putnode{l2}{t2}{0}{8}{\clazy}
+      \putnode{l0}{t1}{7}{2}{\clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{7}{\acdr, \clazy} 
+      \nccurve[angleA=45,
+        angleB=135, ncurv=2, nodesep=-1]{t2}{t2} 
+      \putnode{l2}{t2}{0}{7}{\clazy}
     \end{pspicture}
 }}
 \newcommand{\dfaD}{%
   \scalebox{.7}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(2,-2)(14,8)
+    \begin{pspicture}(2,-2)(13,8)
       \putnode{t0}{origin}{2}{0}{}
-      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{
-          \mbox{\ \ \ \ }}}     
+      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}     
       \psset{arrows=->}    
       \ncline{t0}{t1}     
       \nccurve[angleA=45, angleB=135, ncurv=2, nodesep=-1]{t1}{t1} 
-      \putnode{l1}{t1}{0}{8}{\acdr}
+      \putnode{l1}{t1}{0}{7}{\acdr}
     \end{pspicture}
 }}
 The  NFA for \var{\Df{\length}{1}} is 
@@ -99,19 +99,20 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
   \scalebox{.7}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(0,-2)(35,8)
-     \putnode{t0}{origin}{0}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
-      }}} \hspace{5mm} \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \
-       }}}
-       \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{5}{2}{\clazy}
-         \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\       \       \       \
-           }}} 
-            \psset{arrows=->} \ncline{t2}{tD1} \putnode{l1}{t2}{5}{2}{\bcar}
-             \nccurve[angleA=45,
-              angleB=135,                                                 ncurv=2,
-              nodesep=-1]{tD1}{tD1} \putnode{lD1}{tD1}{0}{10}{\acdr}
-              \end{pspicture} 
-              }
-              }
+     \putnode{t0}{origin}{0}{0}{} 
+     \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{\ \ \ \
+      }}} 
+     \hspace{5mm} 
+   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \ }}}
+   \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} 
+   \putnode{l0}{t1}{5}{2}{\clazy}
+   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}} 
+   \psset{arrows=->} \ncline{t2}{tD1} 
+   \putnode{l1}{t2}{5}{2}{\bcar}
+   \nccurve[angleA=45,angleB=135,ncurv=2,nodesep=-1]{tD1}{tD1} 
+   \putnode{lD1}{tD1}{0}{7}{\acdr}
+\end{pspicture} 
+  }}
 
 \newcommand{\dfaF}{%
   \scalebox{.7}{
