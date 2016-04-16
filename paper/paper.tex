@@ -228,7 +228,16 @@ progresses  and possible  future uses  are eliminated,  we update  the
 liveness  information  in  a  closure with  a  more  precise  version.
 Because  of   these  reasons,  the  garbage   collector  also  becomes
 significantly more  complicated than a liveness-based  collector for a
-eager language.
+eager language. An earlier  effort in efficiently garbage collecting
+closures~\cite{Thomas19951}  used  a   similar  approach  where  every
+closure  would maintain  a  sequence of  executable  code called  {\em
+  preserver}  which  identified  exactly which  closure  variables  to
+copy. The main focus of the  above work was also in garbage collecting
+closures without using  an explicit stack. Our work  extends this work
+and tags  liveness values to evaluated  data, as well as  modfiyng the
+liveness associated with closures dynamically  during runtime to make
+it more precise.
+
 
 
 Experiments    with   a    single    generation   copying    collector
