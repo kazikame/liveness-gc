@@ -1,6 +1,6 @@
 We circumvent the problem of  undecidability by over approximating the
 CFG by non-deterministic finite state automata (NFA) using
-Mohri   and   Nederhof~\cite{mohri00regular}   method.   This   method
+Mohri   and   Nederhof method~\cite{mohri00regular}.   This   method
 transforms a CFG $G$ into a strongly  regular grammar $R$ such that $\lang{G} \subseteq \lang{R}$. 
 %%
 If a CFG consists of a set of mutually recursive non-terminals such that the rules involved are not all left regular or not all right regular, then the method breaks the rules into right regular rules by introducing fresh non-terminals. For our example, the rule  $\var{\Df{\length}{1}}$ has two non regular productions,           $\acdr\var{\Df{\length}{1}}\clazy$          and
@@ -12,18 +12,18 @@ right regular productions are:
 Add a  new non-terminal  $\varnew{\Df{\length}{1}}$ to the  grammar with
 the rule $\varnew{\Df{\length}{1}} \rightarrow \epsilon$.
 \item
- Replace     $\var{\Df{\length}{1}}     \rightarrow     \clazy$,     by
+ Replace     $\var{\Df{\length}{1}}     \rightarrow     \clazy$     by
  $\var{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
 \item
  Replace
- $\var{\Df{\length}{1}} \rightarrow \clazy\var{\Df{\length}{1}}\clazy$,
+ $\var{\Df{\length}{1}} \rightarrow \clazy\var{\Df{\length}{1}}\clazy$
  by  $\var{\Df{\length}{1}}  \rightarrow  \clazy\var{\Df{\length}{1}}$
- and $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
+ and \linebreak $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
 \item
   Replace
- $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}\clazy$,
+ $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}\clazy$
  by $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}$ and
- $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
+ \linebreak $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
 \end{enumerate}
 
 Mohri and Nederhof~\cite{mohri00regular} provide the generalization of
