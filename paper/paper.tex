@@ -233,10 +233,8 @@ closures~\cite{Thomas19951}  used  a   similar  approach  where  every
 closure  would maintain  a  sequence of  executable  code called  {\em
   preserver}  which  identified  exactly which  closure  variables  to
 copy. The main focus of the  above work was also in garbage collecting
-closures without using  an explicit stack. Our work  extends this work
-and tags  liveness values to evaluated  data, as well as  modfiyng the
-liveness associated with closures dynamically  during runtime to make
-it more precise.
+closures without using  an explicit stack. However, it not clear whether
+their method could handle partially live data structures.
 
 
 
@@ -282,7 +280,7 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are:
 \added{
 \begin{itemize}
-\item We  propose a liveness  based GC scheme  for a lazy  first order
+\item {\color{Myblue}We  propose a liveness  based GC scheme  for a lazy  first order
   functional language and  prove its correctness.  To the  best of our
   knowledge,  this is  the first  work on  liveness-based GC  for lazy
   languages.       All      previous      attempts~\cite{shaham01heap,
@@ -290,7 +288,7 @@ contributions of this paper are:
     karkare06effectiveness} have  involved either imperative  or eager
   functional languages.  The novelty of our approach is in handling of
   liveness  of closures,  an  issue  that arises  due  to laziness  at
-  runtime.
+  runtime.}
 
 \item  We  formulate a  liveness  analysis  for the  lazy  first-order
   functional language  and prove  its correctness. The  proof involves
