@@ -274,21 +274,23 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are:
 \added{
 \begin{itemize}
-\item {\color{Myblue}We propose a liveness based GC scheme for a lazy
-  first order functional language and prove its correctness.
-  Thomas~\cite{Thomas19951} describes a copying garbage collector for
-  Three Instruction Machine (TIM) that only traces live variables in a
-  closure's environment, i.e., the variables that are useful for
-  evaluating the closure.  Their notion of liveness of variables is
-  close to the classical notion of liveness, and does not take into
-  account liveness of parts of structures (say, only the spine of a
-  list).  To the best of our knowledge, it is the only earlier work on
-  GC that takes liveness for closures into account.  All previous
-  attempts~\cite{shaham01heap, ran.shaham-sas03, shaham02estimating,
-    asati14lgc, karkare06effectiveness} have involved either
-  imperative or eager functional languages.  The novelty of our
-  approach is in handling of liveness of closures, an issue that
-  arises due to laziness at runtime.}
+\item {\color{Myblue}We  propose an interprocedural liveness  based GC
+  scheme  for a  lazy first  order functional  language and  prove its
+  correctness.  To the  best of our knowledge, this is  the first work
+  that uses  the results  of an  interprocedural liveness  analysis to
+  garbage    collect    both     evaluated    data    and    closures.
+  Thomas~\cite{Thomas19951} describes a  copying garbage collector for
+  the  Three  Instruction  Machine  (TIM)  that  only  preserves  live
+  closures in a function's environment (also called a frame). However,
+  in the absence of  details, it is not clear whether  a) the scope of
+  the method is interprocedural, and b) it handles algebraic datatypes
+  like lists (the original design of TIM did not).  All other previous
+  attempts~\cite{shaham01heap,  ran.shaham-sas03,  shaham02estimating,
+    asati14lgc, karkare06effectiveness} involved  either imperative or
+  eager functional languages.}
+%% The novelty of our approach is in handling of
+%%   liveness  of closures,  an  issue  that arises  due  to laziness  at
+%%   runtime.}
 
 \item  We  formulate a  liveness  analysis  for the  lazy  first-order
   functional language  and prove  its correctness. The  proof involves
@@ -299,10 +301,10 @@ contributions of this paper are:
 \item The  analysis results  in a set  of context-free  grammars along
   with  a fixed  set  of non-context-free  productions.  The  decision
   whether to copy a cell during  GC translates to a membership problem
-  for such  grammars.  Earlier research assumed  the undecidability of
-  this membership question and  used an over-approximation to overcome
-  it.  In this paper, we provide  a formal proof of the undecidability
-  of this problem.
+  for such grammars.  Earlier, this decision problem was assumed to be
+  undecidable, and the context-free grammar was over approximated by a
+  regular  grammar.   In  this  paper,  we  provide  a  proof  of  the
+  undecidability of this problem.
 
 \item We have implemented a garbage collector that uses the result of
   liveness  analysis to  retain  live cells.   Our experiments  reveal
@@ -1117,6 +1119,10 @@ An  explanation of  why the  proposition holds  for the
 modified  \CONS\ rule  is  given in  \cite{asati14lgc}.
 The proposition also holds for other modified rules for
 similar reasons.
+
+We  now return  back  to the  problem of  computing  liveness using
+\Lfonly\  and a  concrete  demand $\sigma$.  Although  the process  is
+explained through an example, it can be generalized easily.
 
 \input{example-program}
 
