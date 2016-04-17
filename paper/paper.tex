@@ -228,13 +228,7 @@ progresses  and possible  future uses  are eliminated,  we update  the
 liveness  information  in  a  closure with  a  more  precise  version.
 Because  of   these  reasons,  the  garbage   collector  also  becomes
 significantly more  complicated than a liveness-based  collector for a
-eager language. An earlier  effort in efficiently garbage collecting
-closures~\cite{Thomas19951}  used  a   similar  approach  where  every
-closure  would maintain  a  sequence of  executable  code called  {\em
-  preserver}  which  identified  exactly which  closure  variables  to
-copy. The main focus of the  above work was also in garbage collecting
-closures without using  an explicit stack. However, it not clear whether
-their method could handle partially live data structures.
+eager language. 
 
 
 
@@ -280,15 +274,21 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are:
 \added{
 \begin{itemize}
-\item {\color{Myblue}We  propose a liveness  based GC scheme  for a lazy  first order
-  functional language and  prove its correctness.  To the  best of our
-  knowledge,  this is  the first  work on  liveness-based GC  for lazy
-  languages.       All      previous      attempts~\cite{shaham01heap,
-    ran.shaham-sas03,          shaham02estimating,         asati14lgc,
-    karkare06effectiveness} have  involved either imperative  or eager
-  functional languages.  The novelty of our approach is in handling of
-  liveness  of closures,  an  issue  that arises  due  to laziness  at
-  runtime.}
+\item {\color{Myblue}We propose a liveness based GC scheme for a lazy
+  first order functional language and prove its correctness.
+  Thomas~\cite{Thomas19951} describes a copying garbage collector for
+  Three Instruction Machine (TIM) that only traces live variables in a
+  closure's environment, i.e., the variables that are useful for
+  evaluating the closure.  Their notion of liveness of variables is
+  close to the classical notion of liveness, and does not take into
+  account liveness of parts of structures (say, only the spine of a
+  list).  To the best of our knowledge, it is the only earlier work on
+  GC that takes liveness for closures into account.  All previous
+  attempts~\cite{shaham01heap, ran.shaham-sas03, shaham02estimating,
+    asati14lgc, karkare06effectiveness} have involved either
+  imperative or eager functional languages.  The novelty of our
+  approach is in handling of liveness of closures, an issue that
+  arises due to laziness at runtime.}
 
 \item  We  formulate a  liveness  analysis  for the  lazy  first-order
   functional language  and prove  its correctness. The  proof involves
@@ -1164,7 +1164,7 @@ solution   for   \Df{f}{i}   yields  a   solution   for
 Note that this equation can also be viewed as a CFG with \{\acdr,
 \clazy\} as terminal symbols and \Df{\length}{1} as the sole
 non-terminal.
-
+{\color{Myblue}
 %\subsection{Generating liveness equations \Lv\  for function bodies}
 \paragraph{Handling user-defined functions:}
 \label{sec:bodylivenessbodies}
@@ -1293,7 +1293,7 @@ grammars is undecidable.
 
 
 \input{cfg-to-nfa}
-
+}
   \SetStartEndCondition{ }{}{}%
   \SetKwProg{Pro}{procedure}{\string:}{}
   \SetKwProg{Fn}{function}{\string:}{}
