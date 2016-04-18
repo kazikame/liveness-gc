@@ -1,19 +1,18 @@
-\begin{figure}[t]
-%\begin{wrapfigure}{l}{0.25\textwidth}
-%\vspace*{-.2cm}
-{%\small
-  \renewcommand{\arraystretch}{.8}{
-    \begin{uprogram}
-      \UFL (\DEFINE~(f~\px)
-      \UNL{1} $\pi_1$:(\LET~\py~$\leftarrow $\
-      (\length~\px) \IN
-      \UNL{3} (\SIF~$\psi_1$:\py
-      \UNL{5}(\LET~\pu~$\leftarrow$~(\Sum~\px)~\IN
-      \UNL{6} (\LET~\pw~$\leftarrow$\ (/~\pu~\py)~\IN\ \UNL{7} (\SRETURN~$\psi_2$:\pw)))
-      \UNL{5}(\LET~\pz~$\leftarrow$~(+~\py~1)~\IN\ \UNL{6} (\SRETURN~$\psi_3$:\pz)))))   
-  \end{uprogram}}
-}
-\caption{Example illustrating liveness of closures}\label{fig:lv-closure}
-\vspace*{.1cm}
-%\end{wrapfigure}
+\begin{figure}[t!]
+  %\begin{wrapfigure}{l}{0.25\textwidth}
+  %\vspace*{-.2cm}
+  \centering
+  \renewcommand{\arraystretch}{.8}
+  \begin{uprogram}
+    \UFL (\DEFINE~(f~\px)
+    \UNL{1} $\pi_1$:(\LET~\py~$\leftarrow $\
+    (\length~\px) \IN
+    \UNL{3} (\SIF~$\psi_1$:\py
+    \UNL{5}(\LET~\pu~$\leftarrow$~(\Sum~\px)~\IN
+    \UNL{6} (\LET~\pw~$\leftarrow$\ (/~\pu~\py)~\IN\ \UNL{7} (\SRETURN~$\psi_2$:\pw)))
+    \UNL{5}(\LET~\pz~$\leftarrow$~(+~\py~1)~\IN\ \UNL{6} (\SRETURN~$\psi_3$:\pz)))))   
+  \end{uprogram}
+  \caption{Example illustrating liveness of closures}\label{fig:lv-closure}
+  \vspace*{-5mm}
+  %\end{wrapfigure}
 \end{figure}

@@ -33,7 +33,7 @@
 
 % to save space in lists
 \usepackage{enumitem}
-\setlist{nolistsep}
+\setlist{nolistsep,leftmargin=*}
 
 \input{fh_defs}
 \def\drawplusplus#1#2#3{\hbox to 0pt{\hbox to #1{\hfill\vrule height #3 depth
@@ -668,31 +668,25 @@ $\lbrace\acar\rbrace\sigma$.
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
 
-%\begin{figure}[t]
-  \input{example-to-illustrate-liveness}  
-%  \caption{Example illustrating liveness of closures}\label{fig:lv-closure}
-%\end{figure}
-\input{fig-liveness}
-
-
 \subsection{Liveness analysis for lazy languages}
 \label{sec:liveness-analysis}
-  
+\input{example-to-illustrate-liveness}
 
-Consider the  program in Figure~\ref{fig:lv-closure}.   As mentioned
+Consider the program in Figure~\ref{fig:lv-closure}.  As mentioned
 earlier, a lazy evaluation of the $\LET$ expression at $\pi_1$ creates
-a closure  for $(\length~\px)$  instead of  evaluating it.   Since the
+a closure for $(\length~\px)$ instead of evaluating it.  Since the
 closure may escape the scope in which it is created, it carries a copy
-of $\px$ within itself.  We treat the  copy of $\px$ in the closure as
-being separate from the $\px$ introduced  by the $\LET$, and call it a
-\emph{closure  variable}.  For  liveness calculations,  such variables
-are distinguished  from variables  introduced by  \LET s  and function
-arguments  (called \emph{stack  variables},  since they  reside in  the
-activation  stack).   We notationally distinguish  a closure  variable
-from  its corresponding  stack variable  by subscripting  it with  the
-label of the program   point  where   the   closure  was   created\footnote{Multiple
-  occurrences  of the  same  variable in  an  application are  further
-  distinguished by their positions in the application.}.
+of $\px$ within itself.  We treat the copy of $\px$ in the closure as
+being separate from the $\px$ introduced by the $\LET$, and call it a
+\emph{closure variable}.  For liveness calculations, such variables
+are distinguished from variables introduced by \LET s and function
+arguments (called \emph{stack variables}, since they reside in the
+activation stack).  We notationally distinguish a closure variable
+from its corresponding stack variable by subscripting it with the
+label of the program point where the closure was
+created\footnote{Multiple occurrences of the same variable in an
+  application are further distinguished by their positions in the
+  application.}.
 
 
   Since a  closure is evaluated  only at evaluation points,  a closure
@@ -739,7 +733,7 @@ observation  to  dynamically  select   an  evaluation  point  specific
 liveness in order to collect more garbage.
 
 
-
+\input{fig-liveness}
 Figure~\ref{fig:live-judge}  describes  our  analysis  which  has  two
 parts. The  function $\mathit{ref}$,  takes an  application $s$  and a
 demand $\sigma$ and returns the incremental liveness generated for the
@@ -809,45 +803,6 @@ variables of $s$ are updated and added
   $s$ so that the GC can refer to it during garbage collection.  }
 %} %comment 
 
-\subsection{Soundness of analysis}  
-
-We shall now present a proof of soundness of the analysis presented in
-Section~\ref{sec:liveness-analysis}. \added{It is easy to see that the analysis
-correctly identifies the liveness of stack variables. A stack variable
-is live
-between its introduction through a \LET\  and its last use to
-create a closure variable. This is correctly captured by the
-\LET\ rule in Figure~\ref{fig:live-judge}.}
-Proving soundness  for closure  variables is more complex. Here  are the
-ideas behind the proof. 
-\begin{enumerate}
-\item      We     augment      the      standard     semantics      in
-  Figure~\ref{fig:lang-semantics} to  model a GC before  the execution
-  of  each \LET\  expression.  \added{Note  that, unlike  eager
-    languages,   memory  is   allocated  only   during  execution   of
-    \LET\ expressions}. During GC, we track each reference in the root
-  set and heap that is declared  dead by our analysis.  Any attempt to
-  dereference  such  references  results   in  the  transition  system
-  entering a special state denoted \bang.  We call the semantics after
-  augmentation, \emph{minefield semantics}.
-
-%% During GC, we bind  a special value
-%%   $\bot$ to each  reference in the root  set and heap  that is not
-%%   live by  our analysis.  This  models the de-allocation  of locations
-%%   without any  live references.  Any  attempt to dereference  a $\bot$
-%%   during execution results
-%% %\added{that  has   been   declared  not   live  by   our
-%% %    analysis} %%with  a null-liveness during a  transition will result
-%%   in the transition system entering  a special state denoted \bang.  We
-%%   call the semantics after augmentation, \emph{minefield semantics}.
-\item \label{inline1} Assuming that a program enters the \bang\ state,
-  we  construct,  through  inline expansion,  a  program
-  without function  calls which has  the same minefield  behavior. The
-  final step shows that no program  without function calls can enter the
-  \bang\ state. As a consequence  no program (with or without function
-  calls) can enter the \bang\ state.
-\end{enumerate}
-
  
 \begin{figure*}[t!]
 \begin{center}\footnotesize
@@ -895,6 +850,45 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S, \heap,\, s, \, \cred{\sigma}$ 
     symbol}\label{fig:minefield-semantics-for-some}}
 \vspace*{-2mm}
 \end{figure*}
+
+\subsection{Soundness of analysis}  
+
+We shall now present a proof of soundness of the analysis presented in
+Section~\ref{sec:liveness-analysis}. \added{It is easy to see that the analysis
+correctly identifies the liveness of stack variables. A stack variable
+is live
+between its introduction through a \LET\  and its last use to
+create a closure variable. This is correctly captured by the
+\LET\ rule in Figure~\ref{fig:live-judge}.}
+Proving soundness  for closure  variables is more complex. Here  are the
+ideas behind the proof. 
+\begin{enumerate}
+\item      We     augment      the      standard     semantics      in
+  Figure~\ref{fig:lang-semantics} to  model a GC before  the execution
+  of  each \LET\  expression.  \added{Note  that, unlike  eager
+    languages,   memory  is   allocated  only   during  execution   of
+    \LET\ expressions}. During GC, we track each reference in the root
+  set and heap that is declared  dead by our analysis.  Any attempt to
+  dereference  such  references  results   in  the  transition  system
+  entering a special state denoted \bang.  We call the semantics after
+  augmentation, \emph{minefield semantics}.
+
+%% During GC, we bind  a special value
+%%   $\bot$ to each  reference in the root  set and heap  that is not
+%%   live by  our analysis.  This  models the de-allocation  of locations
+%%   without any  live references.  Any  attempt to dereference  a $\bot$
+%%   during execution results
+%% %\added{that  has   been   declared  not   live  by   our
+%% %    analysis} %%with  a null-liveness during a  transition will result
+%%   in the transition system entering  a special state denoted \bang.  We
+%%   call the semantics after augmentation, \emph{minefield semantics}.
+\item \label{inline1} Assuming that a program enters the \bang\ state,
+  we  construct,  through  inline expansion,  a  program
+  without function  calls which has  the same minefield  behavior. The
+  final step shows that no program  without function calls can enter the
+  \bang\ state. As a consequence  no program (with or without function
+  calls) can enter the \bang\ state.
+\end{enumerate}
 
 \noindent To set up the minefield semantics, we follow these steps:
 \begin{enumerate}
@@ -1300,66 +1294,6 @@ grammars is undecidable.
 
 \input{cfg-to-nfa}
 }
-  \SetStartEndCondition{ }{}{}%
-  \SetKwProg{Pro}{procedure}{\string:}{}
-  \SetKwProg{Fn}{function}{\string:}{}
-  \SetKwFunction{Range}{range}%%
-  \SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
-  \SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
-  \SetKwFor{While}{while}{:}{fintq}%
-  \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
-  \SetKwFunction{Lgc}{$\mathsf{lgc}$}%
-  \SetKwFunction{Copy}{$\mathsf{copy}$}%
-  \SetKwFunction{LCopy}{$lgcCopy$}%
-  \SetKwFunction{RCopy}{$rgcCopy$}%
-
-\begin{algorithm}[t!]
-  \Pro{\Lgc{}}
-     {
-       \For {each reference $\mathsf{ref}$ in root set}
-            {$\mathsf{ref}$ = \Copy($\mathsf{ref}, \mathsf{init}(\mathsf{ref.dfa})$)\;}
-            ${\mathsf{copyReferencesOnPrintStack}()}$\;  
-     }
-     \Fn{\Copy{$\mathsf{ref}, \mathsf{state}$}}
-        {
-          \eIf {$\mathsf{final}(\mathsf{state}$)}
-             {
-               $\mathsf{newRef} = \mathsf{dupHeapCell}(\mathsf{ref})$\;
-               \If{$\mathsf{ref\!.cell}$($\mathsf{ref}$)
-                 is a cons cell $\mathsf{(cons~arg_1~arg_2)}$}
-                  {
-                    {
-                      $\mathsf{newRef}\!.\mathsf{arg_1}  = \Copy(\mathsf{arg_1}, \mathsf{next}(\mathsf{state}, 0))$\;
-%                      $\mathsf{newRef}\!.\mathsf{arg_1}   =  \mathsf{newCar}$\;
-                    }
-                    {
-                      $\mathsf{newRef}\!.\mathsf{arg_2} =  \Copy(\mathsf{arg_2},
-                      \mathsf{next}(\mathsf{state} , 1))$\;
-%                      $\mathsf{newRef}\!.\mathsf{arg_2}   = \mathsf{newCdr}$\;
-                    }    
-                  }
-               \If
-                  {$\mathsf{ref\!.cell}$ is a
-                    closure cell, generically  $\mathsf{(binop~arg_1~arg_2)}$}
-              %      
-                   { 
-                     $\mathsf{newRef}\!.\mathsf{arg_1} = \Copy(\mathsf{arg_1}, \mathsf{init}(\mathsf{arg_1.dfa}))$\;
-                     $\mathsf{newRef}\!.\mathsf{arg_2} = \Copy(\mathsf{arg_2}, \mathsf{init}(\mathsf{arg_2.dfa}))$\;
-                   }
-             }
-             {$\mathsf{newRef = ref}$}
-\KwRet $\mathsf{newRef}$\;
-        }
-        \caption{Liveness-based garbage collection.  \label{algo:lgc-a}}
-\end{algorithm}
-
-
-
-\newcommand{\hgt}{4.3cm}
-\newcommand{\LGCLine}{blue}
-\newcommand{\RGCLine}{red}
-\newcommand{\ReachLine}{black}
-\newcommand{\UseLine}{light-blue}
 
 %% \begin{figure*}[t!]
 %% \renewcommand{\arraystretch}{.1}
@@ -1392,33 +1326,6 @@ grammars is undecidable.
 %% \label{fig:memory-usage} \figrule
 %% \vspace*{-1mm}
 %% \end{figure*}
-
-
-
-\begin{figure*}[t!]
-\renewcommand{\arraystretch}{.5}
-\begin{tabular}{@{}c@{}@{}c@{}@{}c@{}}
-   \hskip -4mm{\epsfig{file=huffman.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
-\\
-   \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
-&  \hskip -4mm{\epsfig{file=deriv.eps, height=\hgt}}
-\end{tabular}
-\vspace*{-2mm}
- \caption{Memory usage.  
-The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
-cells  in  the  active   semi-space  for  RGC  and  LGC
-respectively.  The \ReachLine\ curve represents the number of
-reachable cells and the  \UseLine\ curve represents the
-number  of  cells  that  are actually  live  (of  which
-liveness analysis does a static approximation).  x-axis
-is the time measured  in number of cons-cells allocated
-(scaled down by factor $10^5$). y-axis is the number of
-cons-cells (scaled down by $10^3$).}
-\label{fig:memory-usage} \figrule
-\vspace*{-1mm}
-\end{figure*}
-
 
 
 
@@ -1481,6 +1388,54 @@ turn,    can    be    one   of    ($\mathsf{unop~arg}$),    ($\mathsf{
 Here each $\mathsf{  arg_i}$ is a reference to another  heap cell.  In
 addition, the closure also carries  a pointer to a DFA (denoted
 $\mathsf{arg_i.dfa_i}$) for each $\mathsf{arg_i}$.
+  \SetStartEndCondition{ }{}{}%
+  \SetKwProg{Pro}{procedure}{\string:}{}
+  \SetKwProg{Fn}{function}{\string:}{}
+  \SetKwFunction{Range}{range}%%
+  \SetKw{KwTo}{in}\SetKwFor{For}{for}{\string:}{}%
+  \SetKwIF{If}{ElseIf}{Else}{if}{:}{elif}{else:}{}%
+  \SetKwFor{While}{while}{:}{fintq}%
+  \AlgoDontDisplayBlockMarkers\SetAlgoNoEnd\SetAlgoNoLine%
+  \SetKwFunction{Lgc}{$\mathsf{lgc}$}%
+  \SetKwFunction{Copy}{$\mathsf{copy}$}%
+  \SetKwFunction{LCopy}{$lgcCopy$}%
+  \SetKwFunction{RCopy}{$rgcCopy$}%
+
+\begin{algorithm}[ht!]
+  \Pro{\Lgc{}}
+     {
+       \For {each reference $\mathsf{ref}$ in root set}
+            {$\mathsf{ref}$ = \Copy($\mathsf{ref}, \mathsf{init}(\mathsf{ref.dfa})$)\;}
+            ${\mathsf{copyReferencesOnPrintStack}()}$\;  
+     }
+     \Fn{\Copy{$\mathsf{ref}, \mathsf{state}$}}
+        {
+          \If {$\neg\mathsf{final}(\mathsf{state}$)} {\KwRet $\mathsf{ref}$\;}
+          $\mathsf{newRef} = \mathsf{dupHeapCell}(\mathsf{ref})$\;
+          \If{$\mathsf{ref\!.cell}$($\mathsf{ref}$)
+            is a cons cell $\mathsf{(cons~arg_1~arg_2)}$}
+             {
+               {
+                 $\mathsf{newRef}\!.\mathsf{arg_1}  = \Copy(\mathsf{arg_1}, \mathsf{next}(\mathsf{state}, 0))$\;
+                 %                      $\mathsf{newRef}\!.\mathsf{arg_1}   =  \mathsf{newCar}$\;
+               }
+               {
+                 $\mathsf{newRef}\!.\mathsf{arg_2} =  \Copy(\mathsf{arg_2},
+                 \mathsf{next}(\mathsf{state} , 1))$\;
+                 %                      $\mathsf{newRef}\!.\mathsf{arg_2}   = \mathsf{newCdr}$\;
+               }    
+             }
+             \If {$\mathsf{ref\!.cell}$ is a closure cell, generically  $\mathsf{(binop~arg_1~arg_2)}$}
+             { 
+               $\mathsf{newRef}\!.\mathsf{arg_1} = \Copy(\mathsf{arg_1}, \mathsf{init}(\mathsf{arg_1.dfa}))$\;
+               $\mathsf{newRef}\!.\mathsf{arg_2} = \Copy(\mathsf{arg_2}, \mathsf{init}(\mathsf{arg_2.dfa}))$\;
+             }
+             \KwRet $\mathsf{newRef}$\;
+        }
+        \caption{Liveness-based garbage collection.  \label{algo:lgc-a}}
+\end{algorithm}
+%\setlength{\textfloatsep}{0pt}% Remove \textfloatsep
+
 Algorithm~\ref{algo:lgc-a}   describes   the   garbage
 collection scheme.  Starting with the root set, each cell pointed by a
 live reference  (i.e., whose associated  DFA state is final)  is copied
@@ -1578,6 +1533,32 @@ trees  of various  sizes that  are  never used  by the  program. As  a
 result,  the benchmark  highly favours  LGC.  The  benchmark has  been
 included  for  completeness,  and  we  do  not  consider  its  numbers
 as being representative of real programs.
+
+\begin{figure*}[t!]
+\renewcommand{\arraystretch}{.5}
+\begin{tabular}{@{}c@{}@{}c@{}@{}c@{}}
+   \hskip -4mm{\epsfig{file=huffman.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=knightstour.eps, height=\hgt}}
+\\
+   \hskip -4mm{\epsfig{file=nqueens.eps, height=\hgt}}
+&  \hskip -4mm{\epsfig{file=deriv.eps, height=\hgt}}
+\end{tabular}
+\vspace*{-2mm}
+ \caption{Memory usage.  
+The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
+cells  in  the  active   semi-space  for  RGC  and  LGC
+respectively.  The \ReachLine\ curve represents the number of
+reachable cells and the  \UseLine\ curve represents the
+number  of  cells  that  are actually  live  (of  which
+liveness analysis does a static approximation).  x-axis
+is the time measured  in number of cons-cells allocated
+(scaled down by factor $10^5$). y-axis is the number of
+cons-cells (scaled down by $10^3$).}
+\label{fig:memory-usage} \figrule
+\vspace*{-1mm}
+\end{figure*}
+
+
 
 Memory    usage    graphs    for     the    benchmarks    are    shown
 Figure~\ref{fig:memory-usage}.  In  all the  programs we can  see that
@@ -1821,7 +1802,7 @@ enough to  show that the $\rightsquigarrow$ step would not lead to a
 $\sigma$.
 
 We consider the rules for \CAR\  only.  
-The rest  of the rules involve similar reasoning. For the {\sc
+The other rules involve similar reasoning. For the {\sc
   car-clo}  rule in  the state  $\rho, S,  \heap, (\CAR~x),
 \sigma$, we  know that $\sigma$ is  non-null. Therefore
 the  liveness  of  $x$  includes  $\epsilon$,  and  the
@@ -2033,7 +2014,7 @@ distinct function in each branch.
   \caption{A possible grammar generated by the proof of
     Lemma~\ref{lemma:grammar-undecidable} and a program to realize the
   grammar.}\label{fig:turing-pgm}
-\vspace*{-6mm}
+\vspace*{-2mm}
 \end{figure}
 
 Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
