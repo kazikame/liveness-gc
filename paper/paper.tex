@@ -280,14 +280,14 @@ contributions of this paper are:
   that uses  the results  of an  interprocedural liveness  analysis to
   garbage    collect    both     evaluated    data    and    closures.
   Thomas~\cite{Thomas19951} describes a  copying garbage collector for
-  the  Three  Instruction  Machine  (TIM)  that  only  preserves  live
-  closures in a function's environment (also called a frame). However,
-  in the absence of  details, it is not clear whether  a) the scope of
-  the method is interprocedural, and b) it handles algebraic datatypes
-  like lists (the original design of TIM did not).  All other previous
-  attempts~\cite{shaham01heap,  ran.shaham-sas03,  shaham02estimating,
-    asati14lgc, karkare06effectiveness} involved  either imperative or
-  eager functional languages.}
+  the Three  Instruction Machine (TIM)~\cite{Fairbairn1987}  that only
+  preserves live closures  in a function's environment  (also called a
+  frame). However, in the absence of  details, it is not clear whether
+  a) the  scope of the  method is  interprocedural, and b)  it handles
+  algebraic datatypes like lists (the original design of TIM did not).
+  All  other  previous attempts~\cite{shaham01heap,  ran.shaham-sas03,
+    shaham02estimating,  asati14lgc, karkare06effectiveness}  involved
+  either imperative or eager functional languages.}
 %% The novelty of our approach is in handling of
 %%   liveness  of closures,  an  issue  that arises  due  to laziness  at
 %%   runtime.}
