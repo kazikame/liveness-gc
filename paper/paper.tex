@@ -1530,12 +1530,13 @@ collection time, which increases the  overall execution time even with
 reduced number of  collections.  However, the execution time  of LGC is
 still comparable for most benchmarks (slowdown within 5X of
 RGC in most cases) and better  for 3 benchmarks (2X speedup in the
-best case).  Note that  \verb@gc_bench@~\cite{gc_bench} is a synthetic
-benchmark that allocates complete binary
-trees  of various  sizes that  are  never used  by the  program. As  a
-result,  the benchmark  highly favours  LGC.  The  benchmark has  been
-included  for  completeness,  and  we  do  not  consider  its  numbers
-as being representative of real programs.
+best case).  
+%% Note that  \verb@gc_bench@~\cite{gc_bench} is a synthetic
+%% benchmark that allocates complete binary
+%% trees  of various  sizes that  are  never used  by the  program. As  a
+%% result,  the benchmark  highly favours  LGC.  The  benchmark has  been
+%% included  for  completeness,  and  we  do  not  consider  its  numbers
+%% as being representative of real programs.
 
 \begin{figure*}[t!]
 \renewcommand{\arraystretch}{.5}
@@ -1769,13 +1770,14 @@ minefield semantics, if the demand $\sigma$  on the LHS of a minefield
 step  is non-null,  the  demand  on the  RHS  is  a transformation  of
 $\sigma$ (for example $(\clazy\cup\acar)\sigma$) which is also non-null.
 
-Note that our proofs will be for a single round of minefield execution
-i.e.,  the evaluation of  $(\mainpgm)$  to   its  WHNF  driven  by   the  printing  mechanism~(Section
-\ref{sec:semantics}).  With  minor variations,  the proof will  also be
-applicable for subsequent evaluations initiated by $\print$.
+Our proofs will be for a single round of minefield execution i.e., the
+evaluation  of  $(\mainpgm)$  to  its  WHNF  driven  by  the  printing
+mechanism~(Section \ref{sec:semantics}).   With minor  variations, the
+proof will also be applicable  for subsequent evaluations initiated by
+$\print$.
 %% We show  next that the  minefield execution of a  call-less program
 %% cannot go \bang.
-
+%
 \begin{lemma}
 \label{lemma:call-less-cannot-go-bang}
 Consider the minefield execution of  a program without function calls.
