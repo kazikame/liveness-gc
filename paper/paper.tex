@@ -45,15 +45,15 @@
       %It would be better to specify these in font-relative measures, but it
       %probably doesn't scale anyway.
 
-\definecolor{Myblue}{rgb}{.2,0,1}
-\definecolor{Myred}{rgb}{1,.2,.2}
+%\definecolor{Myblue}{rgb}{.2,0,1}
+%\definecolor{Myred}{rgb}{1,.2,.2}
 
-\newcommand{\mycomment}[1]{{\color{Myblue}{#1}}}
+%\newcommand{\mycomment}[1]{{\color{Myblue}{#1}}}
 %\newcommand{\added}[1]{{\color{Myblue}{#1}}}
-\newcommand{\added}[1]{#1}
-\newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
+%\newcommand{\added}[1]{#1}
+%\newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
 %\newcommand{\warning}[1]{{\color{Myred}{#1}}}
-\newcommand{\warning}[1]{}
+%\newcommand{\warning}[1]{}
 %\newcommand{\blankout}[1]{}
 
 \newcommand{\oxlb}{\ensuremath{[\!|}}
@@ -200,14 +200,15 @@ restrict reachability during marking.  This  results in an increase in
 the garbage reclaimed and consequently in fewer collections.
 
 
-\added{While  the idea  of  using static  analysis  to improve  memory
+While  the idea  of  using static  analysis  to improve  memory
   utilization  has  been  shown  to   be  effective  for  {\em  eager}
   languages~\cite{asati14lgc,       HofmannJ03,       inoue88analysis,
     lee05static}, a straightforward extension  of the technique is not
   possible  for  lazy  languages,  where  heap-allocated  objects  may
   include   closures    (runtime   representations    of   unevaluated
-  expressions).   }   \todelete{Designing  a  liveness  based  garbage
-  collector   for  lazy   languages  poses   significant  challenges.}
+  expressions).
+%%\todelete{Designing  a  liveness  based  garbage
+%%  collector   for  lazy   languages  poses   significant  challenges.}
 Firstly, since  data is made  live by  evaluation of closures,  and in
 lazy languages  the place in  the program where this  evaluation takes
 place cannot  be statically determined, laziness  complicates liveness
@@ -263,9 +264,9 @@ reachability-based collector (RGC) will preserve all cells.
 In  this work  we show  that  static analysis  of heap  data can  help
 garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are:
-\added{
+
 \begin{itemize}
-\item {\color{Myblue}We  propose an interprocedural liveness  based GC
+\item We  propose an interprocedural liveness  based GC
   scheme  for a  lazy first  order functional  language and  prove its
   correctness.  To the  best of our knowledge, this is  the first work
   that uses  the results  of an  interprocedural liveness  analysis to
@@ -278,7 +279,7 @@ contributions of this paper are:
   algebraic datatypes like lists (the original design of TIM did not).
   All  other  previous attempts~\cite{shaham01heap,  ran.shaham-sas03,
     shaham02estimating,  asati14lgc, karkare06effectiveness}  involved
-  either imperative or eager functional languages.}
+  either imperative or eager functional languages.
 %% The novelty of our approach is in handling of
 %%   liveness  of closures,  an  issue  that arises  due  to laziness  at
 %%   runtime.}
@@ -304,32 +305,7 @@ contributions of this paper are:
   closures during  execution results in more  garbage being collected.
   Empirical results  show the effectiveness of  liveness-based GC.
 \end{itemize}
-}
-\todelete{
-\begin{itemize}
-\item  We  formulate  a  liveness  analysis for  a  lazy  first-order
-  functional language and  prove its correctness. The 
-  proof involves specifying liveness through a non-standard semantics  and then proving the analysis 
-  correct with respect to the specification.   
-\item The analysis results  in a set  of context-free  grammars along
-  with  a fixed  set  of non-context-free  productions.  The  decision
-  whether   to  copy  a  cell   during  GC  translates  to a  membership problem  for such  grammars.  In  this
-  paper, we  have shown the  undecidability of this problem and 
-  circumvent the  problem by over-approximating the  grammars
-  with DFAs.
-\item We  have implemented a garbage  collector that uses the  DFAs to
-  retain live  cells.  Our  experiments reveal  interesting space-time
-  trade-offs  in  the  engineering  of  the  collector---for  example,
-  updating liveness  information carried in closures  during execution
-  results  in   more  garbage  being  collected.    Empirical  results
-  show the effectiveness of liveness-based GC.
-\end{itemize}
 
-As far  as we know, this  is the first work  on liveness-based GC      for      lazy       languages.       All      previous
-attempts~\cite{shaham01heap,   ran.shaham-sas03,   shaham02estimating,
-  asati14lgc, karkare06effectiveness} have  involved either imperative
-or eager functional languages.
-}
 \subsection{Organization of the paper}
 
 Section~\ref{sec:defs}  introduces  the   syntax  of  the  programming
@@ -783,7 +759,7 @@ variables of $s$ are updated and added
   to  give the  overall liveness environment  for $(\LET~x
 \leftarrow~s~\IN~e)$.
 
-\added{  As noted  earlier, $x.\alpha  \in \Lv$  specifies the
+ As noted  earlier, $x.\alpha  \in \Lv$  specifies the
   liveness of the reference $\heap\llbracket\rho(x), \alpha\rrbracket$
   only   if   $\alpha$  corresponds   to   a   closure-free  path   in
   \heap\ starting  from $\rho(x)$.  If  this path is intercepted  by a
@@ -791,8 +767,7 @@ variables of $s$ are updated and added
   starting from $\mathit{y_{\pi}}$ is given by $\Lv_\mathit{y_{\pi}}$.
   As we shall see in  Section~\ref{sec:GC-scheme}, the liveness of the
   closure variable  $y_{\pi}$ is recorded  along with the  closure for
-  $s$ so that the GC can refer to it during garbage collection.  }
-%} %comment 
+  $s$ so that the GC can refer to it during garbage collection.
 
  
 \begin{figure*}[t!]
@@ -835,30 +810,27 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S, \heap,\, s, \, \cred{\sigma}$ 
 \hline
 \end{tabular}
 \end{center}
-\caption{Minefield  semantics for  \CAR\   and \LET. Complete minefield semantics is provided in~\cite{TR16-1}.
-  \warning{Add a note mentioning that we handle the issue of requiring
-    a      specific     demand      by      introducing     a      new
-    symbol}\label{fig:minefield-semantics-for-some}}
+\caption{Minefield  semantics for  \CAR\   and \LET. Complete minefield semantics is provided in~\cite{TR16-1}.}
 \vspace*{-2mm}
 \end{figure*}
 
 \subsection{Soundness of analysis}  
 
 We shall now present a proof of soundness of the analysis presented in
-Section~\ref{sec:liveness-analysis}. \added{It is easy to see that the analysis
+Section~\ref{sec:liveness-analysis}. It is easy to see that the analysis
 correctly identifies the liveness of stack variables. A stack variable
 is live
 between its introduction through a \LET\  and its last use to
 create a closure variable. This is correctly captured by the
-\LET\ rule in Figure~\ref{fig:live-judge}.}
+\LET\ rule in Figure~\ref{fig:live-judge}.
 Proving soundness  for closure  variables is more complex. Here  are the
 ideas behind the proof. 
 \begin{enumerate}
 \item      We     augment      the      standard     semantics      in
   Figure~\ref{fig:lang-semantics} to  model a GC before  the execution
-  of  each \LET\  expression.  \added{Note  that, unlike  eager
+  of  each \LET\  expression. Note  that, unlike  eager
     languages,   memory  is   allocated  only   during  execution   of
-    \LET\ expressions}. During GC, we track each reference in the root
+    \LET\ expressions. During GC, we track each reference in the root
   set and heap that is declared  dead by our analysis.  Any attempt to
   dereference  such  references  results   in  the  transition  system
   entering a special state denoted \bang.  We call the semantics after
@@ -914,8 +886,6 @@ ideas behind the proof.
   the environment  in each of  the closures in  the heap.
   
  \begin{enumerate} 
-\added{
-
  \item \label{env}  For each of  these environments, $GC(\ldots)$  calculates a
    liveness  environment $\Lv$  using  the  corresponding  $e$  (or  $s$)  and
    $\sigma$.
@@ -926,11 +896,6 @@ ideas behind the proof.
     access
     path $\alpha$, it is \emph{not} the case that $x.\alpha \in \Lv$ and $\heap\llbracket\rho(x), \alpha
     \rrbracket = \ell$. 
-%% $x.\alpha$  is  live  and
-%%     corresponds  to   $\ell$ in \heap.  More  formally,  there   are  no  $x\in
-%%     domain(\rho)$ and  $\alpha$, such that  $\heap\llbracket\rho(x), \alpha
-%%     \rrbracket = \ell$  and $x.\alpha \in \Lv$, where 
-}
 
   %% \item {\color{Myblue}\emph{GC} for  each $x \in domain(\rho)$, we  set $\rho(x)$ to
   %%   $\bot$  iff $x.\epsilon  \notin \Lv$.   Similarly, for  each stack
@@ -1155,7 +1120,6 @@ solution   for   \Df{f}{i}   yields  a   solution   for
 Note that this equation can also be viewed as a CFG with \{\acdr,
 \clazy\} as terminal symbols and \Df{\length}{1} as the sole
 non-terminal.
-{\color{Myblue}
 %\subsection{Generating liveness equations \Lv\  for function bodies}
 \paragraph{Handling user-defined functions:}
 \label{sec:bodylivenessbodies}
@@ -1284,7 +1248,7 @@ grammars is undecidable.
 
 
 \input{cfg-to-nfa}
-}
+
 
 %% \begin{figure*}[t!]
 %% \renewcommand{\arraystretch}{.1}
@@ -1449,9 +1413,7 @@ have not been shown.
 \centering
 \include{data-liveness-analysis}
 \vskip -5mm
-{\color{Myblue}
 \include{autotable}
-}
 \vskip -7mm
 \end{table*} 
 
@@ -1470,12 +1432,11 @@ We extend liveness-based  garbage  collection  to
 this function.
 \section{Experimental evaluation}
 \label{sec:experiments}
-{\color{Myblue}
 Our  experimental  setup   consists  of  the  prototypes   of  (a)  an
 interpreter  for our  language, (b)  a  liveness analyzer,  and (c)  a
 single generation  copying garbage  collector.  The  garbage collector
 can be configured  to work on the basis of  reachability (RGC mode) or
-use liveness DFAs (LGC mode).}
+use liveness DFAs (LGC mode).
 %
 Our benchmark consists of programs taken from nofib~\cite{nofib} and
 other repositories for functional programs~\cite{PLT-Scheme, gc_bench,
