@@ -95,22 +95,21 @@ given in~\cite{karkare07liveness,asati14lgc}.
     \end{pspicture}
 }}
 
-\added{The resulting automaton has edges labeled with \acar, \acdr\ and
-\clazy\ only.  For our example, the  NFA for \var{\Df{\length}{1}} is 
-\nfaD.
-In this  automaton, for every  edge labeled  \clazy, we
-check if the source node of the edge  has a path to a final state.  If
-it does, we mark the source node  as final. For \var{\Df{\length}{1}}, we get \nfaDF. Finally, we remove all the
-edges labeled \clazy\  and convert the automaton  into a deterministic
-automaton.   These steps  effectively implement  the $\hookrightarrow$
-simplification rules for \bcar, \bcdr, and
-\clazy\ to  obtain forward access paths.   The final DFA obtained for \var{\Df{\length}{1}} is \dfaD.}
-While checking for  liveness during
-garbage collection,  a forward  access path  is valid  only if  it can
-reach a final state.
-This  expectedly says  that
-for  a  demand  $\sigma_{\length}$,   the  liveness  of  the  argument
-of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
+\added{The  resulting   automaton  has   edges  labeled   with  \acar,
+  \acdr\   and  \clazy\   only.   For   our  example,   the  NFA   for
+  \var{\Df{\length}{1}} is  \nfaD.  In this automaton,  for every edge
+  labeled \clazy, we check  if the source node of the  edge has a path
+  to a final state.  If it does, we mark the source node as final. For
+  \var{\Df{\length}{1}}, we get \nfaDF, in which $q_0$ becomes a final
+  state. Finally, we remove all  the edges labeled \clazy\ and convert
+  the  automaton   into  a   deterministic  automaton.    These  steps
+  effectively implement the $\hookrightarrow$ simplification rules for
+  \bcar, \bcdr, and \clazy\ to obtain forward access paths.  The final
+  DFA obtained  for \var{\Df{\length}{1}}  is \dfaD.}   While checking
+for liveness during garbage collection, a forward access path is valid
+only if it can  reach a final state.  This expectedly  says that for a
+demand $\sigma_{\length}$, the liveness of the argument of \length\ is
+$\acdr^{*}$ (the spine of the list is traversed).
 
 
 \newcommand{\dfaE}{%
@@ -118,15 +117,15 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(0,-2)(35,8)
      \putnode{t0}{origin}{0}{0}{} 
-     \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_0$}}} 
+     \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_3$}}} 
      \hspace{5mm} 
-   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_1$}}}
+   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_4$}}}
    \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} 
    \putnode{l0}{t1}{5}{2}{\clazy}
-   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{$q_2$}}} 
+   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{$q_5$}}} 
    \psset{arrows=->} \ncline{t2}{tD1} 
    \putnode{l1}{t2}{5}{2}{\bcar}
-   \nccurve[angleA=45,angleB=135,ncurv=2,nodesep=-1]{tD1}{tD1} 
+   \nccurve[angleA=45,angleB=135,ncurv=1.5,nodesep=-1]{tD1}{tD1} 
    \putnode{lD1}{tD1}{0}{7}{\acdr}
 \end{pspicture} 
   }}
@@ -135,22 +134,28 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-2)(24,3)
-     \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{$q_0$}}} 
-       \hspace{5mm} 
-        \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_1$}}}
-         \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{5}{2}{\clazy}
-         \end{pspicture}
-         }
-         }
+     \putnode{t0}{origin}{2}{0}{}
+     \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{$q_3$}}} 
+     \hspace{5mm} 
+     \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_4$}}}
+     \psset{arrows=->} \ncline{t0}{t1} 
+     \ncline{t1}{t2} 
+     \putnode{l0}{t1}{5}{2}{\clazy}
+    \end{pspicture}
+  }
+}
 
 \newcommand{\dfaG}{%
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-2)(10,3)
-    \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{7}{0}{\pscirclebox{\mbox{$q_0$}}} \hspace{1mm} \psset{arrows=->} \ncline{t0}{t1}
-      \end{pspicture}
-      }
-      }
+      \putnode{t0}{origin}{2}{0}{}
+      \putnode{t1}{t0}{7}{0}{\pscirclebox{\mbox{$q_3$}}} 
+      \hspace{1mm} \psset{arrows=->} 
+      \ncline{t0}{t1}
+    \end{pspicture}
+  }
+}
 
 
 %\input{main-pgm1}
