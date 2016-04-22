@@ -1,6 +1,6 @@
-We circumvent the problem of  undecidability by over approximating the
-CFG by non-deterministic finite state automata (NFA) using
-Mohri   and   Nederhof method~\cite{mohri00regular}.   This   method
+\added{We circumvent the problem of  undecidability by over approximating the
+CFG by non-deterministic finite state automata (NFA) using the method of 
+Mohri   and   Nederhof~\cite{mohri00regular}}.   This   method
 transforms a CFG $G$ into a strongly  regular grammar $R$ such that $\lang{G} \subseteq \lang{R}$. 
 %%
 If a CFG consists of a set of mutually recursive non-terminals such that the rules involved are not all left regular or not all right regular, then the method breaks the rules into right regular rules by introducing fresh non-terminals. For our example, the rule  $\var{\Df{\length}{1}}$ has two non regular productions,           $\acdr\var{\Df{\length}{1}}\clazy$          and
@@ -42,71 +42,88 @@ The strongly regular grammar is converted  into a set of NFAs, one for
 each non-terminal.  The  $\hookrightarrow$ simplification is now
 done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
 pairs  of consecutive  edges  labeled \bcar\acar\  or \bcdr\acdr\  and
-constructing  the $\epsilon$-closure  till a  fixed point  is reached,
+\added{constructing  the $\epsilon$-closure  until a  fixed point  is reached},
 after which  the edges labeled  \bcar \  and \bcdr\ are  deleted.  The
 details of the  algorithm, its correctness and  termination proofs are
 given in~\cite{karkare07liveness,asati14lgc}.
 
-The resulting automaton has edges labeled with \acar, \acdr\ and
-\clazy\ only.  In this  automaton, for every  edge labeled  \clazy, we
-check if the source node of the edge  has a path to a final state.  If
-it does, we mark the source node  as final. Finally, we remove all the
-edges labeled \clazy\  and convert the automaton  into a deterministic
-automaton.   These steps  effectively implement  the $\hookrightarrow$
-simplification rules for \bcar, \bcdr, and
-\clazy\ to  obtain forward access paths.  While checking for  liveness during
-garbage collection,  a forward  access path  is valid  only if  it can
-reach a final state.
-
 \newcommand{\nfaD}{%
-  \scalebox{.7}{
+  \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-2)(28,10)
-      \putnode{t0}{origin}{2}{-1}{} 
-      \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{\ \ \ \ }}}
+    \begin{pspicture}(3,-1)(28,9)%\psgrid
+      \putnode{t0}{origin}{2}{1}{} 
+      \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_0$}}}
       \hspace{5mm} 
-      \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}} 
+      \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
       \psset{arrows=->} \ncline{t0}{t1} 
       \ncline{t1}{t2} 
       \putnode{l0}{t1}{7}{2}{\clazy} 
-      \nccurve[angleA=45, angleB=135, ncurv=3, nodesep=-1]{t1}{t1} 
-      \putnode{l1}{t1}{0}{7}{\acdr, \clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=2, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{6}{\acdr, \clazy} 
       \nccurve[angleA=45,
-        angleB=135, ncurv=2, nodesep=-1]{t2}{t2} 
+        angleB=135, ncurv=1.5, nodesep=-1]{t2}{t2} 
+      \putnode{l2}{t2}{0}{7}{\clazy}
+    \end{pspicture}
+}}
+\newcommand{\nfaDF}{%
+  \scalebox{.70}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(3,-1)(28,9)%\psgrid
+      \putnode{t0}{origin}{2}{1}{} 
+      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
+      \hspace{5mm} 
+      \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
+      \psset{arrows=->} \ncline{t0}{t1} 
+      \ncline{t1}{t2} 
+      \putnode{l0}{t1}{7}{2}{\clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{7}{\acdr, \clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t2} 
       \putnode{l2}{t2}{0}{7}{\clazy}
     \end{pspicture}
 }}
 \newcommand{\dfaD}{%
-  \scalebox{.7}{
+  \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(2,-2)(13,8)
-      \putnode{t0}{origin}{2}{0}{}
-      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}}     
+    \begin{pspicture}(2,-1)(13,9)
+      \putnode{t0}{origin}{2}{1}{}
+      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
       \psset{arrows=->}    
       \ncline{t0}{t1}     
-      \nccurve[angleA=45, angleB=135, ncurv=2, nodesep=-1]{t1}{t1} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t1}{t1} 
       \putnode{l1}{t1}{0}{7}{\acdr}
     \end{pspicture}
 }}
-The  NFA for \var{\Df{\length}{1}} is 
-\nfaD\ and the final DFA is \dfaD.
+
+\added{The resulting automaton has edges labeled with \acar, \acdr\ and
+\clazy\ only.  For our example, the  NFA for \var{\Df{\length}{1}} is 
+\nfaD.
+In this  automaton, for every  edge labeled  \clazy, we
+check if the source node of the edge  has a path to a final state.  If
+it does, we mark the source node  as final. For \var{\Df{\length}{1}}, we get \nfaDF. Finally, we remove all the
+edges labeled \clazy\  and convert the automaton  into a deterministic
+automaton.   These steps  effectively implement  the $\hookrightarrow$
+simplification rules for \bcar, \bcdr, and
+\clazy\ to  obtain forward access paths.   The final DFA obtained for \var{\Df{\length}{1}} is \dfaD.}
+While checking for  liveness during
+garbage collection,  a forward  access path  is valid  only if  it can
+reach a final state.
 This  expectedly says  that
 for  a  demand  $\sigma_{\length}$,   the  liveness  of  the  argument
 of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
 
 
 \newcommand{\dfaE}{%
-  \scalebox{.7}{
+  \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(0,-2)(35,8)
      \putnode{t0}{origin}{0}{0}{} 
-     \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{\ \ \ \
-      }}} 
+     \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_0$}}} 
      \hspace{5mm} 
-   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \ }}}
+   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_1$}}}
    \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} 
    \putnode{l0}{t1}{5}{2}{\clazy}
-   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\ \ \ \ }}} 
+   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{$q_2$}}} 
    \psset{arrows=->} \ncline{t2}{tD1} 
    \putnode{l1}{t2}{5}{2}{\bcar}
    \nccurve[angleA=45,angleB=135,ncurv=2,nodesep=-1]{tD1}{tD1} 
@@ -115,24 +132,22 @@ of \length\ is $\acdr^{*}$ (the spine of the list is traversed).
   }}
 
 \newcommand{\dfaF}{%
-  \scalebox{.7}{
+  \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-2)(24,3)
-     \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
-      }}} 
+     \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{$q_0$}}} 
        \hspace{5mm} 
-        \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \  }}}
+        \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_1$}}}
          \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{5}{2}{\clazy}
          \end{pspicture}
          }
          }
 
 \newcommand{\dfaG}{%
-  \scalebox{.7}{
+  \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-2)(10,3)
-    \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{7}{0}{\pscirclebox{\mbox{\ \ \ \
-      }}} \hspace{1mm} \psset{arrows=->} \ncline{t0}{t1}
+    \putnode{t0}{origin}{2}{0}{} \putnode{t1}{t0}{7}{0}{\pscirclebox{\mbox{$q_0$}}} \hspace{1mm} \psset{arrows=->} \ncline{t0}{t1}
       \end{pspicture}
       }
       }
@@ -157,54 +172,6 @@ Since
 \length\ does not  evaluate the elements of  the argument list,
 the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
 liveness-based GC triggers beyond $\pi_9$.
-
-
-%% \begin{wrapfigure}{r}{.25\textwidth}
-%% \scalebox{0.5}{
-%% \begin{tabular}{c}
-%% \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-%% \begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
-%%   \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
-%%   }}} \hspace{5mm} \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \
-%%   }}}
-%%   \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{5}{2}{\clazy}
-%%   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{\       \       \       \
-%%   }}} 
-%%   \psset{arrows=->} \ncline{t2}{tD1} \putnode{l1}{t2}{5}{2}{\bcar}
-%%   \nccurve[angleA=45,
-%%   angleB=135,                                                 ncurv=4,
-%%   nodesep=-1]{tD1}{tD1} \putnode{lD1}{tD1}{0}{10}{\acdr}
-%% \end{pspicture} 
-%% \\
-%% (a)
-%% \\
-%% \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-%% \begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
-%%   \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
-%%   }}} 
-%%   \hspace{5mm} 
-%%   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{\  \ \ \  }}}
-%%   \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} \putnode{l0}{t1}{5}{2}{\clazy}
-%% \end{pspicture}
-%% \\
-%% (b)
-%% \\
-%% \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-%% \begin{pspicture}(0,-5)(50,8) %\psframe(0,-5)(40,8)
-%%   \putnode{t0}{origin}{5}{0}{\var{\Lanv{\pa}{}}} \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{\ \ \ \
-%%   }}} \hspace{5mm} \psset{arrows=->} \ncline{t0}{t1}
-%% \end{pspicture}
-%% \\ 
-%% (c)
-%% \end{tabular}}
-%%  \caption{(a) grammar  rules for \var{\Lanv{\pa}{}} converted  into an
-%%   automaton and  its DFAs after simplification.}\label{fig:main1}
-%% \end{wrapfigure}
-
-
-
-
-
 
 
  

@@ -45,11 +45,11 @@
       %It would be better to specify these in font-relative measures, but it
       %probably doesn't scale anyway.
 
-%\definecolor{Myblue}{rgb}{.2,0,1}
+\definecolor{Myblue}{rgb}{.2,0,1}
 %\definecolor{Myred}{rgb}{1,.2,.2}
 
 %\newcommand{\mycomment}[1]{{\color{Myblue}{#1}}}
-%\newcommand{\added}[1]{{\color{Myblue}{#1}}}
+\newcommand{\added}[1]{{\color{Myblue}{#1}}}
 %\newcommand{\added}[1]{#1}
 %\newcommand{\todelete}[1]{}%{\color{Myred}{#1}}}
 %\newcommand{\warning}[1]{{\color{Myred}{#1}}}
@@ -810,7 +810,9 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S, \heap,\, s, \, \cred{\sigma}$ 
 \hline
 \end{tabular}
 \end{center}
-\caption{Minefield  semantics for  \CAR\   and \LET. Complete minefield semantics is provided in~\cite{TR16-1}.}
+\caption{Minefield semantics for \CAR\ and \LET. Complete minefield
+  semantics is provided
+  in~\cite{TR16-1}.\label{fig:minefield-semantics-for-some}}
 \vspace*{-2mm}
 \end{figure*}
 
@@ -1158,10 +1160,10 @@ call site of a function analogous to 0-CFA~\cite{Shivers:1988}.
 
 %% For  the  running  example (Figure~\ref{fig:mot-example2-a}), $\length$  has  calls  from  $\main$  at
 %% $\pi_{12}$ and a recursive call at $\pi_6$. The demands on these calls
-For   the   running  example   (Figure~\ref{fig:mot-example2-a}),   if
+\added{For   the   running  example   (Figure~\ref{fig:mot-example2-a}),
 $\length$  has calls  from  $\main$  with a  demand  $\epsilon$ and  a
 recursive      call      at       $\pi_6$      with      a      demand
-$\clazy\sigma_{\mathit{\length}}$. Thus:
+$\clazy\sigma_{\mathit{\length}}$.} Thus:
 \begin{eqnarray*}
 \sigma_{\length}                    &=&                   \{\epsilon\}
 ~\cup~{\clazy\sigma_{\mathit{\length}}}
@@ -1203,7 +1205,7 @@ grammar  (CFG) on  the  alphabet $\lbrace\acar,  \acdr, \bcar,  \bcdr,
 $X$ occurring on the LHS of the equations generated from the analysis.
 We can  think of  the resulting productions  as being  associated with
 several grammars, one for  each non-terminal \var{\Lanv{x}{}} regarded
-as a start  symbol. The grammar for  \var{\Df{\length}{1}} and \var{\sigma_{\length}} comprise of the following productions:
+as a start  symbol. \added{The grammars for  \var{\Df{\length}{1}} and \var{\sigma_{\length}} consist of the following productions}:
 %%  As  an example, the grammar for \var{\Lanv{\xl}{}}
 %% and \var{\Lanv{\pa}{}} comprise the following productions:
 \begin{eqnarray*}
@@ -1231,8 +1233,8 @@ Let $x.\alpha$ be a forward access path (consisting only
 of edges  \acar\ and \acdr\  but not \bcar,  \bcdr\ or
 \clazy).       Let      $\mathscr{L}(\var{\Lanv{x}{}})
 \stackrel{*}{\hookrightarrow}  \sigma$, where  $\sigma$
-consists  of  forward  access  paths  only.  Then  does
-$\alpha \in \sigma$?
+consists  of  forward  access  paths  only.  \added{Then  is
+$\alpha \in \sigma$?}
 }
 
 We model this problem as one of deciding the membership of a CFG
