@@ -144,7 +144,7 @@ liveness analysis itself and in the design of the garbage collector.
 %% finite-state automata (DFA) describing the liveness at that point.
 To  show the  effectiveness of  our method,  we implemented  a copying
 collector that uses  the results of the liveness  analysis to preserve
-live  objects,  both evaluated  (i.e.,  in  WHNF) and  closures.   Our
+live  objects,  both evaluated  and  closures.   Our
 experiments confirm  that for  programs running with  a liveness-based
 garbage  collector, there  is a  significant decrease  in peak  memory
 requirements.   In addition,  a  sizable reduction  in  the number  of
@@ -174,7 +174,7 @@ to be carried from the point of creation to the point of evaluation.
 
 While  the runtime  system  of most  functional  languages includes  a
 garbage collector to efficiently  reclaim memory, empirical studies on
-Scheme~\cite{karkare06effectiveness}  and,  Haskell~\cite{rojemo96lag}
+Scheme~\cite{karkare06effectiveness}  and  Haskell~\cite{rojemo96lag}
 programs have shown that garbage  collectors leave uncollected a large
 number of  memory objects that are  reachable but not live  (here {\em
   live} means the  object can potentially be used by  the program at a
@@ -497,14 +497,16 @@ c:   & \mathit{Clo} &=& \mathit{(App \times Env)}& \mbox{-- Closures}\\
 \]
 
 
-Here  $\mathit{Loc}$ is  a countable  set  of locations  in the  heap.
-A non-empty location either contains  a value in  \emph{WHNF} (a  number, the
-empty  list  $\NIL$ or  a  \CONS\  cell  with  possibly  unevaluated
-constituents) or  a {\em closure}.   A closure  is a pair  $\langle s,
+Here $\mathit{Loc}$  is a countable set  of locations in the  heap.  A
+non-empty location either contains a {\em closure}, or a value in Weak
+Head Normal Form (WHNF)\cite{Jones87}. In our case, a WHNF value
+can be a number, the empty list  $\NIL$ or a \CONS\ cell with possibly
+unevaluated   constituents.   A   closure  is   a  pair   $\langle  s,
 \rho\rangle$ in  which $s$ is  an unevaluated application,  and $\rho$
-maps free variables of $s$ to their respective locations. Since all data objects are boxed, we model an environment as a mapping
-from the set  of variables of the program  $\mathit{Var}$ to locations
-in the  heap.  
+maps free  variables of $s$  to their respective locations.  Since all
+data objects are boxed, we model  an environment as a mapping from the
+set of  variables of  the program $\mathit{Var}$  to locations  in the
+heap.
 
 
 The  semantics  of   expressions  (and  applications\footnote{In  most
