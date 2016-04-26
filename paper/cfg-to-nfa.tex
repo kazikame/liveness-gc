@@ -3,7 +3,7 @@ CFG by non-deterministic finite state automata (NFA) using the method of
 Mohri   and   Nederhof~\cite{mohri00regular}}.   This   method
 transforms a CFG $G$ into a strongly  regular grammar $R$ such that $\lang{G} \subseteq \lang{R}$. 
 %%
-If a CFG consists of a set of mutually recursive non-terminals such that the rules involved are not all left regular or not all right regular, then the method breaks the rules into right regular rules by introducing fresh non-terminals. For our example, the rule  $\var{\Df{\length}{1}}$ has two non regular productions,           $\acdr\var{\Df{\length}{1}}\clazy$          and
+If a CFG consists of a set of mutually recursive non-terminals such that the rules involved are not all left regular or not all right regular, then the method breaks the rules into right regular rules by introducing fresh non-terminals. For our example, the rule  $\var{\Df{\length}{1}}$ has two non-regular productions,           $\acdr\var{\Df{\length}{1}}\clazy$          and
 $\clazy\var{\Df{\length}{1}}{\clazy}$.  The steps for transforming these productions into
 right regular productions are:
 

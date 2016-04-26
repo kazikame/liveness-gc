@@ -254,19 +254,19 @@ The edges  shown by thick  arrows are those  which are live  at $\pi$.
 %% Only those  cell which have a future use  should be preserved
 %% during garbage collection, all other
 %% cells can be  reclaimed.
-Thus if a GC takes  place at $\pi$ with the heap shown
+Thus, if a GC takes  place at $\pi$ with the heap shown
 in Figure~\ref{fig:mot-example}(b),  a liveness-based  collector (LGC)
 will preserve only  the cells referenced by $\pz$, and  the live cells
 constituting the  closure referenced by $(\CDR~\pz)$.   In contrast, a
 reachability-based collector (RGC) will preserve all cells.
 
-In  this work  we show  that  static analysis  of heap  data can  help
+In  this work,  we show  that  static analysis  of heap  data can  help
 garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are:
 
 \begin{itemize}
 \item We  propose an interprocedural liveness  based GC
-  scheme  for a  lazy first  order functional  language and  prove its
+  scheme  for a  lazy first-order functional  language and  prove its
   correctness.  To the  best of our knowledge, this is  the first work
   that uses  the results  of an  interprocedural liveness  analysis to
   garbage    collect    both     evaluated    data    and    closures.
@@ -293,7 +293,7 @@ contributions of this paper are:
   with  a fixed  set  of non-context-free  productions.  The  decision
   whether to copy a cell during  GC translates to a membership problem
   for such grammars.  Earlier, this decision problem was assumed to be
-  undecidable, and the context-free grammar was over approximated by a
+  undecidable, and the context-free grammar was over-approximated by a
   regular  grammar.   In  this  paper,  we  provide  a  proof  of  the
   undecidability of this problem.
 
@@ -315,7 +315,7 @@ Section~\ref{sec:computing} describes  the formulation of  liveness as
 grammars. We also give a proof  of undecidability of such grammars and
 show     how     they     can     be     approximated     by     DFAs.
 Section~\ref{sec:GC-scheme}   discusses   details   of   the   garbage
-collector,  in  particular  the  use  of  liveness  DFAs  for  GC.     We     report    our    experimental     results    in
+collector,  in  particular,  the  use  of  liveness  DFAs  for  GC.     We     report    our    experimental     results    in
 Section~\ref{sec:experiments}    along    with   some    observations.
 Section~\ref{sec:relatedwork}  discusses  previous   work  related  to
 GC  and   liveness  and  Section~\ref{sec:conclusion}
@@ -323,7 +323,7 @@ discusses possible extensions and concludes the paper.
 \section{The target language---syntax and semantics}
 \label{sec:defs}
 Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
-is a first order language with lazy semantics. Programs are restricted
+is a first-order language with lazy semantics. Programs are restricted
 to        be        in        Administrative        Normal        Form
 (ANF)~\cite{chakravarty03perspective}, where  all actual  parameters to
 functions  are  variables.  While  this  restriction  does not  affect
@@ -525,13 +525,13 @@ consists  of  a  single  continuation   frame  in  which  \ans\  is  a
 distinguished variable that will eventually  be updated with the value
 of  (\mainpgm),  and  $\rho_\mathit{init}$  maps \ans\  to  a  location
 $\ell_{\ans}$.  In addition, \print\ is a function modeling a printing
-mechanism---a   standard   run-time   support  assumption   for   lazy
+mechanism---a   standard   runtime   support  assumption   for   lazy
 languages~\cite{Jones87}---that prints  the value of  (\mainpgm).  The
 operator~$:$ pushes elements on top of the stack.
 
 The   notation  $[\myvec{x}   \mapsto  \myvec{\ell}]$   represents  an
 environment  that  maps  variables  $x_i$ to  locations  $\ell_i$  and
-$\heap[\ell := d]$  indicates updation of  \heap\ at $\ell$
+$\heap[\ell := d]$  indicates an update of  \heap\ at $\ell$
 with  $d$.   $\rho \oplus  \rho'$  represents  the environment  $\rho$
 shadowed  by  $\rho'$  and  $\lfloor \rho  \rfloor_X$  represents  the
 environment  restricted  to  the  variables in  $X$.  Finally  $FV(s)$
@@ -542,7 +542,7 @@ The small-step semantics  is shown in Figure~\ref{fig:lang-semantics}.
 Unlike   an   eager  language,   evaluation   of   a  let   expression
 $(\LET~x\leftarrow  s~\IN~e)$ does  not  result in  the evaluation  of
 $s$. Instead,  as the {\sc let}  rule shows, a closure  is created and
-bound to  $x$. The  program points which  trigger evaluation  of these
+bound to  $x$. The  program points which  trigger the evaluation  of these
 closures   are  an $\SIF$   condition ({\sc  IF-clo})   and
  a \SRETURN\ ({\sc  return-clo}).  We  call such  points \emph{evaluation
   points   $(\epath)$}  and   label  them   with  $\psi$   instead  of
@@ -589,7 +589,7 @@ $x$ with
 liveness  $\{\epsilon,  \acar,  \acdr,  \acdr\acar,
 \acdr\acdr,  \acdr\acdr\acar\}$ means that future computations    only
 refer up  to the  second and  third members of  $x$.  A  {\em liveness
-  environment} is a mapping from  variables to access paths, but often
+  environment} is a mapping from  variables to access paths but often
 expressed as  a set,  for example  by writing  $\{x.\epsilon, x.\acdr,
 x.\acdr\acdr,        y.\epsilon\}$        instead        of        $[x
   \mapsto\{\epsilon,\acdr,\acdr\acdr\},          y\mapsto\{\epsilon\},
@@ -670,14 +670,14 @@ created\footnote{Multiple occurrences of the same variable in an
  
 Closure  variables  get  their  liveness values  through  a  chain  of
 dependences beginning  at a  variable at an  evaluation point.   As an
-example,  consider again  the program  in Figure~\ref{fig:lv-closure}.
+example,  consider the program  in Figure~\ref{fig:lv-closure} again.
 The variable  \pz\ returned  at $\psi_3$ depends  on \py\  through the
 expression $(+~\py~1)$.  $\py$ in turn depends on the closure variable
 $\px_{\mathit{\pi}_1}$  through $(\length~\px_{\mathit{\pi}_1})$.   We
 denote this  chain of  dependences as  $\lbrack \psi_3\!\!\!:\!\!\!\pz
 \leftarrow            (+~\py~1),\,           \py            \leftarrow
 (\length~\px_{\mathit{\pi}_1})\rbrack$.    Indeed,   the   chains   of
-closures  in   the  heap  are   a  runtime  representation   of  these
+closures  in   the  heap  are    runtime  representations   of  these
 dependences.   Since  $\pz$  is  evaluated  at  $\psi_3$  due  to  the
 expression $\SRETURN~\pz$,  the demand made by  the calling context(s)
 of  $f$ places  a demand  on  $\pz$ which  will impart  a liveness  to
@@ -709,7 +709,7 @@ closure  variables.  The function $\mathcal{L}$  uses  $\mathit{ref}$ to  propag
 liveness across expressions.
 
 In  a   lazy  language,   an  expression   is  not   evaluated  unless
-required. Therefore  the null  demand ($\emptyset$) does  not generate
+required. Therefore,  the null  demand ($\emptyset$) does  not generate
 liveness in any of the rules defining $\mathit{ref}$ or $\mathcal{L}$.
 A non-null  demand of  $\sigma$ on (\CDR~$x$),  is transformed  to the
 liveness $\{x.\epsilon,  x.\acdr\sigma\}$.  In an opposite  sense, the
@@ -817,7 +817,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S, \heap,\, s, \, \cred{\sigma}$ 
 
 \subsection{Soundness of analysis}  
 
-We shall now present a proof of soundness of the analysis presented in
+We shall now present a proof of the soundness of the analysis presented in
 Section~\ref{sec:liveness-analysis}. It is easy to see that the analysis
 correctly identifies the liveness of stack variables. A stack variable
 is live
@@ -850,7 +850,7 @@ ideas behind the proof.
   we  construct,  through  inline expansion,  a  program
   without function  calls which has  the same minefield  behavior. The
   final step shows that no program  without function calls can enter the
-  \bang\ state. As a consequence  no program (with or without function
+  \bang\ state. As a consequence,  no program (with or without function
   calls) can enter the \bang\ state.
 \end{enumerate}
 
@@ -863,13 +863,13 @@ ideas behind the proof.
   $e$, that arises from the actual sequence of function calls that led
   to  the  evaluation of  $e$.\footnote{The  static  liveness that  is
     consulted during actual GC  is computed from an over-approximation
-    of this demand.  Thus the soundness  result on the modeled GC will
+    of this demand.  Thus, the soundness  result on the modeled GC will
     also apply for the actual GC.} The demand for the initial state is
   $\sigma_{\mathit  {all}}$,  and each  $\rightsquigarrow$  transition
   transforms   the  demand   according  to   the  liveness   rules  of
   Section~\ref{sec:liveness-analysis}.      The     information     in
   continuation frames  on the stack  $S$ are also  similarly augmented
-  with their demands.  Thus a stacked entry now takes the form $(\rho,
+  with their demands.  Thus, a stacked entry now takes the form $(\rho,
   \ell, e, \sigma)$.
 
 \item The closure created by a let expression is now a 3-tuple
@@ -957,7 +957,7 @@ is preceded  by $GC(\ldots)$.  The details of the transition for the {\sc
   car-clo}  rule   is  also shown.  If    an
 earlier  call to  $GC(\ldots)$  results  in $\rho(x)$  being
 bound  to  $\bot$,  then  the  $\rightsquigarrow$  step
-enters the  \bang\ state ({\sc  car-bang}). Otherwise
+enters the  \bang\ state ({\sc  car-bang}). Otherwise,
 the transition is similar to the earlier {\sc car-clo}
 rule. 
 
@@ -1010,7 +1010,7 @@ rules  $\sigma$   needs  to  be  known.   This  creates
 difficulties  since  we  want to  solve  the  equations
 arising from liveness symbolically.
 
-The solution is to  also treat the operations mentioned
+The solution is to  treat the operations mentioned
 above  symbolically.  We  introduce three  new symbols:
 \bcar, \bcdr,  \clazy.  These symbols are  defined as a
 relation  $\hookrightarrow$  between   sets  of  access
@@ -1019,7 +1019,7 @@ paths:
   &\bcar\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acar\alpha \in \sigma\}\\
   &\bcdr\sigma \hookrightarrow \sigma' \mbox{ where } \sigma' = \{\alpha \mid \acdr\alpha \in \sigma\}
 \end{align*}
-Thus \bcar\ selects those entries in $\sigma$ that have leading \acar, and removes the leading \acar\ from them.
+Thus, \bcar\ selects those entries in $\sigma$ that have leading \acar, and removes the leading \acar\ from them.
 The symbol \clazy\ reduces the set of strings following it to a set containing only $\epsilon$. It filters out, however, the empty set of strings.
 \begin{align*}
   \clazy\sigma \hookrightarrow & \left\{ 
@@ -1098,7 +1098,7 @@ In general, the equations for \Lfonly\ are recursive as in the case of
 \Lfonly$_\mathit{f}$. A closed  form solution for $\Lfone{\mathit{f}}$
 can be derived by observing that each of the liveness rules modifies a
 demand  only by  prefixing it  with symbols  in the  alphabet $\lbrace
-\acar, \acdr,\bcar,  \bcdr, \clazy  \rbrace$. Therefore we  can assume
+\acar, \acdr,\bcar,  \bcdr, \clazy  \rbrace$. Therefore, we  can assume
 that $\Lf{f}{i}{\sigma}$ has the closed form:
 \begin{eqnarray}
 \label{eq:LF:DI}
@@ -1127,7 +1127,7 @@ non-terminal.
 To  avoid analyzing  the body  of a  function for  each
 call, we calculated the  liveness for the arguments and
 the variables in a function  with respect to a symbolic
-demand  $\sigma$.   To  get   the  actual  liveness  we
+demand  $\sigma$.   To  get   the  actual  liveness,  we
 calculate an  over-approximation of the  actual demands
 made by  all the  calls and  calculate the  liveness at
 each  GC  point  inside  the  function  based  on  this
@@ -1296,7 +1296,7 @@ program point  where the closure  was created to  reachable evaluation
 points.  Assume,  for the  sake of  concreteness, that  $\epath_1$ and
 $\epath_2$ are two such evaluation points.  During GC,
 we would like to use a more precise liveness, based on the actual paths
-taken  during  execution.   Therefore   we  create  separate  liveness
+taken  during  execution.   Therefore,   we  create  separate  liveness
 automata for dependences  along paths to $\epath_1$  and $\epath_2$, in
 addition to  automata for dependences  along paths to  both $\epath_1$
 and $\epath_2$.  The closure carries  the liveness environment for its
@@ -1638,7 +1638,7 @@ languages. We extend this to handle lazy evaluation and closures.
 %% evaluation step).
 
 %% To avoid scalability issues (and to avoid performing
-%% part  of the  liveness computation  at run  time) we
+%% part  of the  liveness computation  at runtime) we
 %% defined an  0-CFA version of this  liveness analysis
 %% in  which demands  for function  $f$ at  all calling
 %% contexts   are  conflated   into  a   single  demand
@@ -1646,7 +1646,7 @@ languages. We extend this to handle lazy evaluation and closures.
 %% equations   symbolically    obtaining   context-free
 %% grammars  for liveness  at each  GC point  (calls to
 %% user  functions and  to $\CONS$).   These were  then
-%% converted to  DFA for  run-time consultation  by the
+%% converted to  DFA for  runtime consultation  by the
 %% garbage   collector.     Experiments   confirm   the
 %% precision of the analysis.
 
@@ -1678,7 +1678,7 @@ We have  extended liveness-based  GC  to lazy
   DFAs and used by the garbage collector to improve collection.
 
 In addition to  evaluated data, our collector  also reclaims closures.
-For this, we  had to modify the standard run-time  representation for
+For this, we  had to modify the standard runtime  representation for
 closures  to carry  liveness  of its free  variables and  periodically
 update the liveness during execution  time.  As expected, our garbage
 collector  reclaims more  garbage and  reduces memory  requirement of
@@ -1762,19 +1762,19 @@ $\sigma$.
 We consider the rules for \CAR\  only.  
 The other rules involve similar reasoning. For the {\sc
   car-clo}  rule in  the state  $\rho, S,  \heap, (\CAR~x),
-\sigma$, we  know that $\sigma$ is  non-null. Therefore
-the  liveness  of  $x$  includes  $\epsilon$,  and  the
+\sigma$, we  know that $\sigma$ is  non-null. Therefore,
+the  liveness  of  $x$  includes  $\epsilon$  and  the
 dereferencing $\heap(\rho(x))$ will go without \bang.
 
 For the  {\sc car-1-clo}  rule, observe that  there are
 two dereferences.  First $x$  is dereferenced to  get a
-cons  cell  and then  the  head  of  the cons  cell  is
+cons  cell,  and then  the  head  of  the cons  cell  is
 dereferenced  to  obtain  a  closure.   If  the  demand
 $\sigma$ on  $(\CAR~x)$ is non-null, then  the liveness
 of    $x$   will    include    both   $\epsilon$    and
 $\acar\epsilon$,  and  a  GC with  this  liveness  will
 neither bind $x$ to a  $\bot$, nor insert $\bot$ at the
-first   component  of   the   cons   cell.  Thus   both
+first   component  of   the   cons   cell.  Thus,   both
 dereferences    can take place without 
 $\rightsquigarrow$ entering the   \bang\ state.
 \end{proof} 
@@ -1792,9 +1792,9 @@ Assume to  the contrary that  a program $P$  enters the
 program $P'$ such that  the minefield executions of $P$
 and $P'$  are identical  except for change  of variable
 names.             However,                 by
-Lemma~\ref{lemma:call-less-cannot-go-bang} we know that
+Lemma~\ref{lemma:call-less-cannot-go-bang}, we know that
 $P'$,   a   call-less   program,   cannot   enter   the
-\bang\  state.  Therefore   $P$  also  cannot  enter  the
+\bang\  state.  Therefore,   $P$  also  cannot  enter  the
 \bang\ state.
 \end{proof}
 
@@ -1856,8 +1856,7 @@ is the symbol under the head and \state\ is the current
 state of  the TM.   For each combination  of state
 and symbol  $(\state,c)$, the grammar will  contain the
 non-terminal \nont{}{c}. We shall synchronize each move
-of the TM to  a derivation  step using  a context
-free production, followed, if possible, by a derivation
+of the TM to  a derivation  step using  a context-free production, followed, if possible, by a derivation
 step using either  $\bcar\acar \rightarrow \epsilon$ or
 $\bcdr\acdr   \rightarrow    \epsilon$.    After   each
 synchronization,  we  shall   establish  the  following
@@ -1976,8 +1975,8 @@ distinct function in each branch.
 \end{figure}
 
 Notice that  each production  in Lemma~\ref{lemma:grammar-undecidable}
-had a single non-terminal on the RHS. There are two characteristics of
-the grammar produced from liveness-analysis  that are are relevant for
+had a single non-terminal on the RHS. There are two characteristics, of
+the grammar produced from liveness-analysis,  that are relevant for
 replaying the  earlier proof:  (a) If $\mathsf{S}  \rightarrow \beta_1
 \mathsf{S'}  \beta_2$  was a  production  in  the earlier  proof,  the
 grammar  generated from  liveness  analysis of the constructed program
@@ -1994,7 +1993,7 @@ sentential form by $\epsilon$. However, if  the TM does not accept the
 input string, then every sentential form derived from the start symbol
 would    have     at    least    one    non-terminal from the grammar
 of Lemma~\ref{lemma:grammar-undecidable} that is different
-from $\nont{\mathit{final}}{c}$.   Thus  $\$$  would  not  be
+from $\nont{\mathit{final}}{c}$.   Thus,  $\$$  would  not  be
 derivable from the grammar.
 \end{proof}
 
