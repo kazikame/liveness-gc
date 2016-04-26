@@ -174,12 +174,11 @@ to be carried from the point of creation to the point of evaluation.
 
 While  the runtime  system  of most  functional  languages includes  a
 garbage collector to efficiently  reclaim memory, empirical studies on
-Scheme~\cite{karkare06effectiveness}   and,   more   importantly,   on
-Haskell~\cite{rojemo96lag} programs have shown that garbage collectors
-leave uncollected a large number  of memory objects that are reachable
-but not live (here {\em live} means the object can potentially be used
-by the program at a  later stage).  This results in unnecessary memory
-retention.
+Scheme~\cite{karkare06effectiveness}  and,  Haskell~\cite{rojemo96lag}
+programs have shown that garbage  collectors leave uncollected a large
+number of  memory objects that are  reachable but not live  (here {\em
+  live} means the  object can potentially be used by  the program at a
+later stage).  This results in unnecessary memory retention.
 
 In this paper,  we propose the use of liveness  analysis of heap cells
 for garbage collection (GC) in a lazy first-order functional language.
@@ -218,8 +217,8 @@ closure can escape the scope in which  it was created, it has to carry
 the  liveness  information  of   its  free  variables.   As  execution
 progresses  and possible  future uses  are eliminated,  we update  the
 liveness  information  in  a  closure with  a  more  precise  version.
-Because  of   these  reasons,  the  garbage   collector  also  becomes
-significantly more  complicated than a liveness-based  collector for a
+For these  reasons,  the  garbage   collector  also  becomes
+significantly more  complicated than a liveness-based  collector for an
 eager language. 
 
 
@@ -244,7 +243,7 @@ program and the state of the heap at the program point $\pi$\footnote{We write
 $\pi\!:\!e$ to  associate a  label $\pi$ with  the program  point just
 before  the  expression  $e$. The label is not part of the syntax.},  i.e., just  before  the  evaluation  of
 $(\length\ \pz)$.  The heap is represented  by a graph in which a node
-either  represents  atomic  values   ($\NIL$,  integers  etc.),  or  a
+either  represents  atomic  values   ($\NIL$,  integers,  etc.),  or  a
 \CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
 (represented  by  shaded  clouds).   Edges   in  the  graph  are  {\em
   references} and represent values of variables or fields.  The figure
@@ -992,7 +991,7 @@ in Appendix~\ref{sec:sound}.
 %\section{Generating and storing liveness information}\label{sec:computing}
 The analysis in Section~\ref{sec:liveness} is fully context-sensitive, 
 describing the  liveness sets  in a function body in
-terms of a symbolic demand $\sigma$  and \Lfonly. However, we are yet to
+terms of a symbolic demand $\sigma$  and \Lfonly. However, we have yet to
 describe (i) how to obtain demand transformers \Lfonly\ from the rule
 {\sc live-define} , and (ii) how to compute the concrete demand $\sigma$ on
 each function. To do so, we first need to modify the liveness rules
@@ -1679,7 +1678,7 @@ We have  extended liveness-based  GC  to lazy
   DFAs and used by the garbage collector to improve collection.
 
 In addition to  evaluated data, our collector  also reclaims closures.
-For this, we  had to modify the standard run-time  representation of a
+For this, we  had to modify the standard run-time  representation for
 closures  to carry  liveness  of its free  variables and  periodically
 update the liveness during execution  time.  As expected, our garbage
 collector  reclaims more  garbage and  reduces memory  requirement of
@@ -1701,7 +1700,7 @@ firstification techniques~\cite{Mitchell:2009}.
   Orthogonally,   we   plan  to   improve   the   efficiency  of   the
   liveness-based garbage  collector using heuristics such  as limiting
   the depth of DFA, merging  nearly-equivalent states and using better
-  representation(for example BDDs~\cite{Bryant86})  and algorithms for
+  representation (for example BDDs~\cite{Bryant86})  and algorithms for
   automata manipulation.  We also  need to investigate the interaction
   of liveness with  other collection schemes, such  as incremental and
   generational collection.   It might  be interesting  to use  a mixed
