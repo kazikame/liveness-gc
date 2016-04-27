@@ -13,7 +13,7 @@
 \usepackage{url}
 \usepackage[normalem]{ulem}
 \usepackage{schemepgm}
-\usepackage{graphicx}
+\usepackage{graphicx, subcaption}
 \usepackage{graphpap}
 \usepackage{tabularx}
 \usepackage{amssymb}
@@ -24,7 +24,7 @@
 \usepackage{pst-tree}
 %\usepackage{pst-rel-points}
 \usepackage{bcprules}
-\usepackage{subfigure}
+%\usepackage{subfigure}
 \usepackage[boxed]{algorithm2e}
 \usepackage{makecell}
 \usepackage[numbers,sort&compress]{natbib}
@@ -226,7 +226,7 @@ the  liveness  information  of   its  free  variables.   As  execution
 progresses  and possible  future uses  are eliminated,  we update  the
 liveness  information  in  a  closure with  a  more  precise  version.
 For  these  reasons,  the  garbage   collector  also  becomes
-significantly more  complicated than a liveness-based  collector for a
+significantly more  complicated than a liveness-based  collector for an
 eager language.
 
 
@@ -1747,26 +1747,14 @@ liveness-based GC triggers beyond $\pi_9$.
 
 
 
-\newcommand{\wdh}{.33\textwidth}
+\newcommand{\wdh}{.75\textwidth}
 \newcommand{\LGCLine}{blue}
 \newcommand{\RGCLine}{red}
 \newcommand{\ReachLine}{black}
 \newcommand{\UseLine}{light-blue}
 
 \begin{figure*}[t!]
-  \includegraphics[width=\wdh]{fibheap.pdf}
-  \includegraphics[width=\wdh]{sudoku.pdf}
-  \includegraphics[width=\wdh]{nperm.pdf}\\
-  \includegraphics[width=\wdh]{paraffins.pdf}
-  \includegraphics[width=\wdh]{lcss.pdf}
-  \includegraphics[width=\wdh]{huffman.pdf}\\
-  \includegraphics[width=\wdh]{knightstour.pdf}
-  \includegraphics[width=\wdh]{nqueens.pdf}
-  \includegraphics[width=\wdh]{deriv.pdf}\\
-  \includegraphics[width=\wdh]{treejoin.pdf}
-  \includegraphics[width=\wdh]{lambda.pdf}
-  \includegraphics[width=\wdh]{gc_bench.pdf}
-  \caption{Memory usage.  
+ \caption{Memory usage.  
 The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
 cells  in  the  active   semi-space  for  RGC  and  LGC
 respectively.  The \ReachLine\ curve represents the number of
@@ -1776,11 +1764,59 @@ liveness analysis does a static approximation).  x-axis
 is the time measured  in number of cons-cells allocated
 (scaled down by factor $10^5$). y-axis is the number of
 cons-cells (scaled down by $10^3$).}
-\label{fig:memory-usage} \figrule
-%\vspace*{-1mm}
+\label{fig:memory-usage}
+ \begin{subfigure}{\textwidth}
+   \includegraphics[width=\wdh]{fibheap.pdf}
+ \end{subfigure}
+ \begin{subfigure}{\textwidth}
+   \includegraphics[width=\wdh]{sudoku.pdf}
+ \end{subfigure}
+ \begin{subfigure}{\textwidth}
+   \includegraphics[width=\wdh]{nperm.pdf}
+ \end{subfigure}
 \end{figure*}
 
-%\vspace*{-6.5mm}
+\begin{figure*}[t!]
+  \ContinuedFloat
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{lcss.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{huffman.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{knightstour.pdf}
+  \end{subfigure}
+\end{figure*}
+
+\begin{figure*}[t!]
+  \ContinuedFloat
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{deriv.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{treejoin.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{lambda.pdf}
+  \end{subfigure}
+\end{figure*}
+
+\begin{figure*}[t!]
+  \ContinuedFloat
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{gc_bench.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+    \includegraphics[width=\wdh]{nqueens.pdf}
+  \end{subfigure}
+  \begin{subfigure}{\textwidth}
+   \includegraphics[width=\wdh]{paraffins.pdf}
+  \end{subfigure} 
+ \figrule
+\end{figure*}
+
+
 \section{The GC scheme}
 \label{sec:GC-scheme}
 In        the       liveness        analysis       described        in
@@ -1937,7 +1973,7 @@ result,  the benchmark  highly favours  LGC.  The  benchmark has  been
 included  for  completeness,  and  we  do  not  consider  its  numbers
 as being representative of real programs.
 
-Memory    usage    graphs    for     the    benchmarks    are    shown
+Memory   usage    graphs   for    the   benchmarks   are    shown   in
 Figure~\ref{fig:memory-usage}.  In  all the  programs we can  see that
 the curve  corresponding to  LGC (\LGCLine\ line)  dips below  the RGC
 curve (\RGCLine\ line)  during GC.  The graphs also  include the curve
@@ -1945,7 +1981,9 @@ for reachable cells (\ReachLine) and live cells (\UseLine). These were
 obtained by forcing  RGC to run at very high  frequency. The curve for
 live  cells were  obtained by  recording  heap access  times and  post
 processing the data at  the end of the program. Note  that the size of
-an LGC cell is 1.16 times the size of a RGC cell.
+an LGC  cell is 1.16 times  the size of  a RGC cell as  it potentially
+might have  to store references  to liveness DFA of  closure arguments
+(if the cell is a closure).
 
 
 As  demonstrated by  the gap  between the  \RGCLine\ and  the \UseLine\
@@ -1956,8 +1994,11 @@ eager languages ~\cite{asati14lgc}.  A major source of inefficiency in
 LGC is  multiple traversals  of already copied  heap cells.  Since LGC
 does not mark the heap cells after the first visit, the same cells can
 be  repeatedly  visited  with   different  liveness  states.  We  have
-mitigated  this  problem  by   implementing  a  heuristic  which  tags
-\CONS\ cells with the set of states already visited.
+mitigated  this  problem  by   implementing  a  heuristic  which  avoids 
+revisiting closures and function arguments more than once. 
+%% Since the 
+%% liveness automata for a closure argument encompasses all possible uses 
+%% of the closure, multiple traversals for closures can be safely avoided.
 
 
 %\vspace*{-2mm}
