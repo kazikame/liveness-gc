@@ -27,7 +27,7 @@
 \usepackage{subfigure}
 \usepackage[boxed]{algorithm2e}
 \usepackage{makecell}
-
+\usepackage[numbers,sort&compress]{natbib}
 % to save space in lists
 \usepackage{enumitem}
 \setlist{nolistsep}
@@ -92,7 +92,7 @@
 % and alignment' of the authors beneath the title.
 %
 % For aesthetic reasons, we recommend 'three authors at a time'
-% i.e. three 'name/affiliation blocks' be placed beneath the title.
+% i.e., three 'name/affiliation blocks' be placed beneath the title.
 %
 % NOTE: You are NOT restricted in how many 'rows' of
 % "name/affiliations" may appear. We just ask that you restrict
@@ -152,7 +152,7 @@ liveness analysis itself and in the design of the garbage collector.
 %% finite-state automata (DFA) describing the liveness at that point.
 To  show the  effectiveness of  our method,  we implemented  a copying
 collector that uses  the results of the liveness  analysis to preserve
-live  objects,  both evaluated  (i.e.,  in  WHNF) and  closures.   Our
+live  objects,  both evaluated  and  closures.   Our
 experiments confirm  that for  programs running with  a liveness-based
 garbage  collector, there  is a  significant decrease  in peak  memory
 requirements.   In addition,  a  sizable reduction  in  the number  of
@@ -182,7 +182,7 @@ to be carried from the point of creation to the point of evaluation.
 
 While  the runtime  system  of most  functional  languages includes  a
 garbage collector to efficiently  reclaim memory, empirical studies on
-Scheme~\cite{karkare06effectiveness}   and,   more   importantly,   on
+Scheme~\cite{karkare06effectiveness}   and  on
 Haskell~\cite{rojemo96lag} programs have shown that garbage collectors
 leave uncollected a large number  of memory objects that are reachable
 but not live (here {\em live} means the object can potentially be used
@@ -225,7 +225,7 @@ closure can escape the scope in which  it was created, it has to carry
 the  liveness  information  of   its  free  variables.   As  execution
 progresses  and possible  future uses  are eliminated,  we update  the
 liveness  information  in  a  closure with  a  more  precise  version.
-Because  of   these  reasons,  the  garbage   collector  also  becomes
+For  these  reasons,  the  garbage   collector  also  becomes
 significantly more  complicated than a liveness-based  collector for a
 eager language.
 
@@ -254,7 +254,7 @@ program and the state of the heap at the program point $\pi$\footnote{We write
 $\pi\!:\!e$ to  associate a  label $\pi$ with  the program  point just
 before  the  expression  $e$. The label is not part of the syntax.},  i.e., just  before  the  evaluation  of
 $(\length\ \pz)$.  The heap is represented  by a graph in which a node
-either  represents  atomic  values   ($\NIL$,  integers  etc.),  or  a
+either  represents  atomic  values   ($\NIL$,  integers,  etc.),  or  a
 \CONS\  cell  containing  $\CAR$  and  $\CDR$  fields,  or  a  closure
 (represented  by  shaded  clouds).   Edges   in  the  graph  are  {\em
   references} and represent values of variables or fields.  The figure
@@ -276,16 +276,22 @@ garbage  collectors   in  reclaiming   more  garbage.    The  specific
 contributions of this paper are:
 \added{
 \begin{itemize}
-\item We  propose a liveness  based GC scheme  for a lazy  first order
-  functional language and  prove its correctness.  To the  best of our
-  knowledge,  this is  the first  work on  liveness-based GC  for lazy
-  languages.       All      previous      attempts~\cite{shaham01heap,
-    ran.shaham-sas03,          shaham02estimating,         asati14lgc,
-    karkare06effectiveness} have  involved either imperative  or eager
-  functional languages.  The novelty of our approach is in handling of
-  liveness  of closures,  an  issue  that arises  due  to laziness  at
-  runtime.
+\item We  propose an interprocedural liveness  based GC
+  scheme  for a  lazy first-order functional  language and  prove its
+  correctness.  To the  best of our knowledge, this is  the first work
+  that uses  the results  of an  interprocedural liveness  analysis to
+  garbage    collect    both     evaluated    data    and    closures.
+  Thomas~\cite{Thomas19951} describes a  copying garbage collector for
+  the Three  Instruction Machine (TIM)~\cite{Fairbairn1987}  that only
+  preserves live closures  in a function's environment  (also called a
+  frame). However, in the absence of  details, it is not clear whether
+  a) the  scope of the  method is  interprocedural, and b)  it handles
+  algebraic datatypes like lists (the original design of TIM did not).
+  All  other  previous attempts~\cite{shaham01heap,  ran.shaham-sas03,
+    shaham02estimating,  asati14lgc, karkare06effectiveness}  involved
+  either imperative or eager functional languages.
 
+ 
 \item  We  formulate a  liveness  analysis  for the  lazy  first-order
   functional language  and prove  its correctness. The  proof involves
   specifying  liveness   for  the  language  through   a  non-standard
@@ -392,10 +398,10 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
 \left\{\begin{array}{@{}l@{\hspace{1.2em}}l}
        k & \mbox{\em --- constant (numeric or $\NIL$)}\\
        (\CONS\,\, x_1\,\, x_2) & \mbox{\em --- constructor} \\
-       (\CAR\,\, x) & \\
-       (\CDR\,\, x) & \mbox{\em --- selectors} \\
-       (\NULLQ\,\, x) & \\
-       (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  tester/generic arithmetic} \\
+       (\CAR\,\, x) &  \mbox{\em --- selects $1^{st}$ part of \CONS} \\
+       (\CDR\,\, x) &  \mbox{\em --- selects $2^{nd}$ part of \CONS} \\
+       (\NULLQ\,\, x) & \mbox{\em --- returns 0 if x is not $\NIL$} \\
+       (\PRIM\,\, x_1\,\, x_2) & \mbox{\em generic arithmetic} \\
 %%       (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
        (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
     \end{array}\right.
@@ -524,15 +530,16 @@ c:   & \mathit{Clo} &=& \mathit{(App \times Env)}& \mbox{-- Closures}\\
 \end{array}
 \]
 
-
-Here  $\mathit{Loc}$ is  a countable  set  of locations  in the  heap.
-A non-empty location either contains  a value in  \emph{WHNF} (a  number, the
-empty  list  $\NIL$ or  a  \CONS\  cell  with  possibly  unevaluated
-constituents) or  a {\em closure}.   A closure  is a pair  $\langle s,
+Here $\mathit{Loc}$  is a countable set  of locations in the  heap.  A
+non-empty location either contains a {\em closure}, or a value in Weak
+Head Normal Form  (WHNF)\cite{Jones87}. In our case, a  WHNF value can
+be a  number, the  empty list  $\NIL$ or a  \CONS\ cell  with possibly
+unevaluated   constituents.   A   closure  is   a  pair   $\langle  s,
 \rho\rangle$ in  which $s$ is  an unevaluated application,  and $\rho$
-maps free variables of $s$ to their respective locations. Since all data objects are boxed, we model an environment as a mapping
-from the set  of variables of the program  $\mathit{Var}$ to locations
-in the  heap.  
+maps free  variables of $s$  to their respective locations.  Since all
+data objects are boxed, we model  an environment as a mapping from the
+set of  variables of  the program $\mathit{Var}$  to locations  in the
+heap.
 
 
 The  semantics  of   expressions  (and  applications\footnote{In  most
@@ -704,14 +711,15 @@ label of the program   point  where   the   closure  was   created\footnote{Mult
  
 Closure  variables  get  their  liveness values  through  a  chain  of
 dependences beginning  at a  variable at an  evaluation point.   As an
-example,  consider again  the program  in Figure~\ref{fig:lv-closure}.
-The variable  \pz\ returned  at $\psi_3$ depends  on \py\  through the
-expression $(+~\py~1)$.  $\py$ in turn depends on the closure variable
-$\px_{\mathit{\pi}_1}$  through $(\length~\px_{\mathit{\pi}_1})$.   We
-denote this  chain of  dependences as  $\lbrack \psi_3\!\!\!:\!\!\!\pz
-\leftarrow            (+~\py~1),\,           \py            \leftarrow
-(\length~\px_{\mathit{\pi}_1})\rbrack$.    Indeed,   the   chains   of
-closures  in   the  heap  are   a  runtime  representation   of  these
+example,  in  Figure~\ref{fig:lv-closure},   a  dependence  chain  for
+$\px_{\mathit{\pi}_1}$  begins   with  the   variable  $\pz$   at  the
+evaluation  point $\psi_3$.  The  variable \pz\  returned at  $\psi_3$
+depends on  \py\ through  the expression  $(+~\py~1)$.  $\py$  in turn
+depends  on   the  closure  variable   $\px_{\mathit{\pi}_1}$  through
+$(\length~\px_{\mathit{\pi}_1})$.  We denote this chain of dependences
+as   $\lbrack  \psi_3\!\!\!:\!\!\!\pz   \leftarrow  (+~\py~1),\,   \py
+\leftarrow (\length~\px_{\mathit{\pi}_1})\rbrack$.  Indeed, the chains
+of  closures  in  the  heap  are a  runtime  representation  of  these
 dependences.   Since  $\pz$  is  evaluated  at  $\psi_3$  due  to  the
 expression $\SRETURN~\pz$,  the demand made by  the calling context(s)
 of  $f$ places  a demand  on  $\pz$ which  will impart  a liveness  to
@@ -1121,7 +1129,7 @@ $P'$,   a   call-less   program,   cannot   enter   the
 %\section{Generating and storing liveness information}\label{sec:computing}
 The analysis in Section~\ref{sec:liveness} is fully context-sensitive, 
 describing the  liveness sets  in a function body in
-terms of a symbolic demand $\sigma$  and \Lfonly. However, we are yet to
+terms of a symbolic demand $\sigma$  and \Lfonly. However, we have yet to
 describe (i) how to obtain demand transformers \Lfonly\ from the rule
 {\sc live-define} , and (ii) how to compute the concrete demand $\sigma$ on
 each function. To do so, we first need to modify the liveness rules
@@ -1775,14 +1783,6 @@ cons-cells (scaled down by $10^3$).}
 %\vspace*{-6.5mm}
 \section{The GC scheme}
 \label{sec:GC-scheme}
-
-Our experimental setup  consists of an interpreter
-for  our  language,  a liveness  analyzer,  and  a
-single generation copying  collector.  The garbage
-collector can be configured to work on the
-basis  of  reachability  (RGC  mode)  or  use  
-liveness  DFAs  (LGC  mode).  
-
 In        the       liveness        analysis       described        in
 Section~\ref{sec:liveness-analysis},   the  liveness   of  a   closure
 variable is  derived from dependence  chains along all paths  from the
@@ -1804,8 +1804,8 @@ collections are based on more precise liveness information.
 Based on  the above considerations,  we restrict the  possible garbage
 collection points in a function body to the following:
 \begin{enumerate}
-\item We  maintain static estimates  of the memory required  to create
-  the closures for each function body.  On entering a function, if the
+\item We  statically over-approximate the memory required  to create
+  the closures for each function body. On entering a function, if the
   available memory is  less than this requirement for  the function, a
   GC is triggered.
 \item Since the evaluation of a  \SIF\ condition may trigger a 
@@ -1879,6 +1879,13 @@ We extend liveness-based  garbage  collection  to
 this function.
 \section{Experimental evaluation}
 \label{sec:experiments}
+Our experimental setup  consists of an interpreter
+for  our  language,  a liveness  analyzer,  and  a
+single generation copying  collector.  The garbage
+collector can be configured to work on the
+basis  of  reachability  (RGC  mode)  or  use  
+liveness  DFAs  (LGC  mode).  
+
 Our benchmark  consists of programs taken  from nofib~\cite{nofib} and
 other repositories for functional programs~\cite{PLT-Scheme, gc_bench,
   huffman-sicp}.     We    ran    the   experiments    on    8    core
@@ -2091,7 +2098,7 @@ We have  extended liveness-based  GC  to lazy
   DFAs and used by the garbage collector to improve collection.
 
 In addition to  evaluated data, our collector  also reclaims closures.
-For this, we  had to modify the standard run-time  representation of a
+For this, we  had to modify the standard run-time  representation of
 closures  to carry  liveness  of its free  variables and  periodically
 update the liveness during execution  time.  As expected, our garbage
 collector  reclaims more  garbage and  reduces memory  requirement of
@@ -2113,7 +2120,7 @@ firstification techniques~\cite{Mitchell:2009}.
   Orthogonally,   we   plan  to   improve   the   efficiency  of   the
   liveness-based garbage  collector using heuristics such  as limiting
   the depth of DFA, merging  nearly-equivalent states and using better
-  representation(for example BDDs~\cite{Bryant86})  and algorithms for
+  representation (for example BDDs~\cite{Bryant86})  and algorithms for
   automata manipulation.  We also  need to investigate the interaction
   of liveness with  other collection schemes, such  as incremental and
   generational collection.   It might  be interesting  to use  a mixed

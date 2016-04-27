@@ -1,6 +1,7 @@
 LATEX=pdflatex
 all: 
-	yes X | $(LATEX)  paper.tex ; dvips paper.dvi -o paper.ps; ps2pdf paper.ps
+	#yes X | $(LATEX)  paper.tex ; dvips paper.dvi -o paper.ps; ps2pdf paper.ps
+	$(LATEX) paper.tex
 
 rel:
 	$(LATEX) paper && bibtex paper && $(LATEX) paper && $(LATEX) paper 
