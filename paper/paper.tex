@@ -133,7 +133,7 @@ programs  for liveness  of  heap-allocated data.   The  result of  the
 analysis is  used to preserve  only live data---a subset  of reachable
 data---during garbage  collection.  The result  is an increase  in the
 garbage reclaimed and  a  reduction in  the peak memory requirement 
-of programs.   While this  technique has already  been shown  to yield
+of programs.   Whereas this  technique has already  been shown  to yield
 benefits for  eager first-order  languages, the  lack of  a statically
 determinable execution  order and  the presence  of closures  pose new
 challenges  for lazy  languages.  These  require changes  both in  the
@@ -172,8 +172,8 @@ or  implicit   (creating  closures).   Programs  in   lazy  functional
 languages put additional  demands on memory, as  they require closures
 to be carried from the point of creation to the point of evaluation.
 
-While  the runtime  system  of most  functional  languages includes  a
-garbage collector to efficiently  reclaim memory, empirical studies on
+Whereas  the runtime  system  of most  functional  languages includes  a
+garbage collector to reclaim memory efficiently, empirical studies on
 Scheme~\cite{karkare06effectiveness}  and  Haskell~\cite{rojemo96lag}
 programs have shown that garbage  collectors leave uncollected a large
 number of  memory objects that are  reachable but not live  (here {\em
@@ -199,7 +199,7 @@ restrict reachability during marking.  This  results in an increase in
 the garbage reclaimed and consequently in fewer collections.
 
 
-While  the idea  of  using static  analysis  to improve  memory
+Whereas  the idea  of  using static  analysis  to improve  memory
   utilization  has  been  shown  to   be  effective  for  {\em  eager}
   languages~\cite{asati14lgc,       HofmannJ03,       inoue88analysis,
     lee05static}, a straightforward extension  of the technique is not
@@ -326,7 +326,7 @@ Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
 is a first-order language with lazy semantics. Programs are restricted
 to        be        in        Administrative        Normal        Form
 (ANF)~\cite{chakravarty03perspective}, where  all actual  parameters to
-functions  are  variables.  While  this  restriction  does not  affect
+functions  are  variables.  Whereas  this  restriction  does not  affect
 expressibility,  this form  has  the benefit  of  making explicit  the
 creation of closures through the $\LET$ construct.   We
   assume that  $\LET$s  in  our  language  are  non-recursive;  in  the
@@ -600,7 +600,7 @@ represents access using $y$ itself and $z \mapsto \{\}$ indicates
 $z$ is dead.  In lazy  languages, liveness environments are associated
 with regions of programs instead of program points.
 
-A notion  that generalizes liveness  is {\em demand}.   While liveness
+A notion  that generalizes liveness  is {\em demand}.   Whereas liveness
 gives the patterns of future uses of a variable, demand represents the
 future uses of the value of an expression.  The demand on an expression
 $e$   is   also   a   set    of   access   paths---the   subset   of
