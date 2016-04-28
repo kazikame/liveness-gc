@@ -177,7 +177,7 @@ garbage collector to efficiently  reclaim memory, empirical studies on
 Scheme~\cite{karkare06effectiveness}  and  Haskell~\cite{rojemo96lag}
 programs have shown that garbage  collectors leave uncollected a large
 number of  memory objects that are  reachable but not live  (here {\em
-  live} means the  object can potentially be used by  the program at a
+  live} means the  object may potentially be used by  the program at a
 later stage).  This results in unnecessary memory retention.
 
 In this paper,  we propose the use of liveness  analysis of heap cells
@@ -364,9 +364,9 @@ s \in \mathit{App} & \!\!\!::=\!\!\!  &
 \left\{\begin{array}{@{}l@{\hspace{1.2em}}l}
        k & \mbox{\em --- constant (numeric or $\NIL$)}\\
        (\CONS\,\, x_1\,\, x_2) & \mbox{\em --- constructor} \\
-       (\CAR\,\, x) &  \mbox{\em --- selects $1^{st}$ part of \CONS} \\
-       (\CDR\,\, x) & \mbox{\em --- selects $2^{nd}$ part of \CONS} \\
-       (\NULLQ\,\, x) & \mbox{\em --- returns 0 if x is not $\NIL$}\\
+       (\CAR\,\, x) &  \mbox{\em --- selects first part of \CONS} \\
+       (\CDR\,\, x) & \mbox{\em --- selects second part of \CONS} \\
+       (\NULLQ\,\, x) & \mbox{\em --- returns true if x is $\NIL$}\\
        (\PRIM\,\, x_1\,\, x_2) & \mbox{\em ---  generic arithmetic} \\
 %%       (\ID\,\, x) & \mbox{\em ---  identity function (for inlining)} \\
        (f\,\, x_1\,\,\ldots\,\, x_n) & \mbox{\em --- function application}
@@ -499,11 +499,11 @@ c:   & \mathit{Clo} &=& \mathit{(App \times Env)}& \mbox{-- Closures}\\
 
 Here $\mathit{Loc}$  is a countable set  of locations in the  heap.  A
 non-empty location either contains a {\em closure}, or a value in Weak
-Head Normal Form (WHNF)\cite{Jones87}. In our case, a WHNF value
-can be a number, the empty list  $\NIL$ or a \CONS\ cell with possibly
-unevaluated   constituents.   A   closure  is   a  pair   $\langle  s,
-\rho\rangle$ in  which $s$ is  an unevaluated application,  and $\rho$
-maps free  variables of $s$  to their respective locations.  Since all
+Head Normal Form (WHNF)\cite{Jones87}. For our implementation, a value
+in WHNF is either a number, or  the empty list $\NIL$ or a \CONS\ cell
+with possibly unevaluated constituents.  A  closure is a pair $\langle
+s, \rho\rangle$ in which $s$ is an unevaluated application, and $\rho$
+maps free variables  of $s$ to their respective  locations.  Since all
 data objects are boxed, we model  an environment as a mapping from the
 set of  variables of  the program $\mathit{Var}$  to locations  in the
 heap.
@@ -1532,16 +1532,19 @@ processing the data at  the end of the program. Note  that the size of
 an LGC cell is 1.16 times the size of a RGC cell.
 
 
-As  demonstrated by  the gap  between the  \RGCLine\ and  the \UseLine\
-lines, a  large number of  cells which are  unused by the  program are
-still copied  during RGC. LGC does  a much better job  of closing this
-gap but still falls short of the  precision achieved by LGC in case of
-eager languages ~\cite{asati14lgc}.  A major source of inefficiency in
-LGC is  multiple traversals  of already copied  heap cells.  Since LGC
-does not mark the heap cells after the first visit, the same cells can
-be  repeatedly  visited  with   different  liveness  states.  We  have
-mitigated  this  problem  by  adding checks to avoid multiple traversals 
-of closure and function arguments.
+As   demonstrated  by   the  gap   between  the   \RGCLine\  and   the
+\UseLine\  lines, a  large number  of cells  which are  unused by  the
+program are  still copied during  RGC. LGC does  a much better  job of
+closing this  gap but still falls  short of the precision  achieved by
+LGC in case of eager  languages ~\cite{asati14lgc}.  A major source of
+inefficiency  in LGC  is multiple  traversals of  already copied  heap
+cells.  Since LGC does not mark  the heap cells after the first visit,
+the  same cells  can  be repeatedly  visited  with different  liveness
+states.  This can  be  seen in  the cells touched  per  GC for  $huffman$
+benchmark in Table~\ref{fig:memory-usage}, even though it uses only 72
+cells, number of cells touched is  88.  We have mitigated this problem
+by adding checks to avoid  multiple traversals of closure and function
+arguments.
 
 
 \vspace*{-2mm}
