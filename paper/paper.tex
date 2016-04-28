@@ -603,8 +603,9 @@ with regions of programs instead of program points.
 A notion  that generalizes liveness  is {\em demand}.   Whereas liveness
 gives the patterns of future uses of a variable, demand represents the
 future uses of the value of an expression.  The demand on an expression
-$e$   is   also   a   set    of   access   paths---the   subset   of
-$\{\acar,\acdr\}^\ast$ which the  context of $e$ may  explore of $e$'s
+$e$   is   also   a   set    of   access   paths
+%---the   subset   of $\{\acar,\acdr\}^\ast$ 
+which the  context of $e$ may  explore of $e$'s
 result.   To see  the need  for demands,  consider the expression
 $(\LET~x\leftarrow  (\CDR~y)~\IN~   (\SRETURN~x))$.   Assume   that  the
 context of this expression places  the demand $\lbrace \epsilon, \acar
