@@ -1,14 +1,14 @@
 
 
 # for colored graphs, uncomment next line
-set terminal postscript dashed color portrait "Helvetica" 16
+set terminal postscript dashed color portrait "NimbusSanL-Regu" 16
 # else, for black & white graphs in paper, uncomment next line
-#set terminal postscript portrait butt "Helvetica" 16
+#set terminal postscript portrait butt "NimbusSanL-Regu" 16
 #set terminal size 1300,600
 
 set size ratio 0 1, .33
 
-set xlabel "knightstour*"
+set xlabel "knightstour (partial)"
 set xtics nomirror ("300" 300e5, "320" 320e5, "340" 340e5, "360" 360e5,"380" 380e5,  "400" 400e5)
 set ytics nomirror ("400" 400e3, "500" 500e3, "600" 600e3, "7000" 700e3)
 set border 3 lw 0
