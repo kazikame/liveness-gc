@@ -3,22 +3,6 @@
 \newcommand{\rot}[1]{\rotatebox{30}{\scalebox{0.8}{#1}}}
 \newcommand{\rotmore}[1]{\rotatebox{20}{\scalebox{0.8}{#1}}}
 
-\newcounter{lcount}
-\newenvironment{myenumerate}{
-\begin{list}{\arabic{lcount}.}
-{\usecounter{lcount}\setlength{\topsep}{1mm}\setlength{\itemsep}{0.25mm}
-\setlength{\parsep}{0.1mm}
-\setlength{\itemindent}{0mm}\setlength{\partopsep}{0mm}
-\setlength{\labelwidth}{15mm}
-\setlength{\leftmargin}{4mm}}}{\end{list}}
-
-\newenvironment{myitemize}{\begin{list}{$\bullet$}
-{\setlength{\topsep}{1mm}\setlength{\itemsep}{0.25mm}
-\setlength{\parsep}{0.1mm}
-\setlength{\itemindent}{0mm}\setlength{\partopsep}{0mm}
-\setlength{\labelwidth}{15mm}
-\setlength{\leftmargin}{4mm}}}{\end{list}}
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% Comment out a part of latex document
 \newcommand{\cmt}[1]{}
@@ -201,7 +185,10 @@
 \newcommand{\exit}{{\sf pgm}}
 \newcommand{\gram}{\ensuremath{G}}
 \newcommand{\nt}{\ensuremath{N}}
-\newcommand{\var}[1]{\ensuremath{\langle #1\rangle}}
+\newcommand{\var}[1]{\raisebox{.4mm}{\scalebox{.8}{\ensuremath{\langle #1\rangle}}}}
+%\newcommand{\var}[1]{\psframebox*[fillstyle=solid,fillcolor=lightgray,framesep=0]{\ensuremath{#1}}}
+%\newcommand{\var}[1]{\scalebox{.8}{\ensuremath{\widehat{#1}}}}
+\newcommand{\varnew}[1]{\raisebox{.4mm}{\scalebox{.8}{\ensuremath{\langle#1\rangle'}}}}
 
 \newcommand{\TwoCells}[2]{%
 \psset{unit=.25mm}
@@ -249,7 +236,7 @@
 \end{pspicture}%
 }
 \newcommand{\TwoCellsAD}[2]{%
-\psset{unit=.25mm}
+\psset{unit=.15mm}
 \begin{pspicture}(-6,-2)(42,18)
 %\psframe(0,-5)(36,15)
 %\psline(18,-4)(18,15)
@@ -416,3 +403,8 @@
 
 
 
+\newcommand{\hgt}{4.4cm}
+\newcommand{\LGCLine}{blue}
+\newcommand{\RGCLine}{red}
+\newcommand{\ReachLine}{black}
+\newcommand{\UseLine}{light-blue}
