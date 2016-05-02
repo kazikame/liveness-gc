@@ -66,10 +66,12 @@
 
 \newcommand{\addSubFig}[1] {
   \begin{subfigure}{\textwidth}
-    \includegraphics[width= .75\textwidth]{#1.pdf}
+  \centering
+    \includegraphics[width=.99\textwidth]{#1.pdf}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
-    \includegraphics[width=.75\textwidth]{#1_win.pdf}
+  \centering
+    \includegraphics[width=.99\textwidth]{#1_win.pdf}
   \end{subfigure}
 }
 
@@ -1758,13 +1760,23 @@ liveness-based GC triggers beyond $\pi_9$.
 
 
 
-\newcommand{\wdh}{.7\textwidth}
+\newcommand{\wdh}{.99\textwidth}
 \newcommand{\LGCLine}{blue}
 \newcommand{\RGCLine}{red}
 \newcommand{\ReachLine}{black}
 \newcommand{\UseLine}{light-blue}
 
-\begin{figure*}[t!]
+\newcommand{\mycaption}{\caption{(Continued). Memory usage.  
+The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
+cells  in  the  active   semi-space  for  RGC  and  LGC
+respectively.  The \ReachLine\ curve represents the number of
+reachable cells and the  \UseLine\ curve represents the
+number  of  cells  that  are actually  live  (of  which
+liveness analysis does a static approximation).  x-axis
+is the time measured  in number of cons-cells allocated
+(scaled down by factor $10^5$). y-axis is the number of
+cons-cells (scaled down by $10^3$).}}
+\begin{figure*}[p]
  \caption{Memory usage.  
 The \RGCLine\ and the \LGCLine\ curves indicate the number of cons
 cells  in  the  active   semi-space  for  RGC  and  LGC
@@ -1777,39 +1789,63 @@ is the time measured  in number of cons-cells allocated
 cons-cells (scaled down by $10^3$).}
 \label{fig:memory-usage}
 \addSubFig{fibheap}
-\addSubFig{sudoku}
 \end{figure*}
 
-\begin{figure*}[t!]
-  \ContinuedFloat
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
+  \addSubFig{sudoku}
+\end{figure*}
+
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
   \addSubFig{nperm}
+\end{figure*}
+
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
   \addSubFig{lcss}
 \end{figure*}
 
-\begin{figure*}[t!]
-  \ContinuedFloat
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
   \addSubFig{knightstour}
+\end{figure*}
+
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
   \addSubFig{treejoin}
 \end{figure*}
 
-\begin{figure*}[t!]
-  \ContinuedFloat
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
   \addSubFig{lambda}
+\end{figure*}
+
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
   \addSubFig{nqueens}
 \end{figure*}
 
-\begin{figure*}[t!]
-  \ContinuedFloat
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
    \begin{subfigure}{\textwidth}
+     \centering
     \includegraphics[width=\wdh]{deriv.pdf}
   \end{subfigure}
    \begin{subfigure}{\textwidth}
+     \centering
     \includegraphics[width=\wdh]{gc_bench.pdf}
   \end{subfigure}
+\end{figure*}
+
+\begin{figure*}[p]
+  \ContinuedFloat\mycaption
   \begin{subfigure}{\textwidth}
+     \centering
     \includegraphics[width=\wdh]{huffman.pdf}
   \end{subfigure}
   \begin{subfigure}{\textwidth}
+     \centering
    \includegraphics[width=\wdh]{paraffins.pdf}
   \end{subfigure} 
  \figrule
