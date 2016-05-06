@@ -11,4 +11,4 @@ PHONY: clean
 clean:
 	$(RM) paper.log paper.aux paper.synctex.gz* autotable.aux
 	$(RM) data-liveness-analysis.aux paper.aux paper.bbl paper.log
-	$(RM) paper.pdf paper.synctex.gz
+	$(RM) paper.pdf paper.synctex.gz paper.blg paper.dvi paper.ps
