@@ -234,7 +234,7 @@ benchmark programs.
  
 
 %------------------------------------------------------------%
-\subsection{Motivating example}
+\subsection{Motivating Example}
 \label{sec:motiv}
 \input{fig_motiv}   
 %%
@@ -305,7 +305,7 @@ contributions of this paper are:
   Empirical results  show the effectiveness of  liveness-based GC.
 \end{itemize}
 
-\subsection{Organization of the paper}
+\subsection{Organization of the Paper}
 
 Section~\ref{sec:defs}  introduces  the   syntax  of  the  programming
 language considered  and gives a small-step  operational semantics for
@@ -320,7 +320,7 @@ our experimental  results in Section~\ref{sec:experiments}  along with
 some  observations.  Section~\ref{sec:relatedwork}  discusses previous
 work  related  to  GC and  liveness  and  Section~\ref{sec:conclusion}
 discusses possible extensions and concludes the paper.
-\section{The target language---syntax and semantics}
+\section{The Target Language---Syntax and Semantics}
 \label{sec:defs}
 Figure~\ref{fig:lang-syntax} describes the syntax  of our language. It
 is a first-order language with lazy semantics. Programs are restricted
@@ -637,7 +637,7 @@ $\lbrace\acar\rbrace\sigma$.
 \renewcommand{\pp}[2]{\ensuremath{#1\!\!:\!#2}} % prog point
 %==============================================================
 
-\subsection{Liveness analysis for lazy languages}
+\subsection{Liveness analysis for Lazy Languages}
 \label{sec:liveness-analysis}
 \input{example-to-illustrate-liveness}
 
@@ -820,7 +820,7 @@ s, \rho'\rangle), (\CAR~x),\cred{\sigma} )\!:\!S, \heap,\, s, \, \cred{\sigma}$ 
 \vspace*{-2mm}
 \end{figure*}
 
-\subsection{Soundness of analysis}  
+\subsection{Soundness of Analysis}  
 
 We shall now present a proof of the soundness of the analysis presented in
 Section~\ref{sec:liveness-analysis}. It is easy to see that the analysis
@@ -992,7 +992,7 @@ in Appendix~\ref{sec:sound}.
 
 
 
-\section{Towards a  computable form of liveness}\label{sec:computing}
+\section{Towards a  Computable Form of Liveness}\label{sec:computing}
 %\section{Generating and storing liveness information}\label{sec:computing}
 The analysis in Section~\ref{sec:liveness} is fully context-sensitive, 
 describing the  liveness sets  in a function body in
@@ -1003,7 +1003,7 @@ each function. To do so, we first need to modify the liveness rules
 to a slightly different form.
 
 %\subsection{Modifying liveness rules}
-\paragraph{Symbolic representation of operations:}
+\paragraph{Symbolic Representation of Operations:}
 The   $\mathit{ref}$   rule   for   \CONS,   shown   in
 Figure~\ref{fig:live-judge}, requires us  to remove the
 leading  \acar\ and  \acdr\  from the  access paths  in
@@ -1083,7 +1083,7 @@ explained through an example, it can be generalized easily.
 \input{example-program}
 
 %\subsection{Generating equations for $\Lfonly_{\mathit f}$}
-\paragraph{Computing function summaries $\Lfonly_{\mathit f}$:}
+\paragraph{Computing Function Summaries $\Lfonly_{\mathit f}$:}
 Given a  function $\mathit{f}$, we now  describe how to
 generate  equations   for  the   demand  transformation
 \Lfonly$_\mathit{f}$.        The       program       in
@@ -1127,7 +1127,7 @@ Note that this equation can also be viewed as a CFG with \{\acdr,
 \clazy\} as terminal symbols and \Df{\length}{1} as the sole
 non-terminal.
 %\subsection{Generating liveness equations \Lv\  for function bodies}
-\paragraph{Handling user-defined functions:}
+\paragraph{Handling User-defined Functions:}
 \label{sec:bodylivenessbodies}
 To  avoid analyzing  the body  of a  function for  each
 call, we calculated the  liveness for the arguments and
@@ -1202,7 +1202,7 @@ $\clazy\sigma_{\mathit{\length}}$.} Thus:
 We compute the liveness of all variables and arguments of $\length$ in terms of $\sigma_{\length}$.
 
 %\subsection{Solving liveness equations---the grammar interpretation}\label{sec:grammar-formulation}      
-\paragraph{From liveness sets to context-free grammars:}\label{sec:grammar-formulation}      
+\paragraph{From Liveness Sets to Context-Free Grammars:}\label{sec:grammar-formulation}      
 The  equations  above can  now  be  re-interpreted as  a  context-free
 grammar  (CFG) on  the  alphabet $\lbrace\acar,  \acdr, \bcar,  \bcdr,
 \clazy\rbrace$.  Let \var{X} denote  the non-terminal for a variable
@@ -1291,7 +1291,7 @@ grammars is undecidable.
 
 
 %\vspace*{-6.5mm}
-\section{The GC scheme}
+\section{The GC Scheme}
 \label{sec:GC-scheme}
 
 In        the       liveness        analysis       described        in
@@ -1436,7 +1436,7 @@ a printing function~(Section
 %% them.
 We extend liveness-based  garbage  collection  to
 this function.
-\section{Experimental evaluation}
+\section{Experimental Evaluation}
 \label{sec:experiments}
 Our  experimental  setup   consists  of  the  prototypes   of  (a)  an
 interpreter  for our  language, (b)  a  liveness analyzer,  and (c)  a
@@ -1551,7 +1551,7 @@ traversals.
 
 
 \vspace*{-2mm}
-\section{Related work} 
+\section{Related Work} 
 \label{sec:relatedwork}
 The impact of  liveness on the effectiveness of  GC is
 investigated in~\cite{Hirzel}.   They observe that  liveness can
@@ -1637,7 +1637,7 @@ languages. We extend this to handle lazy evaluation and closures.
 %% \end{figure}
 \vspace*{-2mm}
 \vskip -5mm
-\section{Future work and conclusions}
+\section{Future Work and Conclusions}
 \label{sec:conclusion}
 %% We have  defined a notion of  liveness on structured
 %% data; this generalizes classical liveness and strong
@@ -1719,7 +1719,7 @@ firstification techniques~\cite{Mitchell:2009}.
   liveness-based GC attractive for practical collectors.
 
 \appendix
-\section{Soundness result for liveness analysis under minefield semantics}
+\section{Soundness Result for Liveness Analysis under Minefield Semantics}
 \label{sec:sound}
 We first need an auxiliary  result about minefield semantics. Consider
 a trace of  a minefield execution.  For every  minefield state $(\rho,
