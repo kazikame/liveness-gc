@@ -1,0 +1,24 @@
+\begin{wrapfigure}{l}{.28\textwidth}
+  \renewcommand{\arraystretch}{.8}{
+    \begin{uprogram}
+      \UFL (\DEFINE\ (\main)
+      \UNL{1} \!\!$\pi_9$:\, (\LET\  \pa\  $\leftarrow$
+      (
+      \scalebox{0.8}{\psframebox[framearc=.5,
+	  fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
+          \begin{tabular}{@{}c@{}}
+            {a BIG closure}
+      \end{tabular}}}
+      ) \IN  
+      \UNL{2} \!\!$\pi_{10}$:\, (\LET\  \pb\  $\leftarrow$ ($+$\ \pa\ \acdr)
+      \IN
+      \UNL{3}   \hspace*{.05cm}$\pi_{11}$:\,      (\LET\ \pc\
+      $\leftarrow$  (\CONS\ \pb\ \NIL) \IN
+      \UNL{4}   \hspace*{.15cm}    $\pi_{12}$:\,
+      (\LET\ \pw\  $\leftarrow$  (\length\ \pc) \IN   \UNL{5} \hspace*{1.4mm}  $\pi_{13}$:\,
+      (\SRETURN~$\psi_4$:\pw)))))
+  \end{uprogram}}
+  %%}
+  \caption{main program}\label{fig:main-pgm1}
+  \vspace{-10pt}
+\end{wrapfigure}

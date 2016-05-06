@@ -1,0 +1,184 @@
+\added{We circumvent the problem of  undecidability by over approximating the
+CFG by non-deterministic finite state automata (NFA) using the method of 
+Mohri   and   Nederhof~\cite{mohri00regular}}.   This   method
+transforms a CFG $G$ into a strongly  regular grammar $R$ such that $\lang{G} \subseteq \lang{R}$. 
+%%
+If a CFG consists of a set of mutually recursive non-terminals such that the rules involved are not all left regular or not all right regular, then the method breaks the rules into right regular rules by introducing fresh non-terminals. For our example, the rule  $\var{\Df{\length}{1}}$ has two non-regular productions,           $\acdr\var{\Df{\length}{1}}\clazy$          and
+$\clazy\var{\Df{\length}{1}}{\clazy}$.  The steps for transforming these productions into
+right regular productions are:
+
+\begin{enumerate}
+\item
+Add a  new non-terminal  $\varnew{\Df{\length}{1}}$ to the  grammar with
+the rule $\varnew{\Df{\length}{1}} \rightarrow \epsilon$.
+\item
+ Replace     $\var{\Df{\length}{1}}     \rightarrow     \clazy$     by
+ $\var{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
+\item
+ Replace
+ $\var{\Df{\length}{1}} \rightarrow \clazy\var{\Df{\length}{1}}\clazy$
+ by  $\var{\Df{\length}{1}}  \rightarrow  \clazy\var{\Df{\length}{1}}$
+ and \linebreak $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
+\item
+  Replace
+ $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}\clazy$
+ by $\var{\Df{\length}{1}} \rightarrow \acdr\var{\Df{\length}{1}}$ and
+ \linebreak $\varnew{\Df{\length}{1}} \rightarrow \clazy\varnew{\Df{\length}{1}}$
+\end{enumerate}
+
+Mohri and Nederhof~\cite{mohri00regular} provide the generalization of
+these  steps.  The  rules for  
+$\var{\Df{\length}{1}}$ after the transformation are:
+\begin{eqnarray*}              
+  \var{\Df{\length}{1}}   &\rightarrow&   \clazy\varnew{\Df{\length}{1}}
+  \mid                 \acdr\var{\Df{\length}{1}}                 \mid
+  \clazy\var{\Df{\length}{1}}\\  \varnew{\Df{\length}{1}}  &\rightarrow&
+  \clazy\varnew{\Df{\length}{1}} \mid \epsilon
+\end{eqnarray*}
+
+
+
+The strongly regular grammar is converted  into a set of NFAs, one for
+each non-terminal.  The  $\hookrightarrow$ simplification is now
+done on the NFAs by  repeatedly introducing $\epsilon$ edges to bypass
+pairs  of consecutive  edges  labeled \bcar\acar\  or \bcdr\acdr\  and
+\added{constructing  the $\epsilon$-closure  until a  fixed point  is reached},
+after which  the edges labeled  \bcar \  and \bcdr\ are  deleted.  The
+details of the  algorithm, its correctness and  termination proofs are
+given in~\cite{karkare07liveness,asati14lgc}.
+
+\newcommand{\nfaD}{%
+  \scalebox{.70}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(3,-1)(28,9)%\psgrid
+      \putnode{t0}{origin}{2}{1}{} 
+      \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_0$}}}
+      \hspace{5mm} 
+      \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
+      \psset{arrows=->} \ncline{t0}{t1} 
+      \ncline{t1}{t2} 
+      \putnode{l0}{t1}{7}{2}{\clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=2, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{6}{\acdr, \clazy} 
+      \nccurve[angleA=45,
+        angleB=135, ncurv=1.5, nodesep=-1]{t2}{t2} 
+      \putnode{l2}{t2}{0}{7}{\clazy}
+    \end{pspicture}
+}}
+\newcommand{\nfaDF}{%
+  \scalebox{.70}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(3,-1)(28,9)%\psgrid
+      \putnode{t0}{origin}{2}{1}{} 
+      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
+      \hspace{5mm} 
+      \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
+      \psset{arrows=->} \ncline{t0}{t1} 
+      \ncline{t1}{t2} 
+      \putnode{l0}{t1}{7}{2}{\clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{7}{\acdr, \clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t2} 
+      \putnode{l2}{t2}{0}{7}{\clazy}
+    \end{pspicture}
+}}
+\newcommand{\dfaD}{%
+  \scalebox{.70}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(2,-1)(13,9)
+      \putnode{t0}{origin}{2}{1}{}
+      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
+      \psset{arrows=->}    
+      \ncline{t0}{t1}     
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t1}{t1} 
+      \putnode{l1}{t1}{0}{7}{\acdr}
+    \end{pspicture}
+}}
+
+\added{The  resulting   automaton  has   edges  labeled   with  \acar,
+  \acdr\   and  \clazy\   only.   For   our  example,   the  NFA   for
+  \var{\Df{\length}{1}} is  \nfaD.  In this automaton,  for every edge
+  labeled \clazy, we check  if the source node of the  edge has a path
+  to a final state.  If it does, we mark the source node as final. For
+  \var{\Df{\length}{1}}, we get \nfaDF, in which $q_0$ becomes a final
+  state. Finally, we remove all  the edges labeled \clazy\ and convert
+  the  automaton   into  a   deterministic  automaton.    These  steps
+  effectively implement the $\hookrightarrow$ simplification rules for
+  \bcar, \bcdr, and \clazy\ to obtain forward access paths.  The final
+  DFA obtained  for \var{\Df{\length}{1}}  is \dfaD.}   While checking
+for liveness during garbage collection, a forward access path is valid
+only if it can  reach a final state.  This expectedly  says that for a
+demand $\sigma_{\length}$, the liveness of the argument of \length\ is
+$\acdr^{*}$ (the spine of the list is traversed).
+
+
+\newcommand{\dfaE}{%
+  \scalebox{.70}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(0,-2)(35,8)
+     \putnode{t0}{origin}{0}{0}{} 
+     \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_3$}}} 
+     \hspace{5mm} 
+   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_4$}}}
+   \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} 
+   \putnode{l0}{t1}{5}{2}{\clazy}
+   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{$q_5$}}} 
+   \psset{arrows=->} \ncline{t2}{tD1} 
+   \putnode{l1}{t2}{5}{2}{\bcar}
+   \nccurve[angleA=45,angleB=135,ncurv=1.5,nodesep=-1]{tD1}{tD1} 
+   \putnode{lD1}{tD1}{0}{7}{\acdr}
+\end{pspicture} 
+  }}
+
+\newcommand{\dfaF}{%
+  \scalebox{.70}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(3,-2)(24,3)
+     \putnode{t0}{origin}{2}{0}{}
+     \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{$q_3$}}} 
+     \hspace{5mm} 
+     \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_4$}}}
+     \psset{arrows=->} \ncline{t0}{t1} 
+     \ncline{t1}{t2} 
+     \putnode{l0}{t1}{5}{2}{\clazy}
+    \end{pspicture}
+  }
+}
+
+\newcommand{\dfaG}{%
+  \scalebox{.70}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(3,-2)(10,3)
+      \putnode{t0}{origin}{2}{0}{}
+      \putnode{t1}{t0}{7}{0}{\pscirclebox{\mbox{$q_3$}}} 
+      \hspace{1mm} \psset{arrows=->} 
+      \ncline{t0}{t1}
+    \end{pspicture}
+  }
+}
+
+
+%\input{main-pgm1}
+For the main  program in Figure~\ref{fig:mot-example2-a}, the liveness corresponding
+to  the  variable   \var{\Lanv{\pa}{}} at $\pi_{10}$ is given by 
+$\var{\Lanv{\pa}{}} \rightarrow \clazy \bcar \var{\Df{\length}{1}}$.
+The  DFA   corresponding to this grammar is 
+\dfaE. 
+As there is no $\acar$ symbol to cancel the $\bcar$ symbol in the automaton, no 
+$\epsilon$ edges are added and the $\bcar$ edge is deleted to get 
+\dfaF.
+We finally do the $\clazy$ simplification and notice that there is no path to a final state. 
+Thus, we delete the $\clazy$ edge without marking any state as final giving the final automata for 
+$\var{\Lanv{\pa}{}}$ as 
+\dfaG.
+The final automaton does not
+accept any forward paths, reflecting  the lazy nature of our language.
+Since
+\length\ does not  evaluate the elements of  the argument list,
+the  closure for  \pa\ is  never evaluated  and is  reclaimed whenever
+liveness-based GC triggers beyond $\pi_9$.
+
+
+ 
+
+

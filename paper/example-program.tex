@@ -1,46 +1,46 @@
 \begin{figure}[t!]
-\renewcommand{\arraystretch}{1}
-\begin{minipage}{.40\textwidth}
-  \small
-  \renewcommand{\arraystretch}{1}{
-    \begin{uprogram}
-      \UFL(\DEFINE\ (\length~\xl)
-      \UNL{1}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
-      \UNL{2} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
-      $\psi_1\!\!:\,$ \px
-      \UNL{3} \hspace*{.27cm} $\pi_3\!\!:\,
-      $(\LET\ \pv\ $\leftarrow 0$\ \IN \hspace*{1.4mm}$\pi_4\!\!:\,(\SRETURN~\psi_2:\pv)$
-      \UNL{3} \hspace*{.29cm}    $\pi_5\!\!:\, $(\LET~\pu\
-      $\leftarrow$  (\CDR~\xl)  \IN
-      \UNL{4} \hspace*{.34cm}   $\pi_6\!\!:\, $(\LET~\py\
-      $\leftarrow$  (\length~\pu)  \IN
-      \UNL{5} \hspace*{.34cm} $\pi_7\!\!:\,
-      $(\LET~\pz\ $\leftarrow$ (+~1~\py)\ \IN \hspace*{1.4mm} $\pi_8\!\!:\,
-      (\SRETURN~\psi_3:\pz)$)))))))
-  \end{uprogram}}
-  \renewcommand{\arraystretch}{1}{
-    \begin{uprogram}
-      \UFL $(\DEFINE\ (\main)$
-      \UNL{1} \!\!$\pi_9\!\!:\, (\LET\  \pa\  \leftarrow$
-      (
-      \scalebox{0.8}{\psframebox[framearc=.5,
-	  fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
-          \begin{tabular}{@{}c@{}}
-            {a BIG closure}
-      \end{tabular}}}
-      ) \IN  
-      \UNL{2} \!\!$\pi_{10}\!\!:\, (\LET\  \pb\  \leftarrow ($+$\ \pa\ \acdr)$
-      \IN
-      \UNL{3}   \hspace*{.05cm}$\pi_{11}\!\!:\,      $ (\LET\ \pc\
-      $\leftarrow  (\CONS\ \pb\ \NIL)$ \IN
-      \UNL{4}   \hspace*{.15cm}    $\pi_{12}\!\!:\,
-      $(\LET\ \pw\  $\leftarrow  (\length\ \pc)$ \IN  \hspace*{1.4mm}  $\pi_{13}\!\!:\,
-      (\SRETURN~\psi_4:\pw)))))$
-  \end{uprogram}}
-  %%}
-\end{minipage}
+\renewcommand{\arraystretch}{.99}
+\begin{tabular}{@{}l@{}l@{}}\hline
+\begin{uprogram}
+  \UFL(\DEFINE\ (\length~\xl)\rule{0pt}{3.9mm}
+  \UNL{1}  $\pi_1\!\!:\, $(\LET\ \px\ $\leftarrow $\ (\NULLQ~\xl) \IN
+  \UNL{2} \hspace*{.05cm} $\pi_2\!\!:\,$(\SIF\
+  $\psi_1\!\!:\,$ \px
+  \UNL{3} \hspace*{.05cm} $\pi_3\!\!:\,
+  $(\LET\ \pv\ $\leftarrow 0$\ \IN
+  \UNL{4} \hspace*{.05cm}  $\pi_4\!\!:\,(\SRETURN~\psi_2:\pv)$
+  \UNL{3} \hspace*{.05cm}    $\pi_5\!\!:\, $(\LET~\pu\
+  $\leftarrow$  (\CDR~\xl)  \IN
+  \UNL{4} \hspace*{.05cm}   $\pi_6\!\!:\, $(\LET~\py\
+  $\leftarrow$  (\length~\pu)  \IN
+  \UNL{5} \hspace*{.05cm} $\pi_7\!\!:\,
+  $(\LET~\pz\ $\leftarrow$ (+~1~\py)\ \IN 
+  \UNL{6} \hspace*{.05cm} $\pi_8\!\!:\,
+  (\SRETURN~\psi_3:\pz)$)))))))
+\end{uprogram}
+&
+\hspace{-7mm}\begin{uprogram}
+  \UFL (\DEFINE\ (\main)\rule{0pt}{3.9mm}
+  \UNL{1} \!\!$\pi_9$:\, (\LET\  \pa\  $\leftarrow$
+  (
+  \scalebox{0.8}{\psframebox[framearc=.5,
+      fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
+      \begin{tabular}{@{}c@{}}
+        {a BIG closure}
+  \end{tabular}}}
+  ) \IN  
+  \UNL{2} \!\!$\pi_{10}$:\, (\LET\  \pb\  $\leftarrow$ ($+$\ \pa\ \acdr)
+  \IN
+  \UNL{3}   \hspace*{.05cm}$\pi_{11}$:\,      (\LET\ \pc\
+  $\leftarrow$  (\CONS\ \pb\ \NIL) \IN
+  \UNL{4}   \hspace*{.05cm}    $\pi_{12}$:\,
+  (\LET\ \pw\  $\leftarrow$  (\length\ \pc) \IN   
+  \UNL{5} \hspace*{.05cm}  $\pi_{13}$:\,
+  (\SRETURN~$\psi_4$:\pw))))) \\ \\ \\
+\end{uprogram}
+\end{tabular}
+\psline(5.6,-0.15)(3.5,3.4)
 \caption{An example program}\label{fig:mot-example2-a}
 \vspace*{-5mm}
 \end{figure}
-%\vspace*{-3mm}
 

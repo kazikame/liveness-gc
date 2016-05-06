@@ -1,40 +1,39 @@
 %%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
-\psset{xunit=1mm, yunit=.8mm}
+\psset{xunit=.6mm, yunit=.8mm}
 \psset{linewidth=.3mm}
-\begin{pspicture}(0,0)(70,35)
-%  \psframe(0,17)(70,57)
+\begin{pspicture}(0,0)(60,30)
+%  \psframe(0,0)(60,30)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \putnode{o}{origin}{13}{20}{\TwoCells{o1}{o2}}
+  \putnode{o}{origin}{13}{0}{\TwoCells{o1}{o2}}
   \putnode{a}{o}{-10}{-15}{\psframebox{5}}
   \ncline[offsetB=-.5,nodesepB=.1]{*->}{o1}{a}
-  \putnode{y}{o}{-10}{10}{\psframebox[linestyle=none,framesep=.5]{$\px$}}
-  \nccurve[nodesepB=-.2,angleA=330,angleB=120]{->}{y}{o}
-  \aput[-2.5](.4){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
+  \putnode{y}{o}{-10}{12}{\psframebox[linestyle=none,framesep=.5]{$\px$}}
+  \nccurve[nodesepB=-.1,angleA=0,angleB=120]{->}{y}{o}
+  \aput[-2.5](.6){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
 	fillcolor=white]{$\times$}}}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \putnode{c}{o}{25}{4}{\TwoCells{c1}{c2}}
-  \putnode{d}{c}{10}{-10}{\TwoCellsAD{d1}{d2}}
-  \putnode{e}{o}{10}{-15}{\TwoCellsAD{e1}{e2}}
-  \putnode{f}{d}{13}{-12}{\TwoCellsAD{f1}{f2}}
-  \ncline[nodesepB=-.5]{*->}{c2}{d}
-  \ncline[nodesepB=-.5,linewidth=.7]{->}{c2}{d}
+  \putnode{d}{c}{8}{-10}{\TwoCellsAD{d1}{d2}}
+  \putnode{e}{o}{8}{-15}{\TwoCellsAD{e1}{e2}}
+  \putnode{f}{d}{8}{-12}{\TwoCellsAD{f1}{f2}}
+  \ncline[nodesepB=-.1]{*->}{c2}{d}
+  \ncline[nodesepB=-.1,linewidth=.7]{->}{c2}{d}
   \nccurve[ncurv=1,angleA=235,angleB=45]{*->}{c1}{a}
-  \aput[-3.5](.2){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
+  \aput[-2.5](.3){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
 	fillcolor=white]{$\times$}}}
 %  \putnode{g}{e}{-6}{-13}{\TwoCellsAD{g1}{g2}}
-  \nccurve[nodesepB=-.5,angleA=240,angleB=30]{*->}{d1}{e}
+  \nccurve[nodesepB=-.1,angleA=240,angleB=30]{*->}{d1}{e}
   \aput[-2.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,fillstyle=solid,
 	fillcolor=white]{$\times$}}}
   \ncline[angleA=300,angleB=110]{*->}{d2}{f}
   \ncline[angleA=300,angleB=110,linewidth=.7]{->}{d2}{f}
-  \putnode{w}{c}{-8}{11}{\psframebox[linestyle=none,framesep=.2]{$\pz$}}
-  \putnode{ww}{c}{30}{-5}{\psframebox[linestyle=none,framesep=.2]{$\py$}}
-  \nccurve[nodesepB=-.2,angleA=330,angleB=120,linewidth=.7]{->}{w}{c}
+  \putnode{w}{c}{-15}{8}{\psframebox[linestyle=none,framesep=.2]{$\pz$}}
+  \putnode{ww}{c}{12}{8}{\psframebox[linestyle=none,framesep=.2]{$\py$}}
+  \nccurve[nodesepB=-.2,angleA=0,angleB=120,linewidth=.7]{->}{w}{c}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \ncline[offsetB=-.5,nodesepB=.1]{*->}{o2}{e}
-  %\ncline[offsetB=-.1,nodesepB=-.2]{*->}{e1}{g}
-  \nccurve[nodesepB=-.3,angleA=270,angleB=90,offsetB=.5]{->}{ww}{f}
-  \aput[-3.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
+  \nccurve[angleA=270,angleB=90,offsetB=2.5]{->}{ww}{f}
+  \aput[-2.5](.5){\scalebox{1.2}{\psframebox[framesep=.2,linestyle=none,
         fillstyle=solid, fillcolor=white]{$\times$}}}
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{pspicture}

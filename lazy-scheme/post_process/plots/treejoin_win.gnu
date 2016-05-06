@@ -1,14 +1,14 @@
 
 
 # for colored graphs, uncomment next line
-set terminal postscript dashed color portrait "Helvetica" 16
+set terminal postscript dashed color portrait "NimbusSanL-Regu" 16
 # else, for black & white graphs in paper, uncomment next line
-#set terminal postscript portrait butt "Helvetica" 16
+#set terminal postscript portrait butt "NimbusSanL-Regu" 16
 #set terminal size 1300,600
 
 set size ratio 0 1, .33
 
-set xlabel "treejoin*"
+set xlabel "treejoin (partial)"
 set border 3 lw 0
 
 set output "treejoin_win.eps"
