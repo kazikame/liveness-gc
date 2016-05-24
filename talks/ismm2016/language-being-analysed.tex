@@ -1,0 +1,29 @@
+
+\small
+\begin{eqnarray*}
+   p \in \mathit{Prog} & ::= & d_1 \ldots d_n \,\, e_\mainpgm \\
+    d \in Fdef & ::= & (\DEFINE\,\, (f\,\, 
+    x_1 \,\, \ldots \,\, x_n)\,\,
+    e) 
+    \hspace{1.7em} \mbox{} \\
+e \in \mathit{Expr} & ::= &
+\left\{\begin{array}{lll}
+       (\SIF\,\, x\,\, e_1\,\, e_2) && \mbox{} \\  
+       (\LET\,\, x \leftarrow a\,\, \IN\,\, e) && \mbox{} \\
+       (\RETURN\,\, x) && \mbox{}
+    \end{array}\right. \\
+a \in \mathit{App} & ::= &
+\left\{\begin{array}{lrl}
+       k && \mbox{}\\
+       (\CONS\,\, {x_1}\,\, {x_2}) && \mbox{} \\ 
+       (\CAR\,\, {x)} &  (\CDR\,\, {x)} & \mbox{} \\ 
+       (\NULLQ\,\, {x}) & (\PRIM\,\, {x_1}\,\, {x_2}) & \mbox{} \\ 
+%        (\NULLQ\,\, x) && \mbox{\em ---  tester} \\ 
+%       (\ID\,\, x) && \mbox{\em ---  identity function (for inlining)} \\ 
+%        (\PRIM\,\, x_1\,\, x_2) && \mbox{\em --- generic arithmetic} \\ 
+       \multicolumn{2}{l}{(f\,\,{ x_1}\,\,\ldots\,\, {x_n})} 
+            & \mbox{} 
+    \end{array}\right.
+\end{eqnarray*}
+
+

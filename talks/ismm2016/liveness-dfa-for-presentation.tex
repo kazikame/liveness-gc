@@ -1,0 +1,309 @@
+\newcommand{\iapp}
+{\scalebox{0.75}{
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,0)(100,20)
+%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(5,2)
+\putnode{dfa}{origin}{15}{5}
+{
+\begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+[linecolor=white]\var{\Uf{\append}{1}} & [mnode=circle,doubleline=true]\mbox{\ \ \ \ }
+\end{psmatrix}
+\psset{arrows=->}
+\ncline{1,1}{1,2}
+\nccircle[angleA=0]{1,2}{.4cm}
+\bput(.5){\tt {\acdr}}
+}
+\end{pspicture}
+}}
+
+
+\newcommand{\dapp}
+{\scalebox{0.75}{
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,0)(100,20)
+%psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(6.4,2)
+\putnode{dfa}{origin}{31}{5}
+{
+\begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+[linecolor=white]\var{\Df{\append}{1}} & 
+[mnode=circle]\mbox{\ \ \ \ }
+& [mnode=circle]\mbox{\ \ \ \ }
+& [mnode=circle,doubleline=true]\mbox{\ \ \ \ } 
+\end{psmatrix}
+\psset{arrows=->}
+\ncline{1,1}{1,2}
+\nccircle[angleA=0]{1,2}{.4cm}
+\bput(.5){\tt {\acdr}}
+\ncline{1,2}{1,3}
+\aput(.5){\tt {\acar}}
+\ncline{1,3}{1,4}
+\aput(.5){\tt {\bcar}}
+\nccircle[angleA=0]{1,4}{.4cm}
+\bput(.5){\tt {\bcdr}}
+}
+\end{pspicture}
+}}
+%\dapp 
+
+\newcommand{\lny}
+           {\scalebox{.75}
+             {
+               \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+               \begin{pspicture}(0,0)(100,40)
+%                 \psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(12,3.4)
+                 \putnode{dfa}{origin}{60}{14}
+                         {
+                           \begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+                             & &[mnode=circle,doubleline=true]\mbox{\ \ \ \ } & & & & &  \\ 
+                             [linecolor=white]\var{\Lanv{9}{y}} & [mnode=circle]\mbox{\ \ \ \ } & & & & & & \\
+                             & & [mnode=circle]\mbox{\ \ \ \ } & [mnode=circle]\mbox{\ \ \ \ }& [mnode=circle,doubleline=true]\mbox{\ \ \ \ }& [mnode=circle,doubleline=true]\mbox{\ \ \ \ }& [mnode=circle,doubleline=true]\mbox{\ \ \ \ }& [mnode=circle,doubleline=true]\mbox{\ \ \ \ }
+                           \end{psmatrix}
+                           \psset{arrows=->}
+                           \ncline[linestyle=dashed]{2,1}{2,2}
+                           \nccurve[angleA=45, angleB=180]{2,2}{1,3}
+                           \aput(.5){$\epsilon$}
+                           \nccurve[angleA=-45, angleB=180]{2,2}{3,3}
+                           \bput(.5){$\epsilon$}
+                           \ncline{3,3}{3,4}
+                           \aput(.5){\acar}
+                           \ncline{3,4}{3,5}
+                           \aput(.5){\bcar}
+                           \ncline{3,5}{3,6}
+                           \aput(.5){$\epsilon$}
+                           \ncline{3,6}{3,7}
+                           \aput(.5){\acdr}
+                           \ncline{3,7}{3,8}
+                           \aput(.5){\acar}
+                           \nccircle[angleA=0]{1,3}{.4cm}
+                           \bput(.5){\tt {\acdr}}
+                           \nccircle[angleA=0]{3,3}{.4cm}
+                           \bput(.5){\tt {\acdr}}
+                           \nccircle[angleA=0]{3,5}{.4cm}
+                           \bput(.5){\tt {\bcdr}}
+                           \nccircle[angleA=0]{3,8}{.4cm}
+                           \bput(.5){\tt {\acar/\acdr}}
+                           
+                           
+                         }
+               \end{pspicture}
+             }
+           }
+
+\newcommand{\lnyone}
+{\scalebox{.75}{
+    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+    \begin{pspicture}(0,0)(100,40)
+      %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(12,3.4)
+      \putnode{dfa}{origin}{60}{14}
+              {
+                \begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+                  [linecolor=white]\var{\Lanv{9}{y}} & 
+                  [mnode=circle,doubleline=true]\mbox{\ $q_0$} &
+                  [mnode=circle]\mbox{\ $q_1$ }&
+                  [mnode=circle,doubleline=true]\mbox{\ $q_2$} & 
+                  [mnode=circle,doubleline=true]\mbox{\ $q_3$ }& 
+                  [mnode=circle,doubleline=true]\mbox{\ $q_4$}
+                \end{psmatrix}
+                \psset{arrows=->}
+                \ncline[linestyle=dashed]{1,1}{1,2}
+                \ncline{1,2}{1,3}
+                \aput(.5){\tt {\acar}}
+                \ncline{1,3}{1,4}
+                \aput(.5){\tt {\bcar}}
+                \ncline{1,4}{1,5}
+                \aput(.5){\tt {\acdr}}
+                \ncline{1,5}{1,6}
+                \aput(.5){\tt {\acar}}
+                \nccircle[angleA=0]{1,2}{.4cm}
+                \bput(.5){\tt {\acdr}}
+                \nccircle[angleA=0]{1,4}{.4cm}
+                \bput(.5){\tt {\bcdr}}
+                \nccircle[angleA=0]{1,6}{.4cm}
+                \bput(.5){\tt {\acar/\acdr}}
+              }
+    \end{pspicture}
+  }
+}
+%\lnyone
+
+
+
+\newcommand{\lnytwo}
+{\scalebox{.75}{
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,0)(100,40)
+%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(12,3.4)
+\putnode{dfa}{origin}{60}{14}
+{
+\begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+[linecolor=white]\var{\Lanv{9}{y}} & 
+[mnode=circle,doubleline=true]\mbox{\ $q_0$} &
+[mnode=circle]\mbox{\ $q_1$}&
+[mnode=circle,doubleline=true]\mbox{\ $q_2$ } & 
+[mnode=circle,doubleline=true]\mbox{\ $q_3$}& 
+[mnode=circle,doubleline=true]\mbox{\ $q_4$}
+\end{psmatrix}
+\psset{arrows=->}
+\ncline[linestyle=dashed]{1,1}{1,2}
+\ncline{1,2}{1,3}
+\aput(.5){\tt {\acar}}
+\ncline{1,3}{1,4}
+\aput(.5){\tt {\bcar}}
+\ncline{1,4}{1,5}
+\aput(.5){\tt {\acdr}}
+\ncline{1,5}{1,6}
+\aput(.5){\tt {\acar}}
+\nccircle[angleA=0]{1,2}{.4cm}
+\bput(.5){\tt {\acdr}}
+\nccircle[angleA=0]{1,4}{.4cm}
+\bput(.5){\tt {\bcdr}}
+\nccircle[angleA=0]{1,6}{.4cm}
+\bput(.5){\tt {\acar/\acdr}}
+\onslide<3->{\red {\nccurve[angleA=-60, angleB=-120,linecolor=red]{1,4}{1,5}
+\aput(.5){$\epsilon$}}}}
+\end{pspicture}
+}}
+%\lnytwo
+
+
+
+\newcommand{\lnythree}
+{\scalebox{.75}{
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,0)(100,40)
+%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(12,3.4)
+\putnode{dfa}{origin}{60}{14}
+{
+\begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+[linecolor=white]\var{\Lanv{9}{y}} & 
+[mnode=circle,doubleline=true]\mbox{\ $q_0$} &
+[mnode=circle]\mbox{\ $q_1$}&
+[mnode=circle,doubleline=true]\mbox{\ $q_5$} & 
+[mnode=circle,doubleline=true]\mbox{\ $q_2$}
+\end{psmatrix}
+\psset{arrows=->}
+\ncline[linestyle=dashed]{1,1}{1,2}
+\ncline{1,2}{1,3}
+\aput(.5){\tt {\acar}}
+\ncline{1,3}{1,4}
+\aput(.5){\tt {\bcar}}
+\ncline{1,4}{1,5}
+\aput(.5){\tt {\acar}}
+\nccircle[angleA=0]{1,2}{.4cm}
+\bput(.5){\tt {\acdr}}
+\nccircle[angleA=0]{1,4}{.4cm}
+\bput(.5){\tt {\acdr/\bcdr}}
+%\nccircle[angleA=180]{1,4}{.4cm}
+%\aput(.5){\tt {\acdr}}
+\nccircle[angleA=0]{1,5}{.4cm}
+\bput(.5){\tt {\acar/\acdr}}
+\onslide<5->
+{\nccurve[angleA=-60, angleB=-120, linecolor=red]{1,3}{1,5}
+\aput(.5){{\red $\epsilon$}}}}
+\end{pspicture}
+}}
+%\lnythree
+
+
+
+\newcommand{\lnyfour}
+{\scalebox{.75}{
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,0)(100,40)
+%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(12,3.4)
+\putnode{dfa}{origin}{60}{14}
+{
+\begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+[linecolor=white]\var{\Lanv{9}{y}} & 
+[mnode=circle,doubleline=true]\mbox{\ $q_0$} &
+[mnode=circle,doubleline=true]\mbox{\ $q_6$} & 
+[mnode=circle,doubleline=true]\mbox{\ $q_5$}
+\end{psmatrix}
+}
+\psset{arrows=->}
+\ncline[linestyle=dashed]{1,1}{1,2}
+\ncline{1,2}{1,3}
+\aput(.5){\tt {\acar}}
+\onslide<6-7>{\ncline{1,3}{1,4}}
+\onslide<6>{\aput(.5){\tt {\bcar}}}
+\onslide<7>{{\red{\aput(.5){\tt {\bcar}}}}}
+
+
+
+
+\nccircle[angleA=0]{1,2}{.4cm}
+\bput(.5){\tt {\acdr}}
+\nccircle[angleA=0]{1,4}{.4cm}
+\onslide<6>{\bput(.5){\acdr/\bcdr}}
+\onslide<7>{\bput(.5){\acdr/{\red{\bcdr}}}}
+\onslide<8->{\bput(.5){\acdr}}
+\nccircle[angleA=0]{1,3}{.4cm}
+\bput(.5){\acar/\acdr}
+\nccurve[angleA=-120, angleB=-60]{1,4}{1,3}
+\aput(.5){\acar}
+\end{pspicture}}}
+
+%\lnyfour
+
+\newcommand{\lnyfive}
+{\scalebox{.75}{
+\psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+\begin{pspicture}(0,0)(100,40)
+%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(12,3.4)
+\putnode{dfa}{origin}{60}{14}
+{
+\begin{psmatrix}[colsep=.5cm,rowsep=.1cm,emnode=none,framesep=1mm]
+[linecolor=white]\var{\Lanv{9}{y}} & 
+[mnode=circle,doubleline=true]\mbox{\ $q_0$} &
+[mnode=circle,doubleline=true]\mbox{\ $q_6$} 
+%[mnode=circle,doubleline=true]\mbox{\ $q_5$}
+\end{psmatrix}
+}
+\psset{arrows=->}
+\ncline[linestyle=dashed]{1,1}{1,2}
+\ncline{1,2}{1,3}
+\aput(.5){\tt {\acar}}
+%\ncline{1,3}{1,4}
+%\aput(.5){\tt {\bcar}}
+\nccircle[angleA=0]{1,2}{.4cm}
+\bput(.5){\tt {\acdr}}
+%\nccircle[angleA=0]{1,4}{.4cm}
+%\bput(.5){\acdr,\bcdr}
+\nccircle[angleA=0]{1,3}{.4cm}
+\bput(.5){\acar/\acdr}
+%\nccurve[angleA=-120, angleB=-60]{1,4}{1,3}
+%\aput(.5){\bcar}
+\end{pspicture}
+
+}}
+%\lnyfive
+
+\begin{figure}[t]
+\begin{center}
+{\scalebox{.75}{
+             {\psset{unit=1mm}
+               \begin{pspicture}(0,0)(120,86)
+%                 \psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(12,8.6)
+                %% \putnode{n0}{origin}{40}{81}{\iapp}
+                %% \putnode{l1}{n0}{-25}{-10}{(a)}
+                %% \putnode{n1}{n0}{56}{0}{\dapp}
+                %% \putnode{l2}{l1}{74}{0}{(b)}
+                 \onslide<1->{\putnode{n2}{origin}{45}{71}{\lny}}
+%                 \putnode{l2}{n2}{12}{-18}{(c)}
+                 \onslide<2->{\putnode{n3}{n2}{-29}{-30}{\lnytwo}}
+%                 \onslide<3->{\putnode{n3}{n2}{-29}{-30}{\lnytwo}}
+
+%                 \putnode{l3}{n3}{12}{-12}{(d)}
+                 \onslide<4->{\putnode{n4}{n3}{68}{0}{\lnythree}}
+%                 \putnode{l4}{l3}{60}{0}{(e)}
+                 \onslide<6->{\putnode{n5}{n3}{-6}{-30}{\lnyfour}}
+%                 \putnode{l5}{n5}{12}{-15}{(f)}
+                 \onslide<9->{\putnode{n6}{n5}{64}{0}{\lnyfive}}
+%                 \putnode{l6}{l5}{46}{0}{(g)}   
+%                 \putnode{n7}{n6}{36}{0}{\lnyfive}
+%                 \putnode{l7}{l6}{36}{0}{(h)}   
+               \end{pspicture}
+             }}}
+   \end{center}
+ \end{figure}
+

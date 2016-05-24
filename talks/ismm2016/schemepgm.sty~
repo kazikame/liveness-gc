@@ -1,0 +1,79 @@
+%%%%    Environment program for typesetting programs in Scheme
+%%%%    Can typeset programs with/without line numbers. 
+%%%%    Developed by Amey Karkare (karkare@cse.iitb.ac.in)
+%%%%    Based on flexiprogram.sty, by Uday Khedker (uday@cse.iitb.ac.in)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\protect{\newlength{\TAL}}
+\settowidth{\TAL}{T}
+\protect{\newcounter{programline}}
+\newcommand{\DEFINE}{\mbox{$\mathbf{define}$}}
+\newcommand{\CONS}{\mbox{$\mathbf{cons}$}}
+\newcommand{\CAR}{\mbox{$\mathbf{car}$}}
+\newcommand{\CDR}{\mbox{$\mathbf{cdr}$}}
+\newcommand{\SIF}{\mbox{$\mathbf{ if}$}} % scheme if
+\newcommand{\LET}{\mbox{$\mathbf{ let}$}}
+\newcommand{\NIL}{\mbox{$\mathbf{ nil}$}}
+\newcommand{\BEGIN}{\mbox{$\mathbf{begin}$}}
+\newcommand{\LIST}{\mbox{$\mathbf{ list}$}}
+\newcommand{\NULLQ}{\mbox{$\mathbf{ null?}$}}
+\newcommand{\PAIRQ}{\mbox{$\mathbf{ pair?}$}}
+\newcommand{\PRIM}{\mbox{$\mathbf{ +}$}}
+\newcommand{\IN}{\mbox{$\mathbf{ in}$}}
+\newcommand{\RETURN}{\mbox{$\mathbf{ return}$}}
+\newcommand{\LCOMMENT}[1]{;; \protect{#1}}
+\newcommand{\RCOMMENT}[1]{\hfill ;; \protect{#1}}
+\newcommand{\FLCOMMENT}[1]{/$\star$ \protect{#1} \ $\star$/ \hfill}
+
+%\newcommand{\listc}{\mbox{\sf lst}}
+
+\newcommand{\xtl}{\mbox{\tt tl}}
+\newcommand{\xrec}{\mbox{\tt rec}}
+\newcommand{\xhd}{\mbox{\tt hd}}
+\newcommand{\xlen}{\mbox{\tt len}}
+\newcommand{\xans}{\mbox{\tt ans}}
+\newcommand{\xl}{\mbox{\tt l}}
+\newcommand{\xtest}{\mbox{\tt test}}
+\newcommand{\xone}{\mbox{\tt one}}
+
+
+
+\newcommand{\pa}{\mbox{\tt a}}
+\newcommand{\pb}{\mbox{\tt b}}
+\newcommand{\pc}{\mbox{\tt c}}
+\newcommand{\px}{\mbox{\tt x}}
+\newcommand{\py}{\mbox{\tt y}}
+\newcommand{\pz}{\mbox{\tt z}}
+\newcommand{\pw}{\mbox{\tt w}}
+\newcommand{\pf}{\mbox{\tt f}}
+\newcommand{\pg}{\mbox{\tt g}}
+
+\newcommand{\pthree}{\mbox{\tt 3}}
+\newcommand{\pfour}{\mbox{\tt 4}}
+\newcommand{\pfive}{\mbox{\tt 5}}
+\newcommand{\psix}{\mbox{\tt 6}}
+\newcommand{\ptwo}{\mbox{\tt 2}}
+\newcommand{\pone}{\mbox{\tt 1}}
+\newcommand{\append}{\ensuremath{\mathbf{append}}}
+\newcommand{\xmain}{\ensuremath{\mathbf{main}}}
+\newcommand{\set}{\ensuremath{\mathbf{set{\mbox{\rm \bf !}}}}}
+\newcommand{\setcar}{\ensuremath{\mathbf{set{\mbox{\rm \bf -}}car{\mbox{\rm \bf !}}}}}
+\newcommand{\setcdr}{\ensuremath{\mathbf{set{\mbox{\rm \bf -}}cdr{\mbox{\rm \bf !}}}}}
+
+%%% for program with line number
+\newcommand{\NL}[1]{\\ \refstepcounter{programline}\theprogramline.\ \ 
+& \hspace*{#1\TAL}
+}
+\newcommand{\FL}{&}
+\newenvironment{scmprogram}[1]{%
+  \begin{center}\protect\setcounter{programline}{#1}
+    \begin{tabular}{|r@{. \ }l|} 
+      \hline}{%
+  \rule[-8pt]{0pt}{12pt}\\ \hline \end{tabular}
+  \end{center}
+}
+
+%%% for program without line number
+\newcommand{\UNL}[1]{\\ & \hspace*{#1\TAL}
+}
+\newcommand{\UFL}{ & }
+\newenvironment{uprogram}{\begin{tabular}{@{}r@{}l@{}}}{\\\end{tabular}}
