@@ -1,0 +1,41 @@
+\begin{columns}[c]
+ \begin{column}[T]{0.4\textwidth}
+\hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
+	  \begin{uprogram}
+	  \UNL{1}\hspace*{-.2cm} $\pi_\mainpgm\!\!:\, $(\LET\  \pz\  $\leftarrow$ \ldots  \IN
+	  \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\SIF\ $*$
+          \UNL{3}   \hspace*{-.35cm} $\pi_{10}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\plength\ \pz) \IN
+          \UNL{4}   \hspace*{-.38cm}  $\pi_{11}\!\!:\, $(\RETURN\ \pw) 
+	  \UNL{3}   \hspace*{-.35cm}  $\pi_{12}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN
+          \UNL{4}   \hspace*{-.38cm} $\pi_{13}\!\!:\,$(\RETURN\ \pb))))))
+\end{uprogram}}
+ \end{column}
+ \begin{column}[T]{0.68\textwidth}
+\hspace*{.4cm}  \renewcommand{\arraystretch}{1}{
+  \begin{uprogram}
+    \UNL{1} (\DEFINE\ (\plength~\lista)
+
+    \UNL{2}  $\pi_1\!\!:\, $(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN
+
+
+    \UNL{3}     $\pi_2\!\!:\, $(\SIF\ \xtest
+
+~$\pi_3\!\!:$(\RETURN\ $0$) 
+ 
+          \UNL{4} \hspace*{-.05cm}    
+ $\pi_4\!\!:\, $(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN
+
+	  \UNL{5}  \hspace*{-.05cm}
+          $\pi_5\!\!:\,$(\LET\ \xrec\  $\leftarrow$ (\plength\ \ \xtl\ ) \IN
+
+
+          \UNL{6} \hspace*{-.05cm}   $\pi_6\!\!:\, $(\LET\ \xhd\  $\leftarrow$  $1$)  \IN
+
+
+          \UNL{7}  \hspace*{-.05cm}   $\pi_7\!\!:\,$(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN 
+
+          \UNL{8} \hspace*{-.05cm}
+$\pi_8\!\!:\, $ (\RETURN\ \xans)))))))
+\end{uprogram}}
+ \end{column}
+\end{columns}

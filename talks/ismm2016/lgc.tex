@@ -61,13 +61,14 @@
        {\bf Amey Karkare}\\{\it Indian Institute of Technology, Kanpur}
 }
 
-\date{
-	%% \begin{tikzpicture}[decoration=Koch curve type 2] 
-	%% 	\draw[DeepSkyBlue4] decorate{ decorate{ decorate{ (0,0) -- (3,0)}}}; 
-	%% \end{tikzpicture}  
-	%% \\
-	June 14th, 2016
-}
+%% \date{
+%% 	%% \begin{tikzpicture}[decoration=Koch curve type 2] 
+%% 	%% 	\draw[DeepSkyBlue4] decorate{ decorate{ decorate{ (0,0) -- (3,0)}}}; 
+%% 	%% \end{tikzpicture}  
+%% 	%% \\
+%% 	June 14th, 2016
+%% }
+\date{\today}
 \titlepage
 \end{frame}
 
@@ -111,9 +112,7 @@
 
 \bigskip
 \begin{itemize}
-\item<1->{\em   Though    all   cells   are    reachable   at
-  \rnode{A}{\red{$\pi$}},  a liveness-based  GC  will retain
-  only  the cells  pointed by  thick  arrows.}  
+\item<1->{\em  Expression $(+\ 5\ 2)$ never gets evaluated and $(+\ 4\ 5)$ gets evaluated only if $*$ is false.}  
 \end{itemize}
 \end{frame}
 
@@ -167,79 +166,6 @@
   \end{itemize}
 \item Every expression is evaluated at most once
 \end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Laziness:  Example}
-\small
-\begin{columns}
-\begin{column}[T]{.45\textwidth}
-  \renewcommand{\arraystretch}{1.1}{
-    \begin{uprogram}
-      \UFL (\DEFINE\ (\length~\xl)
-      \UNL{1} (\SIF\  (\NULLQ~\xl)
-      \UNL{2}  \RETURN~0
-      \UNL{2}  \RETURN~(+ 1 (\length~(\CDR~\xl)))))
-  \end{uprogram}}
-\end{column}
-\begin{column}[T]{0.45\textwidth}
-\renewcommand{\arraystretch}{1.1}{
-  \begin{uprogram}
-    \UFL (\DEFINE\ ($\mainpgm$)
-    \UNL{1}  (\LET\  \pa\  $\leftarrow$
-    (
-    \scalebox{0.8}{\psframebox[framearc=.5,
-        fillcolor=lightgray,fillstyle=solid,framesep=2pt]{%
-        \begin{tabular}{@{}c@{}}
-          {a BIG closure}
-        \end{tabular}}}
-    ) \IN 
-    \UNL{2} (\LET\  \pb\  $\leftarrow$ ($+$\ \pa\ \acdr) \IN
-    \UNL{3}   (\LET\ \pc\ $\leftarrow$  (\CONS\ \pb\ \NIL) \IN
-    \UNL{4}     (\LET\ \pw\  $\leftarrow$  (\length\ \pc) \IN
-    \UNL{5}     (\RETURN~\pw))))))
-  \end{uprogram}
-}
-\end{column}
-\end{columns}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Handling lazy semantics: Challenges}
-\normalsize
-  \begin{itemize}\itemsep2em
-  \item Laziness complicates liveness analysis itself. 
-    \begin{itemize}
-    \item Data is made live by evaluation of closures
-    \item In lazy languages, the place in the program
-      where this evaluation takes place cannot be statically determined
-    \end{itemize}
-    \pause
-  \item Liveness-based garbage collector significantly more complicated than that for an eager language.
-    \begin{itemize}
-    \item Need to track liveness of closures
-    \item But a closure can escape the scope in which it was created
-    %% \item Solution: carry the liveness information in the closure itself
-    %% \item For precision: need to update the liveness information as execution progresses
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Handling possible non-evaluation}
-  \begin{itemize}
-  \item Liveness no longer remains independent of demand $\sigma$ \\
-    \begin{itemize}
-    \item If (\CAR~\px) is not evaluated at all, it does not generate any liveness for \px
-    \end{itemize}
-  \item Require a new terminal \clazy\ with following semantics
-    \begin{align*}
-      \clazy\sigma \hookrightarrow & \left\{ 
-      \begin{array}{ll}
-        \emptyset&\mbox{if}~\sigma = \emptyset\\
-        \{\epsilon\} & \mbox{otherwise}
-      \end{array}\right.\\ & \\
-      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
-    \end{align*}
-  \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -306,20 +232,6 @@
   which we call $\sigma_{all}$.
 \item The demands on each function body, $\sigma_f$, have to be computed.
   \end{itemize}
-
-
-
-%% \bigskip
-
-%% \begin{columns}
-%%   \begin{column}{0.55\textwidth}
-%% \centerline{$\sigma_{all} =  (0+1)^*$}
-%% \input{demand-example}
-%%   \end{column}
-%%   \begin{column}{0.55\textwidth}
-%%  
-%%   \end{column}
-%% \end{columns}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -477,6 +389,11 @@ in classical dataflow analysis for imperative languages.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+
+\begin{frame}{Liveness Analysis of User Defined Functions}
+  \input{sample-liveness-program}
+\end{frame}
+
 \begin{frame}{Liveness Analysis of Function Applications}
 \onslide<1->{
   \begin{columns}[c]
@@ -615,16 +532,12 @@ $\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}\onslide<1->{)}
 	\onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
           \sigma{_{all}}$}}
 	\onslide<2-5>{\putnode{call1}{origin}{38}{62}{\large\red $\sigma_1$} 
-%$\{\epsilon, \; \acdr\} \cup    \acdr\acar\sigma_{all}$}
 	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{o}{call1}}
 	\onslide<3-5>{\putnode{appendentry}{origin}{85}{72}{\large\red
           $\sigma_{\append} = \sigma_1 \cup \only<3-4>{\ldots} 
-%\{\epsilon, \; \acdr\} \cup  \acdr\acar\sigma_{all} 
 \only<5->{\sigma_2}$}
-%{ \cup  \bcdr\sigma_{\append}}$}
 	\nccurve[nodesepB=-.2,angleA=45,angleB=165,linecolor=red]{->}{call1}{appendentry}}
 	\onslide<4-5>{\putnode{call2}{origin}{115}{52}{\large\red $\sigma_2$} 
-%$\bcdr\sigma_{\append}$}
 	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{appendentry}{call2}}
 	\onslide<5-5>{\nccurve[nodesepB=-.2,angleA=65,angleB=0,linecolor=red]{->}{call2}{appendentry}}
 
@@ -642,17 +555,9 @@ $\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}\onslide<1->{)}
 $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
 $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
 $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
-%% \Lanv{5}{\lista} &= \{\epsilon\} \cup  \acar\bcar\sigma_{\append}\\
-%% \Lanv{5}{\xtl} &= \Lf{\append}{1}{\bcdr\sigma_{\append}}\\
-%% \Lanv{5}{\listb} &= \Lf{\append}{2}{\bcdr\sigma_{\append}}\\
 \ldots\\
-%% $\mbox{Program}\;  & \mbox{points in \mainpgm}\\ 
 $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
      \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
-%%   \Lanv{9}{\pz}  &= \Lf{\append}{2}{\{\epsilon,
-%%     \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}}\\$
-
-
  \end{column}
  \begin{column}[T]{0.30\textwidth}
 \scriptsize
@@ -660,9 +565,7 @@ $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
 \onslide<6>{
 \begin{align*}
 &\sigma_{\xmain} = \sigma_{all}\\
-&\sigma_{\append} = \{\epsilon, \; \acdr\} \cup
-\acdr\acar\sigma_{all}\\
-&\;\;\;\;\;  \cup  \bcdr\sigma_{\append}
+&\sigma_{\plength} = \sigma_{all} \cup \clazy\sigma_{\plength}
 \end{align*}
 }
  \end{column}
@@ -670,10 +573,7 @@ $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
 \scriptsize
 \centerline{\bf Function summaries:}
 \bigskip
-$\Lf{\append}{1}{\sigma} = \{\epsilon\} \cup \acar\bcar\sigma ~
-\cup$ \\ 
-$ \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma}$\\ \ \\
-$\Lf{\append}{2}{\sigma} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma}$
+$\Lf{\plength}{1}{\sigma} = \{\clazy\sigma\} \cup \Lf{\plength}{1}{\acdr\sigma}$
  \end{column}
 \end{columns}
 \end{frame}
@@ -788,7 +688,43 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\begin{frame} {Handling possible non-evaluation}
+  \begin{itemize}
+  \item Liveness no longer remains independent of demand $\sigma$ \\
+    \begin{itemize}
+    \item If (\CAR~\px) is not evaluated at all, it should not generate any liveness for \px
+    \end{itemize}
+  \item Require a new terminal \clazy\ with following semantics
+    \begin{align*}
+      \clazy\sigma \hookrightarrow & \left\{ 
+      \begin{array}{ll}
+        \emptyset&\mbox{if}~\sigma = \emptyset\\
+        \{\epsilon\} & \mbox{otherwise}
+      \end{array}\right.\\ & \\
+      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
+    \end{align*}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Handling lazy semantics: Closures}
+\normalsize
+  \begin{itemize}\itemsep2em
+  \item Laziness complicates liveness analysis itself. 
+    \begin{itemize}
+    \item Data is made live by evaluation of closures
+    \item In lazy languages, the place in the program
+      where this evaluation takes place cannot be statically determined
+    \end{itemize}
+    \pause
+  \item Liveness-based garbage collector significantly more complicated than that for an eager language.
+    \begin{itemize}
+    \item Need to track liveness of closures
+    \item But a closure can escape the scope in which it was created
+     \item Solution: carry the liveness information in the closure itself
+     \item For precision: need to update the liveness information as execution progresses
+    \end{itemize}
+  \end{itemize}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Working of Liveness-based GC (Mark phase)}
   \begin{itemize}
@@ -832,12 +768,6 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{GC decision problem}
-
-%% Let $x.\alpha$ be  a forward  access path.     Let
-%% $\mathscr{L}(\Lanv{}{x})  \stackrel{*}\hookrightarrow  \sigma$,  where
-%% $\sigma$ consists of forward access  paths only. Then does $\alpha \in
-%% \sigma$?
-%% \bigskip \pause
 \begin{itemize}
 \item Deciding the
   membership in  a CFG augmented  with a
@@ -846,7 +776,7 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
     \bcar\acar    \rightarrow    \epsilon\\
     \bcdr\acdr    \rightarrow   \epsilon\\
   \end{align*}
-\item The problem shown to be undecidable\footnote{ Prasanna, Sanyal, and Karkare. {\em Liveness-Based Garbage Collection for Lazy Languages}, under review.}.
+\item The problem shown to be undecidable
   \begin{itemize}
   \item Reduction from Halting problem.
   \end{itemize}
@@ -932,17 +862,14 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \only<1>{
 \hspace*{-1cm}\centerline{\epsfig{file=nqueens.eps, height=6.5cm}}
 }
-%% \only<2>{
-%% \hspace*{-1cm}\centerline{\epsfig{file=fibheap.eps, height=6.5cm}}
-%%}
+
 \only<1>{      \raisebox{0mm}{\scalebox{1}{
 	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
       \psset{unit=1mm}
       \psset{linewidth=.3mm}
       \begin{pspicture}(0,0)(110,0)
 
-%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(13,9)
-	%\psframe(0,0)(73,60)
+
 
 
 \putnode{activel}{origin}{90}{77}{\scriptsize Cells in active semi-space (LGC)}
@@ -964,317 +891,6 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %******
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Results as Tables}
-
-\centering
-\hspace*{-1.5cm}
-\only<1>
-{
-\bigskip
-
-{\bf Analysis Performance:}
-
-\bigskip
-
-
-\scalebox{.75}
-{\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|}
-\hline
-{Program} & {\sf sudoku} & {\sf lcss} & {\sf gc\_bench}     & {\sf knightstour} &
-{\sf treejoin} & {\sf nqueens} & {\sf lambda}\\
-\hline
-\hline
-{Time (msec)}   &120.95 &2.19 &0.32  &3.05 &2.61 &0.71&20.51\\
-{DFA size}      &4251   &726 &258  &922 &737 &241      & 732 \\
-{Precision(\%)} &{\bf \blue 87.5}   &{\bf \blue 98.8}& {\bf \blue 99.9}&
-  {\bf \blue 94.3}& {\bf \blue 99.6}& {\bf \blue 98.8}      & {\bf \blue 83.8} \\
-\hline
-\end{tabular}}
-\normalsize
-\bigskip
-
-%% \begin{itemize}
-%% \item Our liveness analysis is precise.
-%% \end{itemize}
-}
-
-\only<2>
-{
-\bigskip
-
-{\bf Garbage collection performance}
-
-\bigskip
-
-\small
-\begin{center}
-\hspace*{-.9cm}
-{\scalebox{0.85}
-  {\begin{tabular}{| c | r | r |  r | r | r | r | r | r |}
-\hline
-     & \multicolumn{2}{c|}{\# Collected} 
-   & \multicolumn{2}{c|}{}
-                             &   \multicolumn{2}{c|}{MinHeap} 
-                             &   \multicolumn{2}{c|}{GC time}\\
-
-                            &   \multicolumn{2}{c|}{cells per GC}  
-                            &   \multicolumn{2}{c|}{\#GCs} 
-                            &   \multicolumn{2}{c|}{(\#cells)} 
-                            &   \multicolumn{2}{c|}{(sec)} \\
-\cline{2-9}
-{Program}    &
-RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
-\hline
-\hline
-    {\sf   sudoku}  &{\bf \blue 490}& {\bf \blue 1306} &22 &9 & 1704  &589 & .028 & .122 \\
-    {\sf  lcss}    &{\bf \blue  46522}& {\bf \blue 51101} &8 &7 & 52301  &1701  &.045 & .144 \\
-     {\sf   gc\_bench} &{\bf \blue  129179}& {\bf \blue  131067} &9 &9& 131071   &6  &.086 & .075 \\
-    {\sf  nperm}  &{\bf \blue  47586}& {\bf \blue 174478} &14 &4& 202597  &37507  &1.406 & .9  \\
-   {\sf  fibheap} &{\bf \blue  249502}& {\bf \blue 251525} &1 &1& 254520  &13558  &.006 & .014  \\
-   {\sf  knightstour}  &{\bf \blue  2593}& {\bf \blue 314564} &1161 &10 &508225   &307092 &464.902 & 14.124  \\
-    {\sf  treejoin} &{\bf \blue  288666}& {\bf \blue 519943} &2 &1 & 525488  &7150  &.356 & .217 \\
-    {\sf   nqueens} &{\bf \blue  283822}& {\bf \blue 1423226} &46&9& 1819579  &501093  &70.314 & 24.811 \\     
-    {\sf   lambda}  &{\bf \blue  205}& {\bf \blue  556} &23 &8 &966 & 721  &.093 &2.49  \\ 
-\hline
-\end{tabular}}}
-\end{center}
-
-\normalsize
-\bigskip
-
-\begin{itemize}
-\item LGC collects more garbage than RGC.
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%%%%%%
-
-\only<3>
-{
-\bigskip
-
-{\bf Garbage collection performance}
-
-\bigskip
-\small
-\begin{center}
-\hspace*{-.9cm}
-{\scalebox{0.85}
-  {\begin{tabular}{| c | r | r |  r | r | r | r | r | r |}
-\hline
-     & \multicolumn{2}{c|}{\# Collected} 
-   & \multicolumn{2}{c|}{}
-                             &   \multicolumn{2}{c|}{MinHeap} 
-                             &   \multicolumn{2}{c|}{GC time}\\
-
-                            &   \multicolumn{2}{c|}{cells per GC}  
-                            &   \multicolumn{2}{c|}{\#GCs} 
-                            &   \multicolumn{2}{c|}{(\#cells)} 
-                            &   \multicolumn{2}{c|}{(sec)} \\
-\cline{2-9}
-{Program}    &
-RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
-\hline
-\hline
-    {\sf   sudoku}  &490 &1306  & {\bf \blue 22}& {\bf \blue 9} & 1704  &589 & .028 & .122 \\
-    {\sf  lcss}    & 46522 &51101 &{\bf \blue 8}& {\bf \blue 7} & 52301  &1701  &.045 & .144 \\
-     {\sf   gc\_bench} & 129179 & 131067   &{\bf \blue 9}& {\bf \blue
-       9} & 131071   &6  &.086 & .075 \\
-    {\sf  nperm}  & 47586  &174478 &{\bf \blue 14}& {\bf \blue 4} & 202597  &37507  &1.406 & .9  \\
-   {\sf  fibheap} &249502  &251525 &{\bf \blue 1}& {\bf \blue 1} & 254520  &13558  &.006 & .014  \\
-   {\sf  knightstour}  &2593 &314564 &{\bf \blue 1161}& {\bf \blue 10} &508225   &307092 &464.902 & 14.124  \\
-    {\sf  treejoin} & 288666  &519943 &{\bf \blue 2}& {\bf \blue 1} & 525488  &7150  &.356 & .217 \\
-    {\sf   nqueens} & 283822 &1423226 &{\bf \blue 46}& {\bf \blue 9} & 1819579  &501093  &70.314 & 24.811 \\     
-    {\sf   lambda}  &205 & 556  &{\bf \blue 23}& {\bf \blue 8} &966 & 721  &.093 &2.49  \\ 
-\hline
-\end{tabular}}}
-\end{center}
-\normalsize
-\bigskip
-
-\begin{itemize}
-\item \# collections of LGC no higher than RGC. Often, smaller.
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%%%%
-
-\only<4>
-{
-\bigskip
-
-{\bf Garbage collection performance}
-
-\bigskip
-\small
-\begin{center}
-\hspace*{-.9cm}
-{\scalebox{0.85}
-  {\begin{tabular}{| c | r | r |  r | r | r | r | r | r |}
-\hline
-     & \multicolumn{2}{c|}{\# Collected} 
-   & \multicolumn{2}{c|}{}
-                             &   \multicolumn{2}{c|}{MinHeap} 
-                             &   \multicolumn{2}{c|}{GC time}\\
-
-                            &   \multicolumn{2}{c|}{cells per GC}  
-                            &   \multicolumn{2}{c|}{\#GCs} 
-                            &   \multicolumn{2}{c|}{(\#cells)} 
-                            &   \multicolumn{2}{c|}{(sec)} \\
-\cline{2-9}
-{Program}    &
-RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
-\hline
-\hline
-    {\sf   sudoku}  &490 &1306  &22 &9 &{\bf \blue  1704}& {\bf
-      \blue 589} & .028 & .122 \\
-    {\sf  lcss}    & 46522 &51101 &8 &7 &{\bf \blue  52301}& {\bf
-      \blue 1701} &.045 & .144 \\
-     {\sf   gc\_bench} & 129179 & 131067   &9 &9&{\bf \blue  131071}& {\bf \blue 6} &.086 & .075 \\
-    {\sf  nperm}  & 47586  &174478 &14 &4&{\bf \blue  202597}& {\bf
-      \blue 37507} &1.406 & .9  \\
-   {\sf  fibheap} &249502  &251525 &1 &1&{\bf \blue  254520}& {\bf
-     \blue 13558} &.006 & .014  \\
-   {\sf  knightstour}  &2593 &314564 &1161 &10 &{\bf \blue 508225}&
-   {\bf \blue 307092} &464.902 & 14.124  \\
-    {\sf  treejoin} & 288666  &519943 &2 &1 &{\bf \blue  525488}&
-    {\bf \blue 7150} &.356 & .217 \\
-    {\sf   nqueens} & 283822 &1423226 &46&9&{\bf \blue  1819579}&
-    {\bf \blue 501093} &70.314 & 24.811 \\     
-    {\sf   lambda}  &205 & 556  &23 &8 &{\bf \blue 966}& {\bf \blue
-      721} &.093 &2.49  \\ 
-\hline
-\end{tabular}}}
-\end{center}
-\normalsize
-\bigskip
-
-\begin{itemize}
-\item Programs require smaller heaps to execute with LGC.
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%
-
-\only<6>
-{
-\bigskip
-
-{\bf Garbage collection performance}
-
-\bigskip
-
-
-
-
-
-
-\small
-\begin{center}
-\hspace*{-.9cm}
-{\scalebox{0.85}
-  {\begin{tabular}{| c | r | r |  r | r | r | r | r | r |}
-\hline
-     & \multicolumn{2}{c|}{\# Collected} 
-   & \multicolumn{2}{c|}{}
-                             &   \multicolumn{2}{c|}{MinHeap} 
-                             &   \multicolumn{2}{c|}{GC time}\\
-
-                            &   \multicolumn{2}{c|}{cells per GC}  
-                            &   \multicolumn{2}{c|}{\#GCs} 
-                            &   \multicolumn{2}{c|}{(\#cells)} 
-                            &   \multicolumn{2}{c|}{(sec)} \\
-\cline{2-9}
-{Program}    &
-RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
-\hline
-\hline
-    {\sf   sudoku}  &490 &1306  &22 &9 & 1704  &589 &{\bf \red  .028
- }& {\bf \red  .122} \\
-    {\sf  lcss}   & 46522 &51101 &8 &7 & 52301  &1701  &{\bf \red
-      .045}& {\bf \red  .144} \\
-    {\sf   gc\_bench}  & 129179 & 131067   &9 &9& 131071   &6  &.086 & .075 \\
-    {\sf  nperm}  & 47586  &174478 &14 &4& 202597  &37507  &1.406 & .9  \\
-    {\sf  fibheap} &249502  &251525 &1 &1& 254520  &13558  &{\bf \red
-      .006}& {\bf \red  .014}  \\
-    {\sf  knightstour}   &2593 &314564 &1161 &10 &508225   &307092 &464.902 & 14.124  \\
-    {\sf  treejoin} & 288666  &519943 &2 &1 & 525488  &7150  &.356 & .217 \\
-    {\sf   nqueens} & 283822 &1423226 &46&9& 1819579  &501093  &70.314 & 24.811 \\     
-    {\sf   lambda}  &205 & 556  &23 &8 &966 & 721  &{\bf \red .093} &
-    {\bf \red 2.49}  \\ 
-\hline
-\end{tabular}}}
-\end{center}
-\normalsize
-\bigskip
-
-\begin{itemize}
-\item \ldots and larger in some.
-\end{itemize}
-}
-
-%%%%%%%%%%%%%%%
-
-\only<5>
-{
-
-\bigskip
-
-{\bf Garbage collection performance}
-
-\bigskip
-\small
-\begin{center}
-\hspace*{-.9cm}
-{\scalebox{0.85}
-  {\begin{tabular}{| c | r | r |  r | r | r | r | r | r |}
-\hline
-     & \multicolumn{2}{c|}{\# Collected} 
-   & \multicolumn{2}{c|}{}
-                             &   \multicolumn{2}{c|}{MinHeap} 
-                             &   \multicolumn{2}{c|}{GC time}\\
-
-                            &   \multicolumn{2}{c|}{cells per GC}  
-                            &   \multicolumn{2}{c|}{\#GCs} 
-                            &   \multicolumn{2}{c|}{(\#cells)} 
-                            &   \multicolumn{2}{c|}{(sec)} \\
-\cline{2-9}
-{Program}    &
-RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
-\hline
-\hline
-    {\sf   sudoku}  &490 &1306  &22 &9 & 1704  &
-    589 & .028 & .122 \\
-    {\sf  lcss}    & 46522 &51101 &8 &7 & 52301  &
-    1701  &.045 & .144 \\
-    {\sf   gc\_bench} & 129179 & 131067   &9 &9& 131071   &6  &{\bf
-       \blue .086}& {\bf \blue  .075} \\
-    {\sf  nperm}   & 47586  &174478 &14 &4& 202597  &37507  &{\bf
-      \blue 1.406}& {\bf \blue  .9}  \\
-   {\sf  fibheap}  &249502  &251525 &1 &1& 254520  &13558  &.006 & .014  \\
-   {\sf  knightstour}  &2593 &314564 &1161 &10 &508225   &307092 &{\bf
-     \blue 464.902}& {\bf \blue  14.124}  \\
-    {\sf  treejoin}  & 288666  &519943 &2 &1 & 525488  &7150  &{\bf
-      \blue .356}& {\bf \blue  .217} \\
-    {\sf   nqueens}  & 283822 &1423226 &46&9& 1819579  &501093  &{\bf
-      \blue 70.314}& {\bf \blue  24.811} \\     
-    {\sf   lambda}   &205 & 556  &23 &8 &966 & 721  &.093 &2.49  \\ 
-\hline
-\end{tabular}}}
-\end{center}
-\normalsize
-\bigskip
-
-\begin{itemize}
-\item GC time is smaller for LGC in some cases\ldots 
-\end{itemize}
-}
-
-\end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Future Work  \& Conclusions} 
 \begin{frame}{Scope for future work}
 \normalsize
@@ -1283,24 +899,15 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
   \begin{itemize}
   \item Reducing re-visits to heap nodes.
   \item Basing the implementation on full Scheme, not ANF-Scheme
+  \item Hybrid GC (RGC + LGC)
   \end{itemize}
 \item<2-> Increasing the scope of the method.
   \begin{itemize}
-  \item Lazy languages. (Under review)
-  \item Higher order functions.
+   \item Higher order functions.
     \begin{itemize}
     \item Specialize all higher order functions (Firstification)
     \item Analysis on the firstified program 
     \item For partial applications, carry information about the {\em base} function
-\end{itemize}
-  \end{itemize}
-\item<3-> Using the notion of {\em demand} for other analysis.
-  \begin{itemize}
-  \item Program Slicing
-  \item Strictness Analysis
-    \begin{itemize}
-    \item All path problem, requires doing intersection of demands 
-    \item $\Rightarrow$ intersection of CFGs $\Rightarrow$ under-approximation
     \end{itemize}
   \end{itemize}
 \end{itemize}
@@ -1309,12 +916,12 @@ RGC & LGC & RGC & LGC  & RGC & LGC & RGC & LGC \\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Conclusions}
   \begin{itemize}\itemsep1em
-  \item Proposed a liveness-based GC scheme. 
+  \item Proposed a liveness-based GC scheme and demonstrated its efficiency in reducing number of garbage collections.
+  \item LGC time is high for many programs making it currently not practical.
   \item Not covered in this talk:
     \begin{itemize}
     \item The soundness of liveness analysis.
     \item Details of undecidability proof.
-    \item Details of handling lazy languages.
     \end{itemize}
     \item A prototype implementation to demonstrate:
       \begin{itemize}
