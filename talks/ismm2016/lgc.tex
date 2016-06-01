@@ -251,6 +251,44 @@
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame} {Handling possible non-evaluation}
+  \begin{itemize}
+  \item Liveness no longer remains independent of demand $\sigma$ \\
+    \begin{itemize}
+    \item If (\CAR~\px) is not evaluated at all, it should not generate any liveness for \px
+    \end{itemize}
+  \item Require a new terminal \clazy\ with following semantics
+    \begin{align*}
+      \clazy\sigma \hookrightarrow & \left\{ 
+      \begin{array}{ll}
+        \emptyset&\mbox{if}~\sigma = \emptyset\\
+        \{\epsilon\} & \mbox{otherwise}
+      \end{array}\right.\\ & \\
+      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
+    \end{align*}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Handling lazy semantics: Closures}
+\normalsize
+  \begin{itemize}\itemsep2em
+  \item Laziness complicates liveness analysis itself. 
+    \begin{itemize}
+    \item Data is made live by evaluation of closures
+    \item In lazy languages, the place in the program
+      where this evaluation takes place cannot be statically determined
+    \end{itemize}
+    \pause
+  \item Liveness-based garbage collector significantly more complicated than that for an eager language.
+    \begin{itemize}
+    \item Need to track liveness of closures
+    \item But a closure can escape the scope in which it was created
+     \item Solution: carry the liveness information in the closure itself
+     \item For precision: need to update the liveness information as execution progresses
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Liveness analysis of Expressions}
 
 \normalsize
@@ -675,56 +713,17 @@ $\Lf{\plength}{1}{\sigma} = \{\clazy\sigma\} \cup \Lf{\plength}{1}{\acdr\sigma}$
 \begin{frame}{Solution of the equations}
 
   View the equations as grammar rules:
-\begin{eqnarray*}
-    \Lanv{1}{\lista} &\rightarrow& \epsilon \mid  \acar\bcar\sigma\; \mid 
-    \acdr({\red \Uf{\append}{1} \mid \Df{\append}{1}\bcdr\sigma_{\append}})\\
-  \Uf{\append}{1}    &\rightarrow&    \epsilon   \mid
-   \acdr{\Uf{\append}{1}}\\         
-   \Df{\append}{1}
-   &\rightarrow&               \acar\bcar               \mid
-   \acdr\Df{\append}{1}\bcdr\\
+ \begin{eqnarray*}
+&&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma,~\mbox{and}\\
+&&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
+       \cup \clazy\Df{\plength}{1}{\clazy}
  \end{eqnarray*}
+
 The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\lista})$ generated    by    it.
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Handling possible non-evaluation}
-  \begin{itemize}
-  \item Liveness no longer remains independent of demand $\sigma$ \\
-    \begin{itemize}
-    \item If (\CAR~\px) is not evaluated at all, it should not generate any liveness for \px
-    \end{itemize}
-  \item Require a new terminal \clazy\ with following semantics
-    \begin{align*}
-      \clazy\sigma \hookrightarrow & \left\{ 
-      \begin{array}{ll}
-        \emptyset&\mbox{if}~\sigma = \emptyset\\
-        \{\epsilon\} & \mbox{otherwise}
-      \end{array}\right.\\ & \\
-      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
-    \end{align*}
-  \end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Handling lazy semantics: Closures}
-\normalsize
-  \begin{itemize}\itemsep2em
-  \item Laziness complicates liveness analysis itself. 
-    \begin{itemize}
-    \item Data is made live by evaluation of closures
-    \item In lazy languages, the place in the program
-      where this evaluation takes place cannot be statically determined
-    \end{itemize}
-    \pause
-  \item Liveness-based garbage collector significantly more complicated than that for an eager language.
-    \begin{itemize}
-    \item Need to track liveness of closures
-    \item But a closure can escape the scope in which it was created
-     \item Solution: carry the liveness information in the closure itself
-     \item For precision: need to update the liveness information as execution progresses
-    \end{itemize}
-  \end{itemize}
-\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Working of Liveness-based GC (Mark phase)}
   \begin{itemize}
@@ -746,23 +745,25 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{\bcar/\bcdr\ handling}
+\begin{frame}{\bcar/\bcdr\  and \clazy\ handling}
 
 \begin{itemize}
 \item \acar\   removal from a set of access paths:
-\begin{align*}
-\alpha_1\bcar\acar\alpha_2 &\hookrightarrow
-  \alpha_1\alpha_2\\
-\alpha_1\bcar \acdr\alpha_2 &\hookrightarrow
-  \mbox{ drop $\alpha_1\bcar \acdr \alpha_2$ from the set}
-\end{align*}
-\item \acdr\   removal from a set of access paths:
-\begin{align*}
-\alpha_1\bcdr\acdr\alpha_2 &\hookrightarrow
-  \alpha_1\alpha_2\\
-\alpha_1\bcdr \acar\alpha_2 &\hookrightarrow
-  \mbox{ drop $\alpha_1\bcdr \acar \alpha_2$ from the set}
-\end{align*}
+  \begin{align*}
+    \alpha_1\bcar\acar\alpha_2 &\hookrightarrow
+    \alpha_1\alpha_2\\
+    \alpha_1\bcar \acdr\alpha_2 &\hookrightarrow
+    \mbox{ drop $\alpha_1\bcar \acdr \alpha_2$ from the set}
+  \end{align*}
+\item \clazy\   removal from a set of access paths:
+
+  \begin{align*}
+    \clazy\sigma \hookrightarrow & \left\{ 
+    \begin{array}{ll}
+      \emptyset&\mbox{if}~\sigma = \emptyset\\
+      \{\epsilon\} & \mbox{otherwise}
+    \end{array}\right.
+  \end{align*}
 \end{itemize}
 
 \end{frame}
@@ -800,36 +801,19 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
     \begin{column}[T]{.5\textwidth}
       {Grammar for \Lanv{9}{\py}}
       \begin{eqnarray*}
-        \Lanv{9}{y}  &\rightarrow&  {\Uf{\append}{1}} \mid  {\Df
-          {\append}{1}}        (\epsilon         \mid        \acdr   \mid
-        \acdr\acar {\sigma_{\mathit{\!all}}})\\
-        \Uf{\append}{1}    &\rightarrow&    \epsilon   \mid
-        \acdr{\Uf{\append}{1}}\\         
-        \Df{\append}{1}
-        &\rightarrow&               \acar\bcar               \mid
-        \acdr\Df{\append}{1}\bcdr\\
-        \sigma_{\mathit{\!all}} &\rightarrow & \epsilon \mid \acar
-        \sigma_{\mathit{\!all}} \mid \acdr
-        \sigma_{\mathit{\!all}}
+        &&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma,~\mbox{and}\\
+        &&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
+        \cup \clazy\Df{\plength}{1}{\clazy}
       \end{eqnarray*}
     \end{column}
     \begin{column}[T]{.5\textwidth}
       After Mohri-Nederhoff transformation
-      \begin{eqnarray*}
-        \Lanv{9}{y}  &\rightarrow&  {\Uf{\append}{1}} \mid  {\Df
-          {\append}{1}}        (\epsilon         \mid        \acdr   \mid
-        \acdr\acar {\sigma_{\mathit{\!all}}})\\
-        \Uf{\append}{1}    &\rightarrow&    \epsilon   \mid
-        \acdr{\Uf{\append}{1}}\\   
-        \Df{\append}{1}
-        &\rightarrow&               \acar\bcar \Dfbar{\append}{1}  \mid
-        \acdr\Df{\append}{1} \\ 
-                {\Dfbar{\append}{1}}  &\rightarrow&   \bcdr{\Dfbar{\append}{1}}
-                \mid \epsilon \\
-                \sigma_{\mathit{\!all}} &\rightarrow & \epsilon \mid \acar
-                \sigma_{\mathit{\!all}} \mid \acdr
-                \sigma_{\mathit{\!all}}
-      \end{eqnarray*}
+       \begin{eqnarray*}              
+         \var{\Df{\plength}{1}}   &\rightarrow&   \clazy\varnew{\Df{\plength}{1}}
+         \mid                 \acdr\var{\Df{\plength}{1}}                 \mid
+         \clazy\var{\Df{\plength}{1}}\\  \varnew{\Df{\plength}{1}}  &\rightarrow&
+         \clazy\varnew{\Df{\plength}{1}} \mid \epsilon
+       \end{eqnarray*}
     \end{column}
   \end{columns}
 \end{frame}
