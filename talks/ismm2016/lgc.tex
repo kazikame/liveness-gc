@@ -430,6 +430,11 @@ in classical dataflow analysis for imperative languages.
 
 \begin{frame}{Liveness Analysis of User Defined Functions}
   \input{sample-liveness-program}
+  \begin{itemize}
+  \item Compute liveness of \pz\ at $\pi_{10}$.
+  \item Get context independent summary of \plength\ ($\Lf{\plength}{1}{\sigma}$).
+  \item Use demand on function application as the actual $\sigma$ to get liveness of \pz.
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Liveness Analysis of Function Applications}
@@ -734,6 +739,7 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \item Over-approximate the CFG by an automaton
   (Mohri-Nederhoff transformation).
 \item Perform \acar/\acdr\ removal on the automaton.
+\item Perform \clazy\ removal.
 \end{itemize}
 
 \end{frame}
