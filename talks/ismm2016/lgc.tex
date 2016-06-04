@@ -230,7 +230,7 @@
    \pause
 \item We assume the demand on the main expression to be $(0+1)^*$,
   which we call $\sigma_{all}$.
-\item The demands on each function body, $\sigma_f$, have to be computed.
+
   \end{itemize}
 \end{frame}
 
@@ -433,86 +433,30 @@ in classical dataflow analysis for imperative languages.
   \begin{itemize}
   \item Compute liveness of \pz\ at $\pi_{10}$.
   \item Get context independent summary of \plength\ ($\Lf{\plength}{1}{\sigma}$).
-  \item Use demand on function application as the actual $\sigma$ to get liveness of \pz.
   \end{itemize}
-\end{frame}
-
-\begin{frame}{Liveness Analysis of Function Applications}
-\onslide<1->{
-  \begin{columns}[c]
-    \begin{column}{0.4\textwidth}
-      \onslide<1->{
-        %\centerline{\epsfig{file=live-analysis4.eps, height=2.6cm}}
-        \raisebox{-35mm}{\scalebox{.65}{
-            \psset{unit=1mm}
-            \psset{linewidth=.5mm}
-            \begin{pspicture}(-10,0)(80,0)
-              %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-              \putnode{x}{origin}{0}{30}{\TwoCells{x0}{x1}}
-              \putnode{y}{x}{51}{0}{\TwoCells{y0}{y1}}
-              \putnode{startx}{x}{0}{-3}{}
-              \putnode{starty}{y}{0}{-3}{}
-              \putnode{after0}{x}{-5}{-20}{}
-              \putnode{after1}{y}{5}{-20}{}
-              \putnode{result}{origin}{25}{50}{\OneCell{resultx}}
-              \putnode{labx}{x}{-7}{10}{\large $x$}
-              \putnode{laby}{y}{7}{10}{\large $y$}
-              \putnode{labr}{result}{-12}{7}{\large $(f\ x\ y)$\; {\red $\sigma$} }
-              
-              \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labr}{result}
-              \nccurve[nodesepB=-.2,nodesepA=.2,angleA=295,angleB=135]{->}{labx}{x}
-              \nccurve[nodesepB=-.2,angleA=270,angleB=45]{->}{laby}{y}
-              \onslide<2>{
-                \nccurve[nodesepB=-.2,angleA=270,angleB=75,linestyle=dashed]{*->}{resultx}{x}
-                \bput(.6){\large $\psi_x$}
-                \nccurve[nodesepB=-.2,angleA=270,angleB=105,linestyle=dashed]{*->}{resultx}{y}
-                \aput(.6){\large $\psi_y$}
-              }
-              \onslide<3->{
-                \nccurve[nodesepB=-.2,angleA=270,angleB=75,linestyle=dashed]{*->}{resultx}{x}
-                \bput(.6){\large \Lf{f}{1}{\alpha}}
-                \nccurve[nodesepB=-.2,angleA=270,angleB=105,linestyle=dashed]{*->}{resultx}{y}
-                \aput(.6){\large \Lf{f}{2}{\beta}}
-
-              }
-              \nccurve[nodesepB=-.2,angleA=270,angleB=105]{*->}{resulty}{y}
-              \onslide<2->{\nccurve[nodesepB=-.2,angleA=270,angleB=75,
-                  linestyle=dashed]{*->}{startx}{after0}
-                \onslide<2>{\bput(.5){\large $\alpha$}}
-	        \nccurve[nodesepB=-.2,angleA=270,angleB=105,
-                  linestyle=dashed]{*->}{starty}{after1}
-                \onslide<2>{\aput(.5){\large ${\mathbf \beta}$}}
-              }
-            \end{pspicture}
-      }}}
-    \end{column}
-    \begin{column}{0.5\textwidth}
-      \small
-      \mbox{\onslide<1->{$\Lapp{{\red{(f \;x \;y)}}}{\sigma} =$}
-        \onslide<2->{
-          \alt<2>{$x.\overline{\psi_x}{\sigma} \cup  \;  y.\overline{\psi_y}{\sigma}$}{$x.\Lf{f}{1}{\sigma} \cup  \;  y.\Lf{f}{2}{\sigma}$}
-        }}
-    \end{column}
-  \end{columns}
-}
-{
-  \bigskip
-  \begin{itemize}
-    \onslide<3->{  \item We use \Lfonly$_{\mathit  f}$: context independent summary of  $f$.}
-    \onslide<4-> {\item To find \Lf{\mathit  f}{i}{\ldots}: 
-      \begin{itemize}
-      \item Assume a symbolic demand $\sigma_{sym}$.
-      \item Let $e_f$ be the body of $f$. 
-      \item Set \Lf{\mathit f}{i}{\sigma_{sym}} to
-        \Lexp{e_f}{\sigma_{sym}}($x_i$).  
-        \onslide<5->{
-        \item How to handle recursive calls?         
-          \onslide<6->{
-            {\red Use  \Lfonly$_{\mathit  f}$ with appropriate demand~!!}
-        }}
-    \end{itemize}}
-  \end{itemize}
-}
+  Key Observation : Liveness of function arguments will always be in terms of the
+  input demand $\sigma$
+  \setbeamercovered{invisible}
+  \raisebox{-25mm}{\scalebox{.85}{
+      %%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
+      \psset{unit=1mm}
+      \psset{linewidth=.3mm}
+      \begin{pspicture}(0,0)(180,30)
+        %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(18,10)
+	%\psframe(0,0)(73,60)
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	%% \onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
+        %%     \sigma{_{all}}$}}
+	\onslide<2-5>{\putnode{call1}{origin}{105}{98}{\large\red $\clazy\sigma$}}
+	\onslide<3-5>{\putnode{appendentry}{origin}{94}{106}{\large\red
+            $\Lf{\plength}{1}{\sigma} =$}}
+        \putnode{sigma1}{appendentry}{16}{0}{\large\red $\sigma_1$}
+        \putnode{un}{sigma1}{6}{0}{\large\red $\cup \only<3>{\ldots}$} 
+	\nccurve[nodesepB=-.2,angleA=-5,angleB=-145,linecolor=red]{->}{call1}{sigma1}
+	\onslide<4-5>{\putnode{call2}{origin}{109}{86}{\large\red $\acdr\Lf{\plength}{1}{\clazy\sigma}$}
+          \putnode{sigma2}{sigma1}{6}{0}{\large\red $\sigma_2$}}
+        \onslide<5-5>{\nccurve[nodesepB=-.2,angleA=25,angleB=-135,linecolor=red]{->}{call2}{sigma2}}
+  \end{pspicture}}}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -771,6 +715,16 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \input{liveness-dfa-for-presentation.tex}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{LGC for a \CONS\ cell}
+  Take example of $\pi_1:(\plength\ \px)$ and explain
+  LGC for a \CONS\  cell
+\end{frame}
+
+\begin{frame}{LGC for closures}
+  Take example of $\pi_2:(+\ 1 (\pfun\ \px))$ and explain
+   LGC for closure
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Results}
 \begin{frame}{Experimental Setup}
