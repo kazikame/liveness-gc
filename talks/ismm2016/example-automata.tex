@@ -1,0 +1,35 @@
+
+
+      \raisebox{-25mm}{\scalebox{.75}{
+      \psset{unit=1mm}
+      \psset{linewidth=.3mm}
+      \begin{pspicture}(0,-5)(70,60)
+%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,-5)(7,6)
+	%\psframe(0,0)(73,60)
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	\putnode{y}{origin}{5}{40}{y}
+        \putnode{nexty}{y}{13}{0}{}
+        \ncline[nodesepB=1]{->}{y}{nexty}
+
+	\putnode{z}{y}{0}{-12}{z}
+        \putnode{nextz}{z}{13}{0}{}
+        \ncline[nodesepB=1]{->}{z}{nextz}
+
+	\putnode{w}{z}{0}{-12}{w}
+        \putnode{state1}{w}{15}{0}{\pscirclebox[doubleline=true]{\ \ \ }}
+        \ncline[nodesepB=-1.2]{->}{w}{state1}
+         \putnode{state2}{state1}{15}{0}{\pscirclebox[doubleline=true]{\ \ \ }}
+        \ncline[nodesepB=-1.2]{->}{state1}{state2}
+       \aput(.5){\tt {\acdr}}
+        \putnode{state3}{state2}{15}{0}{\pscirclebox[doubleline=true]{\
+        \ \ }}
+        \ncline[nodesepB=-1.2]{->}{state2}{state3}
+        \aput(.5){\tt {\acar}}
+        \nccurve[angleA=60,angleB=120,ncurv=5,nodesepA=-.2,nodesepB=-.7]{->}{state3}{state3}
+%        \nccurve[angleA=0,angleB=0,nodesepB=-20]{->}{state3}{.4cm}
+       \Bput[.1]{\tt {\acar\,$|$\!\!\! \acdr}}
+
+        \putnode{cap}{w}{25}{-12}{\Large Liveness at \red{$\pi$}}
+
+      \end{pspicture}}}
+
