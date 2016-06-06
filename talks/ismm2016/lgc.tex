@@ -83,11 +83,10 @@
 
 \begin{frame}{Liveness based GC}
     \begin{itemize}\itemsep0.75em
-    \item During execution, there are significant amounts of heap allocated data
-      that  are {\em  reachable but not live}.
-      \begin{itemize}
-      \item Current GCs will retain such data.
-      \end{itemize}
+    \item Current garbage collectors retain heap allocated data
+      that  is {\em  reachable}.
+    \item Programs need only data that will be used in future.
+      Such data is said to be {\em live}.
     \item Our idea: 
       \begin{itemize}
       \item We do  a liveness analysis of {\em heap  data} and provide
@@ -117,6 +116,17 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame} {Lazy evaluation}
+\begin{itemize}
+\item An evaluation  strategy in which evaluation of  an expression is
+  postponed until its value is needed
+  \begin{itemize}
+  \item Binding  of a  variable to  an expression  {\bf does  not force
+    evaluation} of the expression
+  \end{itemize}
+\item Every expression is evaluated at most once
+\end{itemize}
+\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Our method}
 
@@ -156,17 +166,7 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape LGC for lazy languages}
-\begin{frame} {Lazy evaluation}
-\begin{itemize}
-\item An evaluation  strategy in which evaluation of  an expression is
-  postponed until its value is needed
-  \begin{itemize}
-  \item Binding  of a  variable to  an expression  {\bf does  not force
-    evaluation} of the expression
-  \end{itemize}
-\item Every expression is evaluated at most once
-\end{itemize}
-\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Liveness}
@@ -227,29 +227,9 @@
   \begin{itemize}
   \item Demand  (notation: $\sigma$) is a description  of intended use
     of the result of an expression.
-   \pause
-\item We assume the demand on the main expression to be $(0+1)^*$,
-  which we call $\sigma_{all}$.
-
   \end{itemize}
 \end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Liveness analysis}
-  \begin{itemize}
-  \item {\bf  GOAL:} Compute  Liveness Environment at  various program
-    points, statically.
-  \end{itemize}
-  \bigskip\pause
-  \Lapp{a}{\sigma}  --  Liveness  environment  generated  by  an  {\em
-    application} $a$, given a demand $\sigma$.\\
-  \bigskip
-  \Lexp{e}{\sigma} -- Liveness environment  before an {\em expression}
-  $e$, given a demand $\sigma$.
-
-\end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame} {Handling possible non-evaluation}
   \begin{itemize}
@@ -281,14 +261,30 @@
     \pause
   \item Liveness-based garbage collector significantly more complicated than that for an eager language.
     \begin{itemize}
-    \item Need to track liveness of closures
-    \item But a closure can escape the scope in which it was created
-     \item Solution: carry the liveness information in the closure itself
-     \item For precision: need to update the liveness information as execution progresses
+    \item Distinguish between stack variables and closure variables.
+    \item Need to track liveness of closure variables.
+    \item Solution: carry the liveness information in the closure itself.
+    \item For precision: need to update the liveness information as execution progresses.
     \end{itemize}
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Liveness analysis}
+  \begin{itemize}
+  \item {\bf  GOAL:} Compute  Liveness Environment at  various program
+    points, statically. Assume the demand on the main expression to be $(0+1)^*$ and propagate using liveness propagation rules.
+  \end{itemize}
+  \bigskip\pause
+  \Lapp{a}{\sigma}  --  Liveness  environment  generated  by  an  {\em
+    application} $a$, given a demand $\sigma$.\\
+  \bigskip
+  \Lexp{e}{\sigma} -- Liveness environment  before an {\em expression}
+  $e$, given a demand $\sigma$.
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}{Liveness analysis of Expressions}
 
 \normalsize
@@ -447,15 +443,15 @@ in classical dataflow analysis for imperative languages.
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%% \onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
         %%     \sigma{_{all}}$}}
-	\onslide<2-5>{\putnode{call1}{origin}{105}{98}{\large\red $\clazy\sigma$}}
-	\onslide<3-5>{\putnode{appendentry}{origin}{94}{106}{\large\red
-            $\Lf{\plength}{1}{\sigma} =$}}
+	\putnode{call1}{origin}{105}{98}{\large\red $\clazy\sigma$}
+	\putnode{appendentry}{origin}{94}{106}{\large\red
+            $\Lf{\plength}{1}{\sigma} =$}
         \putnode{sigma1}{appendentry}{16}{0}{\large\red $\sigma_1$}
-        \putnode{un}{sigma1}{6}{0}{\large\red $\cup \only<3>{\ldots}$} 
+        \putnode{un}{sigma1}{4}{0}{\large\red $\cup$} 
 	\nccurve[nodesepB=-.2,angleA=-5,angleB=-145,linecolor=red]{->}{call1}{sigma1}
-	\onslide<4-5>{\putnode{call2}{origin}{109}{86}{\large\red $\acdr\Lf{\plength}{1}{\clazy\sigma}$}
-          \putnode{sigma2}{sigma1}{6}{0}{\large\red $\sigma_2$}}
-        \onslide<5-5>{\nccurve[nodesepB=-.2,angleA=25,angleB=-135,linecolor=red]{->}{call2}{sigma2}}
+	\putnode{call2}{origin}{109}{86}{\large\red $\acdr\Lf{\plength}{1}{\clazy\sigma}$}
+          \putnode{sigma2}{un}{4}{0}{\large\red $\sigma_2$}
+        \nccurve[nodesepB=-.2,angleA=25,angleB=-135,linecolor=red]{->}{call2}{sigma2}
   \end{pspicture}}}
 \end{frame}
 
@@ -470,13 +466,13 @@ in classical dataflow analysis for imperative languages.
  \begin{column}[T]{0.5\textwidth}
    \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
      \begin{uprogram}
-       \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\onslide<0>{\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN}
-       \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $\onslide<0>{(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN}
-       \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $\onslide<0>{(\SIF\ $*$}
-       \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $\onslide<0>{(\LET\ \pw\  $\leftarrow$}  (\plength\ \pz) \onslide<0>{(\IN}
-       \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $\onslide<0>{(\RETURN\ \pw)} 
-       \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $\onslide<0>{(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN}
-       \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$\onslide<0>{(\RETURN\ \pb))))))}
+       \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
+       \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
+       \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $(\SIF\ $*$
+       \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\plength\ \pz) (\IN
+       \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $(\RETURN\ \pw)
+       \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN
+       \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
    \end{uprogram}}
  \end{column}
  \begin{column}[T]{0.5\textwidth}
@@ -484,27 +480,27 @@ in classical dataflow analysis for imperative languages.
   \begin{uprogram}
      \UNL{1} (\DEFINE\ (\plength~\lista)
 
-    \UNL{2}  $\pi_1\!\!:\, $\onslide<0>{(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN}
+    \UNL{2}  $\pi_1\!\!:\, $(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN
 
 
-    \UNL{3}     $\pi_2\!\!:\, $\onslide<0>{(\SIF\ \xtest}
+    \UNL{3}     $\pi_2\!\!:\, $(\SIF\ \xtest
 
-~$\pi_3\!\!:$\onslide<0>{(\RETURN\ $0$)} 
+~$\pi_3\!\!:$(\RETURN\ $0$)
  
           \UNL{4} \hspace*{-.05cm}    
- $\pi_4\!\!:\, $\onslide<0>{(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN}
+ $\pi_4\!\!:\, $(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN
 
 	  \UNL{5}  \hspace*{-.05cm}
-          $\pi_5\!\!:\,$\onslide<0>{(\LET\ \xrec\  $\leftarrow$} (\plength\ \ \xtl\ ) \onslide<0>{\IN}
+          $\pi_5\!\!:\,$(\LET\ \xrec\  $\leftarrow$ (\plength\ \ \xtl\ ) \IN
 
 
-          \UNL{6} \hspace*{-.05cm}   $\pi_6\!\!:\, $\onslide<0>{(\LET\ \xhd\  $\leftarrow$  $1$)  \IN}
+          \UNL{6} \hspace*{-.05cm}   $\pi_6\!\!:\, $(\LET\ \xhd\  $\leftarrow$  $1$)  \IN
 
 
-          \UNL{7}  \hspace*{-.05cm}   $\pi_7\!\!:\,$\onslide<0>{(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN} 
+          \UNL{7}  \hspace*{-.05cm}   $\pi_7\!\!:\,$(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN
 
           \UNL{8} \hspace*{-.05cm}
-$\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}
+$\pi_8\!\!:\, $ (\RETURN\ \xans)))))))
  
 \end{uprogram}}
  \end{column}
@@ -518,17 +514,16 @@ $\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}
 %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(18,10)
 	%\psframe(0,0)(73,60)
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
-          \sigma{_{all}}$}}
-	\onslide<2-5>{\putnode{call1}{origin}{41}{58}{\large\red $\sigma_1$} 
+	\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
+          \sigma{_{all}}$}
+	\putnode{call1}{origin}{41}{58}{\large\red $\sigma_1$
 	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{o}{call1}}
-	\onslide<3-5>{\putnode{appendentry}{origin}{85}{72}{\large\red
-          $\sigma_{\plength} = \sigma_1 \cup \only<3-4>{\ldots} 
-\only<5->{\sigma_2}$}
-	\nccurve[nodesepB=-.2,angleA=45,angleB=165,linecolor=red]{->}{call1}{appendentry}}
-	\onslide<4-5>{\putnode{call2}{origin}{125}{52}{\large\red $\sigma_2$} 
-	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{appendentry}{call2}}
-	\onslide<5-5>{\nccurve[nodesepB=-.2,angleA=65,angleB=0,linecolor=red]{->}{call2}{appendentry}}
+	\putnode{appendentry}{origin}{85}{72}{\large\red
+          $\sigma_{\plength} = \sigma_1 \cup  \sigma_2$}
+	\nccurve[nodesepB=-.2,angleA=45,angleB=165,linecolor=red]{->}{call1}{appendentry}
+	\putnode{call2}{origin}{125}{52}{\large\red $\sigma_2$}
+	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{appendentry}{call2}
+	\nccurve[nodesepB=-.2,angleA=65,angleB=0,linecolor=red]{->}{call2}{appendentry}
 
       \end{pspicture}}}
 
@@ -549,12 +544,12 @@ $\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans)))))))}
   \begin{column}[T]{0.30\textwidth}
     \scriptsize
     \centerline{\bf Demand summaries:}
-    \onslide<6>{
-      \begin{align*}
-        &\sigma_{\xmain} = \sigma_{all}\\
-        &\sigma_{\plength} = \sigma_{all} \cup \clazy\sigma_{\plength}
-      \end{align*}
-    }
+    
+    \begin{align*}
+      &\sigma_{\xmain} = \sigma_{all}\\
+      &\sigma_{\plength} = \sigma_{all} \cup \clazy\sigma_{\plength}
+    \end{align*}
+    
   \end{column}
   \begin{column}[T]{0.38\textwidth}
     \scriptsize
@@ -637,28 +632,28 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{\bcar/\bcdr\  and \clazy\ handling}
+%% \begin{frame}{\bcar/\bcdr\  and \clazy\ handling}
 
-\begin{itemize}
-\item \acar\   removal from a set of access paths:
-  \begin{align*}
-    \alpha_1\bcar\acar\alpha_2 &\hookrightarrow
-    \alpha_1\alpha_2\\
-    \alpha_1\bcar \acdr\alpha_2 &\hookrightarrow
-    \mbox{ drop $\alpha_1\bcar \acdr \alpha_2$ from the set}
-  \end{align*}
-\item \clazy\   removal from a set of access paths:
+%% \begin{itemize}
+%% \item \acar\   removal from a set of access paths:
+%%   \begin{align*}
+%%     \alpha_1\bcar\acar\alpha_2 &\hookrightarrow
+%%     \alpha_1\alpha_2\\
+%%     \alpha_1\bcar \acdr\alpha_2 &\hookrightarrow
+%%     \mbox{ drop $\alpha_1\bcar \acdr \alpha_2$ from the set}
+%%   \end{align*}
+%% \item \clazy\   removal from a set of access paths:
 
-  \begin{align*}
-    \clazy\sigma \hookrightarrow & \left\{ 
-    \begin{array}{ll}
-      \emptyset&\mbox{if}~\sigma = \emptyset\\
-      \{\epsilon\} & \mbox{otherwise}
-    \end{array}\right.
-  \end{align*}
-\end{itemize}
+%%   \begin{align*}
+%%     \clazy\sigma \hookrightarrow & \left\{ 
+%%     \begin{array}{ll}
+%%       \emptyset&\mbox{if}~\sigma = \emptyset\\
+%%       \{\epsilon\} & \mbox{otherwise}
+%%     \end{array}\right.
+%%   \end{align*}
+%% \end{itemize}
 
-\end{frame}
+%% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{GC decision problem}
 \begin{itemize}
@@ -716,20 +711,42 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{LGC for a \CONS\ cell}
-  Take example of $\pi_1:(\plength\ \px)$ and explain
-  LGC for a \CONS\  cell
+  \begin{columns}[c]
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+      \item Find corresponding automaton for root variable.
+      \item If automaton accepts $\epsilon$, copy current cell to live buffer.
+      \item Recursively copy the $\CAR$ part with the automaton starting from the state on a $\acar$ from the current state.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      Take example of $\pi_1:(\plength\ \px)$ and explain
+      LGC for a \CONS\  cell
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{LGC for closures}
-  Take example of $\pi_2:(+\ 1 (\pfun\ \px))$ and explain
-   LGC for closure
+   \begin{columns}[c]
+    \begin{column}{0.45\textwidth}
+      \begin{itemize}
+      \item Find corresponding automaton for root variable.
+      \item If automaton accepts $\epsilon$, copy current cell to live buffer.
+      \item For each argument of the closure, use corresponding automaton stored in the closure and copy.
+      \end{itemize}
+    \end{column}
+    \begin{column}{0.50\textwidth}
+      Take example of $\pi_2:(+\ 1 (\pfun\ \px))$ and explain
+      LGC for closure
+    \end{column}
+   \end{columns}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Results}
 \begin{frame}{Experimental Setup}
   \begin{itemize}\itemsep1em
-  \item Built a prototype consisting of:
+  \item A prototype consisting of:
     \begin{itemize}
     \item An ANF-scheme interpreter
     \item Liveness analyzer
@@ -803,18 +820,13 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Conclusions}
   \begin{itemize}\itemsep1em
-  \item Proposed a liveness-based GC scheme and demonstrated its efficiency in reducing number of garbage collections.
-  \item LGC time is high for many programs making it currently not practical.
+  \item Current garbage collectors leave a lot of memory that can be safely collected. 
+  \item By storing extra information in the cell, our method collects dead cells from inside closures also.
+  \item By updating liveness information of closures at run-time, we were able to improve precision of GC.
   \item Not covered in this talk:
     \begin{itemize}
     \item The soundness of liveness analysis.
     \item Details of undecidability proof.
-    \end{itemize}
-    \item A prototype implementation to demonstrate:
-      \begin{itemize}
-      \item the precision of the analysis.
-      \item reduced heap requirement.
-      \item reduced GC time for a majority of programs.
     \end{itemize}
     \item Unfinished agenda:
       \begin{itemize}
