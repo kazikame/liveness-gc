@@ -231,44 +231,6 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Handling possible non-evaluation}
-  \begin{itemize}
-  \item Liveness no longer remains independent of demand $\sigma$ \\
-    \begin{itemize}
-    \item If (\CAR~\px) is not evaluated at all, it should not generate any liveness for \px
-    \end{itemize}
-  \item Require a new terminal \clazy\ with following semantics
-    \begin{align*}
-      \clazy\sigma \hookrightarrow & \left\{ 
-      \begin{array}{ll}
-        \emptyset&\mbox{if}~\sigma = \emptyset\\
-        \{\epsilon\} & \mbox{otherwise}
-      \end{array}\right.\\ & \\
-      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
-    \end{align*}
-  \end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Handling lazy semantics: Closures}
-\normalsize
-  \begin{itemize}\itemsep2em
-  \item Laziness complicates liveness analysis itself. 
-    \begin{itemize}
-    \item Data is made live by evaluation of closures
-    \item In lazy languages, the place in the program
-      where this evaluation takes place cannot be statically determined
-    \end{itemize}
-    \pause
-  \item Liveness-based garbage collector significantly more complicated than that for an eager language.
-    \begin{itemize}
-    \item Distinguish between stack variables and closure variables.
-    \item Need to track liveness of closure variables.
-    \item Solution: carry the liveness information in the closure itself.
-    \item For precision: need to update the liveness information as execution progresses.
-    \end{itemize}
-  \end{itemize}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Liveness analysis}
   \begin{itemize}
@@ -443,13 +405,13 @@ in classical dataflow analysis for imperative languages.
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%% \onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
         %%     \sigma{_{all}}$}}
-	\putnode{call1}{origin}{105}{98}{\large\red $\clazy\sigma$}
+	\putnode{call1}{origin}{105}{98}{\large\red $\{\epsilon\}$}
 	\putnode{appendentry}{origin}{94}{106}{\large\red
             $\Lf{\plength}{1}{\sigma} =$}
         \putnode{sigma1}{appendentry}{16}{0}{\large\red $\sigma_1$}
         \putnode{un}{sigma1}{4}{0}{\large\red $\cup$} 
 	\nccurve[nodesepB=-.2,angleA=-5,angleB=-145,linecolor=red]{->}{call1}{sigma1}
-	\putnode{call2}{origin}{109}{86}{\large\red $\acdr\Lf{\plength}{1}{\clazy\sigma}$}
+	\putnode{call2}{origin}{109}{86}{\large\red $\acdr\Lf{\plength}{1}{\epsilon}$}
           \putnode{sigma2}{un}{4}{0}{\large\red $\sigma_2$}
         \nccurve[nodesepB=-.2,angleA=25,angleB=-135,linecolor=red]{->}{call2}{sigma2}
   \end{pspicture}}}
@@ -463,7 +425,7 @@ in classical dataflow analysis for imperative languages.
 \setbeamercovered{transparent}
 \small
 \begin{columns}[c]
- \begin{column}[T]{0.5\textwidth}
+ \begin{column}[T]{0.45\textwidth}
    \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
      \begin{uprogram}
        \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
@@ -475,7 +437,7 @@ in classical dataflow analysis for imperative languages.
        \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
    \end{uprogram}}
  \end{column}
- \begin{column}[T]{0.5\textwidth}
+ \begin{column}[T]{0.60\textwidth}
 \hspace*{.4cm}  \renewcommand{\arraystretch}{1}{
   \begin{uprogram}
      \UNL{1} (\DEFINE\ (\plength~\lista)
@@ -547,7 +509,7 @@ $\pi_8\!\!:\, $ (\RETURN\ \xans)))))))
     
     \begin{align*}
       &\sigma_{\xmain} = \sigma_{all}\\
-      &\sigma_{\plength} = \sigma_{all} \cup \clazy\sigma_{\plength}
+      &\sigma_{\plength} = \sigma_{all} \cup\  {\epsilon}
     \end{align*}
     
   \end{column}
@@ -555,12 +517,49 @@ $\pi_8\!\!:\, $ (\RETURN\ \xans)))))))
     \scriptsize
     \centerline{\bf Function summaries:}
     \bigskip
-    $\Lf{\plength}{1}{\sigma} = \{\clazy\sigma\} \cup \Lf{\plength}{1}{\acdr\sigma}$
+    $\Lf{\plength}{1}{\sigma} = \{\epsilon\} \cup \acdr\Lf{\plength}{1}{\epsilon}$
   \end{column}
 \end{columns}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\begin{frame} {Handling possible non-evaluation}
+  \begin{itemize}
+  \item Liveness no longer remains independent of demand $\sigma$ \\
+    \begin{itemize}
+    \item If (\CAR~\px) is not evaluated at all, it should not generate any liveness for \px
+    \end{itemize}
+  \item Require a new terminal \clazy\ with following semantics
+    \begin{align*}
+      \clazy\sigma \hookrightarrow & \left\{ 
+      \begin{array}{ll}
+        \emptyset&\mbox{if}~\sigma = \emptyset\\
+        \{\epsilon\} & \mbox{otherwise}
+      \end{array}\right.\\ & \\
+      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
+    \end{align*}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Handling lazy semantics: Closures}
+\normalsize
+  \begin{itemize}\itemsep2em
+  \item Laziness complicates liveness analysis itself. 
+    \begin{itemize}
+    \item Data is made live by evaluation of closures
+    \item In lazy languages, the place in the program
+      where this evaluation takes place cannot be statically determined
+    \end{itemize}
+    \pause
+  \item Liveness-based garbage collector significantly more complicated than that for an eager language.
+    \begin{itemize}
+    \item Distinguish between stack variables and closure variables.
+    \item Need to track liveness of closure variables.
+    \item Solution: carry the liveness information in the closure itself.
+    \item For precision: need to update the liveness information as execution progresses.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[t]{Summary of Analysis Results}
   \scriptsize
   \begin{columns}[c]
@@ -589,7 +588,7 @@ $\pi_8\!\!:\, $ (\RETURN\ \xans)))))))
       \vspace*{1.5cm}
       \centerline{\bf Function summaries:}
       \begin{align*}
-        \Lf{\plength}{1}{\sigma} = \{\clazy\sigma\} \cup \Lf{\plength}{1}{\acdr\sigma}
+        \Lf{\plength}{1}{\sigma} = \{\clazy\sigma\} \cup \acdr\Lf{\plength}{1}{\clazy\sigma}
       \end{align*}
     \end{column}
   \end{columns}
