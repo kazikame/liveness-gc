@@ -2,13 +2,13 @@
  \begin{column}[T]{0.45\textwidth}
 \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
-	    \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
-            \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
-	    \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $(\SIF\ $*$
-            \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\plength\ \pz) \IN
-            \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $(\RETURN\ \pw) 
-	    \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN
-            \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
+	    \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\onslide<0>{\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN}
+            \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $\onslide<0>{(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN}
+	    \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $\onslide<0>{(\SIF\ $*$}
+            \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $\onslide<0>{(\LET\ \pw\  $\leftarrow$  }(\plength\ \pz) \onslide<0>{\IN}
+            \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $\onslide<0>{(\RETURN\ \pw)} 
+	    \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $\onslide<0>{(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN}
+            \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$\onslide<0>{(\RETURN\ \pb)))))})
 \end{uprogram}}
  \end{column}
  \begin{column}[T]{0.60\textwidth}
@@ -16,27 +16,27 @@
   \begin{uprogram}
     \UNL{1} (\DEFINE\ (\plength~\lista)
 
-    \UNL{2}  $\pi_1\!\!:\, $(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN
+    \UNL{2}  $\pi_1\!\!:\, $\onslide<0>{(\LET\ \xtest\ $\leftarrow $\ }(\NULLQ~\lista) \onslide<0>{\IN}
 
 
-    \UNL{3}     $\pi_2\!\!:\, $(\SIF\ \xtest
+    \UNL{3}     $\pi_2\!\!:\, $\onslide<0>{(\SIF\ \xtest}
 
-~$\pi_3\!\!:$(\RETURN\ $0$) 
+~$\pi_3\!\!:$\onslide<0>{(\RETURN\ $0$)}
  
           \UNL{4} \hspace*{-.05cm}    
- $\pi_4\!\!:\, $(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN
+ $\pi_4\!\!:\, $\onslide<0>{(\LET\ \xtl\  $\leftarrow$\   }(\CDR\ \lista) \onslide<0>{\IN}
 
 	  \UNL{5}  \hspace*{-.05cm}
-          $\pi_5\!\!:\,$(\LET\ \xrec\  $\leftarrow$ (\plength\ \ \xtl\ ) \IN
+          $\pi_5\!\!:\,$\onslide<0>{(\LET\ \xrec\  $\leftarrow$ (\plength\ \ \xtl\ ) \IN}
 
 
-          \UNL{6} \hspace*{-.05cm}   $\pi_6\!\!:\, $(\LET\ \xhd\  $\leftarrow$  $1$)  \IN
+          \UNL{6} \hspace*{-.05cm}   $\pi_6\!\!:\, $\onslide<0>{(\LET\ \xhd\  $\leftarrow$  $1$)  \IN}
 
 
-          \UNL{7}  \hspace*{-.05cm}   $\pi_7\!\!:\,$(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN 
+          \UNL{7}  \hspace*{-.05cm}   $\pi_7\!\!:\,$\onslide<0>{(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN} 
 
           \UNL{8} \hspace*{-.05cm}
-$\pi_8\!\!:\, $ (\RETURN\ \xans)))))))
+$\pi_8\!\!:\, $ \onslide<0>{(\RETURN\ \xans))))))})
 \end{uprogram}}
  \end{column}
 \end{columns}
