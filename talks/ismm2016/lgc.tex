@@ -29,6 +29,7 @@
 \usepackage{algorithmic}
 \usepackage{amssymb}
 \usepackage{amsmath}
+\usepackage{calc}
 \input{fh_defs}
 %% packages from the paper
 \setbeamerfont{title like}{shape=\scshape}
@@ -406,12 +407,12 @@ in classical dataflow analysis for imperative languages.
 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 	%% \onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
         %%     \sigma{_{all}}$}}
-	\putnode{call1}{origin}{105}{98}{\large\red $\{\epsilon\}$}
+	\putnode{call1}{origin}{102}{100}{\large\red $\{\epsilon\}$}
 	\putnode{appendentry}{origin}{94}{106}{\large\red
             $\Lf{\plength}{1}{\sigma} =$}
         \putnode{sigma1}{appendentry}{16}{0}{\large\red $\sigma_1$}
         \putnode{un}{sigma1}{4}{0}{\large\red $\cup$} 
-	\nccurve[nodesepB=-.2,angleA=-5,angleB=-145,linecolor=red]{->}{call1}{sigma1}
+	\nccurve[nodesepB=-.2,angleA=-11,angleB=-107,linecolor=red]{->}{call1}{sigma1}
 	\putnode{call2}{origin}{109}{88}{\large\red $\acdr\Lf{\plength}{1}{\epsilon}$}
           \putnode{sigma2}{un}{4}{0}{\large\red $\sigma_2$}
         \nccurve[nodesepB=-.2,angleA=25,angleB=-135,linecolor=red]{->}{call2}{sigma2}
