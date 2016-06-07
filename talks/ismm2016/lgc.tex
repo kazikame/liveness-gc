@@ -764,36 +764,37 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[b]{GC behavior as a  graph}
-\only<1>{
-\hspace*{-1cm}\centerline{\epsfig{file=nqueens.eps, height=6.5cm}}
-}
+\begin{frame}[b]{GC Results}
+%% \only<1>{
+%% \hspace*{-1cm}\centerline{\epsfig{file=nqueens.eps, height=6.5cm}}
+%% }
 
-\only<1>{      \raisebox{0mm}{\scalebox{1}{
-	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
-      \psset{unit=1mm}
-      \psset{linewidth=.3mm}
-      \begin{pspicture}(0,0)(110,0)
-
-
+%% \only<1>{      \raisebox{0mm}{\scalebox{1}{
+%% 	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
+%%       \psset{unit=1mm}
+%%       \psset{linewidth=.3mm}
+%%       \begin{pspicture}(0,0)(110,0)
 
 
-\putnode{activel}{origin}{90}{77}{\scriptsize Cells in active semi-space (LGC)}
-\putnode{activelm}{activel}{-21}{0}{}
-\putnode{activer}{origin}{90}{71}{\scriptsize Cells in active
-  semi-space (RGC)}
-\putnode{activerm}{activer}{-21}{0}{}
-\putnode{livecurve}{origin}{51}{64}{}
-\putnode{reachcurve}{origin}{59}{64}{}
-\putnode{r}{origin}{96}{45}{\scriptsize No. of reachable cells}
-\putnode{l}{origin}{92}{39}{\scriptsize No. of live cells}
-\putnode{livecells}{origin}{66}{24}{}
-\putnode{reachcells}{livecells}{0}{10}{}
-\nccurve[nodesepB=-.9,angleA=180,angleB=30,linecolor=blue]{->}{activelm}{livecurve}
-\nccurve[nodesepB=-.9,angleA=180,angleB=30,linecolor=red]{->}{activerm}{reachcurve}
-\nccurve[nodesepB=0,angleA=180,angleB=30,linecolor=gray]{->}{r}{reachcells}
-\nccurve[nodesepB=0,angleA=180,angleB=30]{->}{l}{livecells}
-      \end{pspicture}}}}
+
+
+%% \putnode{activel}{origin}{90}{77}{\scriptsize Cells in active semi-space (LGC)}
+%% \putnode{activelm}{activel}{-21}{0}{}
+%% \putnode{activer}{origin}{90}{71}{\scriptsize Cells in active
+%%   semi-space (RGC)}
+%% \putnode{activerm}{activer}{-21}{0}{}
+%% \putnode{livecurve}{origin}{51}{64}{}
+%% \putnode{reachcurve}{origin}{59}{64}{}
+%% \putnode{r}{origin}{96}{45}{\scriptsize No. of reachable cells}
+%% \putnode{l}{origin}{92}{39}{\scriptsize No. of live cells}
+%% \putnode{livecells}{origin}{66}{24}{}
+%% \putnode{reachcells}{livecells}{0}{10}{}
+%% \nccurve[nodesepB=-.9,angleA=180,angleB=30,linecolor=blue]{->}{activelm}{livecurve}
+%% \nccurve[nodesepB=-.9,angleA=180,angleB=30,linecolor=red]{->}{activerm}{reachcurve}
+%% \nccurve[nodesepB=0,angleA=180,angleB=30,linecolor=gray]{->}{r}{reachcells}
+%% \nccurve[nodesepB=0,angleA=180,angleB=30]{->}{l}{livecells}
+%%       \end{pspicture}}}}
+\input{autotable.tex}  
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %******
