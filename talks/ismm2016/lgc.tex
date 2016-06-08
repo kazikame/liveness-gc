@@ -108,8 +108,28 @@
 \begin{frame}{An Example}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%% MOTIVATING EXAMPLE
-\input{motivating-example}
-
+  %\input{motivating-example}
+  \begin{columns}
+    \begin{column}{0.5\textwidth}
+      \begin{boxedminipage}{\textwidth}
+        {\scalebox{0.75}{\sf
+	\renewcommand{\arraystretch}{1}{
+	  \begin{uprogram}
+            \UNL{0} \hspace*{-.49\TAL} $\pi_\mainpgm$ : (\LET\ \pz\   $\leftarrow$(\CONS\ ($+$\ $4$ $5$)\
+            \UNL{0} \;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\; (\CONS\ ($+$\ $5$ $2$) \NIL)) \IN
+	    \UNL{0} \;\;\;\;\;\;\;\;\;\;\;\;(\SIF\ $*$\ 
+	    \UNL{1} \;\;\;\;\;\;\;\;\;\;\;\; $\pi_1$: (\plength\ \pz\ )
+	    \UNL{1} \;\;\;\;\;\;\;\;\;\;\;\; $\pi_2$: (\pfun\ \pz\ )))
+       	  \end{uprogram}
+        }}}
+      \end{boxedminipage}
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      %    Add diagram for liveness of $\pz$ at $\pi_1$  and $\pi_2$
+      \epsfig{file=mem-graph.eps, height=6.5cm}
+    \end{column}
+  \end{columns}
+    
 \bigskip
 \begin{itemize}
 \item<1->{\em  Expression $(+\ 5\ 2)$ never gets evaluated and $(+\ 4\ 5)$ gets evaluated only if $*$ is false.}  
@@ -130,23 +150,6 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Our method}
-
-%% \begin{frame}{Liveness Information}
-%%   \begin{itemize}
-%%   \item Our analysis captures liveness as automata.
-%%   \end{itemize}
-%% \begin{columns}
-%%   \begin{column}[T]{0.5\textwidth}
-%% \input{example-automata}
-%%   \end{column}
-%%   \begin{column}[T]{0.5\textwidth}
-%%     \input{example-heap-snap-shot}
-%%   \end{column}
-%% \end{columns}
-%% \end{frame}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{The language analyzed}
 \begin{columns}
@@ -166,9 +169,10 @@
 \end{columns}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{The language analyzed}
+  \input{motivating-example}
+\end{frame}
 \section{\scshape LGC for lazy languages}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Demand}
   \begin{center}
@@ -238,10 +242,21 @@
   \begin{itemize}
   \item {\bf  GOAL:} Compute  Liveness Environment at  various program
     points, statically. 
-  \item Assume that all paths in the result of $\mainpgm$ are live, i.e. demand is $(0 + 1)^*$.
+  \item Assume that all paths in the result of $\mainpgm$ are live, i.e. demand is $(0 + 1)^*$ or $\sigma_{all}$.
   \item Propagate this demand through the program using liveness rules.
   \end{itemize}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Liveness analysis}
+  \begin{columns}
+    \begin{column}[T]{0.5\textwidth}
+      \input{motivating-example}
+    \end{column}
+    \begin{column}[T]{0.5\textwidth}
+    \end{column}
+  \end{columns}
+\end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 \begin{frame}{Liveness analysis of Expressions}
@@ -603,13 +618,31 @@ $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
 \begin{frame}{Solution of the equations}
 
   View the equations as grammar rules:
- \begin{eqnarray*}
-&&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma,~\mbox{and}\\
-&&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
-       \cup \clazy\Df{\plength}{1}{\clazy}
- \end{eqnarray*}
-
-The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\lista})$ generated    by    it.
+  \scalebox{0.75}{
+  \begin{columns}
+    \begin{column}[T]{.5\textwidth}
+      
+      \begin{eqnarray*}
+        &&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma\\
+        &&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
+        \cup \clazy\Df{\plength}{1}{\clazy}
+      \end{eqnarray*}
+      
+    \end{column}
+    \begin{column}[T]{0.5\textwidth}
+      \begin{eqnarray*}
+        \var{\LfNoSigma{\plength}{1}} &\rightarrow& \var{\Df{\plength}{1}} \\
+        \var{\Df{\plength}{1}}   &\rightarrow&   \clazy\var{\Df{\plength}{1}}
+        \mid                 \acdr\var{\Df{\plength}{1}}\clazy                 \mid
+        \clazy\var{\Df{\plength}{1}}\clazy
+      \end{eqnarray*}
+    \end{column}
+  \end{columns}
+  }
+  \linebreak
+  \linebreak
+  \linebreak
+  The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\lista})$ generated    by    it.
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -628,9 +661,9 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
   \item  Note  that  $\alpha$  is a  {\em  forward}-only  access  path
     \begin{itemize}
     \item consisting  only of  edges \acar\  and \acdr,  but not  \bcar\ or
-      \bcdr
+      \bcdr\ or \clazy
     \item But $\mathscr{L}(\Lanv{\pi}{x})$ has access paths marked with \bcar/\bcdr\ for \acar/\acdr\  removal
-  arising from the \CONS\  rule.
+  arising from the \CONS\  rule and \clazy\ added to handle lazy evaluation.
     \end{itemize}
   \end{itemize}
 \end{frame}

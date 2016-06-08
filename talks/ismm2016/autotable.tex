@@ -1,14 +1,11 @@
 \newcommand{\rlratio}{$\frac{LGC}{RGC}$}
 \newcommand{\rlratiotrue}{\raisebox{-2mm}{\rule{0pt}{6mm}}%
   $\frac{1.16\times LGC}{RGC}$}
+\newcommand{\myanimate}[2]  {\alt<#2>{\red#1}{#1}}
 
-\newcommand{\dec}[1] {\number\numexpr#1-1\relax}
-\newcommand{\inc}[1] {\number\numexpr#1+1\relax}
-\newcommand{\myanimate}[2] {\onslide<-#2>{\red#1}\onslide<\inc{#2}->{#1}}
-\newcommand{\animatetwo}[2] {\onslide<-\dec{#2}>{#1}\onslide<#2>{\red#1}\onslide<\inc{#2}->{#1}}
 
-\renewcommand{\arraystretch}{1.9}
-\scalebox{.30}{
+\renewcommand{\arraystretch}{0.9}
+\scalebox{.70}{
 \begin{tabular}{|@{}c@{}
                 %|@{}r@{\ }
                 %|@{\ }r@{\ }
@@ -43,83 +40,83 @@
 \rotmore{\tt fibheap}
 %& 3466.2 & 4164.5
 %& 33576.6 & 50957.9
-& \myanimate{1333}{1} & \myanimate{1108}{1} & \animatetwo{37043}{2} & \animatetwo{37043}{2} & \animatetwo{1.16}{2} & \animatetwo{1.46}{3} & \animatetwo{20.00}{3} & \animatetwo{13.70}{3} & \animatetwo{13.82}{4} & \animatetwo{33.23}{4} & \animatetwo{2.40}{4}
+& \myanimate{1333}{1} & \myanimate{1108}{1} & \myanimate{37043}{2} & \myanimate{37043}{2} & \myanimate{1.16}{2} & \myanimate{1.46}{3} & \myanimate{20.00}{3} & \myanimate{13.70}{3} & \myanimate{13.82}{4} & \myanimate{33.23}{4} & \myanimate{2.40}{4}
 \\ \hline
 
 \rotmore{\tt sudoku}
 %& 931.3 & 2328.7
 %& 3134.6 & 2950.2
-&  \myanimate{179}{1} &  \myanimate{72}{1}  & \animatetwo{4066}{2} & \animatetwo{2960}{2} & \animatetwo{0.84}{2} & \animatetwo{0.01}{3} & \animatetwo{0.04}{3} & \animatetwo{4.64}{3} & \animatetwo{0.11}{4} & \animatetwo{0.16}{4} & \animatetwo{1.5}{4}
+&  \myanimate{179}{1} &  \myanimate{72}{1}  & \myanimate{4066}{2} & \myanimate{2960}{2} & \myanimate{0.84}{2} & \myanimate{0.01}{3} & \myanimate{0.04}{3} & \myanimate{4.64}{3} & \myanimate{0.11}{4} & \myanimate{0.16}{4} & \myanimate{1.5}{4}
 \\ \hline
 
 \rotmore{\tt nperm}
 %% & 4684.4 & 14212.5
 %% & 22743.2 & 23127.1
-&  \myanimate{710}{1} &  \myanimate{235}{1} & \animatetwo{27428}{2} & \animatetwo{25343}{2} & \animatetwo{1.07}{2} & \animatetwo{0.24}{3}
-& \animatetwo{1.24}{3} & \animatetwo{5.20}{3} & \animatetwo{1.80}{4} & \animatetwo{3.39}{4} & \animatetwo{1.88}{4}
+&  \myanimate{710}{1} &  \myanimate{235}{1} & \myanimate{27428}{2} & \myanimate{25343}{2} & \myanimate{1.07}{2} & \myanimate{0.24}{3}
+& \myanimate{1.24}{3} & \myanimate{5.20}{3} & \myanimate{1.80}{4} & \myanimate{3.39}{4} & \myanimate{1.88}{4}
 \\ \hline
 
 \rotmore{\tt paraffins}
 %% & 661.7 & 2920.5
 %% & 4522.6 & 2933.0
-&  \myanimate{16}{1} &  \myanimate{4}{1} & \animatetwo{5185}{2} & \animatetwo{3733}{2} & \animatetwo{0.83}{2} & \animatetwo{0.00}{3}
-& \animatetwo{0.00}{3} & \animatetwo{2.01}{3} & \animatetwo{0.01}{4} & \animatetwo{0.02}{4} & \animatetwo{1.2}{4}
+&  \myanimate{16}{1} &  \myanimate{4}{1} & \myanimate{5185}{2} & \myanimate{3733}{2} & \myanimate{0.83}{2} & \myanimate{0.00}{3}
+& \myanimate{0.00}{3} & \myanimate{2.01}{3} & \myanimate{0.01}{4} & \myanimate{0.02}{4} & \myanimate{1.2}{4}
 \\ \hline
 
 \rotmore{\tt lcss}
 %% & 8064.7 & 18268.7
 %% & 14177.9 & 4604.4
-&  \myanimate{30}{1} &  \myanimate{14}{1} & \animatetwo{22243}{2} & \animatetwo{16296}{2} & \animatetwo{0.84}{2} & \animatetwo{0.01}{3}
-& \animatetwo{0.02}{3} & \animatetwo{3.02}{3} & \animatetwo{0.13}{4} & \animatetwo{0.18}{4} & \animatetwo{1.36}{4}
+&  \myanimate{30}{1} &  \myanimate{14}{1} & \myanimate{22243}{2} & \myanimate{16296}{2} & \myanimate{0.84}{2} & \myanimate{0.01}{3}
+& \myanimate{0.02}{3} & \myanimate{3.02}{3} & \myanimate{0.13}{4} & \myanimate{0.18}{4} & \myanimate{1.36}{4}
 \\ \hline
 
 \rotmore{\tt huffman}
 %% & 10533.8 & 100010.0
 %% & 89536.1 & 88.6
-&  \myanimate{356}{1} &  \myanimate{38}{1} & \animatetwo{100070}{2} & \animatetwo{72}{2} & \animatetwo{0.00}{2} & \animatetwo{0.64}{3}
-& \animatetwo{0.01}{3} & \animatetwo{0.02}{3} & \animatetwo{2.70}{4} & \animatetwo{2.55}{4} & \animatetwo{0.94}{4}
+&  \myanimate{356}{1} &  \myanimate{38}{1} & \myanimate{100070}{2} & \myanimate{72}{2} & \myanimate{0.00}{2} & \myanimate{0.64}{3}
+& \myanimate{0.01}{3} & \myanimate{0.02}{3} & \myanimate{2.70}{4} & \myanimate{2.55}{4} & \myanimate{0.94}{4}
 \\ \hline
 
 \rotmore{\tt knightstour}
 %% & 179155.0 & 312454.0
 %% & 498645.0 & 534562.0
-&  \myanimate{529}{1} &  \myanimate{304}{1} & \animatetwo{677800}{2} & \animatetwo{642303}{2} & \animatetwo{1.09}{2} & \animatetwo{6.24}{3}
-& \animatetwo{64.43}{3} & \animatetwo{10.32}{3} & \animatetwo{55.29}{4} & \animatetwo{134.35}{4} & \animatetwo{2.43}{4}
+&  \myanimate{529}{1} &  \myanimate{304}{1} & \myanimate{677800}{2} & \myanimate{642303}{2} & \myanimate{1.09}{2} & \myanimate{6.24}{3}
+& \myanimate{64.43}{3} & \myanimate{10.32}{3} & \myanimate{55.29}{4} & \myanimate{134.35}{4} & \myanimate{2.43}{4}
 \\ \hline
 
 \rotmore{\tt nqueens}
 %% & 2607.4 & 9529.1
 %% & 7493.4 & 829.0
-&  \myanimate{3345}{1} &  \myanimate{916}{1} & \animatetwo{10101}{2} & \animatetwo{1082}{2} & \animatetwo{0.12}{2} & \animatetwo{0.36}{3}
-& \animatetwo{0.18}{3} & \animatetwo{0.49}{3} & \animatetwo{4.68}{4} & \animatetwo{5.87}{4} & \animatetwo{1.25}{4}
+&  \myanimate{3345}{1} &  \myanimate{916}{1} & \myanimate{10101}{2} & \myanimate{1082}{2} & \myanimate{0.12}{2} & \myanimate{0.36}{3}
+& \myanimate{0.18}{3} & \myanimate{0.49}{3} & \myanimate{4.68}{4} & \myanimate{5.87}{4} & \myanimate{1.25}{4}
 \\ \hline
 
 \rotmore{\tt deriv}
 %% & 854.6 & 10755.3
 %% & 10269.3 & 420.3
-&  \myanimate{31}{1} &  \myanimate{3}{1} & \animatetwo{11124}{2} & \animatetwo{589}{2} & \animatetwo{0.06}{2} & \animatetwo{0.00}{3}
-& \animatetwo{0.00}{3} & \animatetwo{0.05}{3} & \animatetwo{0.05}{4} & \animatetwo{0.05}{4} & \animatetwo{0.9}{4}
+&  \myanimate{31}{1} &  \myanimate{3}{1} & \myanimate{11124}{2} & \myanimate{589}{2} & \myanimate{0.06}{2} & \myanimate{0.00}{3}
+& \myanimate{0.00}{3} & \myanimate{0.05}{3} & \myanimate{0.05}{4} & \myanimate{0.05}{4} & \myanimate{0.9}{4}
 \\ \hline
 
 \rotmore{\tt treejoin}
 %% & 50284.2 & 936525.0
 %% & 1566250.0 & 700756.0
-&  \myanimate{116}{1} &  \myanimate{5}{1} & \animatetwo{1616533}{2} & \animatetwo{887005}{2} & \animatetwo{0.63}{2} & \animatetwo{3.84}{3}
-& \animatetwo{1.90}{3} & \animatetwo{0.49}{3} & \animatetwo{6.66}{4} & \animatetwo{5.50}{4} & \animatetwo{0.82}{4}
+&  \myanimate{116}{1} &  \myanimate{5}{1} & \myanimate{1616533}{2} & \myanimate{887005}{2} & \myanimate{0.63}{2} & \myanimate{3.84}{3}
+& \myanimate{1.90}{3} & \myanimate{0.49}{3} & \myanimate{6.66}{4} & \myanimate{5.50}{4} & \myanimate{0.82}{4}
 \\ \hline
 
 \rotmore{\tt lambda}
 %% & 7271.7 & 8448.4
 %% & 13194.2 & 29156.3
-&  \myanimate{775}{1} &  \myanimate{667}{1} & \animatetwo{20466}{2} & \animatetwo{18169}{2} & \animatetwo{1.02}{2} & \animatetwo{0.17}{3}
-& \animatetwo{4.70}{3} & \animatetwo{28.48}{3} & \animatetwo{2.77}{4} & \animatetwo{8.32}{4} & \animatetwo{3.00}{4}
+&  \myanimate{775}{1} &  \myanimate{667}{1} & \myanimate{20466}{2} & \myanimate{18169}{2} & \myanimate{1.02}{2} & \myanimate{0.17}{3}
+& \myanimate{4.70}{3} & \myanimate{28.48}{3} & \myanimate{2.77}{4} & \myanimate{8.32}{4} & \myanimate{3.00}{4}
 \\ \hline
 
 \rotmore{\tt gc\_bench}
 %& 14932.7 & 204774.0
 %& 189880.0 & 33.2
-&  \myanimate{48}{1} &  \myanimate{4}{1} & \animatetwo{204813}{2} & \animatetwo{72}{2} & \animatetwo{0.00}{2} & \animatetwo{0.11}{3}
-& \animatetwo{0.00}{3} & \animatetwo{0.00}{3} & \animatetwo{1.45}{4} & \animatetwo{1.22}{4} & \animatetwo{0.84}{4}
+&  \myanimate{48}{1} &  \myanimate{4}{1} & \myanimate{204813}{2} & \myanimate{72}{2} & \myanimate{0.00}{2} & \myanimate{0.11}{3}
+& \myanimate{0.00}{3} & \myanimate{0.00}{3} & \myanimate{1.45}{4} & \myanimate{1.22}{4} & \myanimate{0.84}{4}
 \\ \hline
 
 \end{tabular}}
