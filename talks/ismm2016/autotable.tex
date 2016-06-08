@@ -2,16 +2,12 @@
 \newcommand{\rlratiotrue}{\raisebox{-2mm}{\rule{0pt}{6mm}}%
   $\frac{1.16\times LGC}{RGC}$}
 
-\newcommand{\dec}[1] {\number \numexpr #1-1\relax}
-\newcommand{\inc}[1] {\number \numexpr #1+1\relax}
-\newcommand{\myanimate}[2] {\onslide<-#2>{\red #1} \onslide<\inc{#2}->{#1}}
-\newcommand{\animatetwo}[2] {
-  \onslide<-\dec{#2}> {#1}
-  \onslide<#2>{\red #1}
-  \onslide<\inc{#2}->{#1}
-}
+\newcommand{\dec}[1] {\number\numexpr#1-1\relax}
+\newcommand{\inc}[1] {\number\numexpr#1+1\relax}
+\newcommand{\myanimate}[2] {\onslide<-#2>{\red#1}\onslide<\inc{#2}->{#1}}
+\newcommand{\animatetwo}[2] {\onslide<-\dec{#2}>{#1}\onslide<#2>{\red#1}\onslide<\inc{#2}->{#1}}
 
-\renewcommand{\arraystretch}{.9}
+\renewcommand{\arraystretch}{1.9}
 \scalebox{.30}{
 \begin{tabular}{|@{}c@{}
                 %|@{}r@{\ }

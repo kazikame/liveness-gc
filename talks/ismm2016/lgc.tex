@@ -237,15 +237,10 @@
 \begin{frame}{Liveness analysis}
   \begin{itemize}
   \item {\bf  GOAL:} Compute  Liveness Environment at  various program
-    points, statically. Assume the demand on the main expression to be $(0+1)^*$ and propagate using liveness propagation rules.
+    points, statically. 
+  \item Assume that all paths in the result of $\mainpgm$ are live, i.e. demand is $(0 + 1)^*$.
+  \item Propagate this demand through the program using liveness rules.
   \end{itemize}
-  \bigskip\pause
-  \Lapp{a}{\sigma}  --  Liveness  environment  generated  by  an  {\em
-    application} $a$, given a demand $\sigma$.\\
-  \bigskip
-  \Lexp{e}{\sigma} -- Liveness environment  before an {\em expression}
-  $e$, given a demand $\sigma$.
-
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -561,6 +556,14 @@ $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Handling lazy semantics: Closures}
+  Stack variables and closure variables
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Handling lazy semantics: Closures}
+  Improving precision using run-time updates 
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[t]{Summary of Analysis Results}
   \scriptsize
   \begin{columns}[c]
@@ -631,29 +634,7 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
     \end{itemize}
   \end{itemize}
 \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% \begin{frame}{\bcar/\bcdr\  and \clazy\ handling}
 
-%% \begin{itemize}
-%% \item \acar\   removal from a set of access paths:
-%%   \begin{align*}
-%%     \alpha_1\bcar\acar\alpha_2 &\hookrightarrow
-%%     \alpha_1\alpha_2\\
-%%     \alpha_1\bcar \acdr\alpha_2 &\hookrightarrow
-%%     \mbox{ drop $\alpha_1\bcar \acdr \alpha_2$ from the set}
-%%   \end{align*}
-%% \item \clazy\   removal from a set of access paths:
-
-%%   \begin{align*}
-%%     \clazy\sigma \hookrightarrow & \left\{ 
-%%     \begin{array}{ll}
-%%       \emptyset&\mbox{if}~\sigma = \emptyset\\
-%%       \{\epsilon\} & \mbox{otherwise}
-%%     \end{array}\right.
-%%   \end{align*}
-%% \end{itemize}
-
-%% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{GC decision problem}
 \begin{itemize}
@@ -664,7 +645,7 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
     \bcar\acar    \rightarrow    \epsilon\\
     \bcdr\acdr    \rightarrow   \epsilon\\
   \end{align*}
-\item We have shown the problem to be undecidable
+\item We have proven the problem to be undecidable
   \begin{itemize}
   \item Reduction from Halting problem.
   \end{itemize}
@@ -765,35 +746,6 @@ The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\list
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[t]{GC Results}
-%% \only<1>{
-%% \hspace*{-1cm}\centerline{\epsfig{file=nqueens.eps, height=6.5cm}}
-%% }
-
-%% \only<1>{      \raisebox{0mm}{\scalebox{1}{
-%% 	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
-%%       \psset{unit=1mm}
-%%       \psset{linewidth=.3mm}
-%%       \begin{pspicture}(0,0)(110,0)
-
-
-
-
-%% \putnode{activel}{origin}{90}{77}{\scriptsize Cells in active semi-space (LGC)}
-%% \putnode{activelm}{activel}{-21}{0}{}
-%% \putnode{activer}{origin}{90}{71}{\scriptsize Cells in active
-%%   semi-space (RGC)}
-%% \putnode{activerm}{activer}{-21}{0}{}
-%% \putnode{livecurve}{origin}{51}{64}{}
-%% \putnode{reachcurve}{origin}{59}{64}{}
-%% \putnode{r}{origin}{96}{45}{\scriptsize No. of reachable cells}
-%% \putnode{l}{origin}{92}{39}{\scriptsize No. of live cells}
-%% \putnode{livecells}{origin}{66}{24}{}
-%% \putnode{reachcells}{livecells}{0}{10}{}
-%% \nccurve[nodesepB=-.9,angleA=180,angleB=30,linecolor=blue]{->}{activelm}{livecurve}
-%% \nccurve[nodesepB=-.9,angleA=180,angleB=30,linecolor=red]{->}{activerm}{reachcurve}
-%% \nccurve[nodesepB=0,angleA=180,angleB=30,linecolor=gray]{->}{r}{reachcells}
-%% \nccurve[nodesepB=0,angleA=180,angleB=30]{->}{l}{livecells}
-%%       \end{pspicture}}}}
 \input{autotable.tex}  
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
