@@ -170,6 +170,20 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}{Demand}
+  \begin{center}
+     (\CAR\ (\CDR\ \pw)) \\
+  \end{center}
+  \pause
+\centerline{\input{example-heap-snap-shot}}
+  \begin{itemize}
+  \item Demand  (notation: $\sigma$) is a description  of intended use
+    of the result of an expression.
+  \end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Liveness}
 \begin{frame}{Liveness -- Basic Concepts and Notations}
 \small
@@ -218,20 +232,7 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Demand}
-  \begin{center}
-     (\CAR\ (\CDR\ \pw)) \\
-  \end{center}
-  \pause
-\centerline{\input{example-heap-snap-shot}}
-  \begin{itemize}
-  \item Demand  (notation: $\sigma$) is a description  of intended use
-    of the result of an expression.
-  \end{itemize}
-\end{frame}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Liveness analysis}
   \begin{itemize}
@@ -498,12 +499,12 @@ $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
     \scriptsize
     \centerline{\bf Liveness environments:}
     \bigskip
-    $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
-    $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
-    $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
-    \ldots\\
-    $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
-      \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
+    %% $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
+    %% $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
+    %% $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
+    %% \ldots\\
+    %% $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
+    %%   \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
   \end{column}
   \begin{column}[T]{0.30\textwidth}
     \scriptsize
@@ -511,7 +512,7 @@ $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
     
     \begin{align*}
       &\sigma_{\xmain} = \sigma_{all}\\
-      &\sigma_{\plength} = \sigma_{all} \cup\  {\epsilon}
+      &\sigma_{\plength} = \sigma_{all} \cup\  \{\epsilon\}
     \end{align*}
     
   \end{column}
