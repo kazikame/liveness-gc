@@ -137,37 +137,37 @@
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame} {Lazy evaluation}
-\begin{itemize}
-\item An evaluation  strategy in which evaluation of  an expression is
-  postponed until its value is needed
-  \begin{itemize}
-  \item Binding  of a  variable to  an expression  {\bf does  not force
-    evaluation} of the expression
-  \end{itemize}
-\item Every expression is evaluated at most once
-\end{itemize}
-\end{frame}
+%% \begin{frame} {Lazy evaluation}
+%% \begin{itemize}
+%% \item An evaluation  strategy in which evaluation of  an expression is
+%%   postponed until its value is needed
+%%   \begin{itemize}
+%%   \item Binding  of a  variable to  an expression  {\bf does  not force
+%%     evaluation} of the expression
+%%   \end{itemize}
+%% \item Every expression is evaluated at most once
+%% \end{itemize}
+%% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Our method}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{The language analyzed}
-\begin{columns}
-  \begin{column}[T]{0.45\textwidth}
-\small
-    \begin{itemize} \itemsep0.75em
-    \item First order Scheme-like lazy functional language.
-    \item In Administrative Normal Form (ANF).
-%    \item The order  of
-%      evaluation of function arguments is made explicit.
-    \end{itemize}
-\normalsize
-  \end{column}
-  \begin{column}[T]{0.55\textwidth}
-    \input{language-being-analysed}
-  \end{column}
-\end{columns}
-\end{frame}
+%% \begin{frame}{The language analyzed}
+%% \begin{columns}
+%%   \begin{column}[T]{0.45\textwidth}
+%% \small
+%%     \begin{itemize} \itemsep0.75em
+%%     \item First order Scheme-like lazy functional language.
+%%     \item In Administrative Normal Form (ANF).
+%% %    \item The order  of
+%% %      evaluation of function arguments is made explicit.
+%%     \end{itemize}
+%% \normalsize
+%%   \end{column}
+%%   \begin{column}[T]{0.55\textwidth}
+%%     \input{language-being-analysed}
+%%   \end{column}
+%% \end{columns}
+%% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{The language analyzed}
   \input{motivating-example}
@@ -259,280 +259,316 @@
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Liveness analysis of Expressions}
+%% \begin{frame}{Liveness analysis of Expressions}
 
-\normalsize
-$\Lexp{{\red{(return\; x)}}}{\sigma} = \{x.\sigma\}$
-
-
-\bigskip
-\medskip
-
-  $\Lexp{{\red{(\SIF \; x\;\;  e_1\; \; e_2)}}}{\sigma} = \{x.\epsilon\} 
- \cup \Lexp{{\red{ e_1}}}{\sigma} \cup \Lexp{{\red{e_2}}}{\sigma}$
+%% \normalsize
+%% $\Lexp{{\red{(return\; x)}}}{\sigma} = \{x.\sigma\}$
 
 
+%% \bigskip
+%% \medskip
 
-\bigskip
-\medskip
+%%   $\Lexp{{\red{(\SIF \; x\;\;  e_1\; \; e_2)}}}{\sigma} = \{x.\epsilon\} 
+%%  \cup \Lexp{{\red{ e_1}}}{\sigma} \cup \Lexp{{\red{e_2}}}{\sigma}$
 
-$  \Lexp{{\red{(\LET \; x\; \leftarrow \; s \; \IN \; e)}}}{\sigma} = \Lv
-           \setminus \{x.*\}
-           \cup \mathit{\Lapp{s}{\Lv(x)}}$\\
-\hspace*{4.5cm} $ \mbox{ where } \Lv = \mathcal{L}exp(e,\sigma)$
 
-\bigskip
 
-\pause
-Notice the similarity with:
-\bigskip
+%% \bigskip
+%% \medskip
 
-\centerline{$\mathit{live}_\mathit{in}(I)      =     \mathit{live}_\mathit{out}(I)
-\setminus \mathit{def\/}(I) \cup \mathit{ref\/}(I)$}
-\bigskip
+%% $  \Lexp{{\red{(\LET \; x\; \leftarrow \; s \; \IN \; e)}}}{\sigma} = \Lv
+%%            \setminus \{x.*\}
+%%            \cup \mathit{\Lapp{s}{\Lv(x)}}$\\
+%% \hspace*{4.5cm} $ \mbox{ where } \Lv = \mathcal{L}exp(e,\sigma)$
 
-in classical dataflow analysis for imperative languages.
-\end{frame}
+%% \bigskip
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Liveness analysis of Primitive Applications}
-\small
-\onslide<1-2>{
-  \begin{columns}[c]
-    \begin{column}{0.35\textwidth}
-      \bigskip
-      %\centerline{\epsfig{file=live-analysis1.eps, height=2cm}}
-      \scalebox{.65}{
-          \psset{unit=1mm}
-          \psset{linewidth=.5mm}
-          \begin{pspicture}(0,0)(90,0)
-            %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-            \putnode{x}{origin}{13}{-10}{\TwoCells{x0}{x1}}
-            \putnode{startx}{x}{0}{-3}{}
-            \putnode{after0}{x}{-5}{-30}{}
-            \putnode{result}{origin}{32}{10}{\TwoCells{resultx}{resulty}}
-            \putnode{labx}{x}{-7}{10}{\large $(\CAR\ x)$\;{\red $\sigma$} }
-            \putnode{labr}{result}{-12}{12}{\large $x$}
+%% \pause
+%% Notice the similarity with:
+%% \bigskip
+
+%% \centerline{$\mathit{live}_\mathit{in}(I)      =     \mathit{live}_\mathit{out}(I)
+%% \setminus \mathit{def\/}(I) \cup \mathit{ref\/}(I)$}
+%% \bigskip
+
+%% in classical dataflow analysis for imperative languages.
+%% \end{frame}
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \begin{frame}{Liveness analysis of Primitive Applications}
+%% \small
+%% \onslide<1-2>{
+%%   \begin{columns}[c]
+%%     \begin{column}{0.35\textwidth}
+%%       \bigskip
+%%       %\centerline{\epsfig{file=live-analysis1.eps, height=2cm}}
+%%       \scalebox{.65}{
+%%           \psset{unit=1mm}
+%%           \psset{linewidth=.5mm}
+%%           \begin{pspicture}(0,0)(90,0)
+%%             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%             \putnode{x}{origin}{13}{-10}{\TwoCells{x0}{x1}}
+%%             \putnode{startx}{x}{0}{-3}{}
+%%             \putnode{after0}{x}{-5}{-30}{}
+%%             \putnode{result}{origin}{32}{10}{\TwoCells{resultx}{resulty}}
+%%             \putnode{labx}{x}{-7}{10}{\large $(\CAR\ x)$\;{\red $\sigma$} }
+%%             \putnode{labr}{result}{-12}{12}{\large $x$}
             
-            \onslide<1>{\nccurve[nodesepB=-.2,nodesepA=.5,angleA=295,angleB=135]{->}{labr}{result}}
-            \onslide<2>{\nccurve[nodesepB=-.2,nodesepA=.5,angleA=295,angleB=135,linecolor=red]{->}{labr}{result}}
-            \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labx}{x}
-            \onslide<1>{\nccurve[nodesepB=-.2,angleA=270,angleB=75]{*->}{resultx}{x} \bput(.5){\large \acar}}
-            \onslide<2>{\nccurve[nodesepB=-.2,angleA=270,angleB=75,linecolor=red]{*->}{resultx}{x} \bput(.5){\large \acar}}
-            \onslide<2>{\nccurve[nodesepB=-.2,angleA=270,angleB=75,
-                linestyle=dashed,linecolor=red]{*->}{startx}{after0}
-              \bput(.5){\large $\alpha$}}
-          \end{pspicture}
-      }
-    \end{column}
-    \begin{column}{0.65\textwidth}
-      $\Lapp{{\red{(\CAR \;x)}}}{\sigma} = \{x.\epsilon, \; x.\acar\sigma\}$
-    \end{column}
-  \end{columns}
-  \pause
-  \bigskip
-  \bigskip
-  \bigskip
-}
-\only<3->{ 
-  \begin{columns}[c]
-    \begin{column}[T]{0.35\textwidth}
-      %\centerline{\epsfig{file=live-analysis2.eps, height=2.5cm}}
-    \end{column}
-    \begin{column}[T]{0.65\textwidth}
-      \begin{minipage}{\textwidth}
-        \begin{eqnarray*}
-          \Lapp{{\red{(\CONS \;x \;y)}}}{\sigma} &=&  \{x.\alpha \mid \acar\alpha \in \sigma\} \; \cup\\
-          & &  \{y.\beta \mid \acdr\beta \in \sigma\}
-        \end{eqnarray*}
+%%             \onslide<1>{\nccurve[nodesepB=-.2,nodesepA=.5,angleA=295,angleB=135]{->}{labr}{result}}
+%%             \onslide<2>{\nccurve[nodesepB=-.2,nodesepA=.5,angleA=295,angleB=135,linecolor=red]{->}{labr}{result}}
+%%             \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labx}{x}
+%%             \onslide<1>{\nccurve[nodesepB=-.2,angleA=270,angleB=75]{*->}{resultx}{x} \bput(.5){\large \acar}}
+%%             \onslide<2>{\nccurve[nodesepB=-.2,angleA=270,angleB=75,linecolor=red]{*->}{resultx}{x} \bput(.5){\large \acar}}
+%%             \onslide<2>{\nccurve[nodesepB=-.2,angleA=270,angleB=75,
+%%                 linestyle=dashed,linecolor=red]{*->}{startx}{after0}
+%%               \bput(.5){\large $\alpha$}}
+%%           \end{pspicture}
+%%       }
+%%     \end{column}
+%%     \begin{column}{0.65\textwidth}
+%%       $\Lapp{{\red{(\CAR \;x)}}}{\sigma} = \{x.\epsilon, \; x.\acar\sigma\}$
+%%     \end{column}
+%%   \end{columns}
+%%   \pause
+%%   \bigskip
+%%   \bigskip
+%%   \bigskip
+%% }
+%% \only<3->{ 
+%%   \begin{columns}[c]
+%%     \begin{column}[T]{0.35\textwidth}
+%%       %\centerline{\epsfig{file=live-analysis2.eps, height=2.5cm}}
+%%     \end{column}
+%%     \begin{column}[T]{0.65\textwidth}
+%%       \begin{minipage}{\textwidth}
+%%         \begin{eqnarray*}
+%%           \Lapp{{\red{(\CONS \;x \;y)}}}{\sigma} &=&  \{x.\alpha \mid \acar\alpha \in \sigma\} \; \cup\\
+%%           & &  \{y.\beta \mid \acdr\beta \in \sigma\}
+%%         \end{eqnarray*}
         
-        \onslide<5->{
-          \begin{itemize}
-          \item 
-            \bcar\ -- Removal of a leading \acar
-            \\
-            \bcdr\  -- Removal of a leading \acdr
+%%         \onslide<5->{
+%%           \begin{itemize}
+%%           \item 
+%%             \bcar\ -- Removal of a leading \acar
+%%             \\
+%%             \bcdr\  -- Removal of a leading \acdr
             
-          \end{itemize}
-          \begin{eqnarray*}
-            \Lapp{{\red{(\CONS \;x \;y)}}}{\sigma} &=&  x.\bcar\sigma \cup  y.\bcdr\sigma
-        \end{eqnarray*}}
-      \end{minipage}
+%%           \end{itemize}
+%%           \begin{eqnarray*}
+%%             \Lapp{{\red{(\CONS \;x \;y)}}}{\sigma} &=&  x.\bcar\sigma \cup  y.\bcdr\sigma
+%%         \end{eqnarray*}}
+%%       \end{minipage}
+%%     \end{column}
+%%   \end{columns}
+
+%% \raisebox{25mm}{\scalebox{.65}{
+%%     \psset{unit=1mm}
+%%     \psset{linewidth=.5mm}
+%%     \begin{pspicture}(0,0)(90,0)
+%%       %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%       \putnode{x}{origin}{-3}{40}{\TwoCells{x0}{x1}}
+%%       \putnode{y}{x}{51}{0}{\TwoCells{y0}{y1}}
+%%       \putnode{startx}{x}{0}{-3}{}
+%%       \putnode{starty}{y}{0}{-3}{}
+%%       \putnode{after0}{x}{-5}{-30}{}
+%%       \putnode{after1}{y}{5}{-30}{}
+%%       \putnode{result}{origin}{22}{60}{\TwoCells{resultx}{resulty}}
+%%       \putnode{labx}{x}{-7}{10}{\large $x$}
+%%       \putnode{laby}{y}{7}{10}{\large $y$}
+%%       \putnode{labr}{result}{-12}{12}{\large $(\CONS\ x\ y)$\; {\red $\sigma$} }
+
+%%       \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labr}{result}
+%%       \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labx}{x}
+%%       \nccurve[nodesepB=-.2,angleA=270,angleB=45]{->}{laby}{y}
+%%       \nccurve[nodesepB=-.2,angleA=270,angleB=75]{*->}{resultx}{x}
+%%       \onslide<4->{        \bput(.5){\large \acar}}
+%%       \nccurve[nodesepB=-.2,angleA=270,angleB=105]{*->}{resulty}{y}
+%%       \onslide<4->{        \aput(.5){\large \acdr}}
+%%       \onslide<4->{\nccurve[nodesepB=-.2,angleA=270,angleB=75,
+%%           linestyle=dashed]{*->}{startx}{after0}
+%%         \bput(.5){\large $\alpha$}
+%% 	\nccurve[nodesepB=-.2,angleA=270,angleB=105,
+%%           linestyle=dashed]{*->}{starty}{after1}
+%%         \aput(.5){\large ${\mathbf \beta}$}}
+%%     \end{pspicture}
+%% }}}
+%% \end{frame}
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \begin{frame}{Liveness Analysis of User Defined Functions}
+%%   \setbeamercovered{transparent}
+%%   \input{sample-liveness-program}
+%%   \begin{itemize}
+%%   \item Compute liveness of \pz\ at $\pi_{10}$.
+%%   \item Get context independent summary of \plength\ ($\Lf{\plength}{1}{\sigma}$).
+%%   \end{itemize}
+%%   Key Observation : Liveness of function arguments will always be in terms of the
+%%   input demand $\sigma$
+%%   \setbeamercovered{invisible}
+%%   \raisebox{-25mm}{\scalebox{.85}{
+%%       %%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
+%%       \psset{unit=1mm}
+%%       \psset{linewidth=.3mm}
+%%       \begin{pspicture}(0,0)(180,30)
+%%         %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(18,10)
+%% 	%\psframe(0,0)(73,60)
+%% 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 	%% \onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
+%%         %%     \sigma{_{all}}$}}
+%% 	\putnode{call1}{origin}{102}{100}{\large\red $\{\epsilon\}$}
+%% 	\putnode{appendentry}{origin}{94}{106}{\large\red
+%%             $\Lf{\plength}{1}{\sigma} =$}
+%%         \putnode{sigma1}{appendentry}{16}{0}{\large\red $\sigma_1$}
+%%         \putnode{un}{sigma1}{4}{0}{\large\red $\cup$} 
+%% 	\nccurve[nodesepB=-.2,angleA=-11,angleB=-107,linecolor=red]{->}{call1}{sigma1}
+%% 	\putnode{call2}{origin}{109}{88}{\large\red $\acdr\Lf{\plength}{1}{\epsilon}$}
+%%           \putnode{sigma2}{un}{4}{0}{\large\red $\sigma_2$}
+%%         \nccurve[nodesepB=-.2,angleA=25,angleB=-135,linecolor=red]{->}{call2}{sigma2}
+%%   \end{pspicture}}}
+%% \end{frame}
+
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%% \begin{frame}{Liveness analysis -- Demand Summary}
+
+%% \setbeamercovered{transparent}
+%% \small
+%% \begin{columns}[c]
+%%  \begin{column}[T]{0.45\textwidth}
+%%    \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
+%%      \begin{uprogram}
+%%        \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\onslide<0>{\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN}
+%%        \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $\onslide<0>{(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN}
+%%        \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $\onslide<0>{(\SIF\ $*$}
+%%        \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $\onslide<0>{(\LET\ \pw\  $\leftarrow$  }(\plength\ \pz) \onslide<0>{(\IN}
+%%        \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $\onslide<0>{(\RETURN\ \pw)}
+%%        \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $\onslide<0>{(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN}
+%%        \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$\onslide<0>{(\RETURN\ \pb)))))})
+%%    \end{uprogram}}
+%%  \end{column}
+%%  \begin{column}[T]{0.60\textwidth}
+%% \hspace*{.4cm}  \renewcommand{\arraystretch}{1}{
+%%   \begin{uprogram}
+%%      \UNL{1} (\DEFINE\ (\plength~\lista)
+
+%%     \UNL{2}  $\pi_1\!\!:\, $\onslide<0>{(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN}
+
+
+%%     \UNL{3}     $\pi_2\!\!:\, $\onslide<0>{(\SIF\ \xtest}
+
+%% ~$\pi_3\!\!:$\onslide<0>{(\RETURN\ $0$)}
+ 
+%%           \UNL{4} \hspace*{-.05cm}    
+%%  $\pi_4\!\!:\, $\onslide<0>{(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN}
+
+%% 	  \UNL{5}  \hspace*{-.05cm}
+%%           $\pi_5\!\!:\,$\onslide<0>{(\LET\ \xrec\  $\leftarrow$ }(\plength\ \ \xtl\ ) \onslide<0>{\IN}
+
+
+%%           \UNL{6} \hspace*{-.05cm}   $\pi_6\!\!:\, $\onslide<0>{(\LET\ \xhd\  $\leftarrow$  $1$)  \IN}
+
+
+%%           \UNL{7}  \hspace*{-.05cm}   $\pi_7\!\!:\,$\onslide<0>{(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN}
+
+%%           \UNL{8} \hspace*{-.05cm}
+%% $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
+ 
+%% \end{uprogram}}
+%%  \end{column}
+%% \end{columns}
+%% \setbeamercovered{invisible}
+%%       \raisebox{-25mm}{\scalebox{.85}{
+%% 	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
+%%       \psset{unit=1mm}
+%%       \psset{linewidth=.3mm}
+%%       \begin{pspicture}(0,0)(180,30)
+%% %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(18,10)
+%% 	%\psframe(0,0)(73,60)
+%% 	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 	\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
+%%           \sigma{_{all}}$}
+%% 	\putnode{call1}{origin}{41}{58}{\large\red $\sigma_1$
+%% 	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{o}{call1}}
+%% 	\putnode{appendentry}{origin}{85}{72}{\large\red
+%%           $\sigma_{\plength} = \sigma_1 \cup  \sigma_2$}
+%% 	\nccurve[nodesepB=-.2,angleA=45,angleB=165,linecolor=red]{->}{call1}{appendentry}
+%% 	\putnode{call2}{origin}{125}{52}{\large\red $\sigma_2$}
+%% 	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{appendentry}{call2}
+%% 	\nccurve[nodesepB=-.2,angleA=65,angleB=0,linecolor=red]{->}{call2}{appendentry}
+
+%%       \end{pspicture}}}
+
+%% \vspace*{-2cm}
+%% \footnotesize
+%% \begin{columns}[c]
+%%   \begin{column}[T]{0.40\textwidth}
+%%     \scriptsize
+%%     \centerline{\bf Liveness environments:}
+%%     \bigskip
+%%     %% $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
+%%     %% $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
+%%     %% $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
+%%     %% \ldots\\
+%%     %% $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
+%%     %%   \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
+%%   \end{column}
+%%   \begin{column}[T]{0.30\textwidth}
+%%     \scriptsize
+%%     \centerline{\bf Demand summaries:}
+    
+%%     \begin{align*}
+%%       &\sigma_{\xmain} = \sigma_{all}\\
+%%       &\sigma_{\plength} = \sigma_{all} \cup\  \{\epsilon\}
+%%     \end{align*}
+    
+%%   \end{column}
+%%   \begin{column}[T]{0.38\textwidth}
+%%     \scriptsize
+%%     \centerline{\bf Function summaries:}
+%%     \bigskip
+%%     $\Lf{\plength}{1}{\sigma} = \{\epsilon\} \cup \acdr\Lf{\plength}{1}{\epsilon}$
+%%   \end{column}
+%% \end{columns}
+%% \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[t]{Summary of Analysis Results}
+  \scriptsize
+  \begin{columns}[c]
+    \begin{column}[T]{0.33\textwidth}
+      \vspace*{1.5cm}
+      \centerline{\bf Liveness at program points:}
+      \begin{align*}
+        %% $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
+        %% $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
+        %% $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
+        %% \ldots\\
+        %% $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon, \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
+      \end{align*}
+    \end{column}
+    
+    \begin{column}[T]{0.33\textwidth}
+      \vspace*{1.5cm}
+      \centerline{\bf Demand summaries:}
+      \begin{align*}
+        &\sigma_{\xmain} = \sigma_{all}\\
+        &\sigma_{\plength} = \sigma_{all} \cup \{\epsilon\}
+      \end{align*}
+    \end{column}
+    
+    \begin{column}[T]{0.33\textwidth}
+      \vspace*{1.5cm}
+      \centerline{\bf Function summaries:}
+      \begin{align*}
+        \Lf{\plength}{1}{\sigma} = \{\epsilon\} \cup \acdr\Lf{\plength}{1}{\epsilon}
+      \end{align*}
     \end{column}
   \end{columns}
-
-\raisebox{25mm}{\scalebox{.65}{
-    \psset{unit=1mm}
-    \psset{linewidth=.5mm}
-    \begin{pspicture}(0,0)(90,0)
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-      \putnode{x}{origin}{-3}{40}{\TwoCells{x0}{x1}}
-      \putnode{y}{x}{51}{0}{\TwoCells{y0}{y1}}
-      \putnode{startx}{x}{0}{-3}{}
-      \putnode{starty}{y}{0}{-3}{}
-      \putnode{after0}{x}{-5}{-30}{}
-      \putnode{after1}{y}{5}{-30}{}
-      \putnode{result}{origin}{22}{60}{\TwoCells{resultx}{resulty}}
-      \putnode{labx}{x}{-7}{10}{\large $x$}
-      \putnode{laby}{y}{7}{10}{\large $y$}
-      \putnode{labr}{result}{-12}{12}{\large $(\CONS\ x\ y)$\; {\red $\sigma$} }
-
-      \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labr}{result}
-      \nccurve[nodesepB=-.2,angleA=295,angleB=135]{->}{labx}{x}
-      \nccurve[nodesepB=-.2,angleA=270,angleB=45]{->}{laby}{y}
-      \nccurve[nodesepB=-.2,angleA=270,angleB=75]{*->}{resultx}{x}
-      \onslide<4->{        \bput(.5){\large \acar}}
-      \nccurve[nodesepB=-.2,angleA=270,angleB=105]{*->}{resulty}{y}
-      \onslide<4->{        \aput(.5){\large \acdr}}
-      \onslide<4->{\nccurve[nodesepB=-.2,angleA=270,angleB=75,
-          linestyle=dashed]{*->}{startx}{after0}
-        \bput(.5){\large $\alpha$}
-	\nccurve[nodesepB=-.2,angleA=270,angleB=105,
-          linestyle=dashed]{*->}{starty}{after1}
-        \aput(.5){\large ${\mathbf \beta}$}}
-    \end{pspicture}
-}}}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Liveness Analysis of User Defined Functions}
-  \setbeamercovered{transparent}
-  \input{sample-liveness-program}
-  \begin{itemize}
-  \item Compute liveness of \pz\ at $\pi_{10}$.
-  \item Get context independent summary of \plength\ ($\Lf{\plength}{1}{\sigma}$).
-  \end{itemize}
-  Key Observation : Liveness of function arguments will always be in terms of the
-  input demand $\sigma$
-  \setbeamercovered{invisible}
-  \raisebox{-25mm}{\scalebox{.85}{
-      %%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
-      \psset{unit=1mm}
-      \psset{linewidth=.3mm}
-      \begin{pspicture}(0,0)(180,30)
-        %\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(18,10)
-	%\psframe(0,0)(73,60)
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	%% \onslide<1-5>{\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
-        %%     \sigma{_{all}}$}}
-	\putnode{call1}{origin}{102}{100}{\large\red $\{\epsilon\}$}
-	\putnode{appendentry}{origin}{94}{106}{\large\red
-            $\Lf{\plength}{1}{\sigma} =$}
-        \putnode{sigma1}{appendentry}{16}{0}{\large\red $\sigma_1$}
-        \putnode{un}{sigma1}{4}{0}{\large\red $\cup$} 
-	\nccurve[nodesepB=-.2,angleA=-11,angleB=-107,linecolor=red]{->}{call1}{sigma1}
-	\putnode{call2}{origin}{109}{88}{\large\red $\acdr\Lf{\plength}{1}{\epsilon}$}
-          \putnode{sigma2}{un}{4}{0}{\large\red $\sigma_2$}
-        \nccurve[nodesepB=-.2,angleA=25,angleB=-135,linecolor=red]{->}{call2}{sigma2}
-  \end{pspicture}}}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\begin{frame}{Liveness analysis -- Demand Summary}
-
-\setbeamercovered{transparent}
-\small
-\begin{columns}[c]
- \begin{column}[T]{0.45\textwidth}
-   \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
-     \begin{uprogram}
-       \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\onslide<0>{\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN}
-       \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $\onslide<0>{(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN}
-       \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $\onslide<0>{(\SIF\ $*$}
-       \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $\onslide<0>{(\LET\ \pw\  $\leftarrow$  }(\plength\ \pz) \onslide<0>{(\IN}
-       \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $\onslide<0>{(\RETURN\ \pw)}
-       \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $\onslide<0>{(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN}
-       \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$\onslide<0>{(\RETURN\ \pb)))))})
-   \end{uprogram}}
- \end{column}
- \begin{column}[T]{0.60\textwidth}
-\hspace*{.4cm}  \renewcommand{\arraystretch}{1}{
-  \begin{uprogram}
-     \UNL{1} (\DEFINE\ (\plength~\lista)
-
-    \UNL{2}  $\pi_1\!\!:\, $\onslide<0>{(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN}
-
-
-    \UNL{3}     $\pi_2\!\!:\, $\onslide<0>{(\SIF\ \xtest}
-
-~$\pi_3\!\!:$\onslide<0>{(\RETURN\ $0$)}
- 
-          \UNL{4} \hspace*{-.05cm}    
- $\pi_4\!\!:\, $\onslide<0>{(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN}
-
-	  \UNL{5}  \hspace*{-.05cm}
-          $\pi_5\!\!:\,$\onslide<0>{(\LET\ \xrec\  $\leftarrow$ }(\plength\ \ \xtl\ ) \onslide<0>{\IN}
-
-
-          \UNL{6} \hspace*{-.05cm}   $\pi_6\!\!:\, $\onslide<0>{(\LET\ \xhd\  $\leftarrow$  $1$)  \IN}
-
-
-          \UNL{7}  \hspace*{-.05cm}   $\pi_7\!\!:\,$\onslide<0>{(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN}
-
-          \UNL{8} \hspace*{-.05cm}
-$\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
- 
-\end{uprogram}}
- \end{column}
-\end{columns}
-\setbeamercovered{invisible}
-      \raisebox{-25mm}{\scalebox{.85}{
-	%%%%%%%%%%%%%%%%%%%%%Uday's stuff%%%%%%%%%%%%%%%%%%%%%%%%%
-      \psset{unit=1mm}
-      \psset{linewidth=.3mm}
-      \begin{pspicture}(0,0)(180,30)
-%\psgrid[xunit=1cm,yunit=1cm,gridwidth=.2pt,subgridwidth=.1pt,subgriddiv=5,subgridcolor=gray,gridcolor=blue](0,0)(18,10)
-	%\psframe(0,0)(73,60)
-	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-	\putnode{o}{origin}{26}{72}{\large\red $\sigma_{\xmain} =
-          \sigma{_{all}}$}
-	\putnode{call1}{origin}{41}{58}{\large\red $\sigma_1$
-	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{o}{call1}}
-	\putnode{appendentry}{origin}{85}{72}{\large\red
-          $\sigma_{\plength} = \sigma_1 \cup  \sigma_2$}
-	\nccurve[nodesepB=-.2,angleA=45,angleB=165,linecolor=red]{->}{call1}{appendentry}
-	\putnode{call2}{origin}{125}{52}{\large\red $\sigma_2$}
-	\nccurve[nodesepB=-.2,angleA=270,angleB=135,linecolor=red]{->}{appendentry}{call2}
-	\nccurve[nodesepB=-.2,angleA=65,angleB=0,linecolor=red]{->}{call2}{appendentry}
-
-      \end{pspicture}}}
-
-\vspace*{-2cm}
-\footnotesize
-\begin{columns}[c]
-  \begin{column}[T]{0.40\textwidth}
-    \scriptsize
-    \centerline{\bf Liveness environments:}
-    \bigskip
-    %% $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
-    %% $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
-    %% $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
-    %% \ldots\\
-    %% $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon,
-    %%   \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
-  \end{column}
-  \begin{column}[T]{0.30\textwidth}
-    \scriptsize
-    \centerline{\bf Demand summaries:}
-    
-    \begin{align*}
-      &\sigma_{\xmain} = \sigma_{all}\\
-      &\sigma_{\plength} = \sigma_{all} \cup\  \{\epsilon\}
-    \end{align*}
-    
-  \end{column}
-  \begin{column}[T]{0.38\textwidth}
-    \scriptsize
-    \centerline{\bf Function summaries:}
-    \bigskip
-    $\Lf{\plength}{1}{\sigma} = \{\epsilon\} \cup \acdr\Lf{\plength}{1}{\epsilon}$
-  \end{column}
-\end{columns}
-\end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame} {Handling possible non-evaluation}
   \begin{itemize}
   \item Liveness no longer remains independent of demand $\sigma$ \\
@@ -546,7 +582,7 @@ $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
         \emptyset&\mbox{if}~\sigma = \emptyset\\
         \{\epsilon\} & \mbox{otherwise}
       \end{array}\right.\\ & \\
-      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
+%      \Lapp{(\CAR \;\px)}{\sigma} &= \px.\{\clazy, \acar\}\sigma
     \end{align*}
   \end{itemize}
 \end{frame}
@@ -579,7 +615,7 @@ $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
   Improving precision using run-time updates 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}[t]{Summary of Analysis Results}
+\begin{frame}[t]{Modified Analysis Results}
   \scriptsize
   \begin{columns}[c]
     \begin{column}[T]{0.33\textwidth}
@@ -790,7 +826,6 @@ $\pi_8\!\!:\, $\onslide<0>{(\RETURN\ \xans))))))})
 \item<1-> Reducing GC-time.
   \begin{itemize}
   \item Reducing re-visits to heap nodes.
-  \item Basing the implementation on full Scheme, not ANF-Scheme
   \item Hybrid GC (RGC + LGC)
   \end{itemize}
 \item<2-> Increasing the scope of the method.
