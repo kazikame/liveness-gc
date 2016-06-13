@@ -1,0 +1,56 @@
+\scalebox{.99}{ 
+\psset{xunit=.6mm, yunit=.8mm}
+\psset{linewidth=.3mm}
+\begin{pspicture}(0,15)(150,-45)
+% \psframe(0,15)(150,-45)
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \putnode{o}{origin}{13}{-10}{\TwoCells{o1}{o2}}
+  \putnode{a}{o}{-15}{-15}{\psframebox{\mbox{\ }}}
+  \putnode{b}{o}{0}{-5}{\TwoCells{b1}{b2}}
+  \nccurve[angleA=-90,angleB=90]{*->}{o1}{a}
+  %  \Aput[.1pt]{\acar}
+  \putnode{y}{o}{-10}{12}{\psframebox[linestyle=none,framesep=.5pt]{$\px$}}
+  % \nccurve[angleA=-90,angleB=90,nodesepB=-.1pt]{*->}{o2}{b}
+  % \Aput[.1pt]{\acdr}
+  \nccurve[angleA=-45,angleB=120]{->}{y}{o}
+  \putnode{xa}{b}{15}{-15}{\psframebox{\mbox{\ }}}
+  \nccurve[angleA=-90,angleB=90]{*->}{b1}{xa}
+  %  \Aput[.1pt]{\acar}
+  %\putnode{xb}{b}{+15}{-15}{\mbox{}}
+  % \nccurve[angleA=-90,angleB=90]{*->}{b2}{xb}
+  %  \Aput[.1pt]{\acdr}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \putnode{t0}{y}{40}{0}{\Lanv{\pi}{\px}}
+  \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+  \putnode{t3}{t1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+  \psset{arrows=->}    
+  \ncline[nodesep=0]{t0}{t1}
+  %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
+  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{t1}{t3} 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+  \putnode{xt0}{y}{40}{-15}{\mbox{\ }}
+  \putnode{xt1}{xt0}{20}{0}{\pscirclebox{\mbox{\ }}}
+  \putnode{xt3}{xt1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+  \psset{arrows=->}    
+  \ncline[nodesep=0]{xt0}{xt1}
+  %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
+  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{xt1}{xt3} 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \nccurve[nodesep=0.1,linestyle=dashed,angleA=0,angleB=120]{o}{xt1}
+
+  \putnode{zt0}{y}{40}{-30}{\mbox{\ }}
+  \putnode{zt1}{zt0}{20}{0}{\pscirclebox{\mbox{\ }}}     
+  \putnode{zt3}{zt1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+  \psset{arrows=->}    
+  \ncline[nodesep=0]{zt0}{zt1}
+  %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
+  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{zt1}{zt3} 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \nccurve[nodesep=0.1,linestyle=dashed,angleA=0,angleB=120]{b}{zt1}
+
+
+\end{pspicture}
+}
+

@@ -24,6 +24,7 @@
 \usepackage{pst-text}
 \usepackage{pst-node}
 \usepackage{pst-tree}
+\usepackage{pst-coil}
 \usepackage{pst-rel-points}
 \usepackage{boxedminipage}
 \usepackage{algorithmic}
@@ -44,6 +45,7 @@
 \setbeamercolor*{palette tertiary}{fg=black,bg=black!10} 
 \setbeamercolor*{palette quaternary}{fg=black,bg=black!10} 
 
+\newcommand{\cmt}[1]{}
 \renewcommand{\(}{\begin{columns}}
 \renewcommand{\)}{\end{columns}}
 \newcommand{\<}[1]{\begin{column}{#1}}
@@ -826,38 +828,28 @@
 %%   \end{columns}
 %% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{frame}{Example automaton and its simplification}
 \input{liveness-dfa-for-presentation.tex}
 \end{frame}
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{LGC for a \CONS\ cell}
-  \begin{columns}[c]
-    \begin{column}{0.45\textwidth}
       \begin{itemize}
       \item Find corresponding automaton for root variable.
       \item If automaton accepts $\epsilon$, copy current cell to live buffer.
       \item Recursively copy the $\CAR$ part with the automaton starting from the state on a $\acar$ from the current state.
+      \input{LGC_for_cons.tex}
       \end{itemize}
-    \end{column}
-    \begin{column}{0.50\textwidth}
-      \epsfig{file=LGC_for_cons.ps, height=4.5cm}
-    \end{column}
-  \end{columns}
 \end{frame}
 
 \begin{frame}{LGC for closures}
-   \begin{columns}[c]
-    \begin{column}{0.45\textwidth}
       \begin{itemize}
       \item Find corresponding automaton for root variable.
       \item If automaton accepts $\epsilon$, copy current cell to live buffer.
       \item For each argument of the closure, use corresponding automaton stored in the closure and copy.
+      \input{LGC_for_closure.tex}
       \end{itemize}
-    \end{column}
-    \begin{column}{0.50\textwidth}
-      \epsfig{file=LGC_for_closure.ps, height=4.5cm}
-    \end{column}
-   \end{columns}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

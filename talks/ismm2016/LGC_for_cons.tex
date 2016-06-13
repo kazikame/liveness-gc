@@ -1,0 +1,39 @@
+\newcommand{\lgccons}{}%
+\scalebox{.99}{ 
+\psset{xunit=.6mm, yunit=.8mm}
+\psset{linewidth=.3mm}
+\begin{pspicture}(0,15)(150,-45)
+% \psframe(0,15)(150,-45)
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \putnode{o}{origin}{13}{-10}{\TwoCells{o1}{o2}}
+  \putnode{a}{o}{-15}{-15}{\psframebox{\mbox{ }}}
+  \putnode{b}{a}{+30}{0}{\TwoCells{b1}{b2}}
+  \nccurve[angleA=-90,angleB=90]{*->}{o1}{a}
+  \Aput[.1pt]{\acar}
+  \putnode{y}{o}{-10}{12}{\psframebox[linestyle=none,framesep=.5pt]{$\px$}}
+  \nccurve[angleA=-90,angleB=90,nodesepB=-.1pt]{*->}{o2}{b}
+  \Aput[.1pt]{\acdr}
+  \nccurve[angleA=-45,angleB=120]{->}{y}{o}
+  \putnode{xa}{b}{-15}{-15}{\mbox{}}
+  \nccurve[angleA=-90,angleB=90]{*->}{b1}{xa}
+  \Aput[.1pt]{\acar}
+  \putnode{xb}{b}{+15}{-15}{\mbox{}}
+  \nccurve[angleA=-90,angleB=90]{*->}{b2}{xb}
+  \Aput[.1pt]{\acdr}
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \putnode{t0}{y}{40}{0}{\Lanv{\pi}{\px}}
+  \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
+  \putnode{t2}{t1}{30}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}}     
+  \putnode{t3}{t2}{40}{0}{\pscirclebox[doubleline=true]{\mbox{$q_n$}}}     
+  \psset{arrows=->}    
+  \ncline[nodesep=0]{t0}{t1}
+  \ncline[nodesep=0]{t1}{t2} 
+  \Aput[0.1]{\acdr}
+  %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
+  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{t2}{t3} 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \nccurve[nodesep=0.1,linestyle=dashed,angleA=0,angleB=-120]{o}{t1}
+  \nccurve[nodesep=0.1, linestyle=dashed,angleA=0,angleB=-105]{b}{t2}
+\end{pspicture}
+}
+\lgccons
