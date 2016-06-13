@@ -2,8 +2,8 @@
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{} 
-      \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_0$}}}
+      \putnode{t0}{origin}{2}{1}{\Lf{\plength}{1}{\sigma}} 
+      \putnode{t1}{t0}{20}{0}{\pscirclebox{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
       \psset{arrows=->} \ncline{t0}{t1} 
@@ -114,7 +114,7 @@
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{zcdr}} 
+      \putnode{t0}{origin}{2}{1}{\mbox{\Lanv{9}{\px}}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
@@ -136,7 +136,7 @@
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{zcdr}} 
+      \putnode{t0}{origin}{2}{1}{\mbox{\Lanv{9}{\px}}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
@@ -161,7 +161,7 @@
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{zcdr}} 
+      \putnode{t0}{origin}{2}{1}{\mbox{\Lanv{9}{\px}}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
       \psset{arrows=->} \ncline{t0}{t1} 
       \nccurve[angleA=-45, angleB=-115, ncurv=1.5, nodesep=-1]{t1}{t1}
@@ -175,8 +175,8 @@
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{} 
-      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
+      \putnode{t0}{origin}{2}{1}{\Lf{\plength}{1}{\sigma}} 
+      \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
       \psset{arrows=->} \ncline{t0}{t1} 
@@ -192,8 +192,8 @@
   \scalebox{.70}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(2,-1)(13,9)
-      \putnode{t0}{origin}{2}{1}{}
-      \putnode{t1}{t0}{8}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
+      \putnode{t0}{origin}{2}{1}{\Lf{\plength}{1}{\sigma}}
+      \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
       \psset{arrows=->}    
       \ncline{t0}{t1}     
       \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t1}{t1} 
@@ -250,12 +250,10 @@
 \begin{figure}[t]
 \begin{center}
 {\scalebox{.75}{
-    %% \nfaD  \;\;\;\;  \nfaDF \;\;\;\; \dfaD \;\;\;\;
-    %% \linebreak
-    %% \dfaE \;\;\;\; \dfaF \;\;\;\; \dfaG \;\;\; 
-%\zcdrliveness \;\;\;\; 
-\zcdrlivenesssimpl 
-%\;\;\;\; \zcdrlivenessfinal
+    \begin{tabular}[T]{c c c}
+      \nfaD & \nfaDF & \dfaD \\
+      \zcdrliveness & \zcdrlivenesssimpl & \zcdrlivenessfinal
+    \end{tabular}
 }}
 \end{center}
 \end{figure}

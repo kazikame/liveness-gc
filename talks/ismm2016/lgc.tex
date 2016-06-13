@@ -151,30 +151,30 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Our method}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% \begin{frame}{The language analyzed}
-%% \begin{columns}
-%%   \begin{column}[T]{0.45\textwidth}
-%% \small
-%%     \begin{itemize} \itemsep0.75em
-%%     \item First order Scheme-like lazy functional language.
-%%     \item In Administrative Normal Form (ANF).
-%% %    \item The order  of
-%% %      evaluation of function arguments is made explicit.
-%%     \end{itemize}
-%% \normalsize
-%%   \end{column}
-%%   \begin{column}[T]{0.55\textwidth}
-%%     \input{language-being-analysed}
-%%   \end{column}
-%% \end{columns}
-%% \end{frame}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{The language analyzed}
-  \input{motivating-example}
+\begin{columns}
+  \begin{column}[T]{0.45\textwidth}
+\small
+    \begin{itemize} \itemsep0.75em
+    \item First order Scheme-like lazy functional language.
+    \item In Administrative Normal Form (ANF).
+%    \item The order  of
+%      evaluation of function arguments is made explicit.
+    \end{itemize}
+\normalsize
+  \end{column}
+  \begin{column}[T]{0.55\textwidth}
+    \input{language-being-analysed}
+  \end{column}
+\end{columns}
 \end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% \begin{frame}{The language analyzed}
+%%   \input{motivating-example}
+%% \end{frame}
 \section{\scshape LGC for lazy languages}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Demand}
+\begin{frame}{Basic Concepts and Notations--Demand}
   \begin{center}
      (\CAR\ (\CDR\ \pw)) \\
   \end{center}
@@ -189,7 +189,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Liveness}
-\begin{frame}{Liveness -- Basic Concepts and Notations}
+\begin{frame}{Basic Concepts and Notations--Liveness }
 \small
 \begin{columns}
   \begin{column}[T]{0.75\textwidth}
@@ -250,9 +250,45 @@
 \begin{frame}{Liveness analysis}
   \begin{columns}
     \begin{column}[T]{0.5\textwidth}
-      \input{motivating-example}
+       \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
+         \begin{uprogram}
+           \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
+           \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
+           \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $(\SIF\ $*$
+           \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $(\LET\ \pw\  $\leftarrow$  (\plength\ \pz) \IN
+           \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $(\RETURN\ \pw)
+           \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN
+           \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
+       \end{uprogram}}
     \end{column}
-    \begin{column}[T]{0.5\textwidth}
+    \begin{column}[T]{0.6\textwidth}
+      \hspace*{-.8cm}  \renewcommand{\arraystretch}{1}{
+        \begin{uprogram}
+          \UNL{1} (\DEFINE\ (\plength~\lista)
+          
+          \UNL{2}  $\pi_1\!\!:\, $(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN
+          
+
+          \UNL{3}     $\pi_2\!\!:\, $(\SIF\ \xtest
+
+          ~$\pi_3\!\!:$(\RETURN\ $0$)
+          
+          \UNL{4} \hspace*{-.08cm}    
+          $\pi_4\!\!:\, $(\LET\ \xtl\  $\leftarrow$\   (\CDR\ \lista) \IN
+          
+	  \UNL{5}  \hspace*{-.08cm}
+          $\pi_5\!\!:\,$(\LET\ \xrec\  $\leftarrow$ (\plength\ \ \xtl\ ) \IN
+          
+          
+          \UNL{6} \hspace*{-.08cm}   $\pi_6\!\!:\, $(\LET\ \xhd\  $\leftarrow$  $1$)  \IN
+          
+          
+          \UNL{7}  \hspace*{-.08cm}   $\pi_7\!\!:\,$(\LET\ \xans\  $\leftarrow$ ($+$\ \ \xhd\ \ \xrec)  \IN
+          
+          \UNL{8} \hspace*{-.08cm}
+          $\pi_8\!\!:\, $(\RETURN\ \xans)))))))
+          
+      \end{uprogram}}
     \end{column}
   \end{columns}
 \end{frame}
@@ -540,20 +576,17 @@
       \vspace*{1.5cm}
       \centerline{\bf Liveness at program points:}
       \begin{align*}
-        %% $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
-        %% $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
-        %% $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
-        %% \ldots\\
-        %% $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon, \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
+        \Lanv{9}{\px}  &=  \bcdr\Lf{\plength}{1}{\sigma_{\mathit{\!all}}} \\
+        \;\;\;\;\;\;\;\;\;\;  &\cup\; \bcdr\Lf{\pfun}{1}{\sigma_{\mathit{\!all}}}\\ 
       \end{align*}
     \end{column}
-    
     \begin{column}[T]{0.33\textwidth}
       \vspace*{1.5cm}
       \centerline{\bf Demand summaries:}
       \begin{align*}
         &\sigma_{\xmain} = \sigma_{all}\\
-        &\sigma_{\plength} = \sigma_{all} \cup \{\epsilon\}
+        &\sigma_{\plength} = \sigma_{all} \cup \{\epsilon\}\\
+        &\sigma_{\pfun} = \sigma_{all}\\
       \end{align*}
     \end{column}
     
@@ -561,14 +594,14 @@
       \vspace*{1.5cm}
       \centerline{\bf Function summaries:}
       \begin{align*}
-        \Lf{\plength}{1}{\sigma} = \{\epsilon\} \cup \acdr\Lf{\plength}{1}{\epsilon}
+        &\Lf{\plength}{1}{\sigma} = \{\epsilon\} \cup \acdr\Lf{\plength}{1}{\epsilon}\\
+        &\Lf{\pfun}{1}{\sigma} = \{\epsilon\} \cup \{\acar\sigma\}\\
       \end{align*}
     \end{column}
   \end{columns}
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 \begin{frame} {Handling possible non-evaluation}
   \begin{itemize}
   \item Liveness no longer remains independent of demand $\sigma$ \\
@@ -608,11 +641,52 @@
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Handling lazy semantics: Closures}
-  Stack variables and closure variables
+  \begin{columns}[c]
+    \begin{column}[T]{0.5\textwidth}
+      \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
+        \begin{uprogram}
+          \UNL{1}\hspace*{-.4cm} $\pi_8\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
+          \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
+          %% \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $(\SIF\ $*$
+          %% \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $(\LET\ \pw\  $\leftarrow$ (\plength\ \pz) (\IN
+          %% \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $(\RETURN\ \pw)
+          \UNL{2}   \ldots
+          \UNL{2}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\CONS\  \pz\ \NIL) \IN
+          \UNL{3}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
+   \end{uprogram}}
+    \end{column}
+    \begin{column}[T]{0.5\textwidth}
+      \begin{itemize}
+      \item \pz\ {\em escapes} from the scope it was created.
+      \item During GC, we require program point of use of \pz.
+      \item Carry program point of last use in closure.
+      \end{itemize}
+    \end{column}
+  \end{columns}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Handling lazy semantics: Closures}
-  Improving precision using run-time updates 
+\begin{columns}[c]
+    \begin{column}[T]{0.5\textwidth}
+      \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
+        \begin{uprogram}
+          \UNL{1}\hspace*{-.4cm} $\pi_8\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
+          \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
+          \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $(\SIF\ $*$
+          \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $(\LET\ \pw\  $\leftarrow$ (\plength\ \pz) (\IN
+          \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $(\RETURN\ \pw)
+          \UNL{4}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\pfun\  \pz) \IN
+          \UNL{5}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
+   \end{uprogram}}
+    \end{column}
+    \begin{column}[T]{0.5\textwidth}
+      \begin{itemize}
+      \item \px\ is live at $\pi_{9}$  because of its probable use at $\pi_{13}$
+      \item If $*$ evaluates to true, then \px\ is not live.
+      \item Update liveness of closure arguments as execution proceeds.
+      \end{itemize}
+    \end{column}
+  \end{columns}  
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}[t]{Modified Analysis Results}
@@ -622,20 +696,17 @@
       \vspace*{1.5cm}
       \centerline{\bf Liveness at program points:}
       \begin{align*}
-        %% $\Lanv{1}{\lista} = \{\epsilon\} \cup  \acar\bcar\sigma_\append\; \cup $\\
-        %% $\;\;\;\;\;\;\;\;\;\;\;\acdr\Lf{\append}{1}{\bcdr\sigma_{\append}}$\\
-        %% $\Lanv{1}{\listb} = \sigma \cup \Lf{\append}{2}{\bcdr\sigma_{\append}}$\\
-        %% \ldots\\
-        %% $\Lanv{9}{\py}  = $ \Lf{\append}{1}{\{\epsilon, \acdr\} \cup \acdr\acar\sigma_{\mathit{\!all}}} \\
+        \Lanv{9}{\px}  &=  \bcdr\Lf{\plength}{1}{\sigma_{\mathit{\!all}}} \\
+        \;\;\;\;\;\;\;\;\;\;  &\cup\; \bcdr\Lf{\pfun}{1}{\sigma_{\mathit{\!all}}}\\ 
       \end{align*}
     \end{column}
-    
     \begin{column}[T]{0.33\textwidth}
       \vspace*{1.5cm}
       \centerline{\bf Demand summaries:}
       \begin{align*}
         &\sigma_{\xmain} = \sigma_{all}\\
-        &\sigma_{\plength} = \sigma_{all} \cup \clazy\sigma_{\plength}
+        &\sigma_{\plength} = \sigma_{all} \cup \{\clazy\sigma_{\plength}\}\\
+        &\sigma_{\pfun} = \sigma_{all}\\
       \end{align*}
     \end{column}
     
@@ -643,7 +714,8 @@
       \vspace*{1.5cm}
       \centerline{\bf Function summaries:}
       \begin{align*}
-        \Lf{\plength}{1}{\sigma} = \{\clazy\sigma\} \cup \acdr\Lf{\plength}{1}{\clazy\sigma}
+        &\Lf{\plength}{1}{\sigma} = \{\clazy\sigma\} \cup \acdr\Lf{\plength}{1}{\clazy\sigma}\\
+        &\Lf{\pfun}{1}{\sigma} = \{\clazy\sigma\} \cup \{\acar\sigma\}\\
       \end{align*}
     \end{column}
   \end{columns}
@@ -657,13 +729,11 @@
   \scalebox{0.75}{
   \begin{columns}
     \begin{column}[T]{.5\textwidth}
-      
       \begin{eqnarray*}
         &&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma\\
         &&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
         \cup \clazy\Df{\plength}{1}{\clazy}
       \end{eqnarray*}
-      
     \end{column}
     \begin{column}[T]{0.5\textwidth}
       \begin{eqnarray*}
@@ -678,7 +748,7 @@
   \linebreak
   \linebreak
   \linebreak
-  The  solution of \Lanv{1}{\lista} is the   language  $\mathscr{L}(\Lanv{1}{\lista})$ generated    by    it.
+  The  solution of \Lanv{9}{\px} is the   language  $\mathscr{L}(\Lanv{9}{\px})$ generated    by    it.
 \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -733,28 +803,28 @@
 
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Example}
-  \scriptsize
-  \begin{columns}[c]
-    \begin{column}[T]{.5\textwidth}
-      {Grammar for \Lanv{9}{\py}}
-      \begin{eqnarray*}
-        &&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma,~\mbox{and}\\
-        &&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
-        \cup \clazy\Df{\plength}{1}{\clazy}
-      \end{eqnarray*}
-    \end{column}
-    \begin{column}[T]{.5\textwidth}
-      After Mohri-Nederhoff transformation
-       \begin{eqnarray*}              
-         \var{\Df{\plength}{1}}   &\rightarrow&   \clazy\varnew{\Df{\plength}{1}}
-         \mid                 \acdr\var{\Df{\plength}{1}}                 \mid
-         \clazy\var{\Df{\plength}{1}}\\  \varnew{\Df{\plength}{1}}  &\rightarrow&
-         \clazy\varnew{\Df{\plength}{1}} \mid \epsilon
-       \end{eqnarray*}
-    \end{column}
-  \end{columns}
-\end{frame}
+%% \begin{frame}{Example}
+%%   \scriptsize
+%%   \begin{columns}[c]
+%%     \begin{column}[T]{.5\textwidth}
+%%       {Grammar for \Lanv{9}{\px}}
+%%       \begin{eqnarray*}
+%%         &&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma,~\mbox{and}\\
+%%         &&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
+%%         \cup \clazy\Df{\plength}{1}{\clazy}
+%%       \end{eqnarray*}
+%%     \end{column}
+%%     \begin{column}[T]{.5\textwidth}
+%%       After Mohri-Nederhoff transformation
+%%        \begin{eqnarray*}              
+%%          \var{\Df{\plength}{1}}   &\rightarrow&   \clazy\varnew{\Df{\plength}{1}}
+%%          \mid                 \acdr\var{\Df{\plength}{1}}                 \mid
+%%          \clazy\var{\Df{\plength}{1}}\\  \varnew{\Df{\plength}{1}}  &\rightarrow&
+%%          \clazy\varnew{\Df{\plength}{1}} \mid \epsilon
+%%        \end{eqnarray*}
+%%     \end{column}
+%%   \end{columns}
+%% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Example automaton and its simplification}
 \input{liveness-dfa-for-presentation.tex}
@@ -771,8 +841,6 @@
     \end{column}
     \begin{column}{0.50\textwidth}
       \epsfig{file=LGC_for_cons.ps, height=4.5cm}
-      Take example of $\pi_1:(\plength\ \px)$ and explain
-      LGC for a \CONS\  cell
     \end{column}
   \end{columns}
 \end{frame}
@@ -788,8 +856,6 @@
     \end{column}
     \begin{column}{0.50\textwidth}
       \epsfig{file=LGC_for_closure.ps, height=4.5cm}
-      Take example of $\pi_2:(+\ 1 (\pfun\ \px))$ and explain
-      LGC for closure
     \end{column}
    \end{columns}
 \end{frame}
