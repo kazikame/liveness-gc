@@ -1,8 +1,8 @@
 \newcommand{\nfaD}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\Lf{\plength}{1}{\sigma}} 
+      \putnode{t0}{origin}{-4}{15}{\Lf{\plength}{1}{\sigma}} 
       \putnode{t1}{t0}{20}{0}{\pscirclebox{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
@@ -17,45 +17,8 @@
     \end{pspicture}
 }}
 
-\newcommand{\tincrhead}{%
-  \scalebox{.70}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{$\pfun$}} 
-      \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
-      \hspace{5mm} 
-      \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
-      \putnode{t3}{t2}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_2$}}} 
-      \psset{arrows=->} \ncline{t0}{t1} 
-      \ncline{t1}{t2} 
-      \ncline{t2}{t3} 
-      \putnode{l0}{t1}{7}{5}{\clazy} 
-      \putnode{l1}{t2}{7}{2}{\clazy}
-      \putnode{t4}{t1}{15}{-5}{\pscirclebox{\mbox{$q_3$}}}
-      \putnode{t5}{t4}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_4$}}}
-      \ncline{t1}{t4}
-      \ncline{t4}{t5}
-      \putnode{l2}{t1}{7}{0}{\acar} 
-      \putnode{l3}{t4}{7}{2}{\clazy} 
-    \end{pspicture}
-}}
-
-\newcommand{\tincrheadsimpl}{%
-  \scalebox{.70}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{$\pfun$}} 
-      \putnode{t1}{t0}{18}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
-      \hspace{5mm} 
-      \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
-      \psset{arrows=->} \ncline{t0}{t1} 
-      \ncline{t1}{t2} 
-      \putnode{l0}{t1}{7}{5}{\acar} 
-    \end{pspicture}
-}}
-
 \newcommand{\zcarliveness}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
       \putnode{t0}{origin}{2}{1}{\mbox{zcar}} 
@@ -77,7 +40,7 @@
 }}
 
 \newcommand{\zcarlivenesssimpl}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
       \putnode{t0}{origin}{2}{1}{\mbox{zcar}} 
@@ -101,20 +64,20 @@
 }}
 
 \newcommand{\zcarlivenessfinal}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{zcar}} 
+      \putnode{t0}{origin}{2}{-20}{\mbox{zcar}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
       \psset{arrows=->} \ncline{t0}{t1} 
     \end{pspicture}
 }}
 
 \newcommand{\zcdrliveness}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{\Lanv{9}{\px}}} 
+      \putnode{t0}{origin}{-9}{0}{\mbox{\Lanv{9}{\px}}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
@@ -133,10 +96,10 @@
 }}
 
 \newcommand{\zcdrlivenesssimpl}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{\Lanv{9}{\px}}} 
+      \putnode{t0}{origin}{-9}{1}{\mbox{\Lanv{9}{\px}}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
@@ -158,10 +121,10 @@
 }}
 
 \newcommand{\zcdrlivenessfinal}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{\Lanv{9}{\px}}} 
+      \putnode{t0}{origin}{10}{-10}{\mbox{\Lanv{9}{\px}}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
       \psset{arrows=->} \ncline{t0}{t1} 
       \nccurve[angleA=-45, angleB=-115, ncurv=1.5, nodesep=-1]{t1}{t1}
@@ -172,10 +135,10 @@
 
 
 \newcommand{\nfaDF}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\Lf{\plength}{1}{\sigma}} 
+      \putnode{t0}{origin}{2}{15}{\Lf{\plength}{1}{\sigma}} 
       \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
       \hspace{5mm} 
       \putnode{t2}{t1}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}} 
@@ -189,10 +152,10 @@
     \end{pspicture}
 }}
 \newcommand{\dfaD}{%
-  \scalebox{.70}{
+  \scalebox{.99}{
     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
     \begin{pspicture}(2,-1)(13,9)
-      \putnode{t0}{origin}{2}{1}{\Lf{\plength}{1}{\sigma}}
+      \putnode{t0}{origin}{1}{10}{\Lf{\plength}{1}{\sigma}}
       \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
       \psset{arrows=->}    
       \ncline{t0}{t1}     
@@ -202,57 +165,13 @@
 }}
 
 
-\newcommand{\dfaE}{%
-  \scalebox{.70}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(0,-2)(35,8)
-     \putnode{t0}{origin}{0}{0}{} 
-     \putnode{t1}{t0}{8}{0}{\pscirclebox{\mbox{$q_3$}}} 
-     \hspace{5mm} 
-   \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_4$}}}
-   \psset{arrows=->} \ncline{t0}{t1} \ncline{t1}{t2} 
-   \putnode{l0}{t1}{5}{2}{\clazy}
-   \putnode{tD1}{t2}{12}{0}{\pscirclebox[doubleline=true]{\mbox{$q_5$}}} 
-   \psset{arrows=->} \ncline{t2}{tD1} 
-   \putnode{l1}{t2}{5}{2}{\bcar}
-   \nccurve[angleA=45,angleB=135,ncurv=1.5,nodesep=-1]{tD1}{tD1} 
-   \putnode{lD1}{tD1}{0}{7}{\acdr}
-\end{pspicture} 
-  }}
-
-\newcommand{\dfaF}{%
-  \scalebox{.70}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-2)(24,3)
-     \putnode{t0}{origin}{2}{0}{}
-     \putnode{t1}{t0}{9}{0}{\pscirclebox{\mbox{$q_3$}}} 
-     \hspace{5mm} 
-     \putnode{t2}{t1}{12}{0}{\pscirclebox{\mbox{$q_4$}}}
-     \psset{arrows=->} \ncline{t0}{t1} 
-     \ncline{t1}{t2} 
-     \putnode{l0}{t1}{5}{2}{\clazy}
-    \end{pspicture}
-  }
-}
-
-\newcommand{\dfaG}{%
-  \scalebox{.70}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-2)(10,3)
-      \putnode{t0}{origin}{2}{0}{}
-      \putnode{t1}{t0}{7}{0}{\pscirclebox{\mbox{$q_3$}}} 
-      \hspace{1mm} \psset{arrows=->} 
-      \ncline{t0}{t1}
-    \end{pspicture}
-  }
-}
-
 \begin{figure}[t]
 \begin{center}
-{\scalebox{.75}{
+{\scalebox{1.00}{
     \begin{tabular}[T]{c c c}
-      \nfaD & \nfaDF & \dfaD \\
-      \zcdrliveness & \zcdrlivenesssimpl & \zcdrlivenessfinal
+      \nfaD && \nfaDF \\ & \dfaD & \\
+      \zcdrliveness & & \zcdrlivenesssimpl \\ &
+      \zcdrlivenessfinal &
     \end{tabular}
 }}
 \end{center}
