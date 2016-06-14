@@ -732,17 +732,21 @@
   \begin{columns}
     \begin{column}[T]{.5\textwidth}
       \begin{eqnarray*}
-        &&  \Lf{\plength }{1}{\sigma} = \Df{\plength}{1}\sigma\\
-        &&   \Df{\plength}{1} = \clazy \cup \acdr\Df{\plength}{1}\clazy
-        \cup \clazy\Df{\plength}{1}{\clazy}
+          \Lf{\plength }{1}{\sigma} &=& \Df{\plength}{1}\sigma\\
+          \Df{\plength}{1} &=& \clazy \cup \acdr\Df{\plength}{1}\clazy \\
+                                &&\cup\;\;\; \clazy\Df{\plength}{1}{\clazy}\\
+          \Lanv{9}{\px}  &=&  \bcdr\Lf{\plength}{1}{\sigma_{\mathit{\!all}}} \\
+                           &&  \cup\; \bcdr\Lf{\pfun}{1}{\sigma_{\mathit{\!all}}}
       \end{eqnarray*}
     \end{column}
     \begin{column}[T]{0.5\textwidth}
       \begin{eqnarray*}
         \var{\LfNoSigma{\plength}{1}} &\rightarrow& \var{\Df{\plength}{1}} \\
         \var{\Df{\plength}{1}}   &\rightarrow&   \clazy\var{\Df{\plength}{1}}
-        \mid                 \acdr\var{\Df{\plength}{1}}\clazy                 \mid
-        \clazy\var{\Df{\plength}{1}}\clazy
+        \mid                 \acdr\var{\Df{\plength}{1}}\clazy \\
+                            &&\mid\;\; \clazy\var{\Df{\plength}{1}}\clazy\\
+        \var{\Lanv{9}{\px}}  &\rightarrow&  \bcdr\var{\LfNoSigma{\plength}{1}} \\
+                           &&  \cup\; \bcdr\var{\LfNoSigma{\pfun}{1}}
       \end{eqnarray*}
     \end{column}
   \end{columns}
