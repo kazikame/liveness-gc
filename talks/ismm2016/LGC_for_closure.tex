@@ -22,33 +22,33 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \putnode{t0}{y}{40}{0}{\Lanv{\pi}{\px}}
   \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
-  \putnode{t3}{t1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
-  \psset{arrows=->}    
-  \ncline[nodesep=0]{t0}{t1}
+%  \putnode{t3}{t1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+    \psset{arrows=->}    
+    \ncline[nodesep=0]{t0}{t1}
   %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
-  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{t1}{t3} 
+%  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{t1}{t3} 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
   \putnode{xt0}{y}{40}{-15}{\mbox{\ }}
-  \putnode{xt1}{xt0}{20}{0}{\pscirclebox{\mbox{\ }}}
-  \putnode{xt3}{xt1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+  \putnode{xt1}{xt0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}
+  %\putnode{xt3}{xt1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
   \psset{arrows=->}    
   \ncline[nodesep=0]{xt0}{xt1}
   %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
-  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{xt1}{xt3} 
+  %\nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{xt1}{xt3} 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \nccurve[nodesep=0.1,linestyle=dashed,angleA=0,angleB=120]{o}{xt1}
+  \nccurve[nodesep=-0.05,linestyle=dashed,angleA=0,angleB=120]{o}{xt1}
 
   \putnode{zt0}{y}{40}{-30}{\mbox{\ }}
-  \putnode{zt1}{zt0}{20}{0}{\pscirclebox{\mbox{\ }}}     
-  \putnode{zt3}{zt1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+  \putnode{zt1}{zt0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
+%  \putnode{zt3}{zt1}{40}{0}{\pscirclebox[doubleline=true]{\mbox{\ }}}     
   \psset{arrows=->}    
   \ncline[nodesep=0]{zt0}{zt1}
   %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
-  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{zt1}{zt3} 
+ % \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{zt1}{zt3} 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \nccurve[nodesep=0.1,linestyle=dashed,angleA=0,angleB=120]{b}{zt1}
+  \nccurve[nodesep=-0.05,linestyle=dashed,angleA=0,angleB=120]{b}{zt1}
 
 
 \end{pspicture}

@@ -9,69 +9,69 @@
       \psset{arrows=->} \ncline{t0}{t1} 
       \ncline{t1}{t2} 
       \putnode{l0}{t1}{7}{2}{\clazy} 
-      \nccurve[angleA=45, angleB=135, ncurv=2, nodesep=-1]{t1}{t1} 
-      \putnode{l1}{t1}{0}{6}{\acdr, \clazy} 
+      \nccurve[angleA=45, angleB=135, ncurv=2, nodesep=-1.2]{t1}{t1} 
+      \putnode{l1}{t1}{0}{7}{\acdr, \clazy} 
       \nccurve[angleA=45,
-        angleB=135, ncurv=1.5, nodesep=-1]{t2}{t2} 
+        angleB=135, ncurv=1.5, nodesep=-1.2]{t2}{t2} 
       \putnode{l2}{t2}{0}{7}{\clazy}
     \end{pspicture}
 }}
 
-\newcommand{\zcarliveness}{%
-  \scalebox{.99}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{zcar}} 
-      \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
-      \hspace{5mm} 
-      \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
-      \putnode{t3}{t2}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_2$}}} 
-      \psset{arrows=->} \ncline{t0}{t1} 
-      \ncline{t1}{t2} 
-      \ncline{t2}{t3} 
-      \putnode{l0}{t1}{7}{5}{\bcar} 
-      \putnode{l1}{t2}{7}{2}{\acar}
-      \putnode{t4}{t1}{15}{-5}{\pscirclebox[doubleline=true]{\mbox{$q_3$}}}
-      \ncline{t1}{t4}
-      \putnode{l2}{t1}{7}{0}{\bcar} 
-      \nccurve[angleA=-45, angleB=-135, ncurv=1.5, nodesep=-1]{t4}{t4} 
-      \putnode{l3}{t4}{0}{-8}{\acdr} 
-    \end{pspicture}
-}}
+%% \newcommand{\zcarliveness}{%
+%%   \scalebox{.99}{
+%%     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+%%     \begin{pspicture}(3,-1)(28,9)%\psgrid
+%%       \putnode{t0}{origin}{2}{1}{\mbox{zcar}} 
+%%       \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
+%%       \hspace{5mm} 
+%%       \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
+%%       \putnode{t3}{t2}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_2$}}} 
+%%       \psset{arrows=->} \ncline{t0}{t1} 
+%%       \ncline{t1}{t2} 
+%%       \ncline{t2}{t3} 
+%%       \putnode{l0}{t1}{7}{5}{\bcar} 
+%%       \putnode{l1}{t2}{7}{2}{\acar}
+%%       \putnode{t4}{t1}{15}{-5}{\pscirclebox[doubleline=true]{\mbox{$q_3$}}}
+%%       \ncline{t1}{t4}
+%%       \putnode{l2}{t1}{7}{0}{\bcar} 
+%%       \nccurve[angleA=-45, angleB=-135, ncurv=1.5, nodesep=-0.05]{t4}{t4} 
+%%       \putnode{l3}{t4}{0}{-8}{\acdr} 
+%%     \end{pspicture}
+%% }}
 
-\newcommand{\zcarlivenesssimpl}{%
-  \scalebox{.99}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{1}{\mbox{zcar}} 
-      \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
-      \hspace{5mm} 
-      \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
-      \putnode{t3}{t2}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_2$}}} 
-      \psset{arrows=->} \ncline{t0}{t1} 
-      \ncline{t1}{t2} 
-      \ncline{t2}{t3}
-      \nccurve[angleA=65, angleB=115, ncurv=0.75, nodesep=-1, linecolor=red]{t1}{t3} 
-      \putnode{l0}{t1}{7}{5}{\bcar} 
-      \putnode{l1}{t2}{7}{2}{\acar}
-      \putnode{l2}{t1}{13}{14}{\color{red}$\epsilon$}
-      \putnode{t4}{t1}{15}{-5}{\pscirclebox[doubleline=true]{\mbox{$q_3$}}}
-      \ncline{t1}{t4}
-      \putnode{l3}{t1}{7}{0}{\bcar} 
-      \nccurve[angleA=-45, angleB=-135, ncurv=1.5, nodesep=-1]{t4}{t4} 
-      \putnode{l3}{t4}{0}{-8}{\acdr} 
-    \end{pspicture}
-}}
+%% \newcommand{\zcarlivenesssimpl}{%
+%%   \scalebox{.99}{
+%%     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+%%     \begin{pspicture}(3,-1)(28,9)%\psgrid
+%%       \putnode{t0}{origin}{2}{1}{\mbox{zcar}} 
+%%       \putnode{t1}{t0}{18}{0}{\pscirclebox{\mbox{$q_0$}}}
+%%       \hspace{5mm} 
+%%       \putnode{t2}{t1}{15}{5}{\pscirclebox{\mbox{$q_1$}}} 
+%%       \putnode{t3}{t2}{15}{0}{\pscirclebox[doubleline=true]{\mbox{$q_2$}}} 
+%%       \psset{arrows=->} \ncline{t0}{t1} 
+%%       \ncline{t1}{t2} 
+%%       \ncline{t2}{t3}
+%%       \nccurve[angleA=65, angleB=115, ncurv=0.75, nodesep=-0.05, linecolor=red]{t1}{t3} 
+%%       \putnode{l0}{t1}{7}{5}{\bcar} 
+%%       \putnode{l1}{t2}{7}{2}{\acar}
+%%       \putnode{l2}{t1}{13}{14}{\color{red}$\epsilon$}
+%%       \putnode{t4}{t1}{15}{-5}{\pscirclebox[doubleline=true]{\mbox{$q_3$}}}
+%%       \ncline{t1}{t4}
+%%       \putnode{l3}{t1}{7}{0}{\bcar} 
+%%       \nccurve[angleA=-45, angleB=-135, ncurv=1.5, nodesep=-0.05]{t4}{t4} 
+%%       \putnode{l3}{t4}{0}{-8}{\acdr} 
+%%     \end{pspicture}
+%% }}
 
-\newcommand{\zcarlivenessfinal}{%
-  \scalebox{.99}{
-    \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
-    \begin{pspicture}(3,-1)(28,9)%\psgrid
-      \putnode{t0}{origin}{2}{-20}{\mbox{zcar}} 
-      \putnode{t1}{t0}{18}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
-      \psset{arrows=->} \ncline{t0}{t1} 
-    \end{pspicture}
-}}
+%% \newcommand{\zcarlivenessfinal}{%
+%%   \scalebox{.99}{
+%%     \psset{unit=1mm,nodesep=0mm,labelsep=0.5mm}
+%%     \begin{pspicture}(3,-1)(28,9)%\psgrid
+%%       \putnode{t0}{origin}{2}{-20}{\mbox{zcar}} 
+%%       \putnode{t1}{t0}{18}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
+%%       \psset{arrows=->} \ncline{t0}{t1} 
+%%     \end{pspicture}
+%% }}
 
 \newcommand{\zcdrliveness}{%
   \scalebox{.99}{
@@ -90,7 +90,7 @@
       \putnode{t4}{t1}{15}{-5}{\pscirclebox[doubleline=true]{\mbox{$q_3$}}}
       \ncline{t1}{t4}
       \putnode{l2}{t1}{7}{0}{\bcdr} 
-      \nccurve[angleA=-45, angleB=-135, ncurv=1.5, nodesep=-1]{t4}{t4} 
+      \nccurve[angleA=-45, angleB=-135, ncurv=1.5, nodesep=-1.2]{t4}{t4} 
       \putnode{l3}{t4}{0}{-8}{\acdr} 
     \end{pspicture}
 }}
@@ -113,8 +113,8 @@
       \putnode{t4}{t1}{15}{-5}{\pscirclebox[doubleline=true]{\mbox{$q_3$}}}
       \ncline{t1}{t4}
       \putnode{l3}{t1}{7}{0}{\bcdr} 
-      \nccurve[angleA=-65, angleB=-115, ncurv=0.75, nodesep=-1, linecolor=red]{t1}{t4} 
-      \nccurve[angleA=-45, angleB=-115, ncurv=1.5, nodesep=-1]{t4}{t4} 
+      \nccurve[angleA=-65, angleB=-115, ncurv=0.75, nodesep=-1.2, linecolor=red]{t1}{t4} 
+      \nccurve[angleA=-45, angleB=-115, ncurv=1.5, nodesep=-1.2]{t4}{t4} 
       \putnode{l2}{t1}{8}{-12}{\color{red}$\epsilon$}
       \putnode{l3}{t4}{0}{-8}{\acdr} 
     \end{pspicture}
@@ -127,7 +127,7 @@
       \putnode{t0}{origin}{10}{-10}{\mbox{\Lanv{9}{\px}}} 
       \putnode{t1}{t0}{18}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}
       \psset{arrows=->} \ncline{t0}{t1} 
-      \nccurve[angleA=-45, angleB=-115, ncurv=1.5, nodesep=-1]{t1}{t1}
+      \nccurve[angleA=-45, angleB=-115, ncurv=1.5, nodesepB=-0.8, nodesepA=-1.2]{t1}{t1}
       \putnode{l0}{t1}{0}{-7}{\acdr}
     \end{pspicture}
 }}
@@ -145,9 +145,9 @@
       \psset{arrows=->} \ncline{t0}{t1} 
       \ncline{t1}{t2} 
       \putnode{l0}{t1}{7}{2}{\clazy} 
-      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t1}{t1} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1.2]{t1}{t1} 
       \putnode{l1}{t1}{0}{7}{\acdr, \clazy} 
-      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t2} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1.2]{t2}{t2} 
       \putnode{l2}{t2}{0}{7}{\clazy}
     \end{pspicture}
 }}
@@ -159,7 +159,7 @@
       \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
       \psset{arrows=->}    
       \ncline{t0}{t1}     
-      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t1}{t1} 
+      \nccurve[angleA=45, angleB=135, ncurv=1.5, nodesep=-1.2]{t1}{t1} 
       \putnode{l1}{t1}{0}{7}{\acdr}
     \end{pspicture}
 }}

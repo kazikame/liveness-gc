@@ -23,17 +23,18 @@
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   \putnode{t0}{y}{40}{0}{\Lanv{\pi}{\px}}
   \putnode{t1}{t0}{20}{0}{\pscirclebox[doubleline=true]{\mbox{$q_0$}}}     
-  \putnode{t2}{t1}{30}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}}     
-  \putnode{t3}{t2}{40}{0}{\pscirclebox[doubleline=true]{\mbox{$q_n$}}}     
+  %\putnode{t2}{t1}{30}{0}{\pscirclebox[doubleline=true]{\mbox{$q_1$}}}     
+  %\putnode{t3}{t2}{40}{0}{\pscirclebox[doubleline=true]{\mbox{$q_n$}}}     
   \psset{arrows=->}    
   \ncline[nodesep=0]{t0}{t1}
-  \ncline[nodesep=0]{t1}{t2} 
-  \Aput[0.1]{\acdr}
+  %\ncline[nodesep=0]{t1}{t2} 
+  \nccurve[angleA=60,angleB=120,ncurv=3, nodesep=-.05]{->}{t1}{t1}
+  \Aput[0.05]{\acdr}
   %      \nccoil[angleA=45, angleB=135, ncurv=1.5, nodesep=-1]{t2}{t3} 
-  \nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{t2}{t3} 
+  %\nczigzag[nodesep=0.1,coilwidth=4mm,coilheight=.3,coilarm=2mm]{t2}{t3} 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \nccurve[nodesep=0.1,linestyle=dashed,angleA=0,angleB=-120]{o}{t1}
-  \nccurve[nodesep=0.1, linestyle=dashed,angleA=0,angleB=-105]{b}{t2}
+  \nccurve[nodesep=-0.05,linestyle=dashed,angleA=0,angleB=-120]{o}{t1}
+  \nccurve[nodesep=-0.05, linestyle=dashed,angleA=0,angleB=-105]{b}{t1}
 \end{pspicture}
 }
 \lgccons
