@@ -3,7 +3,7 @@
 \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
 	  \begin{uprogram}
 	    \UNL{1}\hspace*{-.4cm} $\pi_\mainpgm\!\!:\, $(\onslide<0>{\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN}
-            \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $\onslide<0>{(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN}
+            \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
 	    \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $\onslide<0>{(\SIF\ $*$}
             \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $\onslide<0>{(\LET\ \pw\  $\leftarrow$  }(\plength\ \pz) \onslide<0>{\IN}
             \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $\onslide<0>{(\RETURN\ \pw)} 
@@ -16,7 +16,7 @@
   \begin{uprogram}
     \UNL{1} (\DEFINE\ (\plength~\lista)
 
-    \UNL{2}  $\pi_1\!\!:\, $\onslide<0>{(\LET\ \xtest\ $\leftarrow $\ }(\NULLQ~\lista) \onslide<0>{\IN}
+    \UNL{2}  $\pi_1\!\!:\, $\onslide<0>{(\LET\ \xtest\ $\leftarrow $\ (\NULLQ~\lista) \IN}
 
 
     \UNL{3}     $\pi_2\!\!:\, $\onslide<0>{(\SIF\ \xtest}
