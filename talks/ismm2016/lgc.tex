@@ -176,34 +176,34 @@
 %% \end{frame}
 \section{\scshape LGC for lazy languages}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Basic Concepts and Notations--Demand}
-  \begin{center}
-     (\CAR\ (\CDR\ \pw)) \\
-  \end{center}
-  \pause
-\centerline{\input{example-heap-snap-shot}}
-  \begin{itemize}
-  \item Demand  (notation: $\sigma$) is a description  of intended use
-    of the result of an expression.
-  \end{itemize}
-\end{frame}
+%% \begin{frame}{Basic Concepts and Notations--Demand}
+%%   \begin{center}
+%%      (\CAR\ (\CDR\ \pw)) \\
+%%   \end{center}
+%%   \pause
+%% \centerline{\input{example-heap-snap-shot}}
+%%   \begin{itemize}
+%%   \item Demand  (notation: $\sigma$) is a description  of intended use
+%%     of the result of an expression.
+%%   \end{itemize}
+%% \end{frame}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{\scshape Liveness}
-\begin{frame}{Basic Concepts and Notations--Liveness }
+\begin{frame}{Basic Concepts and Notations}
 \small
 \begin{columns}
   \begin{column}[T]{0.75\textwidth}
     \begin{itemize}\itemsep0.75em
-    \item {\em Access paths:} Strings over \{\acar, \acdr\}.
-      
+    \item  Demand  (notation: $\sigma$) is a description  of intended use
+      of the result of an expression.
+    \item Denote traversals over the heap graph    
+    \item {\em Access paths:} Strings over \{\acar, \acdr\}.\\
       \hspace*{.25cm}   \acar\  -- access \CAR\ field \\
       \hspace*{.25cm}   \acdr\  -- access \CDR\ field 
-    \item Denote traversals over the heap graph
     \item {\em Liveness environment:} 
-      \only<1>
-          {Maps root variables    to set of access paths.
+      Maps root variables    to set of access paths.
             \begin{eqnarray*}
               \Lanv{i}{}&:&
               \left\{\begin{array}{l}
@@ -212,23 +212,11 @@
               w \mapsto \{\epsilon, 1, 10, 100\}
               \end{array}\right.
             \end{eqnarray*}
-          }
-          \only<2>
-              {Alternate representation.
-                \begin{eqnarray*}
-                  \Lanv{i}{}&:&
-                  \left\{\begin{array}{l}
-                  \emptyset \;\; \cup  \\
-                  \{z.\epsilon\} \;\; \cup\\
-                  \{w.\epsilon, w.1, w.10, w.100\}
-                  \end{array}\right.
-                \end{eqnarray*} 
-              }
     \end{itemize}
   \end{column}
-  \begin{column}[T]{0.25\textwidth}
-    \fbox{\centerline{\epsfig{file=example-liveness-environment.eps, height=5cm}}}
-  \end{column}
+  %% \begin{column}[T]{0.25\textwidth}
+  %%   \fbox{\centerline{\epsfig{file=example-liveness-environment.eps, height=5cm}}}
+  %% \end{column}
 \end{columns}
 
 \bigskip
@@ -242,7 +230,7 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Liveness analysis}
   \begin{itemize}
-  \item {\bf  GOAL:} Compute  Liveness Environment at  various program
+  \item {\bf  GOAL:} Compute  Liveness environment at  various program
     points, statically. 
   \item Assume that all paths in the result of $\mainpgm$ are live, i.e. demand is $(0 + 1)^*$ or $\sigma_{all}$.
   \item Propagate this demand through the program using liveness rules.
@@ -586,14 +574,13 @@
   \begin{itemize}\itemsep2em
   \item Laziness complicates liveness analysis itself. 
     \begin{itemize}
-    \item Data is made live by evaluation of closures
     \item In lazy languages, the place in the program
       where this evaluation takes place cannot be statically determined
+    \item Distinguish between stack variables and closure variables.    
     \end{itemize}
     \pause
   \item Liveness-based garbage collector significantly more complicated than that for an eager language.
     \begin{itemize}
-    \item Distinguish between stack variables and closure variables.
     \item Need to track liveness of closure variables.
     \item Solution: carry the liveness information in the closure itself.
     \item For precision: need to update the liveness information as execution progresses.
@@ -601,30 +588,30 @@
   \end{itemize}
 \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\begin{frame}{Handling lazy semantics: Closures}
-  \begin{columns}[c]
-    \begin{column}[T]{0.5\textwidth}
-      \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
-        \begin{uprogram}
-          \UNL{1}\hspace*{-.4cm} $\pi_8\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
-          \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
-          %% \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $(\SIF\ $*$
-          %% \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $(\LET\ \pw\  $\leftarrow$ (\plength\ \pz) (\IN
-          %% \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $(\RETURN\ \pw)
-          \UNL{2}   \ldots
-          \UNL{2}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\CONS\  \pz\ \NIL) \IN
-          \UNL{3}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
-   \end{uprogram}}
-    \end{column}
-    \begin{column}[T]{0.5\textwidth}
-      \begin{itemize}
-      \item \pz\ {\em escapes} from the scope it was created.
-      \item During GC, we require program point of use of \pz.
-      \item Carry program point of last use in closure.
-      \end{itemize}
-    \end{column}
-  \end{columns}
-\end{frame}
+%% \begin{frame}{Handling lazy semantics: Closures}
+%%   \begin{columns}[c]
+%%     \begin{column}[T]{0.5\textwidth}
+%%       \hspace*{-.3cm}\renewcommand{\arraystretch}{1}{
+%%         \begin{uprogram}
+%%           \UNL{1}\hspace*{-.4cm} $\pi_8\!\!:\, $(\LET\  \px\  $\leftarrow$ ($\CONS$ ($+$ 5 2) \NIL)  \IN
+%%           \UNL{2}   \hspace*{-.3cm}   $\pi_9\!\!:\, $(\LET\ \pz\ $\leftarrow$ ($\CONS$ ($+$ 4 5 ) \px) \IN
+%%           %% \UNL{3}   \hspace*{-.3cm}   $\pi_{10}\!\!:\, $(\SIF\ $*$
+%%           %% \UNL{4}   \hspace*{-.35cm} $\pi_{11}\!\!:\, $(\LET\ \pw\  $\leftarrow$ (\plength\ \pz) (\IN
+%%           %% \UNL{5}   \hspace*{-.38cm}  $\pi_{12}\!\!:\, $(\RETURN\ \pw)
+%%           \UNL{2}   \ldots
+%%           \UNL{2}   \hspace*{-.35cm}  $\pi_{13}\!\!:\, $(\LET\ \pb\  $\leftarrow$ (\CONS\  \pz\ \NIL) \IN
+%%           \UNL{3}   \hspace*{-.38cm} $\pi_{14}\!\!:\,$(\RETURN\ \pb))))))
+%%    \end{uprogram}}
+%%     \end{column}
+%%     \begin{column}[T]{0.5\textwidth}
+%%       \begin{itemize}
+%%       \item \pz\ {\em escapes} from the scope it was created.
+%%       \item During GC, we require program point of use of \pz.
+%%       \item Carry program point of last use in closure.
+%%       \end{itemize}
+%%     \end{column}
+%%   \end{columns}
+%% \end{frame}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{frame}{Handling lazy semantics: Closures}
 \begin{columns}[c]
@@ -642,8 +629,8 @@
     \end{column}
     \begin{column}[T]{0.5\textwidth}
       \begin{itemize}
-      \item \px\ is live at $\pi_{9}$  because of its probable use at $\pi_{13}$
-      \item If $*$ evaluates to true, then \px\ is not live.
+      \item \px\ is live at $\pi_{9}$  because of its probable use at $\pi_{11}$
+      \item If $*$ evaluates to false, then \px\ is not live.
       \item Update liveness of closure arguments as execution proceeds.
       \end{itemize}
     \end{column}
@@ -692,7 +679,7 @@
     \begin{column}[T]{.5\textwidth}
       \begin{eqnarray*}
           \Lf{\plength }{1}{\sigma} &=& \Df{\plength}{1}\sigma\\
-          \Df{\plength}{1} &=& \clazy \cup \acdr\Df{\plength}{1}\clazy \\
+          \Df{\plength}{1} &=& \clazy\Df{\plength}{1} \cup \acdr\Df{\plength}{1}\clazy \\
                                 &&\cup\;\;\; \clazy\Df{\plength}{1}{\clazy}\\
           \Lanv{9}{\px}  &=&  \bcdr\Lf{\plength}{1}{\sigma_{\mathit{\!all}}} \\
                            &&  \cup\; \bcdr\Lf{\pfun}{1}{\sigma_{\mathit{\!all}}}
@@ -705,7 +692,7 @@
         \mid                 \acdr\var{\Df{\plength}{1}}\clazy \\
                             &&\mid\;\; \clazy\var{\Df{\plength}{1}}\clazy\\
         \var{\Lanv{9}{\px}}  &\rightarrow&  \bcdr\var{\LfNoSigma{\plength}{1}} \\
-                           &&  \cup\; \bcdr\var{\LfNoSigma{\pfun}{1}}
+                           &&  \mid\; \bcdr\var{\LfNoSigma{\pfun}{1}}
       \end{eqnarray*}
     \end{column}
   \end{columns}
@@ -871,11 +858,6 @@
     \begin{itemize}
     \item The soundness of liveness analysis.
     \item Details of undecidability proof.
-    \end{itemize}
-    \item Unfinished agenda:
-      \begin{itemize}
-      \item Improving GC time for a larger fraction of programs.
-      \item Extending scope of the method.
     \end{itemize}
   \end{itemize}
 \end{frame}
