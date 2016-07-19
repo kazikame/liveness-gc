@@ -120,6 +120,7 @@ lazy-scheme/benchmarks/*/*/*.slice.json
 lazy-scheme/benchmarks/*/*/*.slice.scm
 lazy-scheme/benchmarks/*/*/*.slice.txt
 lazy-scheme/benchmarks/*/*/*.rkt.txt
+talks/*/*.synctex.gz
 talks/*/*.aux
 talks/*/*.dvi
 talks/*/*.log
