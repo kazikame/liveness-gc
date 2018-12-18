@@ -336,9 +336,9 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	if (gc_type == gc_live)
 	{
 		cleanup(numkeys-1);
-		cout << "Maximum extra memory required during LGC " << *std::max_element(heap_map_size.begin(), heap_map_size.end()) << endl;
-		cout << "size of rgc heap cell = " << sizeof(reach_heap_cell) << endl;
-		cout << "size of lgc heap cell = " << sizeof(live_heap_cell) << endl;
+		// cout << "Maximum extra memory required during LGC " << *std::max_element(heap_map_size.begin(), heap_map_size.end()) << endl;
+		//cout << "size of rgc heap cell = " << sizeof(reach_heap_cell) << endl;
+		//cout << "size of lgc heap cell = " << sizeof(live_heap_cell) << endl;
 	}
 
 	cout << "GC Invocations="<<gccount<<" GC Time="<<gctime<<endl;

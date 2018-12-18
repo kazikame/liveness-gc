@@ -173,22 +173,6 @@
                               nqn)))
              _var101))
 
-
-(define (wrapper n l)
-  (let ((zero 0))
-    (let ((c (> n zero)))
-      (if c
-	  (let ((one 1))
-	    (let ((m (- n one)))
-	      (let ((tl (wrapper m l)))
-		(let ((k 8))
-		  (let ((hd (nqueens k)))
-		    (let ((res (cons hd tl)))
-		      res))))))
-	  l
-	  ))))
-
-(let ((_var102 9))
-  (let ((l '()))
+(let ((_var102 8))
      (let ((_var103 (nqueens _var102)))
-          _var103)))
+          _var103))

@@ -160,7 +160,7 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 
 	for (auto p : localLivenessMap)
 	{
-		cout << "p.first =" <<p.first << endl;
+	  //cout << "p.first =" <<p.first << endl;
 //		auto pgmpt = p.first.substr(p.first.find("/") + 1, p.first.rfind("/") - 2);
 		auto pgmpt = p.first.substr(p.first.rfind("/") + 1, p.first.length());
 //		cout << "Checking for pgmpt " << pgmpt << endl;
@@ -169,17 +169,17 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 		for (auto g : (*var_gram))
 		{
 			std::string liveness_label = "L/" + p.first + "/" + g.first;
-			cout << "g.first = " << g.first << " liveness label=" << liveness_label << endl;
+			// cout << "g.first = " << g.first << " liveness label=" << liveness_label << endl;
 			if ( prog_pts.find(pgmpt) != prog_pts.end() &&
 					prog_pts[pgmpt]->label_set.size() > 1)
 			{
-				cout << "pgmpt=" << pgmpt << endl;
-				cout << "Handling if statement " << prog_pts[pgmpt]->label_set.size() << endl;
+			  //cout << "pgmpt=" << pgmpt << endl;
+			  //cout << "Handling if statement " << prog_pts[pgmpt]->label_set.size() << endl;
 				for (auto l : prog_pts[pgmpt]->label_set)
 				{
-					cout << "l="<<l<<endl;
+				  //cout << "l="<<l<<endl;
 					auto curr_pgm_pt = p.first.substr(0, p.first.find("/"));
-					cout << "Looking for liveness value " << curr_pgm_pt + "/" + l << endl;
+					// cout << "Looking for liveness value " << curr_pgm_pt + "/" + l << endl;
 					if (localLivenessMap.find(curr_pgm_pt + "/" + l) != localLivenessMap.end())
 					{
 						auto dem =  localLivenessMap[curr_pgm_pt + "/" + l];
@@ -189,7 +189,7 @@ std::unordered_map<string, Scheme::Demands::expr_demand_grammars *> Scheme::Sche
 			}
 			else
 			{
-				cout << "Liveness label = " << liveness_label << endl;
+			  //cout << "Liveness label = " << liveness_label << endl;
 				(*combined_grammar)[liveness_label] = g.second;
 			}
 		}

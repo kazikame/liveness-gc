@@ -1,6 +1,7 @@
 #ifndef __DEMANDS_H__
 #define __DEMANDS_H__ 1
 
+#include <iostream>
 #include <list>
 #include <string>
 #include <unordered_map>
