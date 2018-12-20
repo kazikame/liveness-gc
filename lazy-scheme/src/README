@@ -1,0 +1,40 @@
+Instructions for running the interpreter
+
+
+Do make clean
+Do make
+
+The executable is named Simulator and it takes the following arguments,
+
+1) the path of the input program
+2) size of heap in which the program needs to be executed
+3) GC mode (either gc-plain or gc-live)
+
+Example
+The command
+./Simulator ../benchmarks/programs/lcss/lcss.scm 50000 gc-live
+executes the program in the file lcss.scm in the folder ../benchmarks/programs/lcss with a heap containing 50000 cells and with liveness based GC.
+
+The output of the program is stored in output/live.txt or output/plain.txt depending on the GC mode.
+The Simulator prints out GC stats like the number of garbage collections that were triggered, total time spent in doing garbage collection.
+If the program is run using gc-live mode, it also dumps the liveness information as CFG (output/<prog_name>/program-cfg.txt),
+approximated regular grammar (output/<prog_name>/program-reg.txt), the program-point wise liveness automata (output/<prog_name>/fsmdump-<prog_name>-state-map and
+output/<prog_name>/fsmdump-<prog_name>-state-transition-table). These files are generated the first time the program is executed with gc-live and re-used
+during future runs with gc-live option.
+
+Implementation details
+-----------------------
+
+1. The files scheme.l and scheme.y implement the parser to parse the input scheme program.
+2. The code implementing the liveness analysis rules described in the paper is in the file SchemeAST_Demands.cpp.
+3. The memory allocation and garbage collection related functions are defined in the file gc.cpp. The important functions being reachability_gc and liveness_gc which implement plain reachability based GC (gc-plain) and liveness based GC respectively (gc-live).
+4. The implementation of the lazy interpreter is in the file SchemeAST_Defs.cpp.
+5. The main function which starts the evaluation is in Simulator.cpp.
+
+PLEASE NOTE : For the current implementation, the input file must always be in ANF format. All the files under benchmarks/program are in ANF format. 
+
+
+
+
+
+
