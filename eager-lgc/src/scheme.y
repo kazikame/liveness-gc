@@ -3,8 +3,8 @@
 %debug
 %defines
 
-%define namespace           "Scheme"
-%define parser_class_name   "SchemeParser"
+%define api.namespace           {Scheme}
+%define parser_class_name   {SchemeParser}
 
 %code requires {
     #include "SchemeAST.h"
@@ -139,7 +139,7 @@ prim_app    : PAIRQ expr        { $$ = new Scheme::AST::UnaryPrimExprNode("pair?
 
 %%
 
-void Scheme::SchemeParser::error(const Scheme::SchemeParser::location_type &loc, const std::string &err) {
+void Scheme::SchemeParser::error(const std::string &err) {
     driver.getErrorStream() << "ERROR near Line " << scanner.get_yylineno() << " [" << err << "]: " << scanner.get_yytext() << std::endl;
 }
 

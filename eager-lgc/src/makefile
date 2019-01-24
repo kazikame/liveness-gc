@@ -1,4 +1,4 @@
-CC = g++-4.8
+CC = g++
 CFLAGS = -g -Wall -fPIC -std=c++11 -fpermissive
 OBJ_FLAGS=-c
 DBG_FLAGS=-pg -O0

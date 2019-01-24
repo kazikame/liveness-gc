@@ -14,7 +14,7 @@
 #include "Demands.h"
 #include <ctime>
 #include <sys/stat.h>
-
+#include <vector>
 using namespace std;
 using namespace Scheme::AST;
 using namespace Scheme::Demands;
@@ -165,7 +165,9 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	{
 		cout <<"Reading data from cached files "<<endl;
 		const int SZ = 1024 * 1024;
-		std::vector<char> buff(SZ, "");
+		// const char BUFF_INIT = '';
+		//std::vector<char> buff(SZ, BUFF_INIT);
+		std::vector<char> buff(SZ);
 		ifstream ifs( "../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map" );
 		int n = 0;
 		while( int cc = FileRead( ifs, buff ) )
