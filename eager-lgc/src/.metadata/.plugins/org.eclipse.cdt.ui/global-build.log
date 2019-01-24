@@ -1,0 +1,20 @@
+16:28:48 **** Incremental Build of configuration Debug for project lgc ****
+make all 
+Building file: /home/pk/APS-2014/repos/lgc/src/gc.cpp
+Invoking: GCC C++ Compiler
+g++ -O0 -g3 -Wall -c -fmessage-length=0  -std=c++0x -fPIC -MMD -MP -MF"gc.d" -MT"gc.d" -o "gc.o" "/home/pk/APS-2014/repos/lgc/src/gc.cpp"
+/home/pk/APS-2014/repos/lgc/src/gc.cpp: In function ‘void print_sharing_stats()’:
+/home/pk/APS-2014/repos/lgc/src/gc.cpp:861:59: warning: pointer of type ‘void *’ used in arithmetic [-Wpointer-arith]
+/home/pk/APS-2014/repos/lgc/src/gc.cpp: In function ‘void liveness_gc()’:
+/home/pk/APS-2014/repos/lgc/src/gc.cpp:955:68: warning: pointer of type ‘void *’ used in arithmetic [-Wpointer-arith]
+/home/pk/APS-2014/repos/lgc/src/gc.cpp: In function ‘void clear_liveness_data()’:
+/home/pk/APS-2014/repos/lgc/src/gc.cpp:1085:60: warning: pointer of type ‘void *’ used in arithmetic [-Wpointer-arith]
+/home/pk/APS-2014/repos/lgc/src/gc.cpp: In function ‘void print_cell_data()’:
+/home/pk/APS-2014/repos/lgc/src/gc.cpp:1123:60: warning: pointer of type ‘void *’ used in arithmetic [-Wpointer-arith]
+Finished building: /home/pk/APS-2014/repos/lgc/src/gc.cpp
+ 
+Building target: ../../repos/lgc/src/_garbagecollect.so
+Invoking: GCC C++ Linker
+g++ -shared -Wl,-soname=_garbagecollect.so -o "../../repos/lgc/src/_garbagecollect.so"  ./.metadata/.plugins/org.eclipse.cdt.make.core/specs.o  ./gc.o   
+Finished building target: ../../repos/lgc/src/_garbagecollect.so
+ 

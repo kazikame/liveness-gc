@@ -1,0 +1,15 @@
+21:06:26 **** Incremental Build of configuration Debug for project LGC ****
+make all 
+Building file: /home/pk/APS-2014/repos/lgc/src/gc.cpp
+Invoking: GCC C++ Compiler
+g++ -O0 -g3 -Wall -c -fmessage-length=0 -std=c++0x -fPIC -MMD -MP -MF"gc.d" -MT"gc.d" -o "gc.o" "/home/pk/APS-2014/repos/lgc/src/gc.cpp" -std=c++11
+Finished building: /home/pk/APS-2014/repos/lgc/src/gc.cpp
+ 
+Building target: libLGC.so
+Invoking: GCC C++ Linker
+g++ -shared -o "libLGC.so"  ./gc.o   
+Finished building target: libLGC.so
+ 
+
+21:06:27 Build Finished (took 936ms)
+

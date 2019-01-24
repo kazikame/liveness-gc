@@ -1,0 +1,327 @@
+#include "node.h"
+#include <iostream>
+#include "gc.h"
+#include "SchemeAST.h"
+using namespace std;
+
+enum GCStatus {gc_disable, gc_live, gc_freq, gc_plain} gc_status;
+int maxcount = 0;
+
+
+class Simulator
+{
+private:
+	ProgramExprNode* pgm;
+	int conscount;
+	int gcinvoke;
+	//time gcstart;
+	//time gcend;
+	void processArguments(vector<Node*> argExprs, vector<result> &arglocs)
+	{
+		for(vector<Node*>::iterator arg = argExprs.begin(); arg != argExprs.end(); ++arg)
+			arglocs.push_back(evaluate(arg));
+		return;
+	}
+public:
+	Simulator(ProgramExprNode* p)
+	{
+		pgm = p;
+		conscount = 0;
+		gcinvoke = 0;
+	}
+	void* evaluateNilExpr(Node*)
+	{
+		return NULL;
+	}
+	result evaluateConstIntExpr(Node* node)
+	{
+		ConstIntExprNode* intExpr = (ConstIntExprNode*)node;
+		return result(intType, intExpr->getVal());
+	}
+	result evaluateConstBoolExpr(Node* node)
+	{
+		ConstBoolExprNode* boolExpr = (ConstBoolExprNode*)node;
+		return result(boolType, boolExpr->getVal());
+	}
+	result evaluateConstStringExpr(Node* node)
+	{
+		ConstStringExprNode* stringExpr = (ConstStringExprNode*)node;
+		return result(stringType, stringExpr->getVal().c_str());
+	}
+	result evaluateVarExpr(Node* node=NULL)
+	{
+		VarExprNode* varExpr = (VarExprNode*)node;
+		string& varName = varExpr->getName();
+		char resultType = locate_var(varName.c_str());
+		if( resultType == 'a')
+			return result(heap, lookup_addr(varName.c_str()));
+		else if (resultType == 'i')
+			return result(intType, lookup_value(varName.c_str()));
+		else if (resultType == 'b')
+			return result(boolType, lookup_value(varName.c_str()));
+		else if (resultType == 's')
+			return result(stringType, lookup_value(varName.c_str()));
+		else
+			return result(errorType, (void*)NULL);
+	}
+
+	result evaluateIfExpr(Node* n = NULL)
+	{
+		IfExprNode* ifExpr = (IfExprNode*)n;
+		result cond_result = evaluate(ifExpr->getCond());
+		if (cond_result.res.boolVal)
+			return evaluate(ifExpr->getThenPart());
+		else
+			return evaluate(ifExpr->getElsePart());
+
+	}
+
+	result evaluateLetExpr(Node* n = NULL)
+	{
+
+		letExprNode* letExpr = (letExprNode*)n;
+		result var_res = evaluate(letExpr->getVarExpr());
+		switch(var_res.type)
+		{
+		case intType : make_reference_value(letExpr->getVar().c_str(), int_to_void(var_res.res.intVal), 'i');
+		break;
+		case boolType : make_reference_value(letExpr->getVar().c_str(), int_to_void(var_res.res.boolVal), 'b');
+		break;
+		case stringType : make_reference_value(letExpr->getVar().c_str(), int_to_void(var_res.res.charVal), 's');
+		break;
+		default : make_reference_addr(letExpr->getVar().c_str(), var_res.res.heapRef);
+		break;
+		}
+
+		return evaluate(letExpr->getBody());
+	}
+
+	result evaluateFuncDefineExpr(Node* n = NULL)
+	{
+		FunctionDefinitionExprNode* fundef = (FunctionDefinitionExprNode*)n;
+		return result(errorType, (void*)NULL);
+	}
+	result evaluateFuncApplicationExpr(Node* n = NULL)
+	{
+		FunctionApplicationExprNode* funcApp = (FunctionApplicationExprNode*)n;
+		vector<result> arg_locs;
+		FunctionDefinitionExprNode* funcDef = (FunctionDefinitionExprNode*)pgm->getFunction(funcApp->getFunction());
+		for(vector<Node*>::iterator arg = funcApp->getArgs().begin(); arg != funcApp->getArgs().end(); ++arg)
+			arg_locs.push_back(evaluate(arg));
+		make_environment(funcDef->getFuncName().c_str(), 0); //TODO : Calculate exact return point and pass it as second argument
+		for(vector<result>::iterator arg = arg_locs.begin(), i = 0; arg != arg_locs.end(); ++arg, ++i)
+		{
+			switch(arg->type)
+			{
+			case intType : make_reference_value((funcDef->getArgs()[i]).c_str(), int_to_void(arg->res.intVal), 'i');
+			break;
+			case boolType : make_reference_value((funcDef->getArgs()[i]).c_str(), int_to_void(arg->res.boolVal), 'b');
+			break;
+			case stringType : make_reference_value((funcDef->getArgs()[i]).c_str(), int_to_void(arg->res.charVal), 's');
+			break;
+			default : make_reference_addr((funcDef->getArgs()[i]).c_str(), arg->res.heapRef);
+			break;
+			}
+		}
+		//Enter function insert into call graph
+		result res = evaluate(funcDef->getFunctionBody());
+		//Exit function in call graph
+		delete_environment();
+		return res;
+	}
+	result evaluateConsExpr(Node* n=NULL)
+	{
+		PrimitiveExprNode* primExpr = (PrimitiveExprNode*)n;
+		++conscount;
+		if (gc_status != gc_disable && current_heap() <= 5)
+		{
+			conscount = 0;
+			++gcinvoke;
+			if(gc_status == gc_plain || gc_status == gc_freq)
+				reachability_gc();
+			else if (gc_status == gc_live )
+			{
+				//get handle to stack and store return point
+				liveness_gc();
+				//reset return point on top of stack to -1
+			}
+			calculate_garbage();
+			detail_gc();
+			//Update GC time
+			dump_garbage_stats();
+		}
+		else
+		{
+			if (gc_status == gc_freq && conscount >= maxcount)
+			{
+				conscount = 0;
+				++gcinvoke;
+				reachability_gc();
+				calculate_garbage();
+				detail_gc();
+				//Update GC time
+				dump_garbage_stats();
+			}
+		}
+
+		//TODO write a function to get the argument list of a primitive function and call it
+		vector<result> arglocs;
+		processArguments(primExpr->getArgs(), arglocs);
+		result arg1 = arglocs[0];
+		result arg2 = arglocs[1];
+		char arg1type;
+		char arg2type;
+		void* a1;
+		void* a2;
+		switch(arg1.type)
+		{
+		case intType : arg1type = 'i';
+		a1 = int_to_void(arg1.res.intVal);
+		break;
+		case boolType : arg1type = 'b';
+		a1 = int_to_void(arg1.res.boolVal);
+		break;
+		case stringType : arg1type = 's';
+		a1 = (void*)arg1.res.charVal.c_str();
+		break;
+		default : arg1type = 'a';
+		a1 = arg1.res.heapRef;
+		break;
+		}
+		switch(arg2.type)
+		{
+		case intType : arg2type = 'i';
+		a2 = int_to_void(arg2.res.intVal);
+		break;
+		case boolType : arg2type = 'b';
+		a2 = int_to_void(arg2.res.boolVal);
+		break;
+		case stringType : arg2type = 's';
+		a2 = (void*)arg2.res.charVal.c_str();
+		break;
+		default : arg2type = 'a';
+		a2 = arg2.res.heapRef;
+		break;
+		}
+
+		return result(heap, allocate_cons(arg1type, a1, arg2type, a2));
+	}
+	result evaluateCarExpr(Node* n=NULL)
+	{
+		PrimitiveExprNode* primExpr = (PrimitiveExprNode*)n;
+		vector<result> arglocs;
+		processArguments(primExpr->getArgs(), arglocs);
+		assert(arglocs.size() == 1 && arglocs[0].type == heap);
+		switch (getType(arglocs[0].res.heapRef, 1))
+		{
+		case 2 : return result(intType, void_to_int(getCar(arglocs[0].res.heapRef, 0)));
+		break;
+		case 3:  return result(stringType, string(void_to_char(getCar(arglocs[0].res.heapRef, 0))));
+		break;
+		default : return result(heap, getCar(arglocs[0], 0));
+			break;
+		}
+	}
+	void* evaluateCdrExpr()
+	{
+		return NULL;
+	}
+	void* evaluateNullqExpr()
+	{
+		return NULL;
+	}
+	void* evaluatePairqExpr()
+	{
+		return NULL;
+	}
+	void* evaluateAddExpr()
+	{
+		return NULL;
+	}
+	void* evaluateSubExpr()
+	{
+		return NULL;
+	}
+	void* evaluateMulExpr()
+	{
+		return NULL;
+	}
+	void* evaluateDivExpr()
+	{
+		return NULL;
+	}
+	void* evaluateGTExpr()
+	{
+		return NULL;
+	}
+	void* evaluateLTExpr()
+	{
+		return NULL;
+	}
+	void* evaluateModExpr()
+	{
+		return NULL;
+	}
+	void* evaluateEqExpr()
+	{
+		return NULL;
+	}
+
+
+
+
+	void* evaluate(Node* node)
+	{
+		exprType type = node->type;
+		switch(type)
+		{
+		case nilExpr: evaluateNilExpr(node);
+		break;
+		case constIntExpr: evaluateConstIntExpr(node);
+		break;
+		case constBoolExpr: evaluateConstBoolExpr(node);
+		break;
+		case constStringExpr: evaluateConstStringExpr(node);
+		break;
+		case varExpr: evaluateVarExpr();
+		break;
+		case letExpr: evaluateLetExpr();
+		break;
+		case funcDefineExpr: evaluateFuncDefineExpr();
+		break;
+		case funcApplicationExpr: evaluateFuncApplicationExpr();
+		break;
+		case consExpr: evaluateConsExpr();
+		break;
+		case carExpr: evaluateCarExpr();
+		break;
+		case cdrExpr: evaluateCdrExpr();
+		break;
+		case nullqExpr: evaluateNullqExpr();
+		break;
+		case pairqExpr: evaluatePairqExpr();
+		break;
+		case addExpr: evaluateAddExpr();
+		break;
+		case subExpr: evaluateSubExpr();
+		break;
+		case mulExpr: evaluateMulExpr();
+		break;
+		case divExpr: evaluateDivExpr();
+		break;
+		case gtExpr: evaluateGTExpr();
+		break;
+		case ltExpr: evaluateLTExpr();
+		break;
+		case modExpr: evaluateModExpr();
+		break;
+		case eqExpr: evaluateEqExpr();
+		break;
+		case ifExpr: evaluateIfExpr();
+		break;
+		default : cout << "Undefined expression type."<<endl;
+		return NULL;
+		}
+		return NULL;
+	}
+};

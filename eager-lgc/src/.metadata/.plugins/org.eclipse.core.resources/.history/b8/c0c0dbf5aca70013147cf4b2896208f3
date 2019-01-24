@@ -1,0 +1,230 @@
+#include<string>
+#include<map>
+#include<vector>
+using namespace std;
+class Node;
+enum resType {heap, stringType, intType, boolType};
+struct result
+{
+	result(resType t, int val)
+	{
+		type = t;
+		res.intVal = val;
+	}
+	result(resType t, bool val)
+	{
+		type = t;
+		res.boolVal = val;
+	}
+	result(resType t, char* val)
+	{
+		type = t;
+		res.charVal = val;
+	}
+	result(resType t, void* val)
+	{
+		type = t;
+		res.heapRef = val;
+	}
+	resType type;
+	union
+	{
+		void* heapRef;
+		char* charVal;
+		int   intVal;
+		bool  boolVal;
+	}res;
+};
+enum exprType
+{
+	nilExpr,
+	constIntExpr,
+	constBoolExpr,
+	constStringExpr,
+	varExpr,
+	letExpr,
+	funcDefineExpr,
+	funcApplicationExpr,
+	consExpr,
+	carExpr,
+	cdrExpr,
+	nullqExpr,
+	pairqExpr,
+	addExpr,
+	subExpr,
+	mulExpr,
+	divExpr,
+	gtExpr,
+	ltExpr,
+	modExpr,
+	eqExpr,
+	ifExpr
+};
+
+typedef map<string, Node*> funcMap;
+
+class Node
+{
+public:
+	Node();
+	void getPgmPt();
+	int reurnPgmPt();
+	void setPgmPt(int);
+	int Pgmpt(); //Why do we need both returnPgmPt and Pgmpt? they seem to be doing the same thing.
+	string asString();
+	virtual Node* getExp() = 0;
+	virtual void print(int indent) = 0;
+	virtual Node* makeCopy() = 0;
+	void setLiveness();
+	void getLiveness();
+	virtual ~Node();
+	exprType type;
+protected:
+	int pgmpt;
+
+};
+
+class NilExprNode : public Node
+{
+public:
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~NilExprNode();
+};
+
+class ConstIntExprNode : public Node
+{
+public:
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~ConstIntExprNode();
+	int getVal();
+private:
+	int val;
+};
+
+class ConstBoolExprNode : public Node
+{
+public:
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~ConstBoolExprNode();
+	bool getVal();
+private:
+	bool val;
+};
+
+class ConstStringExprNode : public Node
+{
+public:
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~ConstStringExprNode();
+	string getVal();
+private:
+	string val;
+
+};
+
+class VarExprNode : public Node
+{
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~VarExprNode();
+	string getName ();
+private:
+	string name;
+	//maintain a global list for all variables and add this to that list.
+};
+
+class IfExprNode : public Node
+{
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~IfExprNode();
+	Node* getCond();
+	Node* getThenPart();
+	Node* getElsePart();
+private:
+	Node* cond;
+	Node* thenpart;
+	Node* elsepart;
+};
+
+class letExprNode : public Node
+{
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~letExprNode();
+	string getVar();
+	Node* getVarExpr();
+	Node* getBody();
+private:
+	string var;
+	Node* varExpr;
+	Node* bodyExpr;
+};
+
+class PrimitiveExprNode : public Node
+{
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~PrimitiveExprNode();
+	string getPrimitive();
+	vector<Node*>& getArgs();
+private:
+	string primitive;
+	vector<Node*> args;
+};
+
+class FunctionApplicationExprNode : public Node
+{
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~FunctionApplicationExprNode();
+	string getFunction();
+	vector<Node*>& getArgs();
+	int getNumArgs();
+private:
+	string function;
+	vector<Node*> args;
+};
+
+class FunctionDefinitionExprNode : public Node
+{
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~FunctionDefinitionExprNode();
+	string getFuncName();
+	vector<Node*>& getArgs();
+	Node* getFunctionBody();
+	int getNumArgs();
+private:
+	string funcName;
+	vector<Node*> args;
+	Node* funcBody;
+};
+
+class ProgramExprNode : public Node
+{
+	virtual Node* getExpr();
+	virtual void print(int indent);
+	virtual ~ProgramExprNode();
+	vector<Node*>& getDefines();
+	Node* getMainExpr();
+	Node* getFunction(string funcName);
+	funcMap getFunctionMap();
+	vector<int> getPgmPts();
+private:
+	funcMap fmap;
+	vector<int> pgmpts;
+	Node* mainExpr;
+	vector<Node*> defines;
+
+};
+
+
+
+
+
+

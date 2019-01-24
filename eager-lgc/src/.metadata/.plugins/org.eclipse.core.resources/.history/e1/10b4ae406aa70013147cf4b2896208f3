@@ -1,0 +1,19 @@
+#include<string>
+using namespace std;
+
+class Node
+{
+	Node();
+	void getPgmPt();
+	int reurnPgmPt();
+	void setPgmPt(int);
+	int Pgmpt(); //Why do we need both returnPgmPt and Pgmpt? they seem to be doing the same thing.
+	string asString();
+	virtual Node* getExp() = 0;
+	virtual void print(int indent) = 0;
+	virtual Node* makeCopy() = 0;
+	void setLiveness();
+	void getLiveness();
+private:
+	int pgmpt;
+};
