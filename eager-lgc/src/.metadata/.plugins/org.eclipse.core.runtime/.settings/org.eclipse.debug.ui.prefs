@@ -1,7 +1,0 @@
-eclipse.preferences.version=1
-org.eclipse.debug.ui.PREF_FILTER_LAUNCH_TYPES=true
-org.eclipse.debug.ui.PREF_FILTER_TYPE_LIST=org.python.pydev.debug.regularLaunchConfigurationType,
-org.eclipse.debug.ui.PREF_LAUNCH_PERSPECTIVES=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?>\n<launchPerspectives>\n<launchPerspective configurationType\="org.python.pydev.debug.regularLaunchConfigurationType" delegate\="org.python.pydev.debug.regularLaunchConfigurationType" mode\="interactive" perspective\="org.eclipse.debug.ui.DebugPerspective"/>\n</launchPerspectives>\n
-org.eclipse.debug.ui.build_before_launch=false
-org.eclipse.debug.ui.wait_for_build=never
-preferredTargets=org.eclipse.cdt.debug.ui.toggleCBreakpointTarget\:org.eclipse.cdt.debug.ui.toggleCBreakpointTarget|
