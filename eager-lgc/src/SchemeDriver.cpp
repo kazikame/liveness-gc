@@ -3,7 +3,7 @@
 #include <fstream>
 #include "SchemeDriver.h"
 #include "Utils.hpp"
-
+#include <typeinfo>
 
 Scheme::output::options Scheme::output::global_options;
 
@@ -75,8 +75,26 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
     int res = parser->parse();
     if(res) return std::make_pair(false, -1);
 
+    // program is of type ProgramNode
+    //cout<<typeid(program).name()<<'\n';
     anf_program = program->getANF();
     anf_program->doLabel(true);
+
+    // Added by Saksham
+
+    auto revCallGraph = anf_program->makeRevCallGraph();
+    cout<<"YAYAYAY!\n\n\n";
+
+    for (auto i : revCallGraph)
+    {
+        cout<<i.first<<": ";
+        for (auto j : i.second)
+        {
+            cout<<j<<", ";
+        }
+        cout<<'\n';
+    }
+    // Added by Saksham
 
     string inputfilename(infilename);
     string inputfilepath = inputfilename.substr(0, inputfilename.find_last_of("/") + 1);
@@ -91,6 +109,8 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
 
     return std::make_pair(true, getElapsedTimeInUS(start, end));
 }
+
+
 
 long Scheme::SchemeDriver::process()
 {

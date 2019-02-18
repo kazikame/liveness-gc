@@ -28,69 +28,27 @@ ProgramNode* pgm;
 unsigned long lbl_count = 0;
 map< string, vector<ExprNode*>> func_call_points;
 
-// Added by Saksham
-// REVERSED CALL GRAPH FUNCTION
 
-unordered_map<string, EdgeSet> ProgramNode::makeRevCallGraph()
+// REVERSED CALL GRAPH FUNCTION
+unordered_map<string, unordered_set<string> > makeRevCallGraph(std::list<DefineNode *> * pListDefines)
 {
-	unordered_map<string, EdgeSet> result((*pListDefines).size());
+	unordered_map<string, unordered_set<string> > result((*pListDefines).size());
 
 	for (auto i : *pListDefines)
 	{
-		string funcName = i->getFuncName();
-		result[funcName] = {};
-	}
+		result[i->getFuncName()] = {};
 
-	for (auto i: *pListDefines)
-	{
-		string funcName = i->getFuncName();
-
-		for (string j : i->makeCallGraph())
-		{
-			cout<<"Adding "<<funcName<<" to "<<j<<'\n';
-			result[j].insert(funcName);
-		}
 
 	}
-
-	return result;
 }
 
-EdgeSet DefineNode::makeCallGraph()
+unordered_set<string> dependentFunction(unordered_set<string>& s = {})
 {
-	EdgeSet result;
-	pExpr->dependentFunctions(result);
-	return result;
+
 }
+//
 
-EdgeSet FuncExprNode::dependentFunctions(EdgeSet& s)
-{
-	s.insert(getFunction());
-	return s;
-}
-
-EdgeSet LetExprNode::dependentFunctions(EdgeSet& s)
-{
-	pExpr->dependentFunctions(s);
-	pBody->dependentFunctions(s);
-	return s;
-}
-
-EdgeSet IfExprNode::dependentFunctions(EdgeSet& s)
-{
-	pCond->dependentFunctions(s);
-	pThen->dependentFunctions(s);
-	pElse->dependentFunctions(s);
-}
-
-//For every other type of ExprNode
-EdgeSet ExprNode::dependentFunctions(EdgeSet& s)
-{
-	return s;
-}
-
-// Added by Saksham
-
+//OLD CODE BEGINS HERE
 void print_arg_type(resType r)
 {
 		switch(r)

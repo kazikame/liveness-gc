@@ -7,6 +7,7 @@
 #include <unordered_set>
 #include <utility>
 #include <vector>
+#include<functional>
 
 #include <boost/unordered_set.hpp>
 

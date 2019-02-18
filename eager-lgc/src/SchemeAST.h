@@ -26,6 +26,10 @@ class ExprNode;
 typedef std::list<ExprNode*> LivenessInfo;
 typedef std::pair<std::string, LivenessInfo > Liveness;
 
+// Added by Saksham
+typedef unordered_set<string> EdgeSet;
+// Added by Saksham
+
 enum exprType
 {
 	nilExpr,
@@ -140,6 +144,13 @@ public:
 		std::cout << "Method should be overriden in the derived class." <<std::endl;
 		exit(-1);
 	}
+
+	// Added by Saksham
+
+	virtual EdgeSet dependentFunctions(EdgeSet& s);
+
+	// Added by Saksham
+
 	//virtual void nextExpr() = 0;
 	virtual bool isFunctionCallExpression()	{return false;}
 	virtual bool isConsExpression() {return false;}
@@ -233,6 +244,12 @@ public:
 	virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 
+	// Added by Saksham
+
+	virtual EdgeSet dependentFunctions(EdgeSet& s);
+
+	// Added by Saksham
+
 protected:
 	IdExprNode * pID;
 	ExprNode * pExpr, * pBody;
@@ -264,6 +281,12 @@ public:
 	virtual resultValue evaluate();
 	virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
+
+	// Added by Saksham
+
+	virtual EdgeSet dependentFunctions(EdgeSet& s);
+
+	// Added by Saksham
 
 protected:
 	ExprNode * pCond, * pThen, * pElse;
@@ -473,6 +496,12 @@ public:
 	void setNextExpr(std::string);
 	std::string getNextExpr();
 
+	// Added by Saksham
+
+	virtual EdgeSet dependentFunctions(EdgeSet& s);
+
+	// Added by Saksham
+
 protected:
 	IdExprNode * pID;
 	std::list<ExprNode *> * pListArgs;
@@ -503,6 +532,12 @@ public:
 	std::vector<std::string> getArgs();
 	ExprNode* getFunctionBody() {return pExpr;}
 
+	// Added by Saksham
+
+	EdgeSet makeCallGraph();
+
+	// Added by Saksham
+
 protected:
 	ExprNode * pExpr;
 	IdExprNode * pID;
@@ -529,6 +564,11 @@ public:
 
 	Node* getFunction(std::string);
 
+	// Added by Saksham
+
+	unordered_map<string, EdgeSet> makeRevCallGraph();
+
+	// Added by Saksham
 	void doLivenessAnalysis();
 
 	//TODO : Add a function to process function definitions (Similar to the LE function in python)

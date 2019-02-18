@@ -119,8 +119,8 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	bool filesCached = true;
 	struct stat buffer;
 	bool state_map_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map").c_str(), &buffer) == 0);
-	bool state_transition_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
-	filesCached = state_map_file && state_transition_file;
+	//bool state_transition_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
+	filesCached = state_map_file;
 
 	if (gc_type == gc_live && !filesCached)
 	{

@@ -20,6 +20,7 @@ namespace Demands {
 	Functions:
 		operator+(): union of liveness
 */
+
 class LivenessState
 {
 
@@ -68,6 +69,7 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 };
+
 
 typedef std::unordered_map< std::string, LivenessTable> LivenessInformation;
 

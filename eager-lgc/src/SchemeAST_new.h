@@ -117,7 +117,7 @@ public:
 	const std::string node_name;
 protected:
 	std::string label;
-	LivenessInformation livenessInformation;
+	//LivenessInformation livenessInformation;
 
 	Node(const std::string);
 
@@ -136,7 +136,7 @@ public:
 	virtual ExprNode * clone() const = 0;
 	virtual ExprNode * getANF() const = 0;
 	virtual resultValue evaluate() = 0;
-	// virtual LivenessInfo analyse(Liveness)
+	virtual LivenessInfo analyse(Liveness)
 	// {
 	// 	std::cout << "Method should be overriden in the derived class." <<std::endl;
 	// 	exit(-1);
@@ -173,7 +173,7 @@ public:
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getName() {return *pID;}
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 
 	virtual std::string getLabel() const;
@@ -466,7 +466,7 @@ public:
 	std::string getFunction();
 	std::vector<ExprNode*> getArgs();
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	////virtual void nextExpr();
 	virtual bool isFunctionCallExpression()	{return true;}
 	void setNextExpr(std::string);

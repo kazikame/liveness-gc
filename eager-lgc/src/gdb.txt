@@ -1,0 +1,42 @@
+Breakpoint 1 at 0x91c8: file Simulator.cpp, line 105.
+Breakpoint 2 at 0x9830: file Simulator.cpp, line 141.
+Breakpoint 3 at 0x51b67: file Demands.cpp, line 1769.
+Breakpoint 4 at 0x51bc8: file Demands.cpp, line 1770.
+Starting program: /home/saksham/Desktop/Project L-GC/cc2016/eager-lgc/src/Simulator ../../lazy-scheme/benchmarks/programs/nqueens/nqueens.scm 10000 gc-live
+
+Breakpoint 1, Simulator::run (this=0x7fffffffdc20, 
+    pgmFilePath="../../lazy-scheme/benchmarks/programs/nqueens/nqueens.scm", hsize=10000, numkeys=0)
+    at Simulator.cpp:105
+105	{
+Continuing.
+
+Breakpoint 2, Simulator::run (this=0x7fffffffdc20, 
+    pgmFilePath="../../lazy-scheme/benchmarks/programs/nqueens/nqueens.scm", hsize=10000, numkeys=0)
+    at Simulator.cpp:141
+141			simplifyCFG(&gLivenessData);
+Continuing.
+
+Breakpoint 3, Scheme::Demands::simplifyCFG (gram=0x55555561f100 <gLivenessData[abi:cxx11]>)
+    at Demands.cpp:1769
+1769							print << "deleting rule for " << prod.first << " which contains empty non-terminal " << nt << endline;
+$1 = std::__cxx11::list = {[0] = "DF/valid/1", [1] = "e"}
+No symbol "operator*" in current context.
+A syntax error in expression, near `all'.
+Cannot evaluate function -- may be inlined
+Cannot evaluate function -- may be inlined
+No symbol "operator+" in current context.
+$2 = std::__cxx11::list = {[0] = "DF/append/1", [1] = "0b", [2] = "IF/append/1"}
+$3 = std::__cxx11::list = {[0] = "IF/addto/1"}
+$4 = std::__cxx11::list = {[0] = "DF/valid/1", [1] = "e"}
+$5 = std::__cxx11::list = {[0] = "DF/valid/1", [1] = "e"}
+Continuing.
+
+Breakpoint 4, Scheme::Demands::simplifyCFG (gram=0x55555561f100 <gLivenessData[abi:cxx11]>)
+    at Demands.cpp:1770
+1770							prod_rules.erase(r);
+Breakpoint 5 at 0x5555555a5c87: file Demands.cpp, line 1777.
+Note: breakpoint 5 also set at pc 0x5555555a5c87.
+Breakpoint 6 at 0x5555555a5c87: file Demands.cpp, line 1777.
+Continuing.
+[Inferior 1 (process 12422) exited normally]
+quit
