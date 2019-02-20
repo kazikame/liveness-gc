@@ -4,6 +4,7 @@
 #include <iterator>
 #include <unordered_set>
 #include <unordered_map>
+#include <map>
 #include <string>
 #include <boost/graph/adjacency_list.hpp>
 #include <boost/graph/strong_components.hpp>
@@ -177,7 +178,7 @@ LivenessTable::LivenessTable(std::string name, bool self = false): LivenessTable
 }
 
 //LivenessTable operator overloading
-LivenessState& LivenessTable::operator[] (const LivenessState& k) {  return table[k];}
+LivenessState& LivenessTable::operator[] (const LivenessState k) { return table[k];}
 
 void LivenessTable::catZero()
 {
@@ -215,10 +216,11 @@ void LivenessTable::doUnion(const LivenessTable& t)
     std::cerr<<"Taking union of different variables";
     exit(-1);
   }
-
-  for (auto i = table.begin(), j = t.table.begin(); i != table.end(); i++, j++) 
+auto j = t.table.begin();
+  for (auto i = table.begin(); i != table.end(); i++) 
    {
     i->second = i->second + j->second;
+    j++;
    } 
   
 }
@@ -279,15 +281,15 @@ void doUnion(LivenessInformation& l1,const LivenessInformation& l2)
 
 }
 
-LivenessInformation mapLiveness(const LivenessTable& lt, const LivenessInformation& li)
+LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, LivenessInformation& li)
 {
   LivenessInformation returnValue;
   for(auto i=li.begin(); i!= li.end(); i++)
   {
     LivenessTable temp(i->first);
-     for(auto j=lt.begin();j != lt.end(); j++)
+     for(auto j=lt.table.begin();j != lt.table.end(); j++)
      {
-       temp[j->first] = i->second[j->second];
+       temp[j->first] = (i->second).table[(j->second)];
      }
 
      returnValue[i->first] = temp;

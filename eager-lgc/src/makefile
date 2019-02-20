@@ -11,8 +11,8 @@ all : $(TARGET)
 
 
 
-$(TARGET): $(TARGET).cpp gc.o  parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o output.o
-	$(CC) -o $(TARGET) $(CFLAGS) $(TARGET).cpp parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o output.o gc.o
+$(TARGET): $(TARGET).cpp gc.o  parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o output.o DemandStructure.o
+	$(CC) -o $(TARGET) $(CFLAGS) $(TARGET).cpp parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o output.o gc.o DemandStructure.o
 
 
 gc.o : gc.cpp 
@@ -31,20 +31,23 @@ output.o: Output.h Output.cpp
 # demands.o: Demands.h Demands.cpp
 # 	$(CC) -o demands.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) Demands.cpp
 
-SchemeAST_Defs_new.o: Utils.hpp SchemeAST_new.h SchemeAST_Defs_new.cpp gc.cpp
+SchemeAST_Defs_new.o: Utils.hpp SchemeAST_new.h SchemeAST_Defs_new.cpp gc.cpp DemandStructure.h
 	$(CC) -o SchemeAST_Defs_new.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeAST_Defs_new.cpp 
 
-SchemeAST_ANFs.o: SchemeAST_new.h SchemeAST_ANFs.cpp
+SchemeAST_ANFs.o: SchemeAST_new.h SchemeAST_ANFs.cpp DemandStructure.h
 	$(CC) -o SchemeAST_ANFs.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeAST_ANFs.cpp
 
 # SchemeAST_Print.o: SchemeAST_new.h SchemeAST_Print.cpp
 # 	$(CC) -o SchemeAST_Print.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeAST_Print.cpp
 
-SchemeAST_Demands_new.o: SchemeAST_new.h SchemeAST_Demands_new.cpp
+SchemeAST_Demands_new.o: SchemeAST_new.h SchemeAST_Demands_new.cpp DemandStructure.h
 	$(CC) -o SchemeAST_Demands_new.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeAST_Demands_new.cpp
 
 SchemeDriver.o: parser.o Output.h SchemeScanner.hpp SchemeDriver.h SchemeDriver.cpp
 	$(CC) -o SchemeDriver.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeDriver.cpp
+
+DemandStructure.o: DemandStructure.h
+	$(CC) -o DemandStructure.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) DemandStructure.cpp
 
 format:
 	astyle -A14Ck2M56nNSQW2xC96 *.cpp *.h *.hpp

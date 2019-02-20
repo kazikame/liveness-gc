@@ -102,7 +102,7 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
     inputfilename = inputfilepath + "anf_" + inputfilename;
     cout << "The anf file is being written to  " << inputfilename << endl;
     ofstream anf_file(inputfilename);
-    anf_program->print(anf_file, 0, true, false, Scheme::output::SCHEME);
+    //anf_program->print(anf_file, 0, true, false, Scheme::output::SCHEME);
     anf_file.close();
 
     gettimeofday(&end, NULL);
@@ -147,64 +147,64 @@ void Scheme::SchemeDriver::set_prog(Scheme::AST::ProgramNode * prog) {
     program = prog;
 }
 
-bool Scheme::SchemeDriver::printAST(std::ostream & screen, std::ostream & logger) {
+// bool Scheme::SchemeDriver::printAST(std::ostream & screen, std::ostream & logger) {
     
 
-    if(!program) return false;
+//     if(!program) return false;
 
-    timeval start, end;
-    Scheme::AST::ProgramNode * prog = global_options.ast_anf ? anf_program : program;
+//     timeval start, end;
+//     Scheme::AST::ProgramNode * prog = global_options.ast_anf ? anf_program : program;
 
-    if(global_options.json_ast != "") {
-        logger << "  => Writing JSON AST to " << global_options.json_ast << " . . . ";
-        if(global_options.json_ast == Scheme::output::piped) {
-            gettimeofday(&start, NULL);
-            prog->print(screen, 0, true, global_options.ast_label, Scheme::output::JSON);
-            gettimeofday(&end, NULL);
-        } else {
-            std::ofstream file(global_options.json_ast);
-            gettimeofday(&start, NULL);
-            prog->print(file, 0, true, global_options.ast_label, Scheme::output::JSON);
-            gettimeofday(&end, NULL);
-            file.close();
-        }
-        logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
-    }
+//     if(global_options.json_ast != "") {
+//         logger << "  => Writing JSON AST to " << global_options.json_ast << " . . . ";
+//         if(global_options.json_ast == Scheme::output::piped) {
+//             gettimeofday(&start, NULL);
+//             prog->print(screen, 0, true, global_options.ast_label, Scheme::output::JSON);
+//             gettimeofday(&end, NULL);
+//         } else {
+//             std::ofstream file(global_options.json_ast);
+//             gettimeofday(&start, NULL);
+//             prog->print(file, 0, true, global_options.ast_label, Scheme::output::JSON);
+//             gettimeofday(&end, NULL);
+//             file.close();
+//         }
+//         logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
+//     }
 
-    if(global_options.plain_ast != "") {
-        logger << "  => Writing PLAIN AST to " << global_options.plain_ast << " . . . ";
-        if(global_options.plain_ast == Scheme::output::piped) {
-            gettimeofday(&start, NULL);
-            prog->print(screen, 0, true, global_options.ast_label, Scheme::output::PLAIN);
-            gettimeofday(&end, NULL);
-        } else {
-            std::ofstream file(global_options.plain_ast);
-            gettimeofday(&start, NULL);
-            prog->print(file, 0, true, global_options.ast_label, Scheme::output::PLAIN);
-            gettimeofday(&end, NULL);
-            file.close();
-        }
-        logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
-    }
+//     if(global_options.plain_ast != "") {
+//         logger << "  => Writing PLAIN AST to " << global_options.plain_ast << " . . . ";
+//         if(global_options.plain_ast == Scheme::output::piped) {
+//             gettimeofday(&start, NULL);
+//             prog->print(screen, 0, true, global_options.ast_label, Scheme::output::PLAIN);
+//             gettimeofday(&end, NULL);
+//         } else {
+//             std::ofstream file(global_options.plain_ast);
+//             gettimeofday(&start, NULL);
+//             prog->print(file, 0, true, global_options.ast_label, Scheme::output::PLAIN);
+//             gettimeofday(&end, NULL);
+//             file.close();
+//         }
+//         logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
+//     }
 
-    if(global_options.scheme_ast != "") {
-        logger << "  => Writing SCHEME AST to " << global_options.scheme_ast << " . . . ";
-        if(global_options.scheme_ast == Scheme::output::piped) {
-            gettimeofday(&start, NULL);
-            prog->print(screen, 0, true, global_options.ast_label, Scheme::output::SCHEME);
-            gettimeofday(&end, NULL);
-        } else {
-            std::ofstream file(global_options.scheme_ast);
-            gettimeofday(&start, NULL);
-            prog->print(file, 0, true, global_options.ast_label, Scheme::output::SCHEME);
-            gettimeofday(&end, NULL);
-            file.close();
-        }
-        logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
-    }
+//     if(global_options.scheme_ast != "") {
+//         logger << "  => Writing SCHEME AST to " << global_options.scheme_ast << " . . . ";
+//         if(global_options.scheme_ast == Scheme::output::piped) {
+//             gettimeofday(&start, NULL);
+//             prog->print(screen, 0, true, global_options.ast_label, Scheme::output::SCHEME);
+//             gettimeofday(&end, NULL);
+//         } else {
+//             std::ofstream file(global_options.scheme_ast);
+//             gettimeofday(&start, NULL);
+//             prog->print(file, 0, true, global_options.ast_label, Scheme::output::SCHEME);
+//             gettimeofday(&end, NULL);
+//             file.close();
+//         }
+//         logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
+//     }
 
-    return true;
-}
+//     return true;
+// }
 
 
 

@@ -61,18 +61,19 @@ public:
 	std::size_t operator()(const LivenessState& obj) const { return std::hash<std::string>()(obj.idString); }
 };
 
-
+class LivenessTable;
 //Defines a type for liveness table of any variable
+typedef std::map< std::string, LivenessTable> LivenessInformation;
+LivenessInformation mapLiveness(const LivenessTable&, LivenessInformation&);
 class LivenessTable
 {
-private:
-	std::unordered_map<LivenessState, LivenessState, LivenessStateHasher> table;
 public:
+	std::unordered_map<LivenessState, LivenessState, LivenessStateHasher> table;
 	std::string varName;
 	LivenessTable();
-	LivenessTable(std::string, bool self = false);
+	LivenessTable(std::string, bool self);
 	LivenessTable operator+(const LivenessState&);
-	LivenessState& operator[] (const LivenessState& k);
+	LivenessState& operator[] (const LivenessState k);
 	void catZero();
 	void catOne();
 	void stripZero();
@@ -81,9 +82,11 @@ public:
 
 
 	friend std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
+	friend LivenessInformation mapLiveness(const LivenessTable& lt, const LivenessInformation& li);
+
 };
 
-typedef std::map< std::string, LivenessTable> LivenessInformation;
+
 typedef std::unordered_map< std::string, LivenessInformation> ProgramLiveness;
 
 //Printing Demands
@@ -92,7 +95,6 @@ std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 std::ostream& operator<<(std::ostream& out, const LivenessInformation& t);
 
 void doUnion(LivenessInformation &, const LivenessInformation &);
-LivenessInformation mapLiveness(const LivenessTable&, const LivenessInformation&);
 }
 }
 extern Scheme::Demands::ProgramLiveness progLiveness;
