@@ -17,7 +17,7 @@ private:
 
 public:
 	Simulator(int gctype);
-	Simulator& run(std::string pgmFilePath, int hsize, int numkeys); //This method or the constructor should take other parameters like gctype, heap size etc...
+	Simulator& run(std::string pgmFilePath, int hsize); //This method or the constructor should take other parameters like gctype, heap size etc...
 	~Simulator();
 };
 

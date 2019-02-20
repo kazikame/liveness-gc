@@ -4,6 +4,7 @@
 #include <list>
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -82,8 +83,7 @@ public:
 	friend std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 };
 
-
-typedef std::unordered_map< std::string, LivenessTable> LivenessInformation;
+typedef std::map< std::string, LivenessTable> LivenessInformation;
 typedef std::unordered_map< std::string, LivenessInformation> ProgramLiveness;
 
 //Printing Demands

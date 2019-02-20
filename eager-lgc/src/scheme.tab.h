@@ -42,7 +42,7 @@
 // //                    "%code requires" blocks.
 #line 9 "scheme.y" // lalr1.cc:377
 
-    #include "SchemeAST.h"
+    #include "SchemeAST_new.h"
 
     // Forward declare the Scanner and Driver classes, as the Parser needs them
     // But they themselves cannot be declared without the Parser.

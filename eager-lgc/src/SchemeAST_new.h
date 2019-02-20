@@ -22,8 +22,9 @@ public:
     { return std::strcmp(str1, str2) < 0; }
 };
 class ExprNode;
-typedef std::list<ExprNode*> LivenessInfo;
-typedef std::pair<std::string, LivenessInfo > Liveness;
+// Added by Saksham
+typedef unordered_set<string> EdgeSet;
+// Added by Saksham
 
 enum exprType
 {
@@ -527,6 +528,12 @@ public:
 	Node* getFunction(std::string);
 
 	void doLivenessAnalysis();
+		
+	// Added by Saksham
+
+	unordered_map<string, EdgeSet> makeRevCallGraph();
+
+	// Added by Saksham
 
 	//TODO : Add a function to process function definitions (Similar to the LE function in python)
 protected:

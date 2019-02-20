@@ -283,63 +283,61 @@ LivenessInformation FuncExprNode::transformDemand() const
     auto iter = pListArgs->begin();
     for (auto& i: demandTransform)
     {
-
+        i->first = iter->getIDStr();
+        iter++;
     }
+
+    return demandTransform;
 }
 
 
 LivenessInformation DefineNode::transformDemand() const {
-    // The demand argument is unnecessary for this function.
+    // Check if totalLiveness contains only the demands of formal parameters    -   ANF?
+    LivenessInformation totalLiveness = pExpr->transformDemand();
 
-    std::string func_demand_prefix = PREFIX_DEMAND + SEPARATOR + pID->getIDStr();
-    LivenessInformation result = pExpr->transformDemand(rule({{ func_demand_prefix }}));
+    LivenessInformation livenessInOrder;
+    for (auto i : *pListArgs)
+    {
+        auto iter = totalLiveness.find(i);
 
-    int index = 0;
-    demand_grammar * arg_demands = new demand_grammar;
-    for(auto & arg : *pListArgs) {
-        auto arg_demand_pair = result->second->find(arg->getIDStr());
-        if(arg_demand_pair != result->second->end())
-            arg_demands->emplace(func_demand_prefix + SEPARATOR + std::to_string(++index),
-                                 arg_demand_pair->second);
+        if (iter != totalLiveness.end())
+        {
+            livenessInOrder.insert(*i);
+        }
     }
-//The map containing the variable -> demand mapping is being deleted and is overwritten by symbolic demand on arguments.
-//TODO Have to see how this has to be updated to handle liveness.
-//    demand_grammar* var_grammar = result->second;
-//    for (auto &var : (*var_grammar))
-//    {
-//    	string nt = "L/" + getLabel() +  "/" + var.first;
-//    	gLivenessData[nt] = var.second;
-//    }
-
-    delete result->second;
-    result->second = arg_demands;
-
-    return result;
+    functionCallDemands[pID->getIDStr()] = livenessInOrder;
+    return livenessInOrder;
 }
 
 
 
 
 LivenessInformation ProgramNode::transformDemand() const {
-    // The demand argument is unnecessary for this function.
+    // // The demand argument is unnecessary for this function.
 
-    function_call_demands.clear();
+    // function_call_demands.clear();
 
-    rule symbolic_demand = rule({{ PREFIX_DEMAND + SEPARATOR + "all" }});
-    LivenessInformation result = pExpr->transformDemand(symbolic_demand);
-    gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
+    // rule symbolic_demand = rule({{ PREFIX_DEMAND + SEPARATOR + "all" }});
+    // LivenessInformation result = pExpr->transformDemand(symbolic_demand);
+    // gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
 
-    delete result->second;
-    result->second = new demand_grammar;
+    // delete result->second;
+    // result->second = new demand_grammar;
 
-    for(auto & def : *pListDefines)
-        result = merge(result, def->transformDemand(symbolic_demand));
+    // for(auto & def : *pListDefines)
+    //     result = merge(result, def->transformDemand(symbolic_demand));
 
-    for(auto & func : function_call_demands)
-    {
-        result->first->emplace(PREFIX_DEMAND + SEPARATOR + func.first, func.second);
-        gLivenessData[PREFIX_DEMAND + SEPARATOR + func.first] = func.second;
-    }
+    // for(auto & func : function_call_demands)
+    // {
+    //     result->first->emplace(PREFIX_DEMAND + SEPARATOR + func.first, func.second);
+    //     gLivenessData[PREFIX_DEMAND + SEPARATOR + func.first] = func.second;
+    // }
 
-    return result;
+    // return result;
+
+    for (auto& def : *pListDefines)
+        def->transformDemand();
+
+    return pExpr->transformDemand();
+
 }

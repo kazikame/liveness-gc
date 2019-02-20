@@ -11,7 +11,7 @@
 //#include "Utils.hpp"
 #include "Simulator.h"
 #include <unordered_map>
-#include "Demands.h"
+#include "DemandStructure.h"
 #include <ctime>
 #include <sys/stat.h>
 
@@ -101,7 +101,7 @@ void write_grammar_to_text_file(demand_grammar *g, string filename)
 	return;
 }
 
-Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //This method or the constructor should take other parameters like gctype, heap size etc...
+Simulator& Simulator::run(std::string pgmFilePath, int hsize) //This method or the constructor should take other parameters like gctype, heap size etc...
 {
 	//Do any per program initialization here.
 	Scheme::SchemeDriver driver;
@@ -116,74 +116,74 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	std::string pgmname = pgmFilePath.substr(pgmFilePath.find_last_of("/") + 1,
 			                                 pgmFilePath.find_first_of(".", pgmFilePath.find_last_of("/")) - pgmFilePath.find_last_of("/") - 1);
 ///////////////////////////////////////////////////////////////////////
-	bool filesCached = true;
+	//bool filesCached = true;
 	struct stat buffer;
-	bool state_map_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map").c_str(), &buffer) == 0);
+	//bool state_map_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map").c_str(), &buffer) == 0);
 	//bool state_transition_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
-	filesCached = state_map_file;
+	//filesCached = state_map_file;
 
-	if (gc_type == gc_live && !filesCached)
+	if (gc_type == gc_live)
 	{
+		cout<<"came to process"<<endl;
 		int resint = driver.process();
-		//convert LFs into IFs and DFs
-		for (auto elem: gLivenessData)
-		{
-			rule r;
-			for(auto path:elem.second)
-			{
-				rule temp = expandProd(path);
-				r.insert(temp.begin(), temp.end());
-			}
-			gLivenessData[elem.first] = r;
-		}
-		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
-		//Simplify grammar
-		simplifyCFG(&gLivenessData);
-		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/simplified-program-cfg.txt");
-		//Convert CFG to strongly regular grammar
-		regular_demand_grammar *reg = regularize(&gLivenessData);
-		cout << "Converted CFG into strongly regular grammar" << endl;
-		gLivenessData.clear(); //clear the original grammar
-		gLivenessData.swap(*(reg->first));
-		write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-reg.txt");
-		Scheme::Demands::sanitize(&gLivenessData); //Remove empty productions
-		std::cout << "Sanitized the regular grammar"<<std::endl;
-		automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
-		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-nfa.txt");
-		//auto start_states = nfa->second.at("START")[E];
-		std::unordered_set<std::string> start_states;
-		for (auto nt:gLivenessData)
-			start_states.insert(nt.first);
-		Scheme::Demands::simplifyNFA(start_states, nfa);
-		Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
-		automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
-		Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
-		numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);
+		// //convert LFs into IFs and DFs
+		// for (auto elem: gLivenessData)
+		// {
+		// 	rule r;
+		// 	for(auto path:elem.second)
+		// 	{
+		// 		rule temp = expandProd(path);
+		// 		r.insert(temp.begin(), temp.end());
+		// 	}
+		// 	gLivenessData[elem.first] = r;
+		// }
+		// write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
+		// //Simplify grammar
+		// simplifyCFG(&gLivenessData);
+		// write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/simplified-program-cfg.txt");
+		// //Convert CFG to strongly regular grammar
+		// regular_demand_grammar *reg = regularize(&gLivenessData);
+		// cout << "Converted CFG into strongly regular grammar" << endl;
+		// gLivenessData.clear(); //clear the original grammar
+		// gLivenessData.swap(*(reg->first));
+		// write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-reg.txt");
+		// Scheme::Demands::sanitize(&gLivenessData); //Remove empty productions
+		// std::cout << "Sanitized the regular grammar"<<std::endl;
+		// automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
+		// Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-nfa.txt");
+		// //auto start_states = nfa->second.at("START")[E];
+		// std::unordered_set<std::string> start_states;
+		// for (auto nt:gLivenessData)
+		// 	start_states.insert(nt.first);
+		// Scheme::Demands::simplifyNFA(start_states, nfa);
+		// Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
+		// automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
+		// Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
+		// numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);
 		//Scheme::Demands::minimizeDFA(dfa, start_states);
 	}
-	else if (gc_type == gc_live)
-	{
-		cout <<"Reading data from cached files "<<endl;
-		const int SZ = 1024 * 1024;
-		//std::vector<char> buff(SZ, "");
-		std::vector<char> buff(SZ);
-		ifstream ifs( "../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map" );
-		int n = 0;
-		while( int cc = FileRead( ifs, buff ) )
-		{
-			n += CountLines( buff, cc );
-		}
-		numkeys = n + 1;
-	}
-///////////////////////////////////////////////////////////////////////
-	cout << "Num of states " << numkeys << endl;
-	//Do the initialization of the dfa state map and transition table
-	//initialize(pgmFilePath, numkeys, gc_type);
-	clock_t pstart = clock();
-	initialize(pgmname, numkeys, gc_type);
-	allocate_heap(hsize * 2);
-	empty_environment("main");
-	init_gc_stats();
+	// else if (gc_type == gc_live)
+	// {
+	// 	cout <<"Reading data from cached files "<<endl;
+	// 	const int SZ = 1024 * 1024;
+	// 	//std::vector<char> buff(SZ, "");
+	// 	std::vector<char> buff(SZ);
+	// 	ifstream ifs( "../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map" );
+	// 	int n = 0;
+	// 	while( int cc = FileRead( ifs, buff ) )
+	// 	{
+	// 		n += CountLines( buff, cc );
+	// 	}
+	// 	numkeys = n + 1;
+	// }
+
+	// //Do the initialization of the dfa state map and transition table
+	// //initialize(pgmFilePath, numkeys, gc_type);
+	// clock_t pstart = clock();
+	// initialize(pgmname, numkeys, gc_type);
+	// allocate_heap(hsize * 2);
+	// empty_environment("main");
+	// init_gc_stats();
 
 	resultValue r = pgm->evaluate();
 
@@ -213,11 +213,11 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize, int numkeys) //Thi
 	//Remove all the parameters and use private variables in the Simulator class
 	cout << "Heap total="<<hsize<<" Heap left="<<current_heap()<<" Heap used="<<(hsize - current_heap())<<endl;
 	detail_gc();
-	if (gc_type == gc_live)
-		cleanup(numkeys-1);
+	// if (gc_type == gc_live)
+	// 	cleanup(numkeys-1);
 
 	cout << "GC Invocations="<<gcinvoke<<" GC Time="<<gctime<<endl;
-	cout << "Program Execution Time="<<((double(pend - pstart)/CLOCKS_PER_SEC) - gctime)<<" seconds"<<endl;
+	//cout << "Program Execution Time="<<((double(pend - pstart)/CLOCKS_PER_SEC) - gctime)<<" seconds"<<endl;
 
 	return *this;
 }
@@ -262,7 +262,7 @@ int main(int argc, char ** argv)
 	Simulator s(gctype);
 	try
 	{
-		s.run(filepath, heapsize, 0); //This method doesn't need to take numkeys as parameter
+		s.run(filepath, heapsize); //This method doesn't need to take numkeys as parameter
 	}
 	catch(exception &e)
 	{

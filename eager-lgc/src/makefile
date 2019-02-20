@@ -18,7 +18,7 @@ $(TARGET): $(TARGET).cpp gc.o  parser.o lexer.o SchemeDriver.o SchemeAST_Print.o
 gc.o : gc.cpp 
 	$(CC) $(CFLAGS) -c gc.cpp
 
-parser.o: scheme.y SchemeAST.h SchemeDriver.h SchemeScanner.hpp
+parser.o: scheme.y SchemeAST_new.h SchemeDriver.h SchemeScanner.hpp
 	bison -dv $<
 	$(CC) -o parser.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) scheme.tab.c
 

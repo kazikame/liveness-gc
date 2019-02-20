@@ -7,7 +7,7 @@
 %define parser_class_name   {SchemeParser}
 
 %code requires {
-    #include "SchemeAST.h"
+    #include "SchemeAST_new.h"
 
     // Forward declare the Scanner and Driver classes, as the Parser needs them
     // But they themselves cannot be declared without the Parser.

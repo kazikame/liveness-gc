@@ -12,32 +12,32 @@ using namespace std;
 using Scheme::output::global_options;
 
 Scheme::SchemeDriver::SchemeDriver()
-    : parser(NULL), scanner(NULL), program(NULL), anf_program(NULL),program_grammars(NULL), combined_grammar(NULL), approx_grammar(NULL)
+    : parser(NULL), scanner(NULL), program(NULL), anf_program(NULL)
 {}
 
 Scheme::SchemeDriver::~SchemeDriver()
 {
-	if (program)
-		delete(program);
-	if (anf_program)
-		delete(anf_program);
-	if (program_grammars)
-	{
-		if (program_grammars->second)
-			delete(program_grammars->second);
-		if (program_grammars->first)
-			delete(program_grammars->first);
-    delete(program_grammars);
-	}
-	if (combined_grammar)
-		delete(combined_grammar);
-	if (approx_grammar)
-		delete(approx_grammar);
+	// if (program)
+	// 	delete(program);
+	// if (anf_program)
+	// 	delete(anf_program);
+	// if (program_grammars)
+	// {
+	// 	if (program_grammars->second)
+	// 		delete(program_grammars->second);
+	// 	if (program_grammars->first)
+	// 		delete(program_grammars->first);
+ //    delete(program_grammars);
+	// }
+	// if (combined_grammar)
+	// 	delete(combined_grammar);
+	// if (approx_grammar)
+	// 	delete(approx_grammar);
 
-	if(scanner)
-		delete(scanner);
-	if (parser)
-		delete(parser);
+	// if(scanner)
+	// 	delete(scanner);
+	// if (parser)
+	// 	delete(parser);
 }
 
 std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
@@ -119,15 +119,15 @@ long Scheme::SchemeDriver::process()
 
     program->doLabel(true);
     anf_program->doLabel(true);
+    cout<<"inside process()"<<endl;
+    program_grammars = anf_program->transformDemand();
 
-    program_grammars = anf_program->transformDemand(Scheme::Demands::rule({{}}));
-
-    combined_grammar = Scheme::Demands::solve_functions_and_combine(program_grammars);
-    combined_grammar->emplace("D/all", Scheme::Demands::rule({{Scheme::Demands::T0, "D/all"},
-        {Scheme::Demands::T1, "D/all"},
-        {Scheme::Demands::E}
-    }));
-    //Scheme::output::dumpGrammar(cout, combined_grammar);
+    // combined_grammar = Scheme::Demands::solve_functions_and_combine(program_grammars);
+    // combined_grammar->emplace("D/all", Scheme::Demands::rule({{Scheme::Demands::T0, "D/all"},
+    //     {Scheme::Demands::T1, "D/all"},
+    //     {Scheme::Demands::E}
+    // }));
+    // //Scheme::output::dumpGrammar(cout, combined_grammar);
     //approx_grammar = Scheme::Demands::regularize(combined_grammar);
 
     gettimeofday(&end, NULL);
@@ -145,47 +145,6 @@ std::ostream & Scheme::SchemeDriver::getErrorStream() {
 
 void Scheme::SchemeDriver::set_prog(Scheme::AST::ProgramNode * prog) {
     program = prog;
-}
-
-bool Scheme::SchemeDriver::printGrammar(std::ostream & screen, std::ostream & logger) {
-    if(!program) return false;
-
-    timeval start, end;
-    Scheme::AST::ProgramNode * prog = global_options.ast_anf ? anf_program : program;
-
-    if(global_options.cfg != "") {
-        logger << "  => Writing CFG to " << global_options.cfg << " . . . ";
-        if(global_options.cfg == Scheme::output::piped) {
-            gettimeofday(&start, NULL);
-            Scheme::output::dumpGrammar(screen, combined_grammar);
-            gettimeofday(&end, NULL);
-        } else {
-            std::ofstream file(global_options.cfg);
-            gettimeofday(&start, NULL);
-            Scheme::output::dumpGrammar(file, combined_grammar);
-            gettimeofday(&end, NULL);
-            file.close();
-        }
-        logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
-    }
-
-    if(global_options.approx_cfg != "") {
-        logger << "  => Writing Approx Regular CFG to " << global_options.approx_cfg << " . . . ";
-        if(global_options.approx_cfg == Scheme::output::piped) {
-            gettimeofday(&start, NULL);
-            Scheme::output::dumpGrammar(screen, approx_grammar);
-            gettimeofday(&end, NULL);
-        } else {
-            std::ofstream file(global_options.approx_cfg);
-            gettimeofday(&start, NULL);
-            Scheme::output::dumpGrammar(file, approx_grammar);
-            gettimeofday(&end, NULL);
-            file.close();
-        }
-        logger << getElapsedTimeInUS(start, end) << "us." << std::endl;
-    }
-
-    return true;
 }
 
 bool Scheme::SchemeDriver::printAST(std::ostream & screen, std::ostream & logger) {

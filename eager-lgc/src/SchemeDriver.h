@@ -7,6 +7,7 @@
 
 #include "scheme.tab.h"
 #include "SchemeScanner.hpp"
+#include "DemandStructure.h"
 
 namespace Scheme {
 
@@ -35,9 +36,9 @@ namespace Scheme {
         AST::ProgramNode * program;
         AST::ProgramNode * anf_program;
 
-        Scheme::Demands::demand_grammar * approx_grammar;
-        Scheme::Demands::demand_grammar * combined_grammar;
-        Scheme::Demands::expr_demand_grammars * program_grammars;
+        // Scheme::Demands::demand_grammar * approx_grammar;
+        // Scheme::Demands::demand_grammar * combined_grammar;
+        Demands::LivenessInformation program_grammars;
 
         std::stringstream error_stream;
     };
