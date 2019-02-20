@@ -72,6 +72,7 @@ public:
 
 
 typedef std::unordered_map< std::string, LivenessTable> LivenessInformation;
+typedef std::unordered_map< std::string, LivenessInformation> ProgramLiveness;
 
 //Printing Demands
 std::ostream& operator<<(std::ostream& out, const LivenessState& l);

@@ -136,7 +136,7 @@ public:
 	virtual ExprNode * clone() const = 0;
 	virtual ExprNode * getANF() const = 0;
 	virtual resultValue evaluate() = 0;
-	virtual LivenessInfo analyse(Liveness)
+	// virtual LivenessInfo analyse(Liveness)
 	// {
 	// 	std::cout << "Method should be overriden in the derived class." <<std::endl;
 	// 	exit(-1);
@@ -144,10 +144,10 @@ public:
 	//virtual void nextExpr() = 0;
 	virtual bool isFunctionCallExpression()	{return false;}
 	virtual bool isConsExpression() {return false;}
-	LivenessInformation& getLiveness()
-	{
-		return livehhnessInformation;
-	}
+	// LivenessInformation& getLiveness()
+	// {
+	// 	return livehhnessInformation;
+	// }
 protected:
 	ExprNode(const std::string name);
 	//Liveness l;
