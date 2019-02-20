@@ -6,7 +6,7 @@
 #include<map>
 #include<iostream>
 #include <boost/variant.hpp>
-#include "Demands.h"	// Should be able to remove
+//#include "Demands.h"	// Should be able to remove
 #include "DemandStructure.h"
 #include <functional>
 #include <cstring>
@@ -15,8 +15,6 @@ using namespace std;
 namespace Scheme {
 
 namespace AST {
-
-
 
 struct StrCompare : public std::binary_function<const char*, const char*, bool> {
 public:
@@ -107,8 +105,8 @@ public:
 	virtual Node * clone() const = 0;
 	virtual Node * getANF() const = 0;
 
-
-	virtual Scheme::Demands::LivenessInformation&
+	// Return type by reference??
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const = 0;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -166,7 +164,7 @@ public:
 
 	std::string getIDStr() const;
 
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -192,7 +190,7 @@ public:
 	virtual ReturnExprNode * clone() const;
 	virtual ReturnExprNode * getANF() const;
 
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const;
 	virtual resultValue evaluate();
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -221,7 +219,7 @@ public:
 
 	virtual LetExprNode * fillHoleWith(ExprNode * pSubExpr);
 
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -253,7 +251,7 @@ public:
 
 	virtual IfExprNode * fillHoleWith(IdExprNode * pSubExpr);
 	//
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -279,7 +277,7 @@ public:
 
 	virtual void doLabel(bool = true);
 
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const;
 
 protected:
@@ -386,7 +384,7 @@ public:
 
 	virtual UnaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -419,7 +417,7 @@ public:
 
 	virtual BinaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
 	transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -458,7 +456,7 @@ public:
 
 	virtual FuncExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	            virtual Scheme::Demands::LivenessInformation&
+	            virtual Scheme::Demands::LivenessInformation
 	            transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -493,7 +491,7 @@ public:
 	virtual DefineNode * getANF() const;
 
 	virtual std::string getFuncName() const;
-	            virtual Scheme::Demands::LivenessInformation&
+	            virtual Scheme::Demands::LivenessInformation
 	            transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
@@ -519,7 +517,7 @@ public:
 	virtual ProgramNode * clone() const;
 	virtual ProgramNode * getANF() const;
 
-	virtual Scheme::Demands::LivenessInformation&
+	virtual Scheme::Demands::LivenessInformation
             transformDemand() const;
 
 	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,

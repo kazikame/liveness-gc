@@ -29,11 +29,16 @@ public:
 	static std::unordered_map<std::string, std::unordered_map<std::string, LivenessState> > unionRules;
 	static std::unordered_map<std::string, LivenessState> catZeroRules;
 	static std::unordered_map<std::string, LivenessState> catOneRules;
+	static std::unordered_map<std::string, LivenessState> stripZeroRules;
+	static std::unordered_map<std::string, LivenessState> stripOneRules;
+
 	LivenessState();
 	LivenessState(const std::string& s);
 	LivenessState operator+(const LivenessState&);	//Union
 	LivenessState catZero();						//Concatenate Zero
 	LivenessState catOne();							//Concatenate One
+	LivenessState stripZero();						//Strip's Zero from front
+	LivenessState stripOne();						//Strip's One from front
 	friend std::ostream& operator<<(std::ostream& out, const LivenessState& l);
 
 };
@@ -64,8 +69,14 @@ private:
 public:
 	std::string varName;
 	LivenessTable();
-	LivenessTable(std::string);
+	LivenessTable(std::string, bool self = false);
+	LivenessTable operator+(const LivenessState&);
 	LivenessState& operator[] (const LivenessState& k);
+	void catZero();
+	void catOne();
+	void stripZero();
+	void stripOne();
+
 
 	friend std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 };
@@ -78,6 +89,8 @@ typedef std::unordered_map< std::string, LivenessInformation> ProgramLiveness;
 std::ostream& operator<<(std::ostream& out, const LivenessState& l);
 std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 std::ostream& operator<<(std::ostream& out, const LivenessInformation& t);
+
+extern ProgramLiveness progLiveness;
 }
 }
 

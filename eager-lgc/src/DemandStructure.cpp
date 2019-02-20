@@ -104,6 +104,31 @@ std::unordered_map<std::string, LivenessState> getCatOneRules()
 }
 std::unordered_map<std::string, LivenessState> LivenessState::catOneRules = getCatOneRules();
 
+std::unordered_map<std::string, LivenessState> getStripZeroRules()
+{
+  std::unordered_map<std::string, LivenessState> temp = { {"phi", PHI},
+                                                                                      {"e", PHI},
+                                                                                      {"0", EPSILON},
+                                                                                      {"1", PHI},
+                                                                                      {"1*", PHI},
+                                                                                      {"all", ALL} };
+
+  return temp;
+}
+std::unordered_map<std::string, LivenessState> LivenessState::stripZeroRules = getStripZeroRules();
+
+std::unordered_map<std::string, LivenessState> getStripOneRules()
+{
+  std::unordered_map<std::string, LivenessState> temp = { {"phi", PHI},
+                                                                                      {"e", PHI},
+                                                                                      {"0", PHI},
+                                                                                      {"1", EPSILON},
+                                                                                      {"1*", ONE_STAR},
+                                                                                      {"all", ALL} };
+
+  return temp;
+}
+std::unordered_map<std::string, LivenessState> LivenessState::stripOneRules = getStripOneRules();
 
 LivenessState LivenessState::catZero()
 {
@@ -116,26 +141,72 @@ LivenessState LivenessState::catOne()
     return catOneRules[idString];
 }
 
+LivenessState LivenessState::stripZero()
+{
+  return stripZeroRules[idString];
+}
+LivenessState LivenessState::stripOne()
+{
+  return stripOneRules[idString];
+}
 
 // LivenessTable Constructor
 LivenessTable::LivenessTable()
 {
     table[PHI] = PHI;
+    table[EPSILON] = PHI;
     table[ZERO] = PHI;
     table[ONE] = PHI;
     table[ONE_STAR] = PHI;
     table[ALL] = PHI;
 }
 
-LivenessTable::LivenessTable(std::string name): LivenessTable()
+LivenessTable::LivenessTable(std::string name, bool self = false): LivenessTable()
 {
 	varName = name;
+
+  if (self)
+  {
+    table[PHI] = PHI;
+    table[EPSILON] = EPSILON;
+    table[ZERO] = ZERO;
+    table[ONE] = ONE;
+    table[ONE_STAR] = ONE_STAR;
+    table[ALL] = ALL;
+  }
 }
 
 //LivenessTable operator overloading
 LivenessState& LivenessTable::operator[] (const LivenessState& k) {  return table[k];}
 
+void LivenessTable::catZero()
+{
+  for (auto i = table.begin(); i != table.end(); i++)
+    i->second = i->second.catZero();
+}
+void LivenessTable::catOne()
+{
+  for (auto i = table.begin(); i != table.end(); i++)
+    i->second = i->second.catOne();
+}
+void LivenessTable::stripZero()
+{
+  for (auto i = table.begin(); i != table.end(); i++)
+    i->second = i->second.stripZero();
+}
+void LivenessTable::stripOne()
+{
+  for (auto i = table.begin(); i != table.end(); i++)
+    i->second = i->second.stripOne();
+}
 
+LivenessTable LivenessTable::operator+(const LivenessState& state)
+{
+  LivenessTable answer = *this;
+  for (auto i = answer.table.begin(); i != answer.table.end(); i++)
+    i->second = i->second + state;
+  return answer;
+}
 
 
 
