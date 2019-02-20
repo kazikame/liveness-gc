@@ -1,5 +1,5 @@
 #include "SchemeAST_new.h"
-
+#include "DemandStructure.h"
 using namespace Scheme::AST;
 using namespace Scheme::Demands;
 
@@ -22,8 +22,8 @@ LivenessInformation IdExprNode::transformDemand() const
 {
 
 	LivenessInformation returnValue;
-    LivenessTable l= LivenessTable(&pID, true);
-    returnValue[&pID] = l;
+    LivenessTable l= LivenessTable(getIDStr(), true);
+    returnValue[getIDStr()] = l;
     return returnValue;
 }
 
@@ -283,7 +283,7 @@ LivenessInformation FuncExprNode::transformDemand() const
     auto iter = pListArgs->begin();
     for (auto& i: demandTransform)
     {
-        i->first = iter->getIDStr();
+        i.first = (*iter)->getIDStr();
         iter++;
     }
 
@@ -298,11 +298,11 @@ LivenessInformation DefineNode::transformDemand() const {
     LivenessInformation livenessInOrder;
     for (auto i : *pListArgs)
     {
-        auto iter = totalLiveness.find(i);
+        auto iter = totalLiveness.find(i->getIDStr());
 
         if (iter != totalLiveness.end())
         {
-            livenessInOrder.insert(*i);
+            livenessInOrder.insert(*iter);
         }
     }
     functionCallDemands[pID->getIDStr()] = livenessInOrder;
@@ -339,5 +339,6 @@ LivenessInformation ProgramNode::transformDemand() const {
         def->transformDemand();
 
     return pExpr->transformDemand();
+
 
 }

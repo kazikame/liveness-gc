@@ -91,12 +91,11 @@ std::ostream& operator<<(std::ostream& out, const LivenessState& l);
 std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 std::ostream& operator<<(std::ostream& out, const LivenessInformation& t);
 
-extern ProgramLiveness progLiveness;
-
 void doUnion(LivenessInformation &, const LivenessInformation &);
 LivenessInformation mapLiveness(const LivenessTable&, const LivenessInformation&);
 }
 }
+extern Scheme::Demands::ProgramLiveness progLiveness;
 
 
 #endif

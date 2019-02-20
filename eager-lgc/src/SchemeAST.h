@@ -1,7 +1,7 @@
 #ifndef __SCHEME_AST_H__
 #define __SCHEME_AST_H__ 1
 
-#include "Output.h"
+//#include "Output.h"
 #include <vector>
 #include<map>
 #include<iostream>
@@ -114,8 +114,8 @@ public:
 	virtual Scheme::Demands::expr_demand_grammars *
 	transformDemand(const Scheme::Demands::rule&) const = 0;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const = 0;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const = 0;
 	enum exprType type;
 	const std::string node_name;
 protected:
@@ -178,8 +178,8 @@ public:
 	virtual Scheme::Demands::expr_demand_grammars *
 	transformDemand(const Scheme::Demands::rule&) const;
 	virtual resultValue evaluate();
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 	virtual std::string getLabel() const;

@@ -29,24 +29,68 @@ unsigned long lbl_count = 0;
 map< string, vector<ExprNode*>> func_call_points;
 
 
+// Added by Saksham
 // REVERSED CALL GRAPH FUNCTION
-unordered_map<string, unordered_set<string> > makeRevCallGraph(std::list<DefineNode *> * pListDefines)
+
+unordered_map<string, EdgeSet> ProgramNode::makeRevCallGraph()
 {
-	unordered_map<string, unordered_set<string> > result((*pListDefines).size());
+	unordered_map<string, EdgeSet> result((*pListDefines).size());
 
 	for (auto i : *pListDefines)
 	{
-		result[i->getFuncName()] = {};
+		string funcName = i->getFuncName();
+		result[funcName] = {};
+	}
 
+	for (auto i: *pListDefines)
+	{
+		string funcName = i->getFuncName();
+
+		for (string j : i->makeCallGraph())
+		{
+			cout<<"Adding "<<funcName<<" to "<<j<<'\n';
+			result[j].insert(funcName);
+		}
 
 	}
+
+	return result;
 }
 
-unordered_set<string> dependentFunction(unordered_set<string>& s = {})
+EdgeSet DefineNode::makeCallGraph()
 {
-
+	EdgeSet result;
+	pExpr->dependentFunctions(result);
+	return result;
 }
-//
+
+EdgeSet FuncExprNode::dependentFunctions(EdgeSet& s)
+{
+	s.insert(getFunction());
+	return s;
+}
+
+EdgeSet LetExprNode::dependentFunctions(EdgeSet& s)
+{
+	pExpr->dependentFunctions(s);
+	pBody->dependentFunctions(s);
+	return s;
+}
+
+EdgeSet IfExprNode::dependentFunctions(EdgeSet& s)
+{
+	pCond->dependentFunctions(s);
+	pThen->dependentFunctions(s);
+	pElse->dependentFunctions(s);
+}
+
+//For every other type of ExprNode
+EdgeSet ExprNode::dependentFunctions(EdgeSet& s)
+{
+	return s;
+}
+
+// Added by Saksham
 
 //OLD CODE BEGINS HERE
 void print_arg_type(resType r)
@@ -184,14 +228,14 @@ resultValue IdExprNode::evaluate()
 }
 
 
-LivenessInfo IdExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	l.second.assign(lin.second.begin(), lin.second.end());
-	l.second.push_back(this);
-	return l.second;
+// LivenessInfo IdExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	l.second.assign(lin.second.begin(), lin.second.end());
+// 	l.second.push_back(this);
+// 	return l.second;
 
-}
+// }
 
 
 ReturnExprNode::~ReturnExprNode() {
@@ -216,12 +260,12 @@ resultValue ReturnExprNode::evaluate()
 	return pID->evaluate();
 }
 
-LivenessInfo ReturnExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	l.second = this->pID->analyse(lin);
-	return l.second;
-}
+// LivenessInfo ReturnExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	l.second = this->pID->analyse(lin);
+// 	return l.second;
+// }
 
 
 /*  Definitions for CONSTANT nodes */
@@ -245,10 +289,10 @@ resultValue HoleConstExprNode::evaluate()
 	return resultValue(errorType, (void*) NULL);
 }
 
-LivenessInfo HoleConstExprNode::analyse(Liveness lin)
-{
-	return lin.second;
-}
+// LivenessInfo HoleConstExprNode::analyse(Liveness lin)
+// {
+// 	return lin.second;
+// }
 
 
 NilConstExprNode::NilConstExprNode() : ConstExprNode("NIL") {}
@@ -283,12 +327,12 @@ resultValue IntConstExprNode::evaluate()
 	return resultValue(intType, this->getVal());
 }
 
-LivenessInfo IntConstExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	l.second = lin.second;
-	return l.second;
-}
+// LivenessInfo IntConstExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	l.second = lin.second;
+// 	return l.second;
+// }
 
 int IntConstExprNode::getVal()
 {
@@ -313,12 +357,12 @@ resultValue StrConstExprNode::evaluate()
 	return resultValue(stringType, this->getVal());
 }
 
-LivenessInfo StrConstExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	l.second = lin.second;
-	return l.second;
-}
+// LivenessInfo StrConstExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	l.second = lin.second;
+// 	return l.second;
+// }
 
 string* StrConstExprNode::getVal()
 {
@@ -350,21 +394,21 @@ bool BoolConstExprNode::getVal()
 	return *(this->pBoolVal);
 }
 
-LivenessInfo BoolConstExprNode::analyse(Liveness lin )
-{
-	l.first = getLabel();
-	l.second = lin.second;
-	return l.second;}
+// LivenessInfo BoolConstExprNode::analyse(Liveness lin )
+// {
+// 	l.first = getLabel();
+// 	l.second = lin.second;
+// 	return l.second;}
 
 
 
-/*  Definitions for IF node */
+// /*  Definitions for IF node */
 
-IfExprNode::~IfExprNode() {
-	delete pCond;
-	delete pThen;
-	delete pElse;
-}
+// IfExprNode::~IfExprNode() {
+// 	delete pCond;
+// 	delete pThen;
+// 	delete pElse;
+// }
 
 IfExprNode::IfExprNode(ExprNode * cond, ExprNode * then_expr, ExprNode * else_expr)
 : ExprNode("IF"), pCond(cond), pThen(then_expr), pElse(else_expr) {}
@@ -408,27 +452,27 @@ ExprNode* IfExprNode::getElsePart()
 	return this->pElse;
 }
 
-LivenessInfo IfExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	//Check liveness of the Then branch
-	Liveness lThen;
-	lThen.first = pThen->getLabel();
-	lThen.second = pThen->analyse(lin);
-	//Check liveness of the Else branch
-	Liveness lElse;
-	lElse.first = pElse->getLabel();
-	lElse.second = pElse->analyse(lin);
+// LivenessInfo IfExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	//Check liveness of the Then branch
+// 	Liveness lThen;
+// 	lThen.first = pThen->getLabel();
+// 	lThen.second = pThen->analyse(lin);
+// 	//Check liveness of the Else branch
+// 	Liveness lElse;
+// 	lElse.first = pElse->getLabel();
+// 	lElse.second = pElse->analyse(lin);
 
-	//Merge the liveness info
-	this->l.second.insert(l.second.end(), lThen.second.begin(), lThen.second.end());
-	this->l.second.insert(l.second.end(), lElse.second.begin(), lElse.second.end());
+// 	//Merge the liveness info
+// 	this->l.second.insert(l.second.end(), lThen.second.begin(), lThen.second.end());
+// 	this->l.second.insert(l.second.end(), lElse.second.begin(), lElse.second.end());
 
-	//Check liveness of the condition expression using the merged liveness
-	l.second = pCond->analyse(l);
+// 	//Check liveness of the condition expression using the merged liveness
+// 	l.second = pCond->analyse(l);
 
-	return l.second;
-}
+// 	return l.second;
+// }
 
 
 
@@ -494,18 +538,18 @@ ExprNode* LetExprNode::getBody()
 	return this->pBody;
 }
 
-LivenessInfo LetExprNode::analyse(Liveness lin)
-{
-	this->l.first = getLabel();
-	l.second = this->pExpr->analyse(lin);
+// LivenessInfo LetExprNode::analyse(Liveness lin)
+// {
+// 	this->l.first = getLabel();
+// 	l.second = this->pExpr->analyse(lin);
 
-	if (find(l.second.begin(), l.second.end(), pID) != l.second.end())
-	{
-		l.second.erase(find(l.second.begin(), l.second.end(), pID));
-	}
-	l.second = this->pExpr->analyse(l);
-	return l.second;
-}
+// 	if (find(l.second.begin(), l.second.end(), pID) != l.second.end())
+// 	{
+// 		l.second.erase(find(l.second.begin(), l.second.end(), pID));
+// 	}
+// 	l.second = this->pExpr->analyse(l);
+// 	return l.second;
+// }
 
 
 
@@ -619,14 +663,14 @@ resultValue UnaryPrimExprNode::evaluatePairqExpr()
 	return resultValue(boolType, r.val.addrVal != NULL);
 }
 
-LivenessInfo UnaryPrimExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	l.second = this->pArg->analyse(lin);
+// LivenessInfo UnaryPrimExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	l.second = this->pArg->analyse(lin);
 
-	return l.second;
+// 	return l.second;
 
-}
+// }
 
 BinaryPrimExprNode::~BinaryPrimExprNode() {
 	delete pArg1;
@@ -874,14 +918,14 @@ resultValue BinaryPrimExprNode::evaluateEQ()
 	return resultValue(errorType, (void*)0);
 }
 
-LivenessInfo BinaryPrimExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	l.second = this->pArg2->analyse(lin);
-	l.second = this->pArg1->analyse(l);
+// LivenessInfo BinaryPrimExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	l.second = this->pArg2->analyse(lin);
+// 	l.second = this->pArg1->analyse(l);
 
-	return l.second;
-}
+// 	return l.second;
+// }
 
 /*  Definitions for FUNCTION CALL node */
 
@@ -977,16 +1021,16 @@ string FuncExprNode::getNextExpr()
 	return this->nextExpr;
 }
 
-LivenessInfo FuncExprNode::analyse(Liveness lin)
-{
-	l.first = getLabel();
-	l.second = lin.second;
-	for(std::list<ExprNode*>::iterator arg = this->pListArgs->begin(); arg != this->pListArgs->end(); ++arg)
-	{
-		l.second = (*arg)->analyse(l);
-	}
-	return l.second;
-}
+// LivenessInfo FuncExprNode::analyse(Liveness lin)
+// {
+// 	l.first = getLabel();
+// 	l.second = lin.second;
+// 	for(std::list<ExprNode*>::iterator arg = this->pListArgs->begin(); arg != this->pListArgs->end(); ++arg)
+// 	{
+// 		l.second = (*arg)->analyse(l);
+// 	}
+// 	return l.second;
+// }
 
 
 
