@@ -208,6 +208,21 @@ LivenessTable LivenessTable::operator+(const LivenessState& state)
   return answer;
 }
 
+void LivenessTable::doUnion(const LivenessTable& t)
+{
+  if(varName != t.varName)
+  {
+    std::cerr<<"Taking union of different variables";
+    exit(-1);
+  }
+
+  for (auto i = table.begin(), j = t.table.begin(); i != table.end(); i++, j++) 
+   {
+    i->second = i->second + j->second;
+   } 
+  
+}
+
 
 
 //Printing and Debugging
@@ -242,6 +257,44 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessInfor
 	return out;
 }
 
+void doUnion(LivenessInformation& l1,const LivenessInformation& l2)
+{
+  for(auto i=l1.begin();i != l1.end(); i++)
+  {
+    auto temp  = l2.find(i->first);
+    if(temp != l2.end())
+    {
+      i->second.doUnion(temp->second);
+    }
+  }
+
+  for(auto i=l2.begin();i != l2.end(); i++)
+  {
+    auto temp  = l1.find(i->first);
+    if(temp == l1.end())
+    {
+      l1.insert(*i);
+    }
+  }
+
+}
+
+LivenessInformation mapLiveness(const LivenessTable& lt, const LivenessInformation& li)
+{
+  LivenessInformation returnValue;
+  for(auto i=li.begin(); i!= li.end(); i++)
+  {
+    LivenessTable temp(i->first);
+     for(auto j=lt.begin();j != lt.end(); j++)
+     {
+       temp[j->first] = i->second[j->second];
+     }
+
+     returnValue[i->first] = temp;
+  }
+
+  return returnValue;
+}
 
 //Unit Tests
 

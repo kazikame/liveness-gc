@@ -76,6 +76,7 @@ public:
 	void catOne();
 	void stripZero();
 	void stripOne();
+	void doUnion(const LivenessTable&);
 
 
 	friend std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
@@ -91,6 +92,9 @@ std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 std::ostream& operator<<(std::ostream& out, const LivenessInformation& t);
 
 extern ProgramLiveness progLiveness;
+
+void doUnion(LivenessInformation &, const LivenessInformation &);
+LivenessInformation mapLiveness(const LivenessTable&, const LivenessInformation&);
 }
 }
 
