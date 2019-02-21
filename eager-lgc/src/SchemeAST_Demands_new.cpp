@@ -230,7 +230,7 @@ LivenessInformation LetExprNode::transformDemand() const
 
  //    return result;
     LivenessInformation bodyLiveness = pBody->transformDemand();
-    
+    //std::cout<<"Variable Checking:"<<pID->getIDStr()<<endl;
     if (bodyLiveness.find(pID->getIDStr()) != bodyLiveness.end())
     {
         LivenessInformation exprLiveness = pExpr->transformDemand();
@@ -301,12 +301,14 @@ LivenessInformation FuncExprNode::transformDemand() const
 
  //    	return new expr_demand_grammars({new demand_grammar({{label, demand}}), new demand_grammar});
  //    }
-    LivenessInformation demandTransform = functionCallDemands[pID->getIDStr()];
+   // std::cout<<"Variable checking on function call demand:"<<pID->getIDStr()<<endl;
+    LivenessInformation demandTransform = functionCallDemands[pID->getIDStr()];// Works correctly
 
     auto iter = pListArgs->begin();
     for (auto& i: demandTransform)
     {
-        i.first = (*iter)->getIDStr();
+        std::cout<<"Variable checking:"<<(*iter)->getIDStr()<<endl;
+        i.first = (*iter)->getIDStr();//Does not work
         iter++;
     }
 
@@ -321,7 +323,8 @@ LivenessInformation DefineNode::transformDemand() const {
     LivenessInformation livenessInOrder;
     for (auto i : *pListArgs)
     {
-        auto iter = totalLiveness.find(i->getIDStr());
+       // std::cout<<"Variable checking in define:"<<i->getIDStr()<<endl;
+        auto iter = totalLiveness.find(i->getIDStr());// Works fine
 
         if (iter != totalLiveness.end())
         {
@@ -331,6 +334,22 @@ LivenessInformation DefineNode::transformDemand() const {
     functionCallDemands[pID->getIDStr()] = livenessInOrder;
 
     return livenessInOrder;
+
+
+}
+
+void DefineNode::init() {
+    // Check if totalLiveness contains only the demands of formal parameters    -   ANF?
+    //LivenessInformation totalLiveness = pExpr->transformDemand();
+
+   // LivenessInformation livenessInOrder;
+    for (auto i : *pListArgs)
+    {
+       // LivenessTable LivenessTable(i->getIDStr())
+       // std::cout<<"Variable checking in define:"<<i->getIDStr()<<endl;
+        functionCallDemands[pID->getIDStr()][i->getIDStr()] = LivenessTable(i->getIDStr(),false);
+    }
+    
 
 
 }
@@ -361,13 +380,20 @@ LivenessInformation ProgramNode::transformDemand() const {
 
     // return result;
 
+    //INITIALIZATION OF FUNCTION CALL DEMANDS DONE?
+
+    for (auto& def : *pListDefines)
+        def->init();
+
     for (auto& def : *pListDefines)
         def->transformDemand();
 
+
+
     // For testing only
-    std::cout<<"OK-----"<<endl;
+    std::cout<<"Transformations OK-----"<<endl;
     std::cout<<progLiveness<<endl;
-    std::cout<<"OK-----"<<endl;
+    std::cout<<"progLiveness OK-----"<<endl;
     std::cout<<functionCallDemands;
     
     return pExpr->transformDemand();
