@@ -48,20 +48,26 @@ LivenessInformation UnaryPrimExprNode::transformDemand() const
     if(node_name == "car")
     { 
         LivenessInformation returnValue = pArg->transformDemand();
-        returnValue[pArg->getIDStr()].catZero();
+        auto i=returnValue.begin();
+        returnValue[i->first].catZero();
+        //std::cout<<"Variable checking"<<i->first<<endl;
         return returnValue;
     }
 
     else if(node_name == "cdr")
     { 
         LivenessInformation returnValue = pArg->transformDemand();
-        returnValue[pArg->getIDStr()].catOne();
+        auto i=returnValue.begin();
+        returnValue[i->first].catOne();
+        //std::cout<<"Variable checking"<<i->first<<endl;
         return returnValue;
     }
     else
     {
         LivenessInformation returnValue = pArg->transformDemand();
-        returnValue[pArg->getIDStr()] = returnValue[pArg->getIDStr()] + EPSILON;
+        auto i=returnValue.begin();
+        returnValue[i->first] = returnValue[i->first] + EPSILON;
+        //std::cout<<"Variable checking"<<i->first<<endl;
         return returnValue; 
 
     }
@@ -90,16 +96,26 @@ LivenessInformation BinaryPrimExprNode::transformDemand() const
 
         if (!arg1Liveness.empty())
         {
-            arg1Liveness[pArg1->getIDStr()].stripZero();
+            auto i = arg1Liveness.begin();
+            arg1Liveness[i->first].stripZero();
+        //     std::cout<<"Checking..1"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
         }
 
         if (!arg2Liveness.empty())
         {
-            arg2Liveness[pArg2->getIDStr()].stripOne();
+            auto i = arg2Liveness.begin();
+            arg2Liveness[i->first].stripOne();
+        //     std::cout<<"Checking..2"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
         }
+        //  std::cout<<"Before union"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
+        // std::cout<<arg2Liveness;
         
         doUnion(arg1Liveness, arg2Liveness);// Union updates first argument
-
+        // std::cout<<"After union"<<endl;
+        // std::cout<<arg1Liveness;
         return arg1Liveness;////CHECK IN CASE OF ERRORS
     }
     else
@@ -118,18 +134,23 @@ LivenessInformation BinaryPrimExprNode::transformDemand() const
 
         LivenessInformation arg1Liveness = pArg1->transformDemand();
         LivenessInformation arg2Liveness = pArg2->transformDemand();
-
+        if (!arg1Liveness.empty())
         {
-            arg1Liveness[pArg1->getIDStr()]= arg1Liveness[pArg1->getIDStr()] + EPSILON;
+            auto i = arg1Liveness.begin();
+            arg1Liveness[i->first]= arg1Liveness[i->first] + EPSILON;
         }
 
         if (!arg2Liveness.empty())
         {
-            arg2Liveness[pArg2->getIDStr()] = arg2Liveness[pArg2->getIDStr()] + EPSILON;
+            auto i = arg2Liveness.begin();
+            arg2Liveness[i->first] = arg2Liveness[i->first] + EPSILON;
         }
-
+        // std::cout<<"Before union"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
+        // std::cout<<arg2Liveness;
         doUnion(arg1Liveness, arg2Liveness);// Union updates first argument
-
+        // std::cout<<"After union"<<endl;
+        // std::cout<<arg1Liveness;
         return arg1Liveness;
 
     }
@@ -344,7 +365,11 @@ LivenessInformation ProgramNode::transformDemand() const {
         def->transformDemand();
 
     // For testing only
-    std::cout<<progLiveness<<functionCallDemands;
+    std::cout<<"OK-----"<<endl;
+    std::cout<<progLiveness<<endl;
+    std::cout<<"OK-----"<<endl;
+    std::cout<<functionCallDemands;
+    
     return pExpr->transformDemand();
 
 
