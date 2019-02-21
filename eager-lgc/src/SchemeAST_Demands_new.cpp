@@ -1,5 +1,7 @@
 #include "SchemeAST_new.h"
 #include "DemandStructure.h"
+#include<iostream>
+
 using namespace Scheme::AST;
 using namespace Scheme::Demands;
 
@@ -306,7 +308,10 @@ LivenessInformation DefineNode::transformDemand() const {
         }
     }
     functionCallDemands[pID->getIDStr()] = livenessInOrder;
+
     return livenessInOrder;
+
+
 }
 
 
@@ -338,6 +343,8 @@ LivenessInformation ProgramNode::transformDemand() const {
     for (auto& def : *pListDefines)
         def->transformDemand();
 
+    // For testing only
+    std::cout<<progLiveness<<functionCallDemands;
     return pExpr->transformDemand();
 
 

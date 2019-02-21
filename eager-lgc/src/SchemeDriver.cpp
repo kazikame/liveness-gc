@@ -121,6 +121,7 @@ long Scheme::SchemeDriver::process()
     anf_program->doLabel(true);
     cout<<"inside process()"<<endl;
     program_grammars = anf_program->transformDemand();
+    cout<<program_grammars;
 
     // combined_grammar = Scheme::Demands::solve_functions_and_combine(program_grammars);
     // combined_grammar->emplace("D/all", Scheme::Demands::rule({{Scheme::Demands::T0, "D/all"},

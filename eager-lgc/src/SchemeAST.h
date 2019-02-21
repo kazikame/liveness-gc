@@ -205,8 +205,8 @@ public:
 	            virtual Scheme::Demands::expr_demand_grammars *
 	            transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getName() {return *pID;}
 	virtual resultValue evaluate();
 	virtual LivenessInfo analyse(Liveness);
@@ -235,8 +235,8 @@ public:
 	            virtual Scheme::Demands::expr_demand_grammars *
 	            transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getVar();
 	ExprNode* getVarExpr();
 	ExprNode* getBody();
@@ -273,8 +273,8 @@ public:
 	            virtual Scheme::Demands::expr_demand_grammars *
 	            transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	ExprNode* getCond();
 	ExprNode* getThenPart();
 	ExprNode* getElsePart();
@@ -317,8 +317,8 @@ public:
 	virtual LetExprNode * getANF() const;
 	virtual resultValue evaluate();
 	virtual LivenessInfo analyse(Liveness);
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	//virtual void nextExpr();
 };
 
@@ -328,8 +328,8 @@ public:
 
 	virtual NilConstExprNode * clone() const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual resultValue evaluate();
 	//virtual void nextExpr();
 };
@@ -342,8 +342,8 @@ public:
 
 	virtual IntConstExprNode * clone() const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	int getVal();
 	virtual resultValue evaluate();
 	virtual LivenessInfo analyse(Liveness);
@@ -360,8 +360,8 @@ public:
 
 	virtual StrConstExprNode * clone() const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	string* getVal();
 	virtual resultValue evaluate();
 	virtual LivenessInfo analyse(Liveness);
@@ -413,8 +413,8 @@ public:
 	virtual Scheme::Demands::expr_demand_grammars *
 	transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual resultValue evaluate();
 	virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
@@ -446,8 +446,8 @@ public:
 	virtual Scheme::Demands::expr_demand_grammars *
 	transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual resultValue evaluate();
 	virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
@@ -485,8 +485,8 @@ public:
 	            virtual Scheme::Demands::expr_demand_grammars *
 	            transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getFunction();
 	std::vector<ExprNode*> getArgs();
 	virtual resultValue evaluate();
@@ -526,8 +526,8 @@ public:
 	            virtual Scheme::Demands::expr_demand_grammars *
 	            transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getFunctionName() {return pID->getIDStr();}
 	std::vector<std::string> getArgs();
 	ExprNode* getFunctionBody() {return pExpr;}
@@ -558,8 +558,8 @@ public:
 	virtual Scheme::Demands::expr_demand_grammars *
             transformDemand(const Scheme::Demands::rule&) const;
 
-	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	resultValue evaluate();
 
 	Node* getFunction(std::string);

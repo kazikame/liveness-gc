@@ -17,7 +17,7 @@ using namespace Scheme::Demands;
 
 // LivenessState Constructors
 Scheme::Demands::LivenessState::LivenessState(const std::string& s): idString(s) {}
-Scheme::Demands::LivenessState::LivenessState(): idString(nullptr) {}
+Scheme::Demands::LivenessState::LivenessState() {idString = "";}
 
 // Possible Liveness
 const LivenessState Scheme::Demands::PHI = LivenessState("phi");
@@ -178,7 +178,9 @@ LivenessTable::LivenessTable(std::string name, bool self = false): LivenessTable
 }
 
 //LivenessTable operator overloading
-LivenessState& LivenessTable::operator[] (const LivenessState k) { return table[k];}
+LivenessState& LivenessTable::operator[] (LivenessState k) { return table[k];}
+const LivenessState& LivenessTable::operator[] (const LivenessState& k) const { return (table.find(k))->second;}
+
 
 void LivenessTable::catZero()
 {
@@ -238,28 +240,38 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessState
 
 std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessTable& t)
 {
-	out<<t.varName<<'\t';
-	for (auto i: t.table)
-	{
-		out<<i.second<<'\t';
-	}
-
+	out<<t.varName<<"\t\t";
+	out<<t.table[PHI]<<'\t';
+	out<<t.table[EPSILON]<<'\t';
+	out<<t.table[ZERO]<<'\t';
+	out<<t.table[ONE]<<'\t';
+	out<<t.table[ONE_STAR]<<"\t\t";
+	out<<t.table[ALL]<<'\t';
 	return out;
 }
 
 std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessInformation& l)
 {
-	out<<"Variable Name\t"<<"PHI\t"<<"ZERO\t"<<"ONE\t"<<"ONE_STAR\t"<<"ALL\n";
-
+	out<<"Variable Name\t"<<"PHI\t"<<"EPSILON\t"<<"ZERO\t"<<"ONE\t"<<"ONE_STAR\t"<<"ALL\n";
 	for (auto i: l)
 	{
 		out<<i.second<<'\n';
 	}
-
+	out<<'\n';
 	return out;
 }
 
-void doUnion(LivenessInformation& l1,const LivenessInformation& l2)
+std::ostream& Scheme::Demands::operator<<(std::ostream& out, const ProgramLiveness& l)
+{
+	for (auto i: l)
+	{
+		out<<"For program point: "<<i.first<<'\n';
+		out<<i.second;
+	}
+}
+
+
+void Scheme::Demands::doUnion(LivenessInformation& l1,const LivenessInformation& l2)
 {
   for(auto i=l1.begin();i != l1.end(); i++)
   {
@@ -281,7 +293,7 @@ void doUnion(LivenessInformation& l1,const LivenessInformation& l2)
 
 }
 
-LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, LivenessInformation& li)
+LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, const LivenessInformation& li)
 {
   LivenessInformation returnValue;
   for(auto i=li.begin(); i!= li.end(); i++)
@@ -289,7 +301,7 @@ LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, Livene
     LivenessTable temp(i->first);
      for(auto j=lt.table.begin();j != lt.table.end(); j++)
      {
-       temp[j->first] = (i->second).table[(j->second)];
+       temp[j->first] = (i->second)[(j->second)];
      }
 
      returnValue[i->first] = temp;
@@ -305,4 +317,6 @@ LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, Livene
 // 	std::cout<<"Testing!\n";
 // 	std::cout<<PHI<<'\n';
 // 	std::cout<<ONE_STAR<<'\n';
+// 	LivenessInformation l1, l2;
+// 	doUnion(l1, l2);
 // }

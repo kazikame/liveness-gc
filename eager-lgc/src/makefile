@@ -11,8 +11,8 @@ all : $(TARGET)
 
 
 
-$(TARGET): $(TARGET).cpp gc.o  parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o output.o DemandStructure.o
-	$(CC) -o $(TARGET) $(CFLAGS) $(TARGET).cpp parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o output.o gc.o DemandStructure.o
+$(TARGET): $(TARGET).cpp gc.o  parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o DemandStructure.o
+	$(CC) -o $(TARGET) $(CFLAGS) $(TARGET).cpp parser.o lexer.o SchemeDriver.o SchemeAST_ANFs.o SchemeAST_Demands_new.o SchemeAST_Defs_new.o gc.o DemandStructure.o
 
 
 gc.o : gc.cpp 
@@ -25,8 +25,8 @@ parser.o: scheme.y SchemeAST_new.h SchemeDriver.h SchemeScanner.hpp
 lexer.o: scheme.l parser.o SchemeScanner.hpp
 	flex --outfile=scheme_lexer.cc $<
 	$(CC) -o lexer.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) scheme_lexer.cc
-output.o: Output.h Output.cpp
-	$(CC) -o output.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) Output.cpp
+# output.o: Output.h Output.cpp
+# 	$(CC) -o output.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) Output.cpp
 
 # demands.o: Demands.h Demands.cpp
 # 	$(CC) -o demands.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) Demands.cpp
@@ -43,10 +43,10 @@ SchemeAST_ANFs.o: SchemeAST_new.h SchemeAST_ANFs.cpp DemandStructure.h
 SchemeAST_Demands_new.o: SchemeAST_new.h SchemeAST_Demands_new.cpp DemandStructure.h
 	$(CC) -o SchemeAST_Demands_new.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeAST_Demands_new.cpp
 
-SchemeDriver.o: parser.o Output.h SchemeScanner.hpp SchemeDriver.h SchemeDriver.cpp
+SchemeDriver.o: parser.o SchemeScanner.hpp SchemeDriver.h SchemeDriver.cpp
 	$(CC) -o SchemeDriver.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) SchemeDriver.cpp
 
-DemandStructure.o: DemandStructure.h
+DemandStructure.o: DemandStructure.cpp DemandStructure.h
 	$(CC) -o DemandStructure.o $(CFLAGS) $(OBJ_FLAGS) $(PROD_FLAGS) DemandStructure.cpp
 
 format:

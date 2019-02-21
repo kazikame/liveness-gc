@@ -404,11 +404,11 @@ bool BoolConstExprNode::getVal()
 
 // /*  Definitions for IF node */
 
-// IfExprNode::~IfExprNode() {
-// 	delete pCond;
-// 	delete pThen;
-// 	delete pElse;
-// }
+IfExprNode::~IfExprNode() {
+	delete pCond;
+	delete pThen;
+	delete pElse;
+}
 
 IfExprNode::IfExprNode(ExprNode * cond, ExprNode * then_expr, ExprNode * else_expr)
 : ExprNode("IF"), pCond(cond), pThen(then_expr), pElse(else_expr) {}

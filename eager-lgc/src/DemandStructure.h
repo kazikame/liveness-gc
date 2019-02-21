@@ -64,7 +64,7 @@ public:
 class LivenessTable;
 //Defines a type for liveness table of any variable
 typedef std::map< std::string, LivenessTable> LivenessInformation;
-LivenessInformation mapLiveness(const LivenessTable&, LivenessInformation&);
+LivenessInformation mapLiveness(const LivenessTable&, const LivenessInformation&);
 class LivenessTable
 {
 public:
@@ -73,7 +73,8 @@ public:
 	LivenessTable();
 	LivenessTable(std::string, bool self);
 	LivenessTable operator+(const LivenessState&);
-	LivenessState& operator[] (const LivenessState k);
+	LivenessState& operator[](LivenessState k);
+	const LivenessState& operator[](const LivenessState& k) const;
 	void catZero();
 	void catOne();
 	void stripZero();
@@ -93,6 +94,8 @@ typedef std::unordered_map< std::string, LivenessInformation> ProgramLiveness;
 std::ostream& operator<<(std::ostream& out, const LivenessState& l);
 std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 std::ostream& operator<<(std::ostream& out, const LivenessInformation& t);
+std::ostream& operator<<(std::ostream& out, const ProgramLiveness& t);
+
 
 void doUnion(LivenessInformation &, const LivenessInformation &);
 }
