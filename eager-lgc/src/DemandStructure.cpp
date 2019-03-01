@@ -319,6 +319,66 @@ LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, const 
   return returnValue;
 }
 
+bool Scheme::Demands::operator==(const LivenessState& l1, const LivenessState& l2)
+{
+  return l1.idString == l2.idString;
+}
+
+bool Scheme::Demands::operator!=(const LivenessState& l1, const LivenessState& l2)
+{
+  return l1.idString != l2.idString; 
+}
+
+bool Scheme::Demands::operator==(const LivenessTable& t1, const LivenessTable& t2)
+{
+  auto l1 = t1.table;
+  auto l2 = t2.table;
+  if (l1.size() != l2.size())
+    return false;
+
+  auto it1 = l1.begin();
+  auto it2 = l2.begin();
+
+  while (it1 != l1.end() && it2 != l2.end())
+  {
+    if (it1->first != it2->first)
+      return false;
+    else if(it1->second != it2->second)
+      return false;
+    it1++;
+    it2++;
+  }
+
+  return true;  
+}
+
+bool Scheme::Demands::operator!=(const LivenessTable& l1, const LivenessTable& l2)
+{
+  return !(l1 == l2);
+}
+
+bool Scheme::Demands::operator==(const LivenessInformation& l1, const LivenessInformation& l2)
+{
+  if (l1.size() != l2.size())
+    return false;
+
+  auto it1 = l1.begin();
+  auto it2 = l2.begin();
+
+  while (it1 != l1.end() && it2 != l2.end())
+  {
+    if (it1->first != it2->first)
+      return false;
+    else if(!(it1->second == it2->second))
+      return false;
+    it1++;
+    it2++;
+  }
+
+  return true;  
+}
+
+
 //Unit Tests
 
 // int main()

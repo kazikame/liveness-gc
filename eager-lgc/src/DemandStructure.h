@@ -23,6 +23,8 @@ namespace Demands {
 */
 class LivenessState;
 bool operator<(const LivenessState& s1, const LivenessState& s2);
+bool operator==(const LivenessState&, const LivenessState&);
+bool operator!=(const LivenessState&, const LivenessState&);
 class LivenessState
 {
 
@@ -43,6 +45,8 @@ public:
 	LivenessState stripZero();						//Strip's Zero from front
 	LivenessState stripOne();						//Strip's One from front
 	friend std::ostream& operator<<(std::ostream& out, const LivenessState& l);
+	friend bool operator==(const LivenessState&, const LivenessState&);
+	friend bool operator!=(const LivenessState&, const LivenessState&);
 
 };
 
@@ -64,8 +68,11 @@ public:
 };
 
 class LivenessTable;
+bool operator==(const LivenessTable&, const LivenessTable&);
+bool operator!=(const LivenessTable&, const LivenessTable&);
 //Defines a type for liveness table of any variable
 typedef std::map< std::string, LivenessTable> LivenessInformation;
+bool operator==(const LivenessInformation&, const LivenessInformation&);
 LivenessInformation mapLiveness(const LivenessTable&, const LivenessInformation&);
 class LivenessTable
 {
@@ -85,6 +92,8 @@ public:
 
 
 	friend std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
+	friend bool operator==(const LivenessTable&, const LivenessTable&);
+	friend bool operator!=(const LivenessTable&, const LivenessTable&);
 	friend LivenessInformation mapLiveness(const LivenessTable& lt, const LivenessInformation& li);
 
 };
