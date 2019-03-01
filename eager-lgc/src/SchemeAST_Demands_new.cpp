@@ -432,10 +432,16 @@ LivenessInformation ProgramNode::transformDemand() const {
 
 
     // For testing only
-    std::cout<<"Transformations OK-----"<<endl;
-    std::cout<<progLiveness<<endl;
-    std::cout<<"progLiveness OK-----"<<endl;
+    std::cout<<"\n\nPrinting functionCallDemands...\n\n";
     std::cout<<functionCallDemands;
+    std::cout<<"Transformations OK-----"<<'\n';
     
-    return pExpr->transformDemand();
+    LivenessInformation mainBodyLiveness = pExpr->transformDemand();
+
+    std::cout<<"\n\nPrinting progLiveness...\n";
+    std::cout<<progLiveness<<'\n';
+    std::cout<<"progLiveness OK-----\n\n\n";
+
+    return mainBodyLiveness;
+
 }
