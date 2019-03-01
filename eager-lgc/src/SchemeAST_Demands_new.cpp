@@ -2,6 +2,7 @@
 #include "DemandStructure.h"
 #include<iostream>
 #include <typeinfo>
+#include <set>
 
 using namespace Scheme::AST;
 using namespace Scheme::Demands;
@@ -351,6 +352,8 @@ LivenessInformation DefineNode::transformDemand() const {
 
 }
 
+
+
 void DefineNode::init() {
     // Check if totalLiveness contains only the demands of formal parameters    -   ANF?
     //LivenessInformation totalLiveness = pExpr->transformDemand();
@@ -396,8 +399,31 @@ LivenessInformation ProgramNode::transformDemand() const {
     for (auto& def : *pListDefines)
         def->init();
 
+    
+
+    set<DefineNode*> s;
     for (auto& def : *pListDefines)
-        def->transformDemand();
+    {
+        s.insert(def);
+    }  
+
+    while(!s.empty())
+    {
+        DefineNode* func = s.begin();
+        s.remove(func);
+        LivenessInformation oldInfo = functionCallDemands[func->getFunctionName()];
+        newInfo = func->transformDemand();
+        if(oldInfo != newInfo)
+        {
+            auto i=revCallGraph[func].begin();
+            for(;i!=revCallGraph[func].end();i++)
+            {
+                s.insert(*i);
+            }
+        }
+
+    }  
+
 
 
 
