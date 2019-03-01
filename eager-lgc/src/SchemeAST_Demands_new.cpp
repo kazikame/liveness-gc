@@ -395,30 +395,34 @@ LivenessInformation ProgramNode::transformDemand() const {
     // return result;
 
     //INITIALIZATION OF FUNCTION CALL DEMANDS DONE?
-
-    for (auto& def : *pListDefines)
-        def->init();
+    revCallGraph = this->makeRevCallGraph();
+    map<std::string, DefineNode*> funcNametoNode;
+    for (auto& def : *pListDefines) 
+     {  
+        funcNametoNode[def->getFunctionName()]= def;
+         def->init();
+     }
 
     
 
-    set<DefineNode*> s;
+    set<DefineNode*> workList;
     for (auto& def : *pListDefines)
     {
-        s.insert(def);
+        workList.insert(def);
     }  
 
-    while(!s.empty())
+    while(!workList.empty())
     {
-        DefineNode* func = s.begin();
-        s.remove(func);
+        DefineNode* func = *workList.begin();
+        workList.remove(func);
         LivenessInformation oldInfo = functionCallDemands[func->getFunctionName()];
-        newInfo = func->transformDemand();
-        if(oldInfo != newInfo)
+        LivenessInformation newInfo = func->transformDemand();
+        if(!(oldInfo == newInfo))
         {
-            auto i=revCallGraph[func].begin();
-            for(;i!=revCallGraph[func].end();i++)
+            auto i=revCallGraph[func->getFunctionName()].begin();
+            for(;i!=revCallGraph[func->getFunctionName()].end();i++)
             {
-                s.insert(*i);
+                workList.insert(funcNametoNode[*i]);
             }
         }
 
