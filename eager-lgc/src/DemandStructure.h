@@ -21,12 +21,14 @@ namespace Demands {
 	Functions:
 		operator+(): union of liveness
 */
-
+class LivenessState;
+bool operator<(const LivenessState& s1, const LivenessState& s2);
 class LivenessState
 {
 
 public:
 	std::string idString;
+	int latticeNo;
 	static std::unordered_map<std::string, std::unordered_map<std::string, LivenessState> > unionRules;
 	static std::unordered_map<std::string, LivenessState> catZeroRules;
 	static std::unordered_map<std::string, LivenessState> catOneRules;
@@ -34,7 +36,7 @@ public:
 	static std::unordered_map<std::string, LivenessState> stripOneRules;
 
 	LivenessState();
-	LivenessState(const std::string& s);
+	LivenessState(const std::string& s, const int&);
 	LivenessState operator+(const LivenessState&);	//Union
 	LivenessState catZero();						//Concatenate Zero
 	LivenessState catOne();							//Concatenate One
@@ -44,12 +46,12 @@ public:
 
 };
 
-extern const LivenessState PHI;
-extern const LivenessState EPSILON;
-extern const LivenessState ZERO;
-extern const LivenessState ONE;
-extern const LivenessState ONE_STAR;
-extern const LivenessState ALL;
+extern LivenessState PHI;
+extern LivenessState EPSILON;
+extern LivenessState ZERO;
+extern LivenessState ONE;
+extern LivenessState ONE_STAR;
+extern LivenessState ALL;
 
 //Operator overloading
 bool operator==(const LivenessState l1, const LivenessState l2);
@@ -68,7 +70,7 @@ LivenessInformation mapLiveness(const LivenessTable&, const LivenessInformation&
 class LivenessTable
 {
 public:
-	std::unordered_map<LivenessState, LivenessState, LivenessStateHasher> table;
+	std::map<LivenessState, LivenessState> table;
 	std::string varName;
 	LivenessTable();
 	LivenessTable(std::string, bool self);
@@ -88,7 +90,7 @@ public:
 };
 
 
-typedef std::unordered_map< std::string, LivenessInformation> ProgramLiveness;
+typedef std::map< std::string, LivenessInformation> ProgramLiveness;
 
 //Printing Demands
 std::ostream& operator<<(std::ostream& out, const LivenessState& l);

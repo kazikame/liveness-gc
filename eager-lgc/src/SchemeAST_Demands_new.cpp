@@ -14,7 +14,10 @@ ProgramLiveness functionCallDemands;
 /* D( (return x), s, T ) = x.s  */
 LivenessInformation ReturnExprNode::transformDemand() const
 {
-	return pID->transformDemand();
+	LivenessInformation returnValue;
+    LivenessTable l= LivenessTable(pID->getIDStr(), true);
+    returnValue[pID->getIDStr()] = l;
+    return returnValue;
 }
 
 
@@ -24,7 +27,7 @@ LivenessInformation IdExprNode::transformDemand() const
 {
 
 	LivenessInformation returnValue;
-    LivenessTable l= LivenessTable(getIDStr(), true);
+    LivenessTable l= LivenessTable(getIDStr(), false);
     returnValue[getIDStr()] = l;
     return returnValue;
 }
@@ -315,8 +318,6 @@ LivenessInformation DefineNode::transformDemand() const {
 }
 
 
-
-
 LivenessInformation ProgramNode::transformDemand() const {
     // // The demand argument is unnecessary for this function.
 
@@ -346,6 +347,4 @@ LivenessInformation ProgramNode::transformDemand() const {
     // For testing only
     std::cout<<progLiveness<<functionCallDemands;
     return pExpr->transformDemand();
-
-
 }

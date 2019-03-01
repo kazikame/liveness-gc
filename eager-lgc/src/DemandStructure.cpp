@@ -16,16 +16,21 @@
 using namespace Scheme::Demands;
 
 // LivenessState Constructors
-Scheme::Demands::LivenessState::LivenessState(const std::string& s): idString(s) {}
-Scheme::Demands::LivenessState::LivenessState() {idString = "";}
+Scheme::Demands::LivenessState::LivenessState(const std::string& s, const int& n): idString(s), latticeNo(n) {}
+Scheme::Demands::LivenessState::LivenessState(): latticeNo(0) {idString = "";}
 
 // Possible Liveness
-const LivenessState Scheme::Demands::PHI = LivenessState("phi");
-const LivenessState Scheme::Demands::EPSILON = LivenessState("e");
-const LivenessState Scheme::Demands::ZERO = LivenessState("0");
-const LivenessState Scheme::Demands::ONE = LivenessState("1");
-const LivenessState Scheme::Demands::ONE_STAR = LivenessState("1*");
-const LivenessState Scheme::Demands::ALL = LivenessState("all");
+LivenessState Scheme::Demands::PHI = LivenessState("phi", 0);
+LivenessState Scheme::Demands::EPSILON = LivenessState("e", 1);
+LivenessState Scheme::Demands::ZERO = LivenessState("0", 2);
+LivenessState Scheme::Demands::ONE = LivenessState("1", 3);
+LivenessState Scheme::Demands::ONE_STAR = LivenessState("1*", 4);
+LivenessState Scheme::Demands::ALL = LivenessState("all", 5);
+
+bool Scheme::Demands::operator<(const LivenessState& s1, const LivenessState& s2)
+{
+  return s1.latticeNo < s2.latticeNo;
+}
 
 //Can parse from text file
 std::unordered_map<std::string, std::unordered_map<std::string, LivenessState> > getUnionRules()
@@ -150,7 +155,9 @@ LivenessState LivenessState::stripOne()
 {
   return stripOneRules[idString];
 }
-
+//LivenessTable operator overloading
+LivenessState& LivenessTable::operator[] (LivenessState k) { return this->table[k];}
+const LivenessState& LivenessTable::operator[] (const LivenessState& k) const { return (table.find(k))->second;}
 // LivenessTable Constructor
 LivenessTable::LivenessTable()
 {
@@ -177,9 +184,6 @@ LivenessTable::LivenessTable(std::string name, bool self = false): LivenessTable
   }
 }
 
-//LivenessTable operator overloading
-LivenessState& LivenessTable::operator[] (LivenessState k) { return table[k];}
-const LivenessState& LivenessTable::operator[] (const LivenessState& k) const { return (table.find(k))->second;}
 
 
 void LivenessTable::catZero()
@@ -218,11 +222,9 @@ void LivenessTable::doUnion(const LivenessTable& t)
     std::cerr<<"Taking union of different variables";
     exit(-1);
   }
-auto j = t.table.begin();
   for (auto i = table.begin(); i != table.end(); i++) 
    {
-    i->second = i->second + j->second;
-    j++;
+    i->second = i->second + t[i->first];
    } 
   
 }
@@ -241,12 +243,12 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessState
 std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessTable& t)
 {
 	out<<t.varName<<"\t\t";
-	out<<t.table[PHI]<<'\t';
-	out<<t.table[EPSILON]<<'\t';
-	out<<t.table[ZERO]<<'\t';
-	out<<t.table[ONE]<<'\t';
-	out<<t.table[ONE_STAR]<<"\t\t";
-	out<<t.table[ALL]<<'\t';
+	out<<t[PHI]<<'\t';
+	out<<t[EPSILON]<<'\t';
+	out<<t[ZERO]<<'\t';
+	out<<t[ONE]<<'\t';
+	out<<t[ONE_STAR]<<"\t\t";
+	out<<t[ALL]<<'\t';
 	return out;
 }
 
@@ -268,6 +270,8 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const ProgramLivene
 		out<<"For program point: "<<i.first<<'\n';
 		out<<i.second;
 	}
+
+  return out;
 }
 
 
@@ -295,10 +299,10 @@ void Scheme::Demands::doUnion(LivenessInformation& l1,const LivenessInformation&
 
 LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, const LivenessInformation& li)
 {
-  LivenessInformation returnValue;
+  LivenessInformation returnValue = li;
   for(auto i=li.begin(); i!= li.end(); i++)
   {
-    LivenessTable temp(i->first);
+    LivenessTable temp = LivenessTable(i->first);
      for(auto j=lt.table.begin();j != lt.table.end(); j++)
      {
        temp[j->first] = (i->second)[(j->second)];
@@ -315,7 +319,7 @@ LivenessInformation Scheme::Demands::mapLiveness(const LivenessTable& lt, const 
 // int main()
 // {
 // 	std::cout<<"Testing!\n";
-// 	std::cout<<PHI<<'\n';
+// 	std::cout<<PHI + ALL<<'\n';
 // 	std::cout<<ONE_STAR<<'\n';
 // 	LivenessInformation l1, l2;
 // 	doUnion(l1, l2);
