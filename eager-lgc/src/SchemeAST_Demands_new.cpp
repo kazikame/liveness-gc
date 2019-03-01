@@ -1,6 +1,7 @@
 #include "SchemeAST_new.h"
 #include "DemandStructure.h"
 #include<iostream>
+#include <typeinfo>
 
 using namespace Scheme::AST;
 using namespace Scheme::Demands;
@@ -307,8 +308,10 @@ LivenessInformation FuncExprNode::transformDemand() const
     auto iter = pListArgs->begin();
     for (auto& i: demandTransform)
     {
-        std::cout<<"Variable checking:"<<(*iter)->getIDStr()<<endl;
-        i.first = (*iter)->getIDStr();//Does not work
+        IdExprNode* ie = *iter;
+
+        std::cout<<"Variable checking:"<<ie->getIDStr()<<endl;
+        i.first = ie->getIDStr();//Does not work
         iter++;
     }
 
