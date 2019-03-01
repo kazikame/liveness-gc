@@ -59,10 +59,10 @@ std::unordered_map<std::string, std::unordered_map<std::string, LivenessState> >
                                                                                                                       {"1", ONE},
                                                                                                                       {"1*", ONE_STAR},
                                                                                                                       {"all", ALL} }},
-                                                                                                             {"1*", { {"phi", PHI}, 
-                                                                                                                      {"e", EPSILON},
-                                                                                                                      {"0", ZERO},
-                                                                                                                      {"1", ONE},
+                                                                                                             {"1*", { {"phi", ONE_STAR}, 
+                                                                                                                      {"e", ONE_STAR},
+                                                                                                                      {"0", ALL},
+                                                                                                                      {"1", ONE_STAR},
                                                                                                                       {"1*", ONE_STAR},
                                                                                                                       {"all", ALL} }},
                                                                                                              {"all", { {"phi", ALL}, 
@@ -189,7 +189,9 @@ LivenessTable::LivenessTable(std::string name, bool self = false): LivenessTable
 void LivenessTable::catZero()
 {
   for (auto i = table.begin(); i != table.end(); i++)
-    i->second = i->second.catZero();
+    {
+      i->second = i->second.catZero();
+    }
 }
 void LivenessTable::catOne()
 {
@@ -211,7 +213,9 @@ LivenessTable LivenessTable::operator+(const LivenessState& state)
 {
   LivenessTable answer = *this;
   for (auto i = answer.table.begin(); i != answer.table.end(); i++)
-    i->second = i->second + state;
+    {
+      i->second = i->second + state;
+    }
   return answer;
 }
 
@@ -275,7 +279,7 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const ProgramLivene
 }
 
 
-void Scheme::Demands::doUnion(LivenessInformation& l1,const LivenessInformation& l2)
+void Scheme::Demands::doUnion(LivenessInformation& l1, const LivenessInformation& l2)
 {
   for(auto i=l1.begin();i != l1.end(); i++)
   {

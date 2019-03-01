@@ -28,7 +28,7 @@ LivenessInformation IdExprNode::transformDemand() const
 {
 
 	LivenessInformation returnValue;
-    LivenessTable l= LivenessTable(getIDStr(), false);
+    LivenessTable l= LivenessTable(getIDStr(), true);
     returnValue[getIDStr()] = l;
     return returnValue;
 }
@@ -53,7 +53,7 @@ LivenessInformation UnaryPrimExprNode::transformDemand() const
     { 
         LivenessInformation returnValue = pArg->transformDemand();
         auto i=returnValue.begin();
-        returnValue[i->first].catZero();
+		returnValue[i->first].catZero();
         //std::cout<<"Variable checking"<<i->first<<endl;
         return returnValue;
     }
@@ -62,13 +62,14 @@ LivenessInformation UnaryPrimExprNode::transformDemand() const
     { 
         LivenessInformation returnValue = pArg->transformDemand();
         auto i=returnValue.begin();
-        returnValue[i->first].catOne();
+		returnValue[i->first].catOne();
         //std::cout<<"Variable checking"<<i->first<<endl;
         return returnValue;
     }
     else
     {
-        LivenessInformation returnValue = pArg->transformDemand();
+        LivenessInformation returnValue = LivenessInformation();
+        returnValue[pArg->getIDStr()] = LivenessTable(pArg->getIDStr(), false);
         auto i=returnValue.begin();
         returnValue[i->first] = returnValue[i->first] + EPSILON;
         //std::cout<<"Variable checking"<<i->first<<endl;
@@ -95,13 +96,13 @@ LivenessInformation BinaryPrimExprNode::transformDemand() const
      //        arg_2_demand.insert(p);
      //    }
 
-        LivenessInformation arg1Liveness = pArg1->transformDemand();
+    	LivenessInformation arg1Liveness = pArg1->transformDemand();
         LivenessInformation arg2Liveness = pArg2->transformDemand();
 
         if (!arg1Liveness.empty())
         {
             auto i = arg1Liveness.begin();
-            arg1Liveness[i->first].stripZero();
+			arg1Liveness[i->first].stripZero();
         //     std::cout<<"Checking..1"<<endl;
         // std::cout<<arg1Liveness<<endl;;
         }
@@ -109,7 +110,7 @@ LivenessInformation BinaryPrimExprNode::transformDemand() const
         if (!arg2Liveness.empty())
         {
             auto i = arg2Liveness.begin();
-            arg2Liveness[i->first].stripOne();
+			arg2Liveness[i->first].stripOne();
         //     std::cout<<"Checking..2"<<endl;
         // std::cout<<arg1Liveness<<endl;;
         }
@@ -136,8 +137,10 @@ LivenessInformation BinaryPrimExprNode::transformDemand() const
     	// arg_1_demand.insert(p);
     	// arg_2_demand.insert(p);
 
-        LivenessInformation arg1Liveness = pArg1->transformDemand();
-        LivenessInformation arg2Liveness = pArg2->transformDemand();
+        LivenessInformation arg1Liveness =  LivenessInformation();
+    	arg1Liveness[pArg1->getIDStr()] = LivenessTable(pArg1->getIDStr(), false);
+        LivenessInformation arg2Liveness =  LivenessInformation();
+    	arg2Liveness[pArg2->getIDStr()] = LivenessTable(pArg2->getIDStr(), false);
         if (!arg1Liveness.empty())
         {
             auto i = arg1Liveness.begin();
@@ -185,9 +188,15 @@ LivenessInformation IfExprNode::transformDemand() const
     // result->first->emplace(label, demand);
 
     LivenessInformation returnValue = pCond->transformDemand();
+    //cout<<"Inside IfExprNode transformDemand:\n\n"<<"pCond:\n"<<returnValue<<'\n';
     LivenessInformation temp = pThen->transformDemand();
-    doUnion(temp,pElse->transformDemand());
+    //cout<<"pThen:\n"<<temp<<'\n';
+    LivenessInformation elseExpr = pElse->transformDemand();
+    //cout<<"pElse:\n"<<elseExpr<<'\n';
+    doUnion(temp, elseExpr);
+    //cout<<"Union:\n"<<temp;
     doUnion(returnValue,temp);
+    //cout<<"Union with cond:\n"<<returnValue;
     return returnValue;
 }
 
@@ -240,7 +249,6 @@ LivenessInformation LetExprNode::transformDemand() const
         LivenessInformation exprLiveness = pExpr->transformDemand();
         LivenessTable varLiveness = bodyLiveness[pID->getIDStr()];
         LivenessInformation mappedLiveness = mapLiveness(varLiveness,exprLiveness);
-
         bodyLiveness.erase(pID->getIDStr());
         doUnion(bodyLiveness, mappedLiveness);
         if(pExpr->isConsExpression() || pExpr->isFunctionCallExpression())
@@ -313,7 +321,6 @@ LivenessInformation FuncExprNode::transformDemand() const
     {
         IdExprNode* ie = *iter;
 
-        std::cout<<"Variable checking:"<<ie->getIDStr()<<endl;
         i.first = ie->getIDStr();//Does not work
         iter++;
     }

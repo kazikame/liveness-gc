@@ -143,7 +143,7 @@ public:
 	//virtual void nextExpr() = 0;
 	virtual bool isFunctionCallExpression()	{return false;}
 	virtual bool isConsExpression() {return false;}
-	virtual std::string getIDStr() {return "";}
+	virtual std::string getIDStr() const {return "";}
 
 	// LivenessInformation& getLiveness()
 	// {
