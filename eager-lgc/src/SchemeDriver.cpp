@@ -83,8 +83,8 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
     // Added by Saksham
 
     auto revCallGraph = anf_program->makeRevCallGraph();
-    cout<<"YAYAYAY!\n\n\n";
 
+    cout<<"\n\nPrinting the reverse call graph:-\n\n";
     for (auto i : revCallGraph)
     {
         cout<<i.first<<": ";
@@ -94,6 +94,7 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
         }
         cout<<'\n';
     }
+    cout<<"\n\n";
     // Added by Saksham
 
     string inputfilename(infilename);
@@ -119,9 +120,7 @@ long Scheme::SchemeDriver::process()
 
     program->doLabel(true);
     anf_program->doLabel(true);
-    cout<<"inside process()"<<endl;
     program_grammars = anf_program->transformDemand();
-    cout<<program_grammars;
 
     // combined_grammar = Scheme::Demands::solve_functions_and_combine(program_grammars);
     // combined_grammar->emplace("D/all", Scheme::Demands::rule({{Scheme::Demands::T0, "D/all"},

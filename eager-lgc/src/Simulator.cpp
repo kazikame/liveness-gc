@@ -124,7 +124,6 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize) //This method or t
 
 	if (gc_type == gc_live)
 	{
-		cout<<"came to process"<<endl;
 		int resint = driver.process();
 		// //convert LFs into IFs and DFs
 		// for (auto elem: gLivenessData)

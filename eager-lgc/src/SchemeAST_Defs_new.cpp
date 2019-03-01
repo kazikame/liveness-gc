@@ -48,7 +48,6 @@ unordered_map<string, EdgeSet> ProgramNode::makeRevCallGraph()
 
 		for (string j : i->makeCallGraph())
 		{
-			cout<<"Adding "<<funcName<<" to "<<j<<'\n';
 			result[j].insert(funcName);
 		}
 
