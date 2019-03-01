@@ -521,7 +521,7 @@ public:
 	virtual std::string getFuncName() const;
 	            virtual Scheme::Demands::LivenessInformation
 	            transformDemand() const;
-
+	 void init();
 	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
 	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getFunctionName() {return pID->getIDStr();}
