@@ -27,6 +27,13 @@ For more details, check the report
 
 ## Run ##
 
+Make sure the maximum allowed stack size is high enough for benchmarks to run.
+
+```bash
+$ ulimit -s
+unlimited
+```
+
 ```bash
 ./<task> <filename.scm> <heap-size> <type>
 ```
