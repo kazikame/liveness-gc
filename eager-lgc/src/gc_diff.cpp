@@ -17,7 +17,7 @@
 using namespace std;
 
 int numcopied = 0; //TODO:Delete after debugging
-int numLiveness = 6; //TODO:Delete after debugging
+int numLiveness = 7; //TODO:Delete after debugging
 
 
 extern GCStatus gc_status;
@@ -987,66 +987,6 @@ int copy_given_scan_children(void* node, int docar, int docdr)
 }
 
 typedef void* (*gcFunc)(void* );
-void* gcPHI(void* cellptr)
-{
-	assert(lt_scan_freept() != 1);
-	return cellptr;
-}
-void* gcEPS(void* cellptr)
-{
-	void* addr = copy(cellptr);
-	// copy_given_scan_children(addr, 1, 1);
-	while(lt_scan_freept()==1)
-		update_scan();
-	assert(lt_scan_freept() != 1);
-	return addr;
-}
-void* gcZERO(void* cellptr)
-{
-	void* addr = copy(cellptr);
-	copy_given_scan_children(addr, 1 , 0);
-	if(lt_scan_freept()==1)
-		update_scan();
-	if(lt_scan_freept()==1)
-		update_scan();
-	assert(lt_scan_freept() != 1);
-	return addr;
-}
-
-void* gcONE(void* cellptr)
-{
-	void* addr = copy(cellptr);
-	copy_given_scan_children(addr, 0, 1);
-	if(lt_scan_freept()==1)
-		update_scan();
-	if(lt_scan_freept()==1)
-		update_scan();
-	assert(lt_scan_freept() != 1);
-	return addr;
-}
-
-void* gcONES(void* cellptr)
-{
-	void* addr = copy(cellptr);
-	while(lt_scan_freept()==1) //will automatically break upon hitting a cell which has been copied under demand of (0+1)*
-	{
-		copy_given_scan_children(getscan(), 0, 1);
-		update_scan();
-	}
-	return addr;
-}
-
-void* gcALL(void* cellptr)
-{
-	void* addr = copy(cellptr);
-		while(lt_scan_freept()==1)
-		{
-			// cout<<"doing loop"<<endl;
-			copy_given_scan_children(getscan(), 1, 1);
-			update_scan();
-		}
-		return addr;
-}
 
 void print_cons(cons* a)
 {
@@ -1113,29 +1053,133 @@ void liveness_gc()
 
 			// auto curstate = progLiveness2["L/" + stackit->return_point][vhit->varname][Scheme::Demands::ALL];
 			// cout<<"curstate"<<curstate<<endl;
-			// cout<<"I am here with "<<progLiveness2["L/" + stackit->return_point][vhit->varname][ALL]<<endl;
-			
-//			else
-//				cout << "Node " << nodeName << " not found " << endl;
+			// cout<<"I am here with "<<progLiveness2["L/" + stackit->return_point][vhit->varname][ALL]<<endl;	
+			//			else
+			//			cout << "Node " << nodeName << " not found " << endl;
 		}
 	}
-	gcFunc gcfunc[6] = {gcPHI, gcEPS, gcZERO, gcONE, gcONES, gcALL};
-	for (int ind = numLiveness-1; ind >= 0; ind--) {
-		for (auto elem : heapRefsBuckets[ind]) {
+	for (int ind = numLiveness-1; ind >= 0; ind--) 
+	{
 			// cout<<"reaching here"<<endl;
-			auto vhit = elem;
 			// cout<<"liveness : " << elem.first << " " << ind <<endl;
 			// if (vhit->ref && (static_cast<cons*>(vhit->ref))->forward == NULL) //Check to see if a new cell was allocated
 			// 	(static_cast<cons*>(vhit->ref))->setofStates->clear();
 			// cout<<"calling with " << vhit->ref << " and " << ind<<endl;
 			// vhit->ref = static_cast<cons*>(followpathsBFS(vhit->ref, ind));
-			if (vhit->ref) {
 				// cout<<"NULL Before\n";
-				vhit->ref = static_cast<cons*>(gcfunc[ind](vhit->ref));
-			}
-			// if (!(vhit->ref)) cout<<"NULL After\n";
+				void* addr;
+				switch(ind)
+				{
+					case 1:
+					for (auto vhit : heapRefsBuckets[ind]) 
+					{
+						if (vhit->ref) 
+						{
+							addr = copy(vhit->ref);
+							while(lt_scan_freept()==1)
+								update_scan();
+							vhit->ref = addr;
+						}
+					}
+						break;
+					case 2:
+					for (auto vhit : heapRefsBuckets[ind]) 
+					{
+						if (vhit->ref) 
+						{
+							addr = copy(vhit->ref);
+							copy_given_scan_children(addr, 1 , 0);
+							while(lt_scan_freept()==1)
+								update_scan();
+							vhit->ref = addr;
+						}
+					}
+						break;
 
-		}
+					case 3:
+					for (auto vhit : heapRefsBuckets[ind]) 
+					{
+						if (vhit->ref) 
+						{
+							addr = copy(vhit->ref);
+							copy_given_scan_children(addr, 0, 1);
+							if(lt_scan_freept()==1)
+								update_scan();
+							if(lt_scan_freept()==1)
+								update_scan();
+							assert(lt_scan_freept() != 1);
+							vhit->ref = addr;
+						}
+					}
+						break;
+					
+
+					case 4:
+					for (auto vhit : heapRefsBuckets[ind]) 
+					{
+						if (vhit->ref) 
+						{
+							cons* cellptrtemp = static_cast<cons*>(vhit->ref);
+							if (cellptrtemp->typecar == 'a')
+							{
+								addr = copy(cellptrtemp->car);
+								while(lt_scan_freept()==1)
+								{
+									// cout<<"doing loop"<<endl;
+									copy_given_scan_children(getscan(), 1, 1);
+									update_scan();
+								}
+								cellptrtemp->car = addr;
+							}
+
+							heapRefsBuckets[1].push_back(vhit);
+						}
+					}
+						break;
+
+					case 5:
+					for (auto vhit : heapRefsBuckets[ind]) 
+					{
+						if (vhit->ref) 
+						{
+							cons* cellptrtemp = static_cast<cons*>(vhit->ref);
+							if (cellptrtemp->typecdr == 'a')
+							{
+								addr = copy(cellptrtemp->cdr);
+								while(lt_scan_freept()==1)
+								{
+									// cout<<"doing loop"<<endl;
+									copy_given_scan_children(getscan(), 1, 1);
+									update_scan();
+								}
+								cellptrtemp->cdr = addr;
+							}
+
+							heapRefsBuckets[1].push_back(vhit);
+						}
+					}
+						break;
+
+					case 6:
+					for (auto vhit : heapRefsBuckets[ind]) 
+					{
+						if (vhit->ref) 
+						{
+							addr = copy(vhit->ref);
+							while(lt_scan_freept()==1)
+							{
+								// cout<<"doing loop"<<endl;
+								copy_given_scan_children(getscan(), 1, 1);
+								update_scan();
+							}
+							vhit->ref = addr;
+						}
+					}
+					break;
+
+					default: break;
+				}
+			// if (!(vhit->ref)) cout<<"NULL After\n";
 	}
 	// cout<<"Nodename sorted on liveness values:\n";
 	// gcout << "Completed processing root set" << endl;

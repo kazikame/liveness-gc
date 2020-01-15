@@ -1,0 +1,8 @@
+Seg. faults :-
+
+deriv
+takr- parsing error
+testgc - GC not working
+
+Left-
+nperm

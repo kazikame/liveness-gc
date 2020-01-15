@@ -22,9 +22,7 @@ public:
     { return std::strcmp(str1, str2) < 0; }
 };
 class ExprNode;
-// Added by Saksham
 typedef unordered_set<string> EdgeSet;
-// Added by Saksham
 
 enum exprType
 {

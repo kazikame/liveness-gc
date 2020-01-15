@@ -1,34 +1,60 @@
 #include "SchemeAST.h"
+#include "DemandStructure.h"
+#include <iostream>
+#include <typeinfo>
+#include <set>
 
 using namespace Scheme::AST;
 using namespace Scheme::Demands;
 
+ProgramLiveness progLiveness;
+ProgramLiveness functionCallDemands;
+ArgumentsOrder argumentsOrder;
+ProgramLiveness2 progLiveness2;
+unordered_map<string, EdgeSet> Scheme::AST::revCallGraph;
 
-demand_grammar function_call_demands;
-demand_grammar gLivenessData; //Global map which stores the liveness at cons points and the next statement after a function call only.
-
+void Scheme::AST::printRevCallGraph()
+{
+    cout<<"\n\nPrinting the reverse call graph:-\n\n";
+    for (auto i : Scheme::AST::revCallGraph)
+    {
+        cout<<i.first<<": ";
+        for (auto j : i.second)
+        {
+            cout<<j<<", ";
+        }
+        cout<<'\n';
+    }
+    cout<<"\n\n";
+}
 
 /* D( (return x), s, T ) = x.s  */
-expr_demand_grammars * ReturnExprNode::transformDemand(const rule & demand) const
+LivenessInformation ReturnExprNode::transformDemand() const
 {
-	return pID->transformDemand(demand);
+    LivenessInformation returnValue;
+    LivenessTable l= LivenessTable(pID->getIDStr(), true);
+    returnValue[pID->getIDStr()] = l;
+    return returnValue;
 }
 
 
 /* ref( (id x), s, T ) = x.s  */
-expr_demand_grammars * IdExprNode::transformDemand(const rule & demand) const
+// Function calls?
+LivenessInformation IdExprNode::transformDemand() const
 {
 
-	return new expr_demand_grammars({ new demand_grammar({{ label, demand }}),
-        new demand_grammar({{ *pID, demand }})
-    });
+    LivenessInformation returnValue;
+    LivenessTable l= LivenessTable(getIDStr(), true);
+    returnValue[getIDStr()] = l;
+    return returnValue;
 }
 
 
 /* ref( k, s, T ) = {k.s}  */
-expr_demand_grammars * ConstExprNode::transformDemand(const rule & demand) const
+LivenessInformation ConstExprNode::transformDemand() const
 {
-    return new expr_demand_grammars({ new demand_grammar({{ label, demand }}), new demand_grammar({{ }}) }); //TODO: verify this rule
+    LivenessInformation returnValue;
+    return returnValue;
 
 }
 
@@ -36,262 +62,318 @@ expr_demand_grammars * ConstExprNode::transformDemand(const rule & demand) const
 /* ref( (car x), s, T) = x.(0 s) U {x.eps}
    ref( (cdr x), s, T) = x.(1 s)
    ref( (null? x), s, T) = x.s     This should have been x.eps. Why are we putting the demand s on x?        */
-expr_demand_grammars * UnaryPrimExprNode::transformDemand(const rule & demand) const
+LivenessInformation UnaryPrimExprNode::transformDemand() const
 {
-    rule arg_demand;
 
     if(node_name == "car")
-    { /* x.(0 s) */
-        for(auto p : demand)
-        {
-            p.push_front(T0);
-            arg_demand.insert(p);
-        }
-        //Add epsilon demand
-        path p;
-        p.push_front(E);
-        arg_demand.insert(p);
-
+    { 
+        LivenessInformation returnValue = pArg->transformDemand();
+        auto i=returnValue.begin();
+        returnValue[i->first].catZero();
+        //std::cout<<"Variable checking"<<i->first<<endl;
+        return returnValue;
     }
+
     else if(node_name == "cdr")
-    { /* x.(1 s) */
-        for(auto p : demand) {
-            p.push_front(T1);
-            arg_demand.insert(p);
-        }
-        //Add epsilon demand
-        path p;
-        p.push_front(E);
-        arg_demand.insert(p);
+    { 
+        LivenessInformation returnValue = pArg->transformDemand();
+        // auto i = returnValue.begin();
+        returnValue[pArg->getIDStr()].catOne();
+        //std::cout<<"Variable checking"<<i->first<<endl;
+        return returnValue;
     }
     else
     {
-        /* x.s */  /* should be x.eps */
-//        for(auto p : demand)
-//            arg_demand.insert(p);
-    	path p;
-    	p.push_front(E);
-    	arg_demand.insert(p);
+        LivenessInformation returnValue = LivenessInformation();
+        returnValue[pArg->getIDStr()] = LivenessTable(pArg->getIDStr(), false);
+        auto i=returnValue.begin();
+        returnValue[i->first] = returnValue[i->first] + EPSILON;
+        //std::cout<<"Variable checking"<<i->first<<endl;
+        return returnValue; 
+
     }
-
-    expr_demand_grammars * result = pArg->transformDemand(arg_demand);
-    result->first->emplace(label, demand);
-
-    demand_grammar* var_grammar = result->second;
-
-
-    return result;
 }
 
 
 /* ref( (cons x y), s, T) = x.(0b s) + y.(1b s)
    ref( (eq? x y), s, T) = x.s + y.s            */
-expr_demand_grammars * BinaryPrimExprNode::transformDemand(const rule & demand) const
+LivenessInformation BinaryPrimExprNode::transformDemand() const
 {
-    rule arg_1_demand, arg_2_demand;
 
     if(node_name == "cons")
-    { /* x.(0b s) + y.(1b s) */
-    	for(auto p : demand)
+    { 
+
+        LivenessInformation arg1Liveness = pArg1->transformDemand();
+        LivenessInformation arg2Liveness = pArg2->transformDemand();
+
+        if (!arg1Liveness.empty())
         {
-            p.push_front(T0b);
-            arg_1_demand.insert(p);
-        }
-        for(auto p : demand) {
-            p.push_front(T1b);
-            arg_2_demand.insert(p);
+            auto i = arg1Liveness.begin();
+            arg1Liveness[i->first].stripZero();
+        //     std::cout<<"Checking..1"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
         }
 
+        if (!arg2Liveness.empty())
+        {
+            auto i = arg2Liveness.begin();
+            arg2Liveness[i->first].stripOne();
+        //     std::cout<<"Checking..2"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
+        }
+        //  std::cout<<"Before union"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
+        // std::cout<<arg2Liveness;
+        
+        doUnion(arg1Liveness, arg2Liveness);// Union updates first argument
+        // std::cout<<"After union"<<endl;
+        // std::cout<<arg1Liveness;
+        return arg1Liveness;////CHECK IN CASE OF ERRORS
     }
     else
     {
-    	//Shouldn't this be epsilon demand for all the cases?
+        //Shouldn't this be epsilon demand for all the cases?
         /* x.s + y .s */
 //        for(auto p : demand)
 //            arg_1_demand.insert(p);
 //        for(auto p : demand)
 //            arg_2_demand.insert(p);
-    	//Inserting epsilon demands for arguments for primitive functions other than cons
-    	path p;
-    	p.push_front(E);
-    	arg_1_demand.insert(p);
-    	arg_2_demand.insert(p);
+        //Inserting epsilon demands for arguments for primitive functions other than cons
+        // path p;
+        // p.push_front(E);
+        // arg_1_demand.insert(p);
+        // arg_2_demand.insert(p);
+
+        LivenessInformation arg1Liveness =  LivenessInformation();
+        arg1Liveness[pArg1->getIDStr()] = LivenessTable(pArg1->getIDStr(), false);
+        LivenessInformation arg2Liveness =  LivenessInformation();
+        arg2Liveness[pArg2->getIDStr()] = LivenessTable(pArg2->getIDStr(), false);
+        if (!arg1Liveness.empty())
+        {
+            auto i = arg1Liveness.begin();
+            arg1Liveness[i->first]= arg1Liveness[i->first] + EPSILON;
+        }
+
+        if (!arg2Liveness.empty())
+        {
+            auto i = arg2Liveness.begin();
+            arg2Liveness[i->first] = arg2Liveness[i->first] + EPSILON;
+        }
+        // std::cout<<"Before union"<<endl;
+        // std::cout<<arg1Liveness<<endl;;
+        // std::cout<<arg2Liveness;
+        doUnion(arg1Liveness, arg2Liveness);// Union updates first argument
+        // std::cout<<"After union"<<endl;
+        // std::cout<<arg1Liveness;
+        return arg1Liveness;
+
     }
 
-    expr_demand_grammars * result =  merge(pArg1->transformDemand(arg_1_demand),
-                                           pArg2->transformDemand(arg_2_demand));
-    result->first->emplace(label, demand);
+    // LivenessInformation result =  merge(pArg1->transformDemand(arg_1_demand),
+    //                                        pArg2->transformDemand(arg_2_demand));
+    // result->first->emplace(label, demand);
 
-    return result;
+    // return result;
 }
 
 
 /* D( (if x e1 e2), s, T) = D(e1, s, T) + D(e2, s, T) + x.(Xb s) */
-expr_demand_grammars * IfExprNode::transformDemand(const rule & demand) const
+LivenessInformation IfExprNode::transformDemand() const
 {
-    rule cond_demand; // TODO Add an epsilon demand instead of Xb demand.
+    //rule cond_demand; // TODO Add an epsilon demand instead of Xb demand.
      //We don't need the Xb addition for liveness GC for strict languages
 //    for(auto p : demand) {
 //        p.push_front(TXb);
 //        cond_demand.insert(p);
 //    }
-    path p;
-    p.push_front(E);
-    cond_demand.insert(p);
-    expr_demand_grammars * result =  merge(pCond->transformDemand(cond_demand),
-                                           merge(pThen->transformDemand(demand),
-                                                 pElse->transformDemand(demand)));
-    result->first->emplace(label, demand);
+    // path p;
+    // p.push_front(E);
+    // cond_demand.insert(p);
+    // LivenessInformation result =  merge(pCond->transformDemand(cond_demand),
+    //                                        merge(pThen->transformDemand(demand),
+    //                                              pElse->transformDemand(demand)));
+    // result->first->emplace(label, demand);
 
-    return result;
+    LivenessInformation returnValue = pCond->transformDemand();
+    //cout<<"Inside IfExprNode transformDemand:\n\n"<<"pCond:\n"<<returnValue<<'\n';
+    LivenessInformation temp = pThen->transformDemand();
+    //cout<<"pThen:\n"<<temp<<'\n';
+    LivenessInformation elseExpr = pElse->transformDemand();
+    //cout<<"pElse:\n"<<elseExpr<<'\n';
+    doUnion(temp, elseExpr);
+    //cout<<"Union:\n"<<temp;
+    doUnion(returnValue,temp);
+    //cout<<"Union with cond:\n"<<returnValue;
+    return returnValue;
 }
 
 
 /* D( (let x <- st in e), s, T) = E - E(x) + ref(st, E(x), T) where E = D(e, s, T) */
-expr_demand_grammars * LetExprNode::transformDemand(const rule & demand) const
+LivenessInformation LetExprNode::transformDemand() const
 {
-	expr_demand_grammars * result = pBody->transformDemand(demand);
-
-	if (pExpr->isFunctionCallExpression())
-	{
-		demand_grammar* var_grammar = result->second;
-		for (auto &var : (*var_grammar))
-		{
-			string nt = "L/" + pBody->getLabel() +  "/" + var.first;
-			gLivenessData[nt] = var.second;
-			//((FuncExprNode*)pExpr)->setNextExpr(pBody->getLabel());
-		}
-	}
-
-    std::string let_var = pID->getIDStr();
-    auto let_var_demand_it = result->second->find(let_var);
-
-    if(let_var_demand_it != result->second->end())
+    LivenessInformation bodyLiveness = pBody->transformDemand();
+    LivenessInformation temp = bodyLiveness;
+    //std::cout<<"Variable Checking:"<<pID->getIDStr()<<endl;
+    LivenessInformation exprLiveness = pExpr->transformDemand();
+    LivenessTable varLiveness = bodyLiveness[pID->getIDStr()];
+    LivenessInformation mappedLiveness = mapLiveness(varLiveness,exprLiveness);
+    doUnion(temp, mappedLiveness);
+    if (pID->getIDStr() == "_var14")
     {
-        rule let_var_demand = let_var_demand_it->second;
-        result->second->erase(let_var_demand_it);
-        expr_demand_grammars* let_body = pExpr->transformDemand(let_var_demand);
-
-        result = merge(result, let_body);
-        if (pExpr->isConsExpression())
-        {
-        	demand_grammar* var_grammar = result->second;
-        	for (auto &var : (*var_grammar))
-        	{
-        		string nt = "L/" + pExpr->getLabel() +  "/" + var.first;
-        		gLivenessData[nt] = var.second;
-        	}
-        }
+        cout<<bodyLiveness<<endl;
+        cout<<mappedLiveness<<endl;
     }
+    if(pExpr->isConsExpression())
+    {  
+        string label = "L/" + pExpr->getLabel();
+        progLiveness[label] = temp;
+    }
+    if(pExpr->isFunctionCallExpression())
+    {  
+        string label = "L/" + pBody->getLabel();
+        progLiveness[label] = bodyLiveness;
+        progLiveness[label][""] = progLiveness[label][pID->getIDStr()];
+        // progLiveness[label].erase(pID->getIDStr());
+    }
+    temp.erase(pID->getIDStr());
 
-    result->first->emplace(label, demand);
-
-
-    return result;
+    // cout<<getLabel()<<' '<<pID->getIDStr()<<endl<<temp<<endl;
+    return temp;
 }
 
 
 /* D( (f x1 x2 ... xn), s, T) = T_1(x1, s) + T_2(x2, s) + ... + T_n(xn, s) */
-expr_demand_grammars * FuncExprNode::transformDemand(const rule & demand) const
+LivenessInformation FuncExprNode::transformDemand() const
 {
-   // TODO :Have to change it to have both IF and DF part
-	rule temp_demand = demand;
-    if(function_call_demands.find(pID->getIDStr()) != function_call_demands.end())
-        function_call_demands[pID->getIDStr()].insert(temp_demand.begin(), temp_demand.end());
-    else
-        function_call_demands[pID->getIDStr()] =  demand;
-
-    if(pListArgs->size())
+    LivenessInformation demandTransform;
+    LivenessInformation temp = functionCallDemands[pID->getIDStr()];// Works correctly
+    const auto& variableOrder = argumentsOrder[pID->getIDStr()];
+    // cout<<demandTransform<<"<---demand transformer"<<endl;
+    auto iter = pListArgs->begin();
+    for (const auto& i: variableOrder)
     {
-        unsigned index = 1;
-        std::string prefix = PREFIX_TRANSFORMER + SEPARATOR + pID->getIDStr() + SEPARATOR;
+        IdExprNode* ie = (IdExprNode*) *iter;
+        demandTransform[ie->getIDStr()] = temp[i];
+        demandTransform[ie->getIDStr()].varName = ie->getIDStr();
+        iter++;
 
-        rule arg_demand;
-        //This should be done for the DF's only
-        for(auto p : demand)
+        // cout<<ie->getIDStr()<<"<---actual varname"<<endl;
+    }
+
+    return demandTransform;
+}
+
+
+LivenessInformation DefineNode::transformDemand() const {
+    // Check if totalLiveness contains only the demands of formal parameters    -   ANF?
+    LivenessInformation totalLiveness = pExpr->transformDemand();
+    vector<string> order;
+    LivenessInformation livenessInOrder;
+    for (auto i : *pListArgs)
+    {
+       // std::cout<<"Variable checking in define:"<<i->getIDStr()<<endl;
+        auto iter = totalLiveness.find(i->getIDStr());// Works fine
+        order.push_back(i->getIDStr());
+        if (iter != totalLiveness.end())
         {
-            p.push_front(prefix + std::to_string(index));
-            arg_demand.insert(p);
+            livenessInOrder.insert(*iter);
         }
+    }
+    functionCallDemands[pID->getIDStr()] = livenessInOrder;
+    argumentsOrder[pID->getIDStr()] = order;
+    return livenessInOrder;
+}
 
-        auto iter = pListArgs->begin();
-        auto result = (*iter)->transformDemand(arg_demand);
 
-        while(++iter != pListArgs->end())
+
+void DefineNode::init() {
+    // Check if totalLiveness contains only the demands of formal parameters    -   ANF?
+    //LivenessInformation totalLiveness = pExpr->transformDemand();
+
+   // LivenessInformation livenessInOrder;
+    for (auto i : *pListArgs)
+    {
+       // LivenessTable LivenessTable(i->getIDStr())
+       // std::cout<<"Variable checking in define:"<<i->getIDStr()<<endl;
+        functionCallDemands[pID->getIDStr()][i->getIDStr()] = LivenessTable(i->getIDStr(),false);
+    }
+
+}
+
+
+LivenessInformation ProgramNode::transformDemand() const {
+
+    //INITIALIZATION OF FUNCTION CALL DEMANDS DONE?
+    // revCallGraph = makeRevCallGraph();
+    // cout<<"\n\nPrinting the reverse call graph:-\n\n";
+    // for (auto i : revCallGraph)
+    // {
+    //     cout<<i.first<<": ";
+    //     for (auto j : i.second)
+    //     {
+    //         cout<<j<<", ";
+    //     }
+    //     cout<<'\n';
+    // }
+    // cout<<"\n\n";
+
+    map<std::string, DefineNode*> funcNametoNode;
+    for (auto& def : *pListDefines) 
+     {  
+        funcNametoNode[def->getFunctionName()]= def;
+         def->init();
+     }
+
+    
+
+    set<DefineNode*> workList;
+    for (auto& def : *pListDefines)
+    {
+        workList.insert(def);
+    }  
+
+    while(!workList.empty())
+    {
+        DefineNode* func = *workList.begin();
+
+        workList.erase(func);
+
+        LivenessInformation oldInfo = functionCallDemands[func->getFunctionName()];
+        LivenessInformation newInfo = func->transformDemand();
+        if(!(oldInfo == newInfo))
         {
-            ++index;
-            arg_demand.clear();
-            for(auto p : demand) {
-                p.push_front(prefix + std::to_string(index));
-                arg_demand.insert(p);
+            auto i=revCallGraph[func->getFunctionName()].begin();
+            for(;i!=revCallGraph[func->getFunctionName()].end();i++)
+            {
+                // cout<<"Inside graph loop"<<endl;
+                workList.insert(funcNametoNode[*i]);
             }
-            result = merge(result, (*iter)->transformDemand(arg_demand));
         }
+        
 
-        result->first->emplace(label, demand);
+    }  
 
-        return result;
-    }
-    else
+
+
+
+    // For testing only
+    // std::cout<<"\n\nPrinting functionCallDemands...\n\n";
+    // std::cout<<functionCallDemands;
+    // std::cout<<"Transformations OK-----"<<'\n';
+    
+    LivenessInformation mainBodyLiveness = pExpr->transformDemand();
+
+    // std::cout<<"\n\nPrinting progLiveness...\n";
+    // std::cout<<progLiveness<<'\n';
+    // std::cout<<"progLiveness OK-----\n\n\n";
+
+    for (auto i : progLiveness)
     {
-
-    	return new expr_demand_grammars({new demand_grammar({{label, demand}}), new demand_grammar});
+        for (auto j : i.second)
+        {
+            progLiveness2[i.first][j.first] = j.second;
+        }
     }
-}
+    return mainBodyLiveness;
 
-
-expr_demand_grammars * DefineNode::transformDemand(const rule & demand) const {
-    // The demand argument is unnecessary for this function.
-
-    std::string func_demand_prefix = PREFIX_DEMAND + SEPARATOR + pID->getIDStr();
-    expr_demand_grammars * result = pExpr->transformDemand(rule({{ func_demand_prefix }}));
-
-    int index = 0;
-    demand_grammar * arg_demands = new demand_grammar;
-    for(auto & arg : *pListArgs) {
-        auto arg_demand_pair = result->second->find(arg->getIDStr());
-        if(arg_demand_pair != result->second->end())
-            arg_demands->emplace(func_demand_prefix + SEPARATOR + std::to_string(++index),
-                                 arg_demand_pair->second);
-    }
-//The map containing the variable -> demand mapping is being deleted and is overwritten by symbolic demand on arguments.
-//TODO Have to see how this has to be updated to handle liveness.
-//    demand_grammar* var_grammar = result->second;
-//    for (auto &var : (*var_grammar))
-//    {
-//    	string nt = "L/" + getLabel() +  "/" + var.first;
-//    	gLivenessData[nt] = var.second;
-//    }
-
-    delete result->second;
-    result->second = arg_demands;
-
-    return result;
-}
-
-
-
-
-expr_demand_grammars * ProgramNode::transformDemand(const rule & demand) const {
-    // The demand argument is unnecessary for this function.
-
-    function_call_demands.clear();
-
-    rule symbolic_demand = rule({{ PREFIX_DEMAND + SEPARATOR + "all" }});
-    expr_demand_grammars * result = pExpr->transformDemand(symbolic_demand);
-    gLivenessData[PREFIX_DEMAND + SEPARATOR + "all" ] = rule({{"0", PREFIX_DEMAND + SEPARATOR + "all" }, {"1", PREFIX_DEMAND + SEPARATOR + "all" },{E}});
-
-    delete result->second;
-    result->second = new demand_grammar;
-
-    for(auto & def : *pListDefines)
-        result = merge(result, def->transformDemand(symbolic_demand));
-
-    for(auto & func : function_call_demands)
-    {
-        result->first->emplace(PREFIX_DEMAND + SEPARATOR + func.first, func.second);
-        gLivenessData[PREFIX_DEMAND + SEPARATOR + func.first] = func.second;
-    }
-
-    return result;
 }

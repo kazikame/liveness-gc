@@ -28,6 +28,7 @@ ProgramNode* pgm;
 unsigned long lbl_count = 0;
 map< string, vector<ExprNode*>> func_call_points;
 
+
 // Added by Saksham
 // REVERSED CALL GRAPH FUNCTION
 
@@ -40,19 +41,16 @@ unordered_map<string, EdgeSet> ProgramNode::makeRevCallGraph()
 		string funcName = i->getFuncName();
 		result[funcName] = {};
 	}
-
 	for (auto i: *pListDefines)
 	{
 		string funcName = i->getFuncName();
 
 		for (string j : i->makeCallGraph())
 		{
-			cout<<"Adding "<<funcName<<" to "<<j<<'\n';
 			result[j].insert(funcName);
 		}
 
 	}
-
 	return result;
 }
 
@@ -81,6 +79,7 @@ EdgeSet IfExprNode::dependentFunctions(EdgeSet& s)
 	pCond->dependentFunctions(s);
 	pThen->dependentFunctions(s);
 	pElse->dependentFunctions(s);
+	return s;
 }
 
 //For every other type of ExprNode
@@ -91,6 +90,7 @@ EdgeSet ExprNode::dependentFunctions(EdgeSet& s)
 
 // Added by Saksham
 
+//OLD CODE BEGINS HERE
 void print_arg_type(resType r)
 {
 		switch(r)
@@ -402,11 +402,11 @@ bool BoolConstExprNode::getVal()
 
 // /*  Definitions for IF node */
 
-// IfExprNode::~IfExprNode() {
-// 	delete pCond;
-// 	delete pThen;
-// 	delete pElse;
-// }
+IfExprNode::~IfExprNode() {
+	delete pCond;
+	delete pThen;
+	delete pElse;
+}
 
 IfExprNode::IfExprNode(ExprNode * cond, ExprNode * then_expr, ExprNode * else_expr)
 : ExprNode("IF"), pCond(cond), pThen(then_expr), pElse(else_expr) {}
@@ -502,6 +502,10 @@ LetExprNode * LetExprNode::clone() const {
 
 resultValue LetExprNode::evaluate()
 {
+	// if (pArg->getIDStr() == "_var181")
+	// {
+	// 	cout<<pExpr
+	// }
 	resultValue var_res = this->getVarExpr()->evaluate();
 
 	//cout << "Completed processing let expression " << endl;
@@ -637,7 +641,7 @@ resultValue UnaryPrimExprNode::evaluateCdrExpr()
 	break;
 	case 3:  return resultValue(stringType, void_to_char(getCdr(r.val.addrVal, 0)));
 	break;
-	case 4: return resultValue(boolType, (bool)void_to_int(getCar(r.val.addrVal, 0)));
+	case 4: return resultValue(boolType, (bool)void_to_int(getCar(r.val.addrVal, 0))); //TODO: ????????????
 	break;
 	default : return resultValue(heap, getCdr(r.val.addrVal, 0));
 	break;
@@ -650,7 +654,24 @@ resultValue UnaryPrimExprNode::evaluateNullqExpr()
 {
 	resultValue r = this->pArg->evaluate();
 
-	assert(r.type == heap);
+	// if (getLabel() == "292")
+	// {
+	// 	print_result(r);
+	// }
+	// if (r.type != heap)
+	// {
+	// 	switch (r.type)
+	// 	{
+	// 		case intType: cout<<r.val.intVal<<endl;
+	// 		break;
+	// 		case stringType: cout<<r.val.stringVal<<endl;
+	// 		break;
+	// 		case boolType: cout<<r.val.boolVal<<endl;
+	// 		break;
+	// 	}
+	// 	cout<<getLabel()<<"<-----LABEL"<<endl;
+	// }
+	// assert(r.type == heap);
 	return resultValue(boolType, r.val.addrVal == NULL);
 }
 
@@ -752,19 +773,22 @@ resultValue BinaryPrimExprNode::evaluateCons()
 			return_stack().return_point = this->getLabel();
 			//get handle to stack and store return point
 			gcstart = clock();
+			// cout<<"Cons gc node label: "<<getLabel()<<endl;
 			liveness_gc();
 			gcend = clock();
 			return_stack().return_point = -1;
 			//cout << "Completed liveness based GC"<<endl;
 			//reset return point on top of stack to -1
 		}
-		calculate_garbage();
-		detail_gc();
+		#ifdef GC_ENABLE_STATS
+			calculate_garbage();
+			detail_gc();
+		#endif
 		//Update GC time
 		gctime += double(gcend-gcstart)/CLOCKS_PER_SEC;
 		//cout << "GC end time="<<gcend<<"GC begin time=">>gcstart<<endl;
 		gc_times.push_back(double(gcend-gcstart)/CLOCKS_PER_SEC);
-		dump_garbage_stats();
+		// dump_garbage_stats();
 	}
 	else
 	{
@@ -822,7 +846,6 @@ resultValue BinaryPrimExprNode::evaluateCons()
 	a2 = arg2.val.addrVal;
 	break;
 	}
-
 	return resultValue(heap, allocate_cons(arg1type, a1, arg2type, a2));
 }
 
@@ -972,6 +995,25 @@ resultValue FuncExprNode::evaluate()
 	std::vector<resultValue> arg_locs;
 	//cout << "Calling function " << funcDef->getFuncName() << endl;
 
+	// if (funcDef->getFuncName() == "drop")
+	// {
+	// 	cout<<"In drop:\n";
+	// 	cout<<getArgs()[1]->getIDStr()<<": "<<endl;
+	// 	print_result(getArgs()[1]->evaluate());
+	// }
+
+	// if (funcDef->getFuncName() == "algc")
+	// {
+	// 	cout<<"In algc:\n";
+	// 	cout<<getArgs()[3]->getIDStr()<<": "<<endl;
+	// 	print_result(getArgs()[3]->evaluate());
+	// }
+	// if (funcDef->getFuncName() == "elem")
+	// {
+	// 	cout<<"In elem:";
+	// 	print_result(this->getArgs()[1]->evaluate());
+	// }
+	// cerr<<getLabel()<<' '<<getFunction()<<endl;
 	int j = 0;
 	for(std::list<ExprNode*>::iterator arg = this->pListArgs->begin(); arg != this->pListArgs->end(); ++arg)
 	{

@@ -22,7 +22,6 @@ using namespace Scheme::output;
 
 double gctime=0;
 int gcinvoke=0;
-extern demand_grammar gLivenessData;
 
 
 
@@ -66,44 +65,8 @@ Simulator::Simulator(int gctype)
 	//Do all global initialization here
 }
 
-void print_path (path prod_path, ostream& out)
-{
-
-	std::stringstream ss;
-	for_each(prod_path.begin(), prod_path.end(), [&ss] (const std::string& s) { ss << "." << s; });
-	if (ss.str().size() > 1)
-	{
-		std::string a = ss.str().substr(1); //Remove the first "." character
-		out << a;
-	}
-}
-
-void write_grammar_to_text_file(demand_grammar *g, string filename)
-{
-	std::ofstream gram_file(filename);
-	//Convert the set into a vector and sort it and print it to a file
-	for(auto l:*g)
-	{
-		vector<list<string> > vec(l.second.begin(), l.second.end());
-		sort(vec.begin(), vec.end(), StringListComparer);
-		int i = 0;
-		gram_file << l.first << "->";
-		for(auto p:vec)
-		{
-			print_path(p, gram_file);
-			++i;
-			if (i < vec.size())
-				gram_file << "|";
-		}
-		gram_file << endl;
-	}
-	gram_file.close();
-	return;
-}
-
 Simulator& Simulator::run(std::string pgmFilePath, int hsize) //This method or the constructor should take other parameters like gctype, heap size etc...
 {
-	//Do any per program initialization here.
 	Scheme::SchemeDriver driver;
 	cout << "Parsing " << pgmFilePath << endl;
 	std::pair<bool, long> parseResult = driver.parse(pgmFilePath.c_str());
@@ -115,108 +78,57 @@ Simulator& Simulator::run(std::string pgmFilePath, int hsize) //This method or t
 	pgm = driver.get_anf_prog();
 	std::string pgmname = pgmFilePath.substr(pgmFilePath.find_last_of("/") + 1,
 			                                 pgmFilePath.find_first_of(".", pgmFilePath.find_last_of("/")) - pgmFilePath.find_last_of("/") - 1);
-///////////////////////////////////////////////////////////////////////
-	//bool filesCached = true;
-	struct stat buffer;
-	//bool state_map_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map").c_str(), &buffer) == 0);
-	//bool state_transition_file =  (stat (("../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-transition-table").c_str(), &buffer) == 0);
-	//filesCached = state_map_file;
 
 	if (gc_type == gc_live)
 	{
-		int resint = driver.process();
-		// //convert LFs into IFs and DFs
-		// for (auto elem: gLivenessData)
-		// {
-		// 	rule r;
-		// 	for(auto path:elem.second)
-		// 	{
-		// 		rule temp = expandProd(path);
-		// 		r.insert(temp.begin(), temp.end());
-		// 	}
-		// 	gLivenessData[elem.first] = r;
-		// }
-		// write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-cfg.txt");
-		// //Simplify grammar
-		// simplifyCFG(&gLivenessData);
-		// write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/simplified-program-cfg.txt");
-		// //Convert CFG to strongly regular grammar
-		// regular_demand_grammar *reg = regularize(&gLivenessData);
-		// cout << "Converted CFG into strongly regular grammar" << endl;
-		// gLivenessData.clear(); //clear the original grammar
-		// gLivenessData.swap(*(reg->first));
-		// write_grammar_to_text_file(&gLivenessData, "../benchmarks/programs/" + pgmname + "/program-reg.txt");
-		// Scheme::Demands::sanitize(&gLivenessData); //Remove empty productions
-		// std::cout << "Sanitized the regular grammar"<<std::endl;
-		// automaton *nfa = Scheme::Demands::getNFAsFromRegularGrammar(&gLivenessData, pgmname);
-		// Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-nfa.txt");
-		// //auto start_states = nfa->second.at("START")[E];
-		// std::unordered_set<std::string> start_states;
-		// for (auto nt:gLivenessData)
-		// 	start_states.insert(nt.first);
-		// Scheme::Demands::simplifyNFA(start_states, nfa);
-		// Scheme::Demands::printNFAToFile(nfa, "../benchmarks/programs/" + pgmname + "/program-simplified-nfa.txt");
-		// automaton* dfa = convertNFAtoDFA(start_states, nfa, pgmname);
-		// Scheme::Demands::printNFAToFile(dfa, "../benchmarks/programs/" + pgmname + "/program-dfa.txt");
-		// numkeys = Scheme::Demands::writeDFAToFile(pgmname, dfa);
-		//Scheme::Demands::minimizeDFA(dfa, start_states);
+		double resint = driver.process();
+		cout<<"Time taken to build liveness tables: "<<resint/1000000<<"s\n\n";
+		// cout<<"Printing Reverse Call Graph:\n ";
+		Scheme::AST::printRevCallGraph();
+		string pgmdir = pgmFilePath.substr(0, pgmFilePath.find_last_of("/") + 1);
+		string progLivePath = pgmdir + pgmname + "_progLiveness";
+		string funcLivePath = pgmdir + pgmname + "_funcLiveness";
+		Scheme::Demands::printLivenessToFile(progLiveness, progLivePath);
+		Scheme::Demands::printLivenessToFile(functionCallDemands, funcLivePath);
+		cout<<"Program Liveness printed to:\t"<<progLivePath<<endl;
+		cout<<"Function Demand Transfomers printed to:\t"<<funcLivePath<<endl;
+		cout<<"\n\n";
 	}
-	// else if (gc_type == gc_live)
-	// {
-	// 	cout <<"Reading data from cached files "<<endl;
-	// 	const int SZ = 1024 * 1024;
-	// 	//std::vector<char> buff(SZ, "");
-	// 	std::vector<char> buff(SZ);
-	// 	ifstream ifs( "../benchmarks/programs/" + pgmname + "/fsmdump-" + pgmname + "-state-map" );
-	// 	int n = 0;
-	// 	while( int cc = FileRead( ifs, buff ) )
-	// 	{
-	// 		n += CountLines( buff, cc );
-	// 	}
-	// 	numkeys = n + 1;
-	// }
-
-	// //Do the initialization of the dfa state map and transition table
-	// //initialize(pgmFilePath, numkeys, gc_type);
-	// clock_t pstart = clock();
-	// initialize(pgmname, numkeys, gc_type);
-	// allocate_heap(hsize * 2);
-	// empty_environment("main");
-	// init_gc_stats();
-
+	clock_t pstart = clock();
+	initialize2(gc_type);
+	allocate_heap(hsize * 2);
+	empty_environment("main");
+	init_gc_stats();
 	resultValue r = pgm->evaluate();
+	switch(r.type)
+	{
+	case intType : cout << "ans = " << r.val.intVal << endl;
+	break;
+	case stringType :  cout << "ans = " << r.val.stringVal << endl;
+	break;
+	case boolType : cout << "ans = " << r.val.boolVal << endl;
+	break;
+	case heap : cout << "loc ans = ";
+				printval(r.val.addrVal);
+				cout<<endl;
+	break;
+	default : cerr<<"ans = Error!"<<endl;
+	}
 
-	if (r.type == heap)
-	{
-		cout << "loc ans = ";
-		printval(r.val.addrVal);
-		cout << endl;
-	}
-	else
-	{
-		cout << "ans = ";
-		switch(r.type)
-		{
-		case intType : cout << r.val.intVal << endl;
-		break;
-		case stringType :  cout << r.val.stringVal << endl;
-		break;
-		case boolType : cout << r.val.boolVal << endl;
-		break;
-		}
-	}
 	cout << "Completed program evaluation" << endl;
 	clock_t pend = clock();
 	if (gc_type != gc_disable)
 		finish_gc_stats();
 	//Remove all the parameters and use private variables in the Simulator class
 	cout << "Heap total="<<hsize<<" Heap left="<<current_heap()<<" Heap used="<<(hsize - current_heap())<<endl;
-	detail_gc();
+	#ifdef GC_ENABLE_STATS
+		detail_gc();
+	#endif
 	// if (gc_type == gc_live)
 	// 	cleanup(numkeys-1);
 
 	cout << "GC Invocations="<<gcinvoke<<" GC Time="<<gctime<<endl;
-	//cout << "Program Execution Time="<<((double(pend - pstart)/CLOCKS_PER_SEC) - gctime)<<" seconds"<<endl;
+	cout << "Program Execution Time="<<((double(pend - pstart)/CLOCKS_PER_SEC) - gctime)<<" seconds"<<endl;
 
 	return *this;
 }
@@ -251,7 +163,6 @@ int main(int argc, char ** argv)
 		 return(EXIT_FAILURE);
 	}
 	vector<string> cmdline_args;
-	int optind = 1;
 
 	string filepath = argv[1];
 	long heapsize = stol(argv[2]);

@@ -29,7 +29,6 @@ unsigned long lbl_count = 0;
 map< string, vector<ExprNode*>> func_call_points;
 
 
-// Added by Saksham
 // REVERSED CALL GRAPH FUNCTION
 
 unordered_map<string, EdgeSet> ProgramNode::makeRevCallGraph()
@@ -45,14 +44,15 @@ unordered_map<string, EdgeSet> ProgramNode::makeRevCallGraph()
 	for (auto i: *pListDefines)
 	{
 		string funcName = i->getFuncName();
-
+		cout << "Processing Function " << funcName << '\n';
 		for (string j : i->makeCallGraph())
 		{
 			result[j].insert(funcName);
+			cout << "Found " << j << '\n';
 		}
 
 	}
-
+	cout << "DONE!\n";
 	return result;
 }
 
@@ -65,7 +65,12 @@ EdgeSet DefineNode::makeCallGraph()
 
 EdgeSet FuncExprNode::dependentFunctions(EdgeSet& s)
 {
-	s.insert(getFunction());
+	auto name = getFunction();
+	if (name == "check") {
+		cout << "got it back!" << '\n';
+	}
+	cout << name << "\n";
+	s.insert(name);
 	return s;
 }
 
@@ -961,6 +966,7 @@ FuncExprNode * FuncExprNode::clone() const {
 
 std::string FuncExprNode::getFunction()
 {
+	cout << "Processing function : " << this->pID->getName() << '\n';
 	return this->pID->getName();
 }
 

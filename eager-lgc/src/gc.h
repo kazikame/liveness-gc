@@ -5,6 +5,8 @@
 #include<unordered_map>
 #include<set>
 #include<utility>
+#include "DemandStructure.h"
+
 using namespace std;
 
 
@@ -22,7 +24,7 @@ using namespace std;
  * to disable stat generation.
  * Author : Amey Karkare
  * */
-#define GC_ENABLE_STATS
+ #define GC_ENABLE_STATS
 #if 0
 #define DBG(stmt) stmt
 #else
@@ -32,12 +34,12 @@ using namespace std;
 enum GCStatus {gc_disable, gc_live, gc_freq, gc_plain};
 
 typedef int state_index;
+typedef int liv_index;
 typedef set<state_index> stateset;
 typedef stateset::iterator setiter;
 typedef unordered_map<string, state_index>::const_iterator stateMapIter;
 typedef unordered_map<string, state_index> stateMap;
 typedef unordered_map<std::string, std::string> call_next_data;
-
 
 
 typedef struct Var_Heap
@@ -62,6 +64,7 @@ typedef struct activationRecord
 	string funcname;
 	vector<var_heap> heapRefs;
 	vector<var_stack> nonRefs;
+  Scheme::Demands::LivenessState funcLiveness;
 }actRec;
 
 typedef unsigned long clock_tick;
@@ -160,6 +163,7 @@ typedef struct cell_cons
 //GC methods
  void reachability_gc();
  void initialize (string program_name, state_index, GCStatus);
+ void initialize2 (GCStatus gc_type);
  void cleanup(state_index);
  void liveness_gc();
  void dump_heap(string label);

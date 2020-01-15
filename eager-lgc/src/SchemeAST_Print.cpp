@@ -1,4 +1,4 @@
-#include "SchemeAST_new.h"
+#include "SchemeAST.h"
 
 #include <cassert>
 #include <algorithm>
@@ -386,7 +386,3 @@ std::ostream & ProgramNode::print(std::ostream & stream, unsigned depth, bool ne
     }
     return stream;
 }
-
-
-
-

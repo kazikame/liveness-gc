@@ -1,21 +1,19 @@
 #ifndef __SCHEME_AST_H__
 #define __SCHEME_AST_H__ 1
 
-//#include "Output.h"
+#include "Output.h"
 #include <vector>
-#include<map>
-#include<iostream>
+#include <map>
+#include <iostream>
 #include <boost/variant.hpp>
-#include "Demands.h"
+#include "DemandStructure.h"
 #include <functional>
 #include <cstring>
-#include<utility>
+#include <utility>
 using namespace std;
 namespace Scheme {
 
 namespace AST {
-
-
 
 struct StrCompare : public std::binary_function<const char*, const char*, bool> {
 public:
@@ -23,12 +21,10 @@ public:
     { return std::strcmp(str1, str2) < 0; }
 };
 class ExprNode;
-typedef std::list<ExprNode*> LivenessInfo;
-typedef std::pair<std::string, LivenessInfo > Liveness;
 
-// Added by Saksham
+
 typedef unordered_set<string> EdgeSet;
-// Added by Saksham
+extern unordered_map<string, EdgeSet> revCallGraph;
 
 enum exprType
 {
@@ -110,17 +106,17 @@ public:
 	virtual Node * clone() const = 0;
 	virtual Node * getANF() const = 0;
 
+	// Return type by reference??
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const = 0;
 
-	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const = 0;
-
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const = 0;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const = 0;
 	enum exprType type;
 	const std::string node_name;
 protected:
 	std::string label;
-
+	//LivenessInformation livenessInformation;
 
 	Node(const std::string);
 
@@ -139,56 +135,31 @@ public:
 	virtual ExprNode * clone() const = 0;
 	virtual ExprNode * getANF() const = 0;
 	virtual resultValue evaluate() = 0;
-	virtual LivenessInfo analyse(Liveness)
-	{
-		std::cout << "Method should be overriden in the derived class." <<std::endl;
-		exit(-1);
-	}
-
-	// Added by Saksham
-
-	virtual EdgeSet dependentFunctions(EdgeSet& s);
-
-	// Added by Saksham
-
+	// virtual LivenessInfo analyse(Liveness)
+	// {
+	// 	std::cout << "Method should be overriden in the derived class." <<std::endl;
+	// 	exit(-1);
+	// }
 	//virtual void nextExpr() = 0;
 	virtual bool isFunctionCallExpression()	{return false;}
 	virtual bool isConsExpression() {return false;}
-	Liveness& getLiveness()
-	{
-		return l;
-	}
+	virtual std::string getIDStr() const {return "";}
+
+	// LivenessInformation& getLiveness()
+	// {
+	// 	return livehhnessInformation;
+	// }
+
+	
+
+	virtual EdgeSet dependentFunctions(EdgeSet& s);
+
+	
 protected:
 	ExprNode(const std::string name);
-	Liveness l;
+	//Liveness l;
 };
 
-
-class IdExprNode;
-class ReturnExprNode : public ExprNode {
-public:
-	virtual ~ReturnExprNode();
-	ReturnExprNode(IdExprNode *);
-
-	virtual void doLabel(bool = true);
-
-	virtual ReturnExprNode * clone() const;
-	virtual ReturnExprNode * getANF() const;
-
-	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
-	virtual resultValue evaluate();
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
-	virtual LivenessInfo analyse(Liveness);
-	//virtual void nextExpr();
-	virtual std::string getLabel() const;
-
-protected:
-	IdExprNode * pID;
-
-	friend ExprNode * pushDown(ExprNode *, ExprNode *);
-};
 
 class IdExprNode : public ExprNode {
 public:
@@ -202,20 +173,45 @@ public:
 
 	std::string getIDStr() const;
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getName() {return *pID;}
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 
 	virtual std::string getLabel() const;
 
 protected:
 	std::string * pID;
+};
+
+class ReturnExprNode : public ExprNode {
+public:
+	virtual ~ReturnExprNode();
+	ReturnExprNode(IdExprNode *);
+
+	virtual void doLabel(bool = true);
+
+	virtual ReturnExprNode * clone() const;
+	virtual ReturnExprNode * getANF() const;
+
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const;
+	virtual resultValue evaluate();
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	//virtual LivenessInfo analyse(Liveness);
+	//virtual void nextExpr();
+	virtual std::string getLabel() const;
+
+protected:
+	IdExprNode * pID;
+
+	friend ExprNode * pushDown(ExprNode *, ExprNode *);
 };
 
 
@@ -232,23 +228,23 @@ public:
 
 	virtual LetExprNode * fillHoleWith(ExprNode * pSubExpr);
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getVar();
 	ExprNode* getVarExpr();
 	ExprNode* getBody();
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 
-	// Added by Saksham
+	
 
 	virtual EdgeSet dependentFunctions(EdgeSet& s);
 
-	// Added by Saksham
+	
 
 protected:
 	IdExprNode * pID;
@@ -270,23 +266,23 @@ public:
 
 	virtual IfExprNode * fillHoleWith(IdExprNode * pSubExpr);
 	//
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	ExprNode* getCond();
 	ExprNode* getThenPart();
 	ExprNode* getElsePart();
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 
-	// Added by Saksham
+	
 
 	virtual EdgeSet dependentFunctions(EdgeSet& s);
 
-	// Added by Saksham
+	
 
 protected:
 	ExprNode * pCond, * pThen, * pElse;
@@ -302,8 +298,8 @@ public:
 
 	virtual void doLabel(bool = true);
 
-	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const;
 
 protected:
 	ConstExprNode(const std::string);
@@ -316,9 +312,9 @@ public:
 	virtual HoleConstExprNode * clone() const;
 	virtual LetExprNode * getANF() const;
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	//virtual LivenessInfo analyse(Liveness);
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	//virtual void nextExpr();
 };
 
@@ -328,12 +324,11 @@ public:
 
 	virtual NilConstExprNode * clone() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual resultValue evaluate();
 	//virtual void nextExpr();
 };
-
 
 class IntConstExprNode : public ConstExprNode {
 public:
@@ -342,11 +337,11 @@ public:
 
 	virtual IntConstExprNode * clone() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	int getVal();
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 protected:
 	int * pIntVal;
@@ -360,11 +355,11 @@ public:
 
 	virtual StrConstExprNode * clone() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	string* getVal();
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 protected:
 	std::string * pStrVal;
@@ -382,7 +377,7 @@ public:
 			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	bool getVal();
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 protected:
 	bool * pBoolVal;
@@ -410,13 +405,13 @@ public:
 
 	virtual UnaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 
 protected:
@@ -443,13 +438,13 @@ public:
 
 	virtual BinaryPrimExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	virtual Scheme::Demands::expr_demand_grammars *
-	transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::LivenessInformation
+	transformDemand() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	///virtual LivenessInfo analyse(Liveness);
 	//virtual void nextExpr();
 	virtual bool isConsExpression() {return (node_name == "cons");}
 protected:
@@ -482,25 +477,26 @@ public:
 
 	virtual FuncExprNode * fillHoleWith(IdExprNode * pSubExpr);
 
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
+	            virtual Scheme::Demands::LivenessInformation
+	            transformDemand() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getFunction();
+
 	std::vector<ExprNode*> getArgs();
 	virtual resultValue evaluate();
-	virtual LivenessInfo analyse(Liveness);
+	//virtual LivenessInfo analyse(Liveness);
 	////virtual void nextExpr();
 	virtual bool isFunctionCallExpression()	{return true;}
 	void setNextExpr(std::string);
 	std::string getNextExpr();
 
-	// Added by Saksham
+	
 
 	virtual EdgeSet dependentFunctions(EdgeSet& s);
 
-	// Added by Saksham
+	
 
 protected:
 	IdExprNode * pID;
@@ -523,20 +519,20 @@ public:
 	virtual DefineNode * getANF() const;
 
 	virtual std::string getFuncName() const;
-	            virtual Scheme::Demands::expr_demand_grammars *
-	            transformDemand(const Scheme::Demands::rule&) const;
-
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	            virtual Scheme::Demands::LivenessInformation
+	            transformDemand() const;
+	 void init();
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	std::string getFunctionName() {return pID->getIDStr();}
 	std::vector<std::string> getArgs();
 	ExprNode* getFunctionBody() {return pExpr;}
 
-	// Added by Saksham
+	
 
 	EdgeSet makeCallGraph();
 
-	// Added by Saksham
+	
 
 protected:
 	ExprNode * pExpr;
@@ -555,21 +551,19 @@ public:
 	virtual ProgramNode * clone() const;
 	virtual ProgramNode * getANF() const;
 
-	virtual Scheme::Demands::expr_demand_grammars *
-            transformDemand(const Scheme::Demands::rule&) const;
+	virtual Scheme::Demands::LivenessInformation
+            transformDemand() const;
 
-	// virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
-	// 		Scheme::output::output_t format = Scheme::output::PLAIN) const;
+	virtual std::ostream & print(std::ostream &, unsigned = 0, bool = true, bool = false,
+			Scheme::output::output_t format = Scheme::output::PLAIN) const;
 	resultValue evaluate();
 
 	Node* getFunction(std::string);
 
-	// Added by Saksham
+	void doLivenessAnalysis();
 
 	unordered_map<string, EdgeSet> makeRevCallGraph();
 
-	// Added by Saksham
-	void doLivenessAnalysis();
 
 	//TODO : Add a function to process function definitions (Similar to the LE function in python)
 protected:
@@ -581,10 +575,10 @@ protected:
 
 ExprNode * pushDown(ExprNode *, ExprNode *);
 
-}
+void printRevCallGraph();
 
 }
-
+}
 
 
 

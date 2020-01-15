@@ -8,16 +8,12 @@
 #include <iomanip>
 #include <iostream>
 
-#include "Demands.h"
-
-
 namespace Scheme {
 
     namespace output {
 
         struct options {
-            std::string cfg, approx_cfg, approx_nfa, reduced_nfa,
-                json_ast, plain_ast, scheme_ast,
+            std::string json_ast, plain_ast, scheme_ast,
                 json_slice, plain_slice, scheme_slice;
             int ast_anf, slice_anf, ast_label, slice_label, dump_all;
         };
@@ -34,9 +30,6 @@ namespace Scheme {
         enum output_t { SCHEME = 0, PLAIN = 1, JSON = 2 };
 
         std::ostream & indentTill(std::ostream &, unsigned = 0);
-        void dumpGrammar(std::ostream &, Scheme::Demands::demand_grammar *);
-        void dumpGrammar(std::ostream &, Scheme::Demands::expr_demand_grammars *);
-        void dumpGrammar(std::ostream &, Scheme::Demands::regular_demand_grammar *);
 
     }
 

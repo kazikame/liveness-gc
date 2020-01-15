@@ -5,7 +5,7 @@ import time
 import datetime
 from collections import namedtuple
 
-prog_size = {'testgc':143370}
+prog_size = {"append": 5, "gc_bench": 131071, "takl": 3, "testgc": 143355, "testsmall": 12, "paraffins": 2079, "lcss": 10801, "nperm": 93264, "sudoku": 1704, "test": 5, "fibheap": 254520, "knightstour": 423318, "deriv": 313, "fft": 768, "lambda": 7014, "nqueens": 17437}
 
 gc_info = namedtuple("gc_info", "heap_total heap_left heap_used gc_invocations gc_time exec_time")
 gc_stat = namedtuple("gc_stat", "prog_name reachability liveness")
@@ -16,7 +16,7 @@ path = os.getcwd()
 collector_path = os.path.join(path, "Simulator ")
 
 def run_program(filename, prog_dir_path, gc_type):
-    inputfile =  prog_dir_path + '/' + filename + '.scm'
+    inputfile =  prog_dir_path + '/' + filename + ''
     cmd = collector_path + " "  + inputfile + " " +  str(prog_size[filename]) + "   " + gc_type + " > " + prog_dir_path +'/results/' + filename + '-' + gc_type
     subprocess.call(cmd,shell=True)
 

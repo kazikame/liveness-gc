@@ -54,6 +54,8 @@ extern LivenessState PHI;
 extern LivenessState EPSILON;
 extern LivenessState ZERO;
 extern LivenessState ONE;
+extern LivenessState ZEROALL;
+extern LivenessState ONEALL;
 extern LivenessState ONE_STAR;
 extern LivenessState ALL;
 
@@ -64,7 +66,7 @@ bool operator==(const LivenessState l1, const LivenessState l2);
 class LivenessStateHasher
 {
 public:
-	std::size_t operator()(const LivenessState& obj) const { return std::hash<std::string>()(obj.idString); }
+	std::size_t operator()(const LivenessState& obj) const { return std::hash<int>()(obj.latticeNo); }
 };
 
 class LivenessTable;
@@ -72,6 +74,7 @@ bool operator==(const LivenessTable&, const LivenessTable&);
 bool operator!=(const LivenessTable&, const LivenessTable&);
 //Defines a type for liveness table of any variable
 typedef std::map< std::string, LivenessTable> LivenessInformation;
+typedef std::unordered_map<std::string, LivenessTable> LivenessInformation2;
 bool operator==(const LivenessInformation&, const LivenessInformation&);
 LivenessInformation mapLiveness(const LivenessTable&, const LivenessInformation&);
 class LivenessTable
@@ -100,18 +103,22 @@ public:
 
 
 typedef std::map< std::string, LivenessInformation> ProgramLiveness;
+typedef std::unordered_map<std::string, std::vector<std::string> > ArgumentsOrder;
+typedef std::unordered_map<std::string, LivenessInformation2> ProgramLiveness2;
 
 //Printing Demands
 std::ostream& operator<<(std::ostream& out, const LivenessState& l);
 std::ostream& operator<<(std::ostream& out, const LivenessTable& t);
 std::ostream& operator<<(std::ostream& out, const LivenessInformation& t);
 std::ostream& operator<<(std::ostream& out, const ProgramLiveness& t);
-
+bool printLivenessToFile(const ProgramLiveness&, const std::string&);
 
 void doUnion(LivenessInformation &, const LivenessInformation &);
 }
 }
 extern Scheme::Demands::ProgramLiveness progLiveness;
+extern Scheme::Demands::ProgramLiveness functionCallDemands;
+extern Scheme::Demands::ProgramLiveness2 progLiveness2;
 
 
 #endif

@@ -35,44 +35,43 @@ bool Scheme::Demands::operator<(const LivenessState& s1, const LivenessState& s2
   return s1.latticeNo < s2.latticeNo;
 }
 
-//Can parse from text file
 std::unordered_map<std::string, std::unordered_map<std::string, LivenessState> > getUnionRules()
 {
     std::unordered_map<std::string, std::unordered_map<std::string, LivenessState> > m { {"phi", { {"phi", PHI}, 
                                                                                                                       {"eps", EPSILON},
-                                                                                                                      {"zero", ZERO},
-                                                                                                                      {"one", ONE},
-                                                                                                                      {"one*", ONE_STAR},
+                                                                                                                      // {"0", ZERO},
+                                                                                                                      // {"1", ONE},
+                                                                                                                      // {"1*", ONE_STAR},
                                                                                                                       {"all", ALL} }},
                                                                                                              {"eps", { {"phi", EPSILON}, 
                                                                                                                       {"eps", EPSILON},
-                                                                                                                      {"zero", ZERO},
-                                                                                                                      {"one", ONE},
-                                                                                                                      {"one*", ONE_STAR},
+                                                                                                                      // {"0", ZERO},
+                                                                                                                      // {"1", ONE},
+                                                                                                                      // {"1*", ONE_STAR},
                                                                                                                       {"all", ALL} }},
-                                                                                                             {"zero", { {"phi", ZERO}, 
-                                                                                                                      {"eps", ZERO},
-                                                                                                                      {"zero", ZERO},
-                                                                                                                      {"one", ALL},
-                                                                                                                      {"one*", ALL},
-                                                                                                                      {"all", ALL} }},
-                                                                                                             {"one", { {"phi", ONE}, 
-                                                                                                                      {"eps", ONE},
-                                                                                                                      {"zero", ALL},
-                                                                                                                      {"one", ONE},
-                                                                                                                      {"one*", ONE_STAR},
-                                                                                                                      {"all", ALL} }},
-                                                                                                             {"one*", { {"phi", ONE_STAR}, 
-                                                                                                                      {"eps", ONE_STAR},
-                                                                                                                      {"zero", ALL},
-                                                                                                                      {"one", ONE_STAR},
-                                                                                                                      {"one*", ONE_STAR},
-                                                                                                                      {"all", ALL} }},
+                                                                                                             // {"0", { {"phi", ZERO}, 
+                                                                                                             //          {"eps", ZERO},
+                                                                                                             //          {"0", ZERO},
+                                                                                                             //          {"1", ALL},
+                                                                                                             //          {"1*", ALL},
+                                                                                                             //          {"all", ALL} }},
+                                                                                                             // {"1", { {"phi", ONE}, 
+                                                                                                             //          {"eps", ONE},
+                                                                                                             //          {"0", ALL},
+                                                                                                             //          {"1", ONE},
+                                                                                                             //          {"1*", ONE_STAR},
+                                                                                                             //          {"all", ALL} }},
+                                                                                                             // {"1*", { {"phi", ONE_STAR}, 
+                                                                                                             //          {"eps", ONE_STAR},
+                                                                                                             //          {"0", ALL},
+                                                                                                             //          {"1", ONE_STAR},
+                                                                                                             //          {"1*", ONE_STAR},
+                                                                                                             //          {"all", ALL} }},
                                                                                                              {"all", { {"phi", ALL}, 
                                                                                                                       {"eps", ALL},
-                                                                                                                      {"zero", ALL},
-                                                                                                                      {"one", ALL},
-                                                                                                                      {"one*", ALL},
+                                                                                                                      // {"0", ALL},
+                                                                                                                      // {"1", ALL},
+                                                                                                                      // {"1*", ALL},
                                                                                                                       {"all", ALL} }} };
     return m;
 }
@@ -82,7 +81,7 @@ std::unordered_map<std::string, std::unordered_map<std::string, LivenessState> >
 //Operator overloading
 bool Scheme::Demands::operator==(const LivenessState l1, const LivenessState l2)
 {
-	return (l1.idString == l2.idString);
+  return (l1.idString == l2.idString);
 }
 LivenessState LivenessState::operator+(const LivenessState& other)
 {
@@ -91,11 +90,11 @@ LivenessState LivenessState::operator+(const LivenessState& other)
 
 std::unordered_map<std::string, LivenessState> getCatZeroRules()
 {
-    std::unordered_map<std::string, LivenessState> temp = { {"phi", EPSILON},
-                                                                                      {"eps", ZERO},
-                                                                                      {"zero", ALL},
-                                                                                      {"one", ALL},
-                                                                                      {"one*", ALL},
+    std::unordered_map<std::string, LivenessState> temp = { {"phi", PHI},
+                                                                                      {"eps", ALL},
+                                                                                      // {"0", ALL},
+                                                                                      // {"1", ALL},
+                                                                                      // {"1*", ALL},
                                                                                       {"all", ALL} };
     return temp;
 }
@@ -103,11 +102,11 @@ std::unordered_map<std::string, LivenessState> LivenessState::catZeroRules = get
 
 std::unordered_map<std::string, LivenessState> getCatOneRules()
 {
-    std::unordered_map<std::string, LivenessState> temp = { {"phi", EPSILON},
-                                                                                      {"eps", ONE},
-                                                                                      {"zero", ALL},
-                                                                                      {"one", ONE_STAR},
-                                                                                      {"one*", ONE_STAR},
+    std::unordered_map<std::string, LivenessState> temp = { {"phi", PHI},
+                                                                                      {"eps", ALL},
+                                                                                      // {"0", ALL},
+                                                                                      // {"1", ONE_STAR},
+                                                                                      // {"1*", ONE_STAR},
                                                                                       {"all", ALL} };
     return temp;
 }
@@ -117,9 +116,9 @@ std::unordered_map<std::string, LivenessState> getStripZeroRules()
 {
   std::unordered_map<std::string, LivenessState> temp = { {"phi", PHI},
                                                                                       {"eps", PHI},
-                                                                                      {"zero", EPSILON},
-                                                                                      {"one", PHI},
-                                                                                      {"one*", PHI},
+                                                                                      // {"0", EPSILON},
+                                                                                      // {"1", PHI},
+                                                                                      // {"1*", PHI},
                                                                                       {"all", ALL} };
 
   return temp;
@@ -130,9 +129,9 @@ std::unordered_map<std::string, LivenessState> getStripOneRules()
 {
   std::unordered_map<std::string, LivenessState> temp = { {"phi", PHI},
                                                                                       {"eps", PHI},
-                                                                                      {"zero", PHI},
-                                                                                      {"one", EPSILON},
-                                                                                      {"one*", ONE_STAR},
+                                                                                      // {"0", PHI},
+                                                                                      // {"1", EPSILON},
+                                                                                      // {"1*", ONE_STAR},
                                                                                       {"all", ALL} };
 
   return temp;
@@ -166,23 +165,23 @@ LivenessTable::LivenessTable()
 {
     table[PHI] = PHI;
     table[EPSILON] = PHI;
-    table[ZERO] = PHI;
-    table[ONE] = PHI;
-    table[ONE_STAR] = PHI;
+    // table[ZERO] = PHI;
+    // table[ONE] = PHI;
+    // table[ONE_STAR] = PHI;
     table[ALL] = PHI;
 }
 
 LivenessTable::LivenessTable(std::string name, bool self = false): LivenessTable()
 {
-	varName = name;
+  varName = name;
 
   if (self)
   {
     table[PHI] = PHI;
     table[EPSILON] = EPSILON;
-    table[ZERO] = ZERO;
-    table[ONE] = ONE;
-    table[ONE_STAR] = ONE_STAR;
+    // table[ZERO] = ZERO;
+    // table[ONE] = ONE;
+    // table[ONE_STAR] = ONE_STAR;
     table[ALL] = ALL;
   }
 }
@@ -244,13 +243,13 @@ void LivenessTable::doUnion(const LivenessTable& t)
 // Printing demands
 std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessState& l)
 {
-	out<<l.idString;
-	return out;
+  out<<l.idString;
+  return out;
 }
 
 std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessTable& t)
 {
-	out<<"| "<<t.varName;
+  out<<"| "<<t.varName;
   if (t.varName.size() < 7)
     for (int i = 0; i < 7 - t.varName.size(); ++i)
     {
@@ -262,7 +261,7 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessTable
   {
     out<<" "<<i.second<<"\t|";
   }
-	return out;
+  return out;
 }
 
 std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessInformation& l)
@@ -271,7 +270,7 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessInfor
   {
     return out;
   }
-	out<<"| VarName\t|";
+  out<<"| VarName\t|";
   auto iter = l.begin();
 
   for (const auto& i : (iter->second).table)
@@ -279,21 +278,21 @@ std::ostream& Scheme::Demands::operator<<(std::ostream& out, const LivenessInfor
     out<<" "<<boost::to_upper_copy<std::string>(i.first.idString)<<"\t|";
   }
   out<<'\n';
-	for (auto i: l)
-	{
-		out<<i.second<<'\n';
-	}
-	out<<'\n';
-	return out;
+  for (auto i: l)
+  {
+    out<<i.second<<'\n';
+  }
+  out<<'\n';
+  return out;
 }
 
 std::ostream& Scheme::Demands::operator<<(std::ostream& out, const ProgramLiveness& l)
 {
-	for (auto i: l)
-	{
-		out<<"For program point: "<<i.first<<'\n';
-		out<<i.second;
-	}
+  for (auto i: l)
+  {
+    out<<"For program point: "<<i.first<<'\n';
+    out<<i.second;
+  }
 
   return out;
 }
@@ -411,9 +410,10 @@ bool Scheme::Demands::operator==(const LivenessInformation& l1, const LivenessIn
 
 // int main()
 // {
-// 	std::cout<<"Testing!\n";
-// 	std::cout<<PHI + ALL<<'\n';
-// 	std::cout<<ONE_STAR<<'\n';
-// 	LivenessInformation l1, l2;
-// 	doUnion(l1, l2);
+//  std::cout<<"Testing!\n";
+//  std::cout<<PHI + ALL<<'\n';
+//  std::cout<<ONE_STAR<<'\n';
+//  LivenessInformation l1, l2;
+//  doUnion(l1, l2);
 // }
+

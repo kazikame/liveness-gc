@@ -17,27 +17,7 @@ Scheme::SchemeDriver::SchemeDriver()
 
 Scheme::SchemeDriver::~SchemeDriver()
 {
-	// if (program)
-	// 	delete(program);
-	// if (anf_program)
-	// 	delete(anf_program);
-	// if (program_grammars)
-	// {
-	// 	if (program_grammars->second)
-	// 		delete(program_grammars->second);
-	// 	if (program_grammars->first)
-	// 		delete(program_grammars->first);
- //    delete(program_grammars);
-	// }
-	// if (combined_grammar)
-	// 	delete(combined_grammar);
-	// if (approx_grammar)
-	// 	delete(approx_grammar);
 
-	// if(scanner)
-	// 	delete(scanner);
-	// if (parser)
-	// 	delete(parser);
 }
 
 std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
@@ -80,22 +60,19 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
     anf_program = program->getANF();
     anf_program->doLabel(true);
 
-    // Added by Saksham
+    // auto revCallGraph = anf_program->makeRevCallGraph();
 
-    auto revCallGraph = anf_program->makeRevCallGraph();
-
-    cout<<"\n\nPrinting the reverse call graph:-\n\n";
-    for (auto i : revCallGraph)
-    {
-        cout<<i.first<<": ";
-        for (auto j : i.second)
-        {
-            cout<<j<<", ";
-        }
-        cout<<'\n';
-    }
-    cout<<"\n\n";
-    // Added by Saksham
+    // cout<<"\n\nPrinting the reverse call graph:-\n\n";
+    // for (auto i : revCallGraph)
+    // {
+    //     cout<<i.first<<": ";
+    //     for (auto j : i.second)
+    //     {
+    //         cout<<j<<", ";
+    //     }
+    //     cout<<'\n';
+    // }
+    // cout<<"\n\n";
 
     string inputfilename(infilename);
     string inputfilepath = inputfilename.substr(0, inputfilename.find_last_of("/") + 1);
@@ -103,7 +80,7 @@ std::pair<bool, long> Scheme::SchemeDriver::parse(const char * infilename)
     inputfilename = inputfilepath + "anf_" + inputfilename;
     cout << "The anf file is being written to  " << inputfilename << endl;
     ofstream anf_file(inputfilename);
-    //anf_program->print(anf_file, 0, true, false, Scheme::output::SCHEME);
+    anf_program->print(anf_file, 0, true, false, Scheme::output::SCHEME);
     anf_file.close();
 
     gettimeofday(&end, NULL);
@@ -120,15 +97,8 @@ long Scheme::SchemeDriver::process()
 
     program->doLabel(true);
     anf_program->doLabel(true);
+    Scheme::AST::revCallGraph = anf_program->makeRevCallGraph();
     program_grammars = anf_program->transformDemand();
-
-    // combined_grammar = Scheme::Demands::solve_functions_and_combine(program_grammars);
-    // combined_grammar->emplace("D/all", Scheme::Demands::rule({{Scheme::Demands::T0, "D/all"},
-    //     {Scheme::Demands::T1, "D/all"},
-    //     {Scheme::Demands::E}
-    // }));
-    // //Scheme::output::dumpGrammar(cout, combined_grammar);
-    //approx_grammar = Scheme::Demands::regularize(combined_grammar);
 
     gettimeofday(&end, NULL);
 
