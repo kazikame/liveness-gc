@@ -1,33 +1,37 @@
 # README #
 
-This README would normally document whatever steps are necessary to get your application up and running.
+Liveness based GC with restricted lattice of demands.
 
+## Pre-req ##
 
-Download and read **plan-for-liveNstrict.xoj**
+1. boost
+2. bison
+3. flex
 
+Tested on Ubuntu 16.04(xenial) /18.04(bionic)
 
-### What is this repository for? ###
+## Build ##
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+```bash
+cd eager-lgc/src
+make -j<no-of-cores> <task>
+```
 
-### How do I get set up? ###
+The valid \<task\> are:
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
+1. `Simulator` - Default lattice
+2. `Simulator_simple` - Simple lattice
+3. `Simulator_diff` - Comprehensive lattice
 
-### Contribution guidelines ###
+For more details, check the report
 
-* Writing tests
-* Code review
-* Other guidelines
+## Run ##
 
-### Who do I talk to? ###
+```bash
+./<task> <filename.scm> <heap-size> <type>
+```
 
-* Repo owner or admin
-* Other community or team contact
+Types:
+
+1. `gc-live`
+2. `gc-plain`
