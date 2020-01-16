@@ -474,7 +474,7 @@ char locate_var(const char *var)
 		++its;
 	}
 
-	cout << "Element "<< var <<" not found." << endl;
+	// cout << "Element "<< var <<" not found." << endl;
 	return 'n'; /*Element not found.*/
 }
 

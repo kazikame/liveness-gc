@@ -28,8 +28,6 @@ ProgramNode* pgm;
 unsigned long lbl_count = 0;
 map< string, vector<ExprNode*>> func_call_points;
 
-
-// Added by Saksham
 // REVERSED CALL GRAPH FUNCTION
 
 unordered_map<string, EdgeSet> ProgramNode::makeRevCallGraph()
@@ -88,7 +86,6 @@ EdgeSet ExprNode::dependentFunctions(EdgeSet& s)
 	return s;
 }
 
-// Added by Saksham
 
 //OLD CODE BEGINS HERE
 void print_arg_type(resType r)
@@ -146,13 +143,18 @@ resultValue::resultValue(resType t, bool v)
 }
 resultValue::resultValue(resType t, string *v)
 {
-	assert(t==stringType);
+	// CAN BE stringType OR funcType
+	// assert(t==stringType);
 	type = t;
 	this->val.stringVal = v;
 }
 resultValue::resultValue(resType t, void* v)
 {
-	assert(t==heap);
+	// if (t == funcType) {
+	// 	cout << "FuncType found in heap \n";
+	// }
+	// cout << t << '\n';
+	// assert(t==heap);
 	type = t;
 	this->val.addrVal = v;
 }
@@ -221,6 +223,10 @@ resultValue IdExprNode::evaluate()
 		return resultValue(boolType, (bool)lookup_value(varName.c_str()));
 	else if (resultValueType == 's')
 		return resultValue(stringType, (string*)lookup_value(varName.c_str()));
+	else if (resultValueType == 'f')	// Local function as a variable
+		return resultValue(funcType, (string*)lookup_value(varName.c_str()));
+	else if (pgm->getFunction(varName))	// Global function
+		return resultValue(funcType, (string*)this->pID);
 	else
 		return resultValue(errorType, (void*)NULL);
 }
@@ -983,7 +989,13 @@ FuncExprNode * FuncExprNode::clone() const {
 
 std::string FuncExprNode::getFunction()
 {
-	return this->pID->getName();
+	auto result = this->pID->evaluate();
+	// if (result.type == errorType) {
+	// 	return this->pID->getName();
+	// }
+	// else {
+	return *(result.val.stringVal);
+	// }
 }
 
 
@@ -1035,6 +1047,7 @@ resultValue FuncExprNode::evaluate()
 		break;
 		case stringType : make_reference_value((funcDef->getArgs()[i]).c_str(), char_to_void(arg->val.stringVal), 's');
 		break;
+		case funcType : make_reference_value((funcDef->getArgs()[i]).c_str(), char_to_void(arg->val.stringVal), 'f');
 		default : make_reference_addr((funcDef->getArgs()[i]).c_str(), arg->val.addrVal);
 		break;
 		}
@@ -1168,7 +1181,13 @@ resultValue ProgramNode::evaluate()
 Node* ProgramNode::getFunction(std::string funcName)
 {
 	//cout << "Looking for function " << funcName << endl;
-	return this->funcmap[funcName];
+	auto ite = this->funcmap.find(funcName);
+	if (ite != this->funcmap.end()) {
+		return ite->second;
+	}
+	else {
+		return nullptr;
+	}
 }
 
 void ProgramNode::doLivenessAnalysis()

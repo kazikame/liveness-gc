@@ -53,7 +53,7 @@ enum exprType
 	defaultType
 };
 
-enum resType {heap, stringType, intType, boolType, errorType};
+enum resType {heap, stringType, intType, boolType, errorType, funcType};
 
 //class resultValue
 //{
